@@ -16,6 +16,7 @@ import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
 import { DEFAULT_ERC_CHAIN_INFO } from 'constants/index';
 import { switchChain } from 'utils/network';
 import { sleep } from 'utils';
+import { isPortkey } from 'utils/portkey';
 export default function WalletList() {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
@@ -65,6 +66,11 @@ export default function WalletList() {
           const option = SUPPORTED_WALLETS[key];
           const isStringConnector = typeof option.connector === 'string';
           const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
+
+          if (isPortkey() && isStringChain) {
+            return option.connector === 'PORTKEY';
+          }
+
           return isStringConnector ? isStringChain : !isStringChain;
         })
         .map((key) => {
