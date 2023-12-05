@@ -5,14 +5,13 @@ import { useWalletActions } from 'contexts/useWallet/hooks';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import Change from 'assets/images/change.svg';
 import styles from './styles.module.less';
-const time = 500;
 export default function ChangeIcon() {
   const { dispatch } = useWalletActions();
   const onChange = useDebounceCallback(() => {
     dispatch(changeWallet());
     setTimeout(() => {
       dispatch(changeEnd());
-    }, time);
+    }, 0);
   }, [dispatch, changeWallet]);
   return (
     <div className={clsx('flex-center', styles['change-body'])}>
