@@ -1,8 +1,10 @@
 import { Checkbox, Input, Row } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import CommonPopover from 'components/CommonPopover';
 import type { InputProps } from 'antd';
 import { useLanguage } from 'i18n';
 import { useMemo, useState } from 'react';
+import QuestionCircleOutlined from '@ant-design/icons/QuestionCircleOutlined';
 import clsx from 'clsx';
 import styles from './styles.module.less';
 import useMediaQueries from 'hooks/useMediaQueries';
@@ -35,7 +37,7 @@ export default function CheckBoxInputRow({
 
   return (
     <div className={styles['check-input']}>
-      <Row>
+      <Row align="middle">
         <Checkbox
           className={styles['check-box']}
           checked={checked}
@@ -47,6 +49,9 @@ export default function CheckBoxInputRow({
             {t("Initiate cross-chain transfer to the recipient's address")}
           </span>
         </Checkbox>
+        <CommonPopover className="cursor-pointer" content="Your funds will be transferred to this address.">
+          <QuestionCircleOutlined className={styles['help-icon']} />
+        </CommonPopover>
       </Row>
       {checked && (
         <Row>
