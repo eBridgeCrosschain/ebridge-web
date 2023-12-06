@@ -1,12 +1,11 @@
-import { Input, Row } from 'antd';
+import { Input, Row, Empty } from 'antd';
 import clsx from 'clsx';
 import CommonModal from 'components/CommonModal';
-import IconFont from 'components/IconFont';
 import TokenLogo from 'components/TokenLogo';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { CurrentWhitelistItem, useCurrentWhitelist } from 'hooks/whitelist';
 import { useLanguage } from 'i18n';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useHomeContext } from '../HomeContext';
 import { setSelectModal, setAddModal, setSelectToken, homeModalDestroy } from '../HomeContext/actions';
@@ -19,48 +18,56 @@ function SelectToken() {
   const [value, setValue] = useState<string>();
   const allWhitelist = useCurrentWhitelist();
   const { t } = useLanguage();
-  const onSearch = useCallback(() => {
-    if (value === undefined) return;
+
+  const onSearchToken = (keyword = '') => {
+    if (keyword === undefined) return;
     setSearchList(
       allWhitelist.filter((i) => {
-        return typeof value === 'string' && i.symbol.toUpperCase().includes(value.toUpperCase());
+        return typeof keyword === 'string' && i.symbol.toUpperCase().includes(keyword.trim().toUpperCase());
       }),
     );
-  }, [allWhitelist, value]);
+  };
+
   useEffect(() => {
-    if (value === '') onSearch();
-  }, [onSearch, value]);
+    if (value === '') onSearchToken(value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allWhitelist]);
   return (
     <>
       <Input
         allowClear
         value={value}
         onChange={(e) => {
+          onSearchToken(e.target.value);
           setValue(e.target.value);
         }}
-        onPressEnter={onSearch}
         className={styles['input-search']}
         placeholder={t('Select a token')}
-        suffix={<IconFont onClick={onSearch} className="cursor-pointer" type="Icon-search" />}
       />
       <div className={clsx({ [styles['token-list']]: true, [styles['token-list-add']]: isHomogeneous && account })}>
-        {(searchList || allWhitelist).map((i, k) => {
-          return (
-            <Row
-              onClick={() => {
-                dispatch(setSelectToken(i));
-                dispatch(homeModalDestroy());
-              }}
-              key={k}
-              className={clsx('cursor-pointer', {
-                [styles['token-item']]: true,
-                [styles['token-item-selected']]: i.symbol === selectToken?.symbol,
-              })}>
-              <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={i.symbol} />
-              {i.symbol}
-            </Row>
-          );
-        })}
+        {(searchList || allWhitelist).length > 0 ? (
+          (searchList || allWhitelist).map((i, k) => {
+            return (
+              <Row
+                onClick={() => {
+                  dispatch(setSelectToken(i));
+                  dispatch(homeModalDestroy());
+                }}
+                key={k}
+                className={clsx('cursor-pointer', {
+                  [styles['token-item']]: true,
+                  [styles['token-item-selected']]: i.symbol === selectToken?.symbol,
+                })}>
+                <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={i.symbol} />
+                {i.symbol}
+              </Row>
+            );
+          })
+        ) : (
+          <div className={styles['empty-container']}>
+            <Empty />
+          </div>
+        )}
       </div>
       {isHomogeneous && account && (
         <div className={styles['bottom-row']}>
