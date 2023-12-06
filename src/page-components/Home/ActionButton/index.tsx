@@ -66,6 +66,27 @@ function Actions() {
   const [limitAmountModal, checkLimitAndRate] = useLimitAmountModal();
 
   const { checkPortkeyConnect } = useCheckPortkeyStatus();
+  const fetchELFToken = async (metaMaskAddress?: string) => {
+    const provider = window.ethereum;
+    try {
+      if (provider?.request) {
+        await provider?.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: metaMaskAddress,
+              symbol: 'ELF',
+              decimals: 8,
+              image: 'https://raw.githubusercontent.com/VadimMalykhin/binance-icons/main/crypto/elf.svg',
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error, '======error');
+    }
+  };
 
   const onCrossChainReceive = useLockCallback(async () => {
     if (!receiveItem) return CommonMessage.error(t('record does not exist'));
@@ -343,6 +364,16 @@ function Actions() {
           }
         }
       }
+    }
+    if (fromWallet?.walletType === 'ERC' && toWallet?.walletType === 'PORTKEY') {
+      onClick = () => fetchELFToken(fromWallet?.account);
+      disabled = false;
+      return { children, onClick, disabled };
+    }
+    if (toWallet?.walletType === 'ERC' && fromWallet?.walletType === 'PORTKEY') {
+      onClick = fetchELFToken(toWallet?.account);
+      disabled = false;
+      return { children, onClick, disabled };
     }
     return { children, disabled, onClick };
   }, [
