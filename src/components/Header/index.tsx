@@ -1,4 +1,5 @@
 import styles from './styles.module.less';
+import CloseOutlined from '@ant-design/icons/CloseOutlined';
 import logo from './images/logo.svg';
 import testLogo from './images/testLogo.svg';
 import clsx from 'clsx';
@@ -54,8 +55,9 @@ function MDHeader({ selectedHref }: { selectedHref: string[] }) {
         width={'80%'}
         closable={false}
         onClose={() => setVisible(false)}
-        visible={visible}>
-        <CommonImage src={logo} className={styles['drawer-logo']} />
+        title={<CommonImage src={logo} className={styles['drawer-logo']} />}
+        visible={visible}
+        extra={<CloseOutlined onClick={() => setVisible(false)} className={styles['close-icon-header-menu']} />}>
         {navList.map(({ title, href }, k) => (
           <div
             className={clsx('flex-row-between', 'flex-row-center', 'cursor-pointer', styles['mobile-button'], {
