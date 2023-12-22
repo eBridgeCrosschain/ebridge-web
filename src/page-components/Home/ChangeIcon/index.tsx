@@ -9,9 +9,7 @@ export default function ChangeIcon() {
   const { dispatch } = useWalletActions();
   const onChange = useThrottleCallback(() => {
     dispatch(changeWallet());
-    setTimeout(() => {
-      dispatch(changeEnd());
-    }, 0);
+    dispatch(changeEnd());
   }, [dispatch, changeWallet]);
   return (
     <div className={clsx('flex-center', styles['change-body'])}>
