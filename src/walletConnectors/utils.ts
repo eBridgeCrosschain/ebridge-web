@@ -1,10 +1,12 @@
 import { Connector } from '@web3-react/types';
+// import { useTronWeb } from '@tronlink/react';
 import {
   coinbaseWalletConnection,
   ConnectionType,
   injectedConnection,
   networkConnection,
   walletConnectConnection,
+  tronLinkWalletConnection,
 } from '.';
 
 export function getIsInjected(): boolean {
@@ -19,7 +21,17 @@ export function getIsCoinbaseWallet(): boolean {
   return window.ethereum?.isCoinbaseWallet ?? false;
 }
 
-const CONNECTIONS = [injectedConnection, coinbaseWalletConnection, walletConnectConnection, networkConnection];
+export function getIsTronLink(): boolean {
+  return Boolean(window?.tronWeb?.isTronLink);
+}
+
+const CONNECTIONS = [
+  injectedConnection,
+  coinbaseWalletConnection,
+  walletConnectConnection,
+  networkConnection,
+  tronLinkWalletConnection,
+];
 export function getConnection(c: Connector | ConnectionType) {
   if (c instanceof Connector) {
     const connection = CONNECTIONS.find((connection) => connection.connector === c);
@@ -37,6 +49,8 @@ export function getConnection(c: Connector | ConnectionType) {
         return walletConnectConnection;
       case ConnectionType.NETWORK:
         return networkConnection;
+      case ConnectionType.TRON_LINK:
+        return tronLinkWalletConnection;
     }
   }
 }
@@ -51,5 +65,7 @@ export function getConnectionName(connectionType: ConnectionType, isMetaMask?: b
       return 'WalletConnect';
     case ConnectionType.NETWORK:
       return 'Network';
+    case ConnectionType.TRON_LINK:
+      return 'TronLink';
   }
 }
