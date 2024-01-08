@@ -9,7 +9,7 @@ import { setFromWallet, setToWallet } from 'contexts/useWallet/actions';
 import { useWalletActions } from 'contexts/useWallet/hooks';
 import { usePortkey, useWeb3 } from 'hooks/web3';
 import { memo, useCallback, useMemo } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { ChainType, NetworkType, Web3Type } from 'types';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
@@ -29,6 +29,7 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
   const portkeyWallet = usePortkey();
   const [{ selectELFWallet }] = useChain();
   const modalDispatch = useModalDispatch();
+  const { t } = useTranslation();
 
   const renderRightBtn = useMemo(() => {
     if (account && isPortkey() && isELFChain(chainId)) {
@@ -67,12 +68,12 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
                 }),
               )
             }>
-            <Trans>Connect</Trans>
+            <Trans t={t}>Connect</Trans>
           </Button>
         )}
       </>
     );
-  }, [account, chainId, chainType, connector, modalDispatch, wallet?.walletType]);
+  }, [account, chainId, chainType, connector, modalDispatch, t, wallet?.walletType]);
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
       const _wallet = portkeyWallet;
