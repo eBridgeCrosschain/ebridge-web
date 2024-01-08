@@ -1,5 +1,5 @@
 export const CHAIN_INFO = {
-  chainId: 3,
+  chainId: 3448148188,
   exploreUrl: 'https://nile.tronscan.org/',
   rpcUrl: 'https://api.nileex.io',
   chainName: 'TRON Nile Testnet',
@@ -8,7 +8,7 @@ export const CHAIN_INFO = {
     symbol: 'nTRX',
     decimals: 6,
   },
-  iconUrls: ['https://etherscan.io/token/images/bnb_28_2.png'], // TODO
+  iconUrls: ['https://etherscan.io/token/images/trontrx_32.png'], // TODO
   rpcUrls: ['https://api.nileex.io'],
   blockExplorerUrls: ['https://nile.tronscan.org/'],
 };

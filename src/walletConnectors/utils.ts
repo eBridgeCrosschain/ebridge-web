@@ -1,5 +1,5 @@
+// import { tronWeb } from "tronweb";
 import { Connector } from '@web3-react/types';
-// import { useTronWeb } from '@tronlink/react';
 import {
   coinbaseWalletConnection,
   ConnectionType,
@@ -22,7 +22,8 @@ export function getIsCoinbaseWallet(): boolean {
 }
 
 export function getIsTronLink(): boolean {
-  return Boolean(window?.tronWeb?.isTronLink);
+  // console.log("Window Object ******* ", window.ethereum);
+  return Boolean(window.tronLink);
 }
 
 const CONNECTIONS = [

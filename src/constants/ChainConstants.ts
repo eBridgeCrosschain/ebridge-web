@@ -1,11 +1,15 @@
 import { AelfInstancesKey, ChainType, Web3Type } from 'types';
 import type { provider } from 'web3-core';
+import { SupportedChainId } from './chain';
 import {
   ACTIVE_CHAIN,
   ChainConstantsType,
   ERC_CHAIN_TYPE,
+  TRC_CHAIN_TYPE,
   DEFAULT_ERC_CHAIN,
+  DEFAULT_TRC_CHAIN,
   SupportedERCChain,
+  SupportedTRCChain,
   SupportedELFChain,
 } from '.';
 
@@ -50,6 +54,44 @@ export class ERCChainConstants extends ChainConstants {
     ERCChainConstants['chainId'] = attrs?.CHAIN_INFO.chainId;
   }
 }
+
+function getChainId() {
+  if (!window.tronWeb) return undefined;
+  const host = window.tronWeb.fullNode.host;
+
+  if (host.includes('api.trongrid')) {
+    return SupportedChainId.TRON_MAINNET;
+    // } else if (host.includes('api.tronstack')) {
+    //   return tronChainId
+  } else if (host.includes('api.shasta')) {
+    return SupportedChainId.TRON_SHASTA_TESTNET;
+  } else if (host.includes('api.nile')) {
+    return SupportedChainId.TRON_NILE_TESTNET;
+  }
+}
+
+export class TRCChainConstants extends ChainConstants {
+  static constants: Constants = SupportedTRCChain[DEFAULT_TRC_CHAIN];
+  static chainType: ChainType = 'TRC';
+  static library?: provider;
+  constructor(id: number | string, library?: provider) {
+    super(id);
+    TRCChainConstants['library'] = library;
+    this.setStaticAttrs();
+  }
+  setStaticAttrs() {
+    const chainId = (this.id || getChainId()) as TRC_CHAIN_TYPE;
+    let attrs;
+    if (ACTIVE_CHAIN[chainId]) {
+      attrs = SupportedTRCChain[chainId];
+    } else {
+      attrs = SupportedTRCChain[DEFAULT_ERC_CHAIN];
+    }
+    TRCChainConstants['constants'] = attrs;
+    TRCChainConstants['chainId'] = attrs?.CHAIN_INFO.chainId;
+  }
+}
+
 export class ELFChainConstants extends ChainConstants {
   static chainType: ChainType = 'ELF';
   static aelfInstances?: Web3Type['aelfInstances'];

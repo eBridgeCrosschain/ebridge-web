@@ -1,5 +1,5 @@
 export const CHAIN_INFO = {
-  chainId: 1,
+  chainId: 728126428,
   exploreUrl: 'https://tronscan.io/',
   rpcUrl: 'https://api.trongrid.io',
   chainName: 'TRON Mainnet',
@@ -8,7 +8,7 @@ export const CHAIN_INFO = {
     symbol: 'TRX',
     decimals: 6,
   },
-  iconUrls: ['https://etherscan.io/token/images/bnb_28_2.png'], //TODO
+  iconUrls: ['https://etherscan.io/token/images/trontrx_32.png'], //TODO
   rpcUrls: ['https://api.trongrid.io'],
   blockExplorerUrls: ['https://tronscan.io/'],
 };

@@ -8,7 +8,7 @@ import type { Connector } from '@web3-react/types';
 import { Accounts } from '@portkey/provider-types';
 
 export type ChainId = keyof typeof CHAIN_NAME;
-export type ChainType = 'ERC' | 'ELF';
+export type ChainType = 'ERC' | 'ELF' | 'TRC';
 
 export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC';
 

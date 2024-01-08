@@ -2,18 +2,26 @@ import * as AELF_Test from './AELF';
 import * as tDVV_Test from './tDVV';
 import * as BSC_TESTNET from './BSC_Test';
 import * as SEPOLIA from './sepolia';
+import * as TRON_NILE_TESTNET from './tron_nile_testnet';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 import { SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
-export type ChainConstantsType = typeof AELF_Test | typeof tDVV_Test | typeof SEPOLIA | typeof BSC_TESTNET;
+export type ChainConstantsType =
+  | typeof AELF_Test
+  | typeof tDVV_Test
+  | typeof SEPOLIA
+  | typeof BSC_TESTNET
+  | typeof TRON_NILE_TESTNET;
 
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
+export type TRC_CHAIN_TYPE = keyof typeof SupportedTRCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
 
 export const DEFAULT_ELF_CHAIN = SupportedELFChainId.AELF;
 export const DEFAULT_ERC_CHAIN = SupportedChainId.SEPOLIA;
+export const DEFAULT_TRC_CHAIN = SupportedChainId.TRON_NILE_TESTNET;
 
 export const DEFAULT_MODAL_INITIAL_STATE = {
   fromOptions: { chainType: 'ERC', chainId: DEFAULT_ERC_CHAIN },
@@ -23,7 +31,14 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedChainId.BSC_TESTNET]: BSC_TESTNET,
   [SupportedChainId.SEPOLIA]: SEPOLIA,
 };
+
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
+
+export const SupportedTRCChain: { [k: string | number]: ChainConstantsType } = {
+  [SupportedChainId.TRON_NILE_TESTNET]: TRON_NILE_TESTNET,
+};
+
+export const DEFAULT_TRC_CHAIN_INFO = SupportedTRCChain[DEFAULT_TRC_CHAIN].CHAIN_INFO;
 
 export const SupportedELFChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedELFChainId.AELF]: AELF_Test,
@@ -35,8 +50,9 @@ export const ACTIVE_CHAIN: any = {
   [SupportedELFChainId.tDVV]: true,
   [SupportedChainId.BSC_TESTNET]: true,
   [SupportedChainId.SEPOLIA]: true,
+  [SupportedChainId.TRON_NILE_TESTNET]: true,
 };
-export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
+export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB', 'TRX'];
 
 export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
   [SupportedChainId.MAINNET]: 'Ethereum',
@@ -50,6 +66,9 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedChainId.OEC_TESTNET]: 'OEC Testnet',
   [SupportedChainId.POLYGON_MAINNET]: 'Polygon',
   [SupportedChainId.POLYGON_TESTNET]: 'Polygon Testnet',
+  [SupportedChainId.TRON_MAINNET]: 'Tron Mainnet',
+  [SupportedChainId.TRON_SHASTA_TESTNET]: 'Tron Shasta Testnet',
+  [SupportedChainId.TRON_NILE_TESTNET]: 'Tron Nile Testnet',
   [SupportedELFChainId.AELF]: 'MainChain AELF Testnet',
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
@@ -103,6 +122,15 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
     // type: 'SEPOLIA',
     type: 'Ethereum',
   },
+  [SupportedChainId.TRON_MAINNET]: {
+    type: 'Tron',
+  },
+  [SupportedChainId.TRON_SHASTA_TESTNET]: {
+    type: 'Tron',
+  },
+  [SupportedChainId.TRON_NILE_TESTNET]: {
+    type: 'Tron',
+  },
 };
 
 export const NetworkList = [
@@ -123,6 +151,11 @@ export const NetworkList = [
     title: CHAIN_NAME[SupportedChainId.BSC_TESTNET],
     icon: CHAIN_ICON[SupportedChainId.BSC_TESTNET],
     info: BSC_TESTNET.CHAIN_INFO,
+  },
+  {
+    title: CHAIN_NAME[SupportedChainId.TRON_NILE_TESTNET],
+    icon: CHAIN_ICON[SupportedChainId.TRON_NILE_TESTNET],
+    info: TRON_NILE_TESTNET.CHAIN_INFO,
   },
 ] as unknown as NetworkType[];
 
@@ -146,6 +179,12 @@ export const FormatTokenList = [
     fromSymbol: 'WETH',
     toSymbol: 'ETH',
   },
+  {
+    fromChainId: [SupportedChainId.TRON_NILE_TESTNET],
+    toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
+    fromSymbol: 'WTRX',
+    toSymbol: 'TRX',
+  },
 ];
 
 export const CrossChainTimeList = [
@@ -161,6 +200,11 @@ export const CrossChainTimeList = [
   },
   {
     fromChainId: SupportedChainId.SEPOLIA,
+    toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
+    time: '500s',
+  },
+  {
+    fromChainId: SupportedChainId.TRON_NILE_TESTNET,
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     time: '500s',
   },

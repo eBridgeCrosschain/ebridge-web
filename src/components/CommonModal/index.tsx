@@ -39,7 +39,7 @@ export default function CommonModal(
         <Row justify="space-between">
           {leftCallBack || leftElement ? (
             <Col className="common-modal-left-icon" flex={1} onClick={leftCallBack}>
-              {leftElement || <LeftOutlined />}
+              {leftElement || <LeftOutlined rev={'left'} />}
             </Col>
           ) : null}
           <Col flex={2} style={{ textAlign: 'center' }}>

@@ -52,6 +52,9 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedChainId.OEC_TESTNET]: 'OEC Testnet',
   [SupportedChainId.POLYGON_MAINNET]: 'Polygon',
   [SupportedChainId.POLYGON_TESTNET]: 'Polygon Testnet',
+  [SupportedChainId.TRON_MAINNET]: 'Tron Mainnet',
+  [SupportedChainId.TRON_SHASTA_TESTNET]: 'Tron Shasta Testnet',
+  [SupportedChainId.TRON_NILE_TESTNET]: 'Tron Nile Testnet',
   [SupportedELFChainId.AELF]: 'MainChain AELF Mainnet',
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Mainnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Mainnet',
@@ -104,6 +107,15 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedChainId.SEPOLIA]: {
     // type: 'SEPOLIA',
     type: 'Ethereum',
+  },
+  [SupportedChainId.TRON_MAINNET]: {
+    type: 'Tron',
+  },
+  [SupportedChainId.TRON_SHASTA_TESTNET]: {
+    type: 'Tron',
+  },
+  [SupportedChainId.TRON_NILE_TESTNET]: {
+    type: 'Tron',
   },
 };
 

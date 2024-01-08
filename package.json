@@ -19,6 +19,7 @@
     "@aelf-react/types": "^0.1.10",
     "@ant-design/icons": "^4.7.0",
     "@apollo/client": "^3.7.3",
+    "@mohit6b/tron-link": "^8.2.2",
     "@portkey/detect-provider": "^1.0.1",
     "@portkey/onboarding": "^1.5.0-alpha.6",
     "@portkey/provider-types": "^1.0.1",

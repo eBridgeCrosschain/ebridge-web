@@ -1,4 +1,4 @@
-import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
+import { ELFChainConstants, ERCChainConstants, TRCChainConstants } from 'constants/ChainConstants';
 import { ZERO } from 'constants/misc';
 import { useAElf, useWeb3 } from 'hooks/web3';
 import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
@@ -38,6 +38,10 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     initialized(chainId, library);
   }, [chainId, library]);
   useMemo(() => {
+    if (!chainId) return;
+    initializedTron(chainId, library);
+  }, [chainId, library]);
+  useMemo(() => {
     initializedELF(aelfChainId || '', aelfInstances);
   }, [aelfChainId, aelfInstances]);
 
@@ -74,6 +78,10 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 }
 function initialized(chainId: number | string, library?: provider) {
   new ERCChainConstants(chainId, library);
+}
+
+function initializedTron(chainId: number | string, library?: provider) {
+  new TRCChainConstants(chainId, library);
 }
 
 function initializedELF(chainId: number | string, aelfInstances?: Web3Type['aelfInstances']) {

@@ -39,9 +39,9 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   },
   TRON_LINK: {
     connector: tronLink,
-    name: 'TRON LINK',
-    iconType: 'tron link',
-    description: 'tron link description',
+    name: 'TRONLINK',
+    iconType: 'tronlink',
+    description: 'TRONLINK',
     href: null,
   },
 };

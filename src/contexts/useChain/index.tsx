@@ -3,9 +3,9 @@ import { BasicActions } from 'contexts/utils';
 import useStorageReducer from 'hooks/useStorageReducer';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import { eventBus } from 'utils';
-import { ChainActions, ChainState, setUserELFChainId, setUserERCChainId } from './actions';
+import { ChainActions, ChainState, setUserELFChainId, setUserERCChainId, setUserTRCChainId } from './actions';
 
-const INITIAL_STATE = { userERCChainId: undefined };
+const INITIAL_STATE = { userERCChainId: undefined, userTRCChainId: undefined };
 
 const ChainContext = createContext<any>([INITIAL_STATE]);
 
@@ -41,6 +41,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const Listeners = useMemo(() => {
     return [
       { eventName: storages.userERCChainId, listener: (id: string) => dispatch(setUserERCChainId(id)) },
+      { eventName: storages.userTRCChainId, listener: (id: string) => dispatch(setUserTRCChainId(id)) },
       { eventName: storages.userELFChainId, listener: (id: string) => dispatch(setUserELFChainId(id)) },
     ];
   }, [dispatch]);

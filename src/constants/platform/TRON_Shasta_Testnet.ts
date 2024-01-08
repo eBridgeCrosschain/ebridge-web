@@ -1,5 +1,5 @@
 export const CHAIN_INFO = {
-  chainId: 2,
+  chainId: 2494104990,
   exploreUrl: 'https://shasta.tronscan.org/',
   rpcUrl: 'https://api.shasta.trongrid.io',
   chainName: 'TRON Shasta Testnet',
@@ -8,7 +8,7 @@ export const CHAIN_INFO = {
     symbol: 'sTRX',
     decimals: 6,
   },
-  iconUrls: ['https://etherscan.io/token/images/bnb_28_2.png'], // TODO
+  iconUrls: ['https://etherscan.io/token/images/trontrx_32.png'],
   rpcUrls: ['https://api.shasta.trongrid.io'],
   blockExplorerUrls: ['https://shasta.tronscan.org/'],
 };

@@ -6,7 +6,7 @@ import { getProvider } from 'utils/provider';
 import { AElfNodes } from 'constants/aelf';
 import { Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
-import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
+import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, DEFAULT_TRC_CHAIN } from 'constants/index';
 import { message } from 'antd';
 import { usePortkeyReact } from 'contexts/usePortkey/provider';
 import { Accounts } from '@portkey/provider-types';
@@ -57,7 +57,7 @@ export function usePortkeyConnect() {
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useWeb3(): Web3Type {
   const web3React = useWeb3React();
-  const [{ userERCChainId }] = useChain();
+  const [{ userERCChainId, userTRCChainId }] = useChain();
   const tmpContext = useMemo(() => {
     const contextNetwork: Web3Type = { ...web3React, accounts: web3React?.accounts as Accounts };
     if (!web3React.account) {
@@ -68,6 +68,8 @@ export function useWeb3(): Web3Type {
           contextNetwork.chainId = chainId.toNumber();
         } else if (userERCChainId) {
           contextNetwork.chainId = userERCChainId;
+        } else if (userTRCChainId) {
+          contextNetwork.chainId = userTRCChainId;
         }
       }
       const provider = getProvider(contextNetwork.chainId);
@@ -81,7 +83,7 @@ export function useWeb3(): Web3Type {
       contextNetwork.library = contextNetwork.provider?.provider;
     }
     return contextNetwork;
-  }, [web3React, userERCChainId]);
+  }, [web3React, userERCChainId, userTRCChainId]);
   return tmpContext;
 }
 
