@@ -8,7 +8,7 @@ export const CHAIN_INFO = {
     symbol: 'nTRX',
     decimals: 6,
   },
-  iconUrls: ['https://etherscan.io/token/images/trontrx_32.png'], // TODO
+  iconUrls: ['https://etherscan.io/token/images/trontrx_32.png'],
   rpcUrls: ['https://api.nileex.io'],
   blockExplorerUrls: ['https://nile.tronscan.org/'],
 };

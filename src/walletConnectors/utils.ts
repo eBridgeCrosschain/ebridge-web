@@ -10,7 +10,7 @@ import {
 } from '.';
 
 export function getIsInjected(): boolean {
-  return Boolean(window.ethereum);
+  return Boolean(window.ethereum || window.tronWeb);
 }
 
 export function getIsMetaMask(): boolean {
@@ -22,8 +22,7 @@ export function getIsCoinbaseWallet(): boolean {
 }
 
 export function getIsTronLink(): boolean {
-  // console.log("Window Object ******* ", window.ethereum);
-  return Boolean(window.tronLink);
+  return Boolean(window.tronWeb);
 }
 
 const CONNECTIONS = [
@@ -56,10 +55,10 @@ export function getConnection(c: Connector | ConnectionType) {
   }
 }
 
-export function getConnectionName(connectionType: ConnectionType, isMetaMask?: boolean) {
+export function getConnectionName(connectionType: ConnectionType, isMetaMask?: boolean, isTronLink?: boolean) {
   switch (connectionType) {
     case ConnectionType.INJECTED:
-      return isMetaMask ? 'MetaMask' : 'Injected';
+      return isMetaMask ? 'MetaMask' : isTronLink ? 'TronLink' : 'Injected';
     case ConnectionType.COINBASE_WALLET:
       return 'Coinbase Wallet';
     case ConnectionType.WALLET_CONNECT:

@@ -14,6 +14,7 @@ import * as BSC from 'constants/platform/BSC';
 import * as TRON_MAINNET from 'constants/platform/TRON_Mainnet';
 import * as TRON_SHASTA_TESTNET from 'constants/platform/TRON_Shasta_Testnet';
 import * as TRON_NILE_TESTNET from 'constants/platform/TRON_Nile_Testnet';
+import * as TRON_DEVNET from 'constants/platform/TRON_Devnet';
 import { DEFAULT_ERC_CHAIN } from 'constants/index';
 
 export const NETWORK_URLS: { [key: number]: string } = {
@@ -24,6 +25,7 @@ export const NETWORK_URLS: { [key: number]: string } = {
   [SupportedChainId.TRON_MAINNET]: TRON_MAINNET.CHAIN_INFO.rpcUrl,
   [SupportedChainId.TRON_SHASTA_TESTNET]: TRON_SHASTA_TESTNET.CHAIN_INFO.rpcUrl,
   [SupportedChainId.TRON_NILE_TESTNET]: TRON_NILE_TESTNET.CHAIN_INFO.rpcUrl,
+  [SupportedChainId.TRON_DEVNET]: TRON_DEVNET.CHAIN_INFO.rpcUrl,
 };
 export enum ConnectionType {
   INJECTED = 'INJECTED',
@@ -109,7 +111,10 @@ export const [tronLink, tronLinkHooks] = initializeConnector<TronLink>(
     new TronLink({
       actions,
       options: {
-        // TODO: options here
+        // TODO
+        // url: NETWORK_URLS[DEFAULT_ERC_CHAIN],
+        // appName: process.env.NEXT_PUBLIC_PREFIX || 'appName',
+        // reloadOnDisconnect: false,
       },
       onError,
     }),
