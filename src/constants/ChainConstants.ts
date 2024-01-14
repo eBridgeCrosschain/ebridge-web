@@ -61,8 +61,8 @@ function getChainId() {
 
   if (host.includes('api.trongrid')) {
     return SupportedChainId.TRON_MAINNET;
-    // } else if (host.includes('api.tronstack')) {
-    //   return tronChainId
+  } else if (host.includes('https://fb48-202-156-61-238.ngrok-free.app')) {
+    return SupportedChainId.TRON_DEVNET;
   } else if (host.includes('api.shasta')) {
     return SupportedChainId.TRON_SHASTA_TESTNET;
   } else if (host.includes('api.nile')) {

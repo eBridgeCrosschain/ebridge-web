@@ -69,6 +69,7 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedChainId.TRON_MAINNET]: 'Tron Mainnet',
   [SupportedChainId.TRON_SHASTA_TESTNET]: 'Tron Shasta Testnet',
   [SupportedChainId.TRON_NILE_TESTNET]: 'Tron Nile Testnet',
+  [SupportedChainId.TRON_DEVNET]: 'Tron Devnet',
   [SupportedELFChainId.AELF]: 'MainChain AELF Testnet',
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
@@ -129,6 +130,9 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
     type: 'Tron',
   },
   [SupportedChainId.TRON_NILE_TESTNET]: {
+    type: 'Tron',
+  },
+  [SupportedChainId.TRON_DEVNET]: {
     type: 'Tron',
   },
 };

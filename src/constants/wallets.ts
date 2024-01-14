@@ -40,8 +40,8 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   TRON_LINK: {
     connector: tronLink,
     name: 'TRONLINK',
-    iconType: 'tronlink',
+    iconType: 'tronLink',
     description: 'TRONLINK',
-    href: null,
+    href: 'https://lf1-cdn-tos.bytegoofy.com/obj/iconpark/svg_16148_23.0e0b48355a318994ec8af9b76b4de4a8.js',
   },
 };
