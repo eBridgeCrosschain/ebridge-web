@@ -2,6 +2,7 @@ import { Collapse } from 'antd';
 import clsx from 'clsx';
 import IconFont from 'components/IconFont';
 import { useWallet } from 'contexts/useWallet/hooks';
+import { SUPPORTED_TRON_CHAIN_IDS, SUPPORTED_ELF_CHAIN_IDS } from 'constants/chain';
 import { useLanguage } from 'i18n';
 import { useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
@@ -36,9 +37,10 @@ function Heterogeneous() {
     [isHomogeneous, toChainId],
   );
   const time = useMemo(() => getCrossChainTime(fromChainId, toChainId), [toChainId, fromChainId]);
-  return (
-    <>
-      {isHeterogeneousCrossInChain ? (
+
+  const getContent = () => {
+    if (isHeterogeneousCrossInChain) {
+      return (
         <>
           <p>{t('Estimated time of arrival in AELF is', { time })}</p>
           <p>{t('Tokens will arrive automatically after being sent. Please check them in your wallet')}</p>
@@ -52,7 +54,52 @@ function Heterogeneous() {
             </a>
           </p>
         </>
-      ) : (
+      );
+    } else if (
+      SUPPORTED_ELF_CHAIN_IDS.some((item) => item === fromChainId) &&
+      SUPPORTED_TRON_CHAIN_IDS.some((item) => item === toChainId)
+    ) {
+      return (
+        <>
+          <p>{t('Estimated time of arrival is', { time })}</p>
+          <p>
+            {t(
+              "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the 'To' wallet, and select the 'Receipt ID' to receive the token. This will incur transaction fees on <Chain Name, e.g. Shasta> so the recipient should ensure there a sufficient balance to pay for the fees.",
+            )}
+          </p>
+          <p>
+            <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
+              {t('eBridge limit rules')}
+            </a>
+          </p>
+        </>
+      );
+    } else if (
+      SUPPORTED_ELF_CHAIN_IDS.some((item) => item === toChainId) &&
+      SUPPORTED_TRON_CHAIN_IDS.some((item) => item === fromChainId)
+    ) {
+      return (
+        <>
+          <p>{t('Estimated time of arrival is', { time })}</p>
+          <p>
+            {t(
+              'You only need to pay for transaction fees generated on <Chain Name, e.g. Shasta> as fees on aelf will be covered by eBridge.',
+            )}
+          </p>
+          <p>
+            {t(
+              "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.",
+            )}
+          </p>
+          <p>
+            <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
+              {t('eBridge limit rules')}
+            </a>
+          </p>
+        </>
+      );
+    } else {
+      return (
         <>
           <p>
             {t(
@@ -66,9 +113,11 @@ function Heterogeneous() {
             </a>
           </p>
         </>
-      )}
-    </>
-  );
+      );
+    }
+  };
+
+  return <>{getContent()};</>;
 }
 
 export default function Notice() {

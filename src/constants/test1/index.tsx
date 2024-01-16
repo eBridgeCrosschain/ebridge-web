@@ -124,16 +124,16 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
     type: 'Ethereum',
   },
   [SupportedChainId.TRON_MAINNET]: {
-    type: 'Tron',
+    type: 'tronLink',
   },
   [SupportedChainId.TRON_SHASTA_TESTNET]: {
-    type: 'Tron',
+    type: 'tronLink',
   },
   [SupportedChainId.TRON_NILE_TESTNET]: {
-    type: 'Tron',
+    type: 'tronLink',
   },
   [SupportedChainId.TRON_DEVNET]: {
-    type: 'Tron',
+    type: 'tronLink',
   },
 };
 
@@ -211,6 +211,26 @@ export const CrossChainTimeList = [
     fromChainId: SupportedChainId.TRON_NILE_TESTNET,
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     time: '500s',
+  },
+  {
+    fromChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
+    toChainId: [
+      SupportedChainId.TRON_DEVNET,
+      SupportedChainId.TRON_MAINNET,
+      SupportedChainId.TRON_NILE_TESTNET,
+      SupportedChainId.TRON_SHASTA_TESTNET,
+    ],
+    time: '10 minutes',
+  },
+  {
+    fromChainId: [
+      SupportedChainId.TRON_DEVNET,
+      SupportedChainId.TRON_MAINNET,
+      SupportedChainId.TRON_NILE_TESTNET,
+      SupportedChainId.TRON_SHASTA_TESTNET,
+    ],
+    toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
+    time: '10 minutes',
   },
 ];
 

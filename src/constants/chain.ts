@@ -23,6 +23,15 @@ export enum SupportedELFChainId {
   tDVW = 'tDVW',
 }
 
+export const SUPPORTED_TRON_CHAIN_IDS = [
+  SupportedChainId.TRON_DEVNET,
+  SupportedChainId.TRON_MAINNET,
+  SupportedChainId.TRON_NILE_TESTNET,
+  SupportedChainId.TRON_SHASTA_TESTNET,
+];
+
+export const SUPPORTED_ELF_CHAIN_IDS = [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW];
+
 // export enum SupportedTRONChainId {
 //   TRON_MAINNET = 728126428,
 //   TRON_SHASTA_TESTNET = 2494104990,

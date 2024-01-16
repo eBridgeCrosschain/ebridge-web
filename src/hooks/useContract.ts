@@ -196,7 +196,7 @@ export function useBridgeOutContract(chainId?: ChainId, isPortkey?: boolean) {
 
 export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
   return useERCContract(
-    ERCChainConstants.constants.LIMIT_CONTRACT || '',
+    ERCChainConstants.constants?.LIMIT_CONTRACT || '',
     LIMIT_ABI,
     isELFChain(fromChainId) ? toChainId : fromChainId,
   );

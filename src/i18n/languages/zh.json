@@ -40,6 +40,12 @@
     "Estimated time of homogeneous cross-chain arrival is": "内部跨鏈耗時約為{{time}}",
     "Estimated time of homogeneous cross-chain arrival is2": "内部跨鏈耗時約為{{time}}。",
     "Estimated time of arrival in AELF is": "代幣跨入AELF用時約{{time}}。",
+
+    "Estimated time of arrival is": "CH_Estimated time of arrival is {{time}}.",
+    "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the 'To' wallet, and select the 'Receipt ID' to receive the token. This will incur transaction fees on <Chain Name, e.g. Shasta> so the recipient should ensure there a sufficient balance to pay for the fees.": "CH_Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the 'To' wallet, and select the 'Receipt ID' to receive the token. This will incur transaction fees on <Chain Name, e.g. Shasta> so the recipient should ensure there a sufficient balance to pay for the fees.",
+    "You only need to pay for transaction fees generated on <Chain Name, e.g. Shasta> as fees on aelf will be covered by eBridge.": "CH_You only need to pay for transaction fees generated on <Chain Name, e.g. Shasta> as fees on aelf will be covered by eBridge.",
+    "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.": "CH_Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.",
+
     "Cross Chain time": "異構跨鏈耗時約為{{heterogeneous}}，同構跨鏈的耗時約為{{homogeneous}}。",
     "Tokens will arrive automatically after being sent. Please check them in your wallet": "請耐心等待，您的代幣將自動顯示在您的錢包中。",
     "The cross-chain transaction fee will be covered by AELF": "您僅需支付在ETH/BNB上產生的跨鏈交易手續費，aelf區塊鏈上的手續費將由eBridge支付。",

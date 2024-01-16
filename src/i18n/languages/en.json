@@ -40,6 +40,12 @@
     "Estimated time of homogeneous cross-chain arrival is": "The estimated time of internal cross-chain transaction is {{time}}",
     "Estimated time of homogeneous cross-chain arrival is2": "The estimated time of internal cross-chain transaction is {{time}}.",
     "Estimated time of arrival in AELF is": "Estimated time of arrival in AELF is {{time}}.",
+
+    "Estimated time of arrival is": "Estimated time of arrival is {{time}}.",
+    "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the 'To' wallet, and select the 'Receipt ID' to receive the token. This will incur transaction fees on <Chain Name, e.g. Shasta> so the recipient should ensure there a sufficient balance to pay for the fees.": "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the 'To' wallet, and select the 'Receipt ID' to receive the token. This will incur transaction fees on <Chain Name, e.g. Shasta> so the recipient should ensure there a sufficient balance to pay for the fees.",
+    "You only need to pay for transaction fees generated on <Chain Name, e.g. Shasta> as fees on aelf will be covered by eBridge.": "You only need to pay for transaction fees generated on <Chain Name, e.g. Shasta> as fees on aelf will be covered by eBridge.",
+    "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.": "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.",
+
     "Cross Chain time": "Estimated time of heterogenous cross-chain arrival is {{heterogeneous}}",
     "Tokens will arrive automatically after being sent. Please check them in your wallet": "Please allow some time for tokens to be shown automatically in your wallet.",
     "The cross-chain transaction fee will be covered by AELF": "Users pay for cross-chain transaction fees generated on ETH/BNB, while fees on aelf blockchain will be covered by eBridge.",
