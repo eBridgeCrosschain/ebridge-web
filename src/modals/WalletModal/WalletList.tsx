@@ -37,33 +37,40 @@ export default function WalletList() {
       if (loading) return;
       setLoading({ [key]: true });
       try {
-        if (typeof connector === 'string') {
-          if (isPortkeyConnector(connector)) {
-            await portkeyConnect();
-            chainDispatch(setSelectELFWallet('PORTKEY'));
-          } else {
-            await connect();
-            chainDispatch(setSelectELFWallet('NIGHTELF'));
-          }
-        } else {
-          try {
-            delete (connector as any).eagerConnection;
-          } catch (error) {
-            // fix network error
-          }
-          await connector.activate();
-          chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
-          chainDispatch(setSelectTRCWallet(getConnection(connector)?.type));
+        switch (key) {
+          case 'Coinbase Wallet':
+            if (connector instanceof CoinbaseWallet) {
+              await sleep(500);
+              await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
+            }
+            break;
+          case 'TRONLINK':
+            if (connector instanceof TronLink) {
+              await sleep(500);
+              await switchChain(DEFAULT_TRC_CHAIN_INFO as any, connector, true);
+            }
+            break;
+          default:
+            if (typeof connector === 'string') {
+              if (isPortkeyConnector(connector)) {
+                await portkeyConnect();
+                chainDispatch(setSelectELFWallet('PORTKEY'));
+              } else {
+                await connect();
+                chainDispatch(setSelectELFWallet('NIGHTELF'));
+              }
+            } else {
+              try {
+                delete (connector as any).eagerConnection;
+              } catch (error) {
+                // fix network error
+              }
+
+              await connector.activate();
+              chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
+            }
         }
-        if (connector instanceof CoinbaseWallet) {
-          await sleep(500);
-          await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
-        }
-        onCancel();
-        if (connector instanceof TronLink) {
-          await sleep(500);
-          await switchChain(DEFAULT_TRC_CHAIN_INFO as any, connector, true);
-        }
+
         onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
