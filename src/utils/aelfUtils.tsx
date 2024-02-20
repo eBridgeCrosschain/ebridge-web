@@ -67,7 +67,6 @@ export async function getTxResult(
 ): Promise<any> {
   const txFun = getAElf(chainId).chain.getTxResult;
   const txResult = await txFun(TransactionId);
-  console.log(txResult, reGetCount, '====txResult');
 
   if (txResult.error && txResult.errorMessage) {
     throw Error(txResult.errorMessage.message || txResult.errorMessage.Message);
@@ -236,13 +235,13 @@ export const getServicesFromFileDescriptors = (descriptors: any) => {
     });
 };
 const isWrappedBytes = (resolvedType: any, name: string) => {
-  if (!resolvedType.name || resolvedType.name !== name) {
+  if (!resolvedType?.name || resolvedType.name !== name) {
     return false;
   }
-  if (!resolvedType.fieldsArray || resolvedType.fieldsArray.length !== 1) {
+  if (!resolvedType?.fieldsArray || resolvedType.fieldsArray.length !== 1) {
     return false;
   }
-  return resolvedType.fieldsArray[0].type === 'bytes';
+  return resolvedType?.fieldsArray[0].type === 'bytes';
 };
 const isAddress = (resolvedType: any) => isWrappedBytes(resolvedType, 'Address');
 

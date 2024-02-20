@@ -13,7 +13,6 @@ import { SUPPORTED_WALLETS } from 'constants/wallets';
 import { getConnection } from 'walletConnectors/utils';
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
 import { TronLink } from '@web3-react/tron-link';
-
 import { DEFAULT_ERC_CHAIN_INFO, DEFAULT_TRC_CHAIN_INFO } from 'constants/index';
 import { switchChain } from 'utils/network';
 import { sleep } from 'utils';
@@ -33,7 +32,7 @@ export default function WalletList() {
     dispatch(basicModalView.setWalletModal(false));
   }, [dispatch]);
   const tryActivation = useCallback(
-    async (connector: Connector | string, key: string, version?: string) => {
+    async (connector: Connector | string, key: string) => {
       if (loading) return;
       setLoading({ [key]: true });
       try {
@@ -50,8 +49,8 @@ export default function WalletList() {
             break;
           default:
             if (typeof connector === 'string') {
-              if (isPortkeyConnector(connector) && version) {
-                await portkeyConnect(version);
+              if (isPortkeyConnector(connector)) {
+                await portkeyConnect();
                 chainDispatch(setSelectELFWallet('PORTKEY'));
               } else {
                 await connect();
@@ -67,11 +66,8 @@ export default function WalletList() {
               await connector.activate();
               chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
             }
-            if (connector instanceof CoinbaseWallet) {
-              await sleep(500);
-              await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
-            }
         }
+
         onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
@@ -110,7 +106,7 @@ export default function WalletList() {
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
-              tryActivation(option.connector, option.name, option?.version);
+              tryActivation(option.connector, option.name);
             }}>
             <div>{option.name}</div>
             <IconFont className="wallet-icon" type={option.iconType} />

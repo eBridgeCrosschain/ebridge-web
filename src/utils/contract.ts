@@ -11,6 +11,8 @@ import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
 import { IAElfChain } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
+import { TronLink } from '@web3-react/tron-link';
+import { isChainSupportedByTRC } from './common';
 export interface AbiType {
   internalType?: string;
   name?: string;
@@ -78,18 +80,21 @@ type CallSendMethod = (
 export type ContractBasicErrorMsg = ErrorMsg;
 export class ContractBasic {
   public address?: string;
-  public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic;
+  public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic | TronContractBasic;
   public contractType: ChainType;
   // public isPortkey?: boolean;
   constructor(options: ContractProps) {
     this.address = options.contractAddress;
     const isELF = isELFChain(options.chainId);
+    const isTron = isChainSupportedByTRC(options.chainId);
     this.callContract = options.portkeyChain
       ? new PortkeyContractBasic(options)
       : isELF
       ? new AElfContractBasic(options)
+      : isTron
+      ? new TronContractBasic(options)
       : new WB3ContractBasic(options);
-    this.contractType = isELF ? 'ELF' : 'ERC';
+    this.contractType = isELF ? 'ELF' : isTron ? 'TRC' : 'ERC';
   }
 
   public callViewMethod: CallViewMethod = async (
@@ -104,7 +109,6 @@ export class ContractBasic {
   };
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    console.log(paramsOption, '++++paramsOption');
     if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
       return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
     return this.callContract.callSendMethod(functionName, account, paramsOption, sendOptions);
@@ -268,7 +272,6 @@ export class AElfContractBasic {
       await this.checkConnected();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
-      console.log(transformArrayToMap(inputType, paramsOption), '=Option');
       const req = await this.aelfContract[functionNameUpper](transformArrayToMap(inputType, paramsOption));
       if (req.error) {
         return {
@@ -363,7 +366,6 @@ export class PortkeyContractBasic {
       const inputType = this.methods[functionNameUpper];
 
       const req = await contract.callViewMethod(functionNameUpper, transformArrayToMap(inputType, paramsOption));
-      console.log(req, transformArrayToMap(inputType, paramsOption), functionNameUpper, '=======callViewMethod');
 
       if (req.error) return req;
 
@@ -383,7 +385,6 @@ export class PortkeyContractBasic {
       await this.checkMethods();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
-      console.log(transformArrayToMap(inputType, paramsOption), paramsOption, functionNameUpper, '=callSendMethod');
       const req = await contract.callSendMethod(functionNameUpper, '', transformArrayToMap(inputType, paramsOption), {
         onMethod,
         ...options,
@@ -395,7 +396,63 @@ export class PortkeyContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
-  public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
+  /* public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     throw new Error('Method not implemented.');
+  }; */
+}
+
+export class TronContractBasic {
+  public contract: Contract | null;
+  public address?: string;
+  public provider?: provider;
+  public chainId?: number;
+  public tron?: TronLink;
+  constructor(options: ContractProps) {
+    const { contractABI, provider, contractAddress, chainId } = options;
+    const contactABITemp = contractABI;
+
+    this.contract =
+      contractAddress && provider ? this.initContract(provider, contractAddress, contactABITemp as AbiItem) : null;
+
+    this.address = contractAddress;
+    this.provider = provider;
+    this.chainId = chainId as number;
+  }
+
+  public initContract: InitContract = async (provider, address, ABI) => {
+    this.contract = window.tronWeb.contract(ABI as any, address);
+    return this.contract as any;
+  };
+
+  public callViewMethod: CallViewMethod = async (
+    functionName,
+    paramsOption,
+    callOptions = { defaultBlock: 'latest' },
+  ) => {
+    if (!this.contract) return { error: { code: 401, message: 'Contract init error' } };
+    try {
+      const { options } = callOptions;
+      const contract = await this.contract;
+      const result: any = await contract?.[functionName](...(paramsOption || [])).call();
+      return result;
+    } catch (e) {
+      return { error: e };
+    }
+  };
+
+  public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
+    if (!this.contract) return { error: { code: 401, message: 'Contract init error' } };
+    try {
+      const contract = await this.contract;
+      const { onMethod = 'receipt', ...options } = sendOptions || {};
+      const result: any = await contract?.[functionName](...(paramsOption || [])).send({
+        from: account,
+        ...options,
+      });
+      if (onMethod === 'receipt') return { ...result, TransactionId: result.transactionHash };
+      return { TransactionId: result };
+    } catch (error) {
+      return { error };
+    }
   };
 }

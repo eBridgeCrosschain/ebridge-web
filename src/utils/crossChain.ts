@@ -9,6 +9,7 @@ import { AElfTransaction, TransactionResult } from '@aelf-react/types';
 import { checkApprove } from 'contracts';
 import type { provider } from 'web3-core';
 import { CrossFeeToken, REQ_CODE, ZERO } from 'constants/misc';
+import { isChainSupportedByTRC } from 'utils/common';
 import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
 import { formatAddress, isIncludesChainId } from 'utils';
@@ -31,8 +32,6 @@ export async function CrossChainTransfer({
   toChainId: ChainId;
   amount: string;
 }) {
-  console.log('CrossChainTransfer', '===CrossChainTransfer');
-
   return contract.callSendMethod(
     'CrossChainTransfer',
     account,
@@ -208,6 +207,8 @@ export async function CreateReceipt({
   toChainId,
   to,
   tokenContract,
+  fromChainId,
+  trcLibrary,
   crossFee,
 }: {
   bridgeContract: ContractBasic;
@@ -218,6 +219,8 @@ export async function CreateReceipt({
   toChainId: ChainId;
   to: string;
   tokenContract: ContractBasic;
+  fromChainId: ChainId;
+  trcLibrary: provider;
   crossFee?: string;
 }) {
   const toAddress = formatAddress(to);
@@ -225,9 +228,11 @@ export async function CreateReceipt({
   if (fromELFChain && fromToken !== CrossFeeToken) {
     const req = await checkApprove(
       library,
+      trcLibrary,
       CrossFeeToken,
       account,
       bridgeContract.address || '',
+      fromChainId,
       timesDecimals(crossFee, 8).toFixed(0),
       undefined,
       fromELFChain ? tokenContract : undefined,
@@ -246,9 +251,11 @@ export async function CreateReceipt({
   }
   const req = await checkApprove(
     library,
+    trcLibrary,
     fromToken,
     account,
     bridgeContract.address || '',
+    fromChainId,
     checkAmount,
     undefined,
     fromELFChain ? tokenContract : undefined,
@@ -348,9 +355,10 @@ export async function getSwapId({
   let swapId;
   const { address } = getTokenInfoByWhitelist(toChainId, symbol) || {};
   const chainId = getChainIdToMap(fromChainId);
-
   if (bridgeOutContract?.contractType === 'ELF') {
     swapId = await bridgeOutContract?.callViewMethod('GetSwapIdByToken', [chainId, symbol]);
+  } else if (isChainSupportedByTRC(toChainId)) {
+    swapId = await bridgeOutContract?.callViewMethod('getSwapId', [address, chainId]);
   } else {
     swapId = await bridgeOutContract?.callViewMethod('getSwapId', [address, chainId]);
   }
@@ -393,7 +401,6 @@ export async function getReceiptLimit({
     };
   } catch (error: any) {
     CommonMessage.error(error.message);
-    console.log('getReceiptLimit error :', error);
   }
 }
 
@@ -434,6 +441,5 @@ export async function getSwapLimit({
     };
   } catch (error: any) {
     CommonMessage.error(error.message);
-    console.log('getSwapLimit error :', error);
   }
 }

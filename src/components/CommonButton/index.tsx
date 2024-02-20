@@ -3,7 +3,8 @@ import type { ButtonProps } from 'antd/lib/button/button';
 import clsx from 'clsx';
 import React from 'react';
 import styles from './styles.module.less';
-declare const ButtonTypes: ['default', 'primary', 'ghost', 'dashed', 'link', 'text', 'select'];
+// declare const ButtonTypes: ['default', 'primary', 'ghost', 'dashed', 'link', 'text', 'select'];
+type ButtonTypes = 'default' | 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'select';
 
 interface CommonButtonProps {
   type?: (typeof ButtonTypes)[number];

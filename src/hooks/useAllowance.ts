@@ -20,7 +20,7 @@ export function useAllowance(
       }
     } else {
       const req = await tokenContract?.callViewMethod('allowance', [account, approveTargetAddress]);
-      if (!req.error) {
+      if (!req?.error) {
         setAllowance(ZERO.plus(req));
       }
     }

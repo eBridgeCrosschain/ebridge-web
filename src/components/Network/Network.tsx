@@ -46,7 +46,6 @@ export default function Network({
 
   const isMd = useMediaQueries('md');
   const name = getNameByActiveChainId(chainId);
-
   const IconName = useMemo(() => {
     const props = { nameSize: 14, marginRight: 16 };
 
@@ -70,7 +69,7 @@ export default function Network({
     <Dropdown
       className={clsx(styles.dropdown, 'cursor-pointer', className)}
       overlayClassName={clsx(styles['dropdown-overlay'], overlayClassName)}
-      overlay={menu}
+      menu={{ items }}
       trigger={['click']}
       getPopupContainer={(triggerNode) => triggerNode}>
       <Row className="flex-row-center">
