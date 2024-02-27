@@ -56,6 +56,7 @@
     "Click the button to receive the token(s) transferred": "點擊接收按鈕，接收已發送的代幣。",
     "Cross-chain transaction initiated": "異構跨鏈已發起",
     "Receive": "接收",
+    "Internal JSON-RPC error": "RPC 提供者不稳定。请更换其他RPC Provider",
     "Receiving request submitted": "接收請求已發送",
     "Can't find your token": "找不到您的代幣？",
     "Import custom tokens": "添加新幣種",

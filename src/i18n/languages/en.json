@@ -57,6 +57,7 @@
     "Click the button to receive the token(s) transferred": "Click the button to receive the token(s) transferred",
     "Cross-chain transaction initiated": "Cross-chain transaction initiated",
     "Receive": "Receive",
+    "Internal JSON-RPC error": "RPC Provider is unstable. Please change to another RPC Provider.",
     "Receiving request submitted": "Receiving request submitted",
     "Can't find your token": "Can't find your token? ",
     "Import custom tokens": "Import custom tokens",
