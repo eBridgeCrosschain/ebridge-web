@@ -102,9 +102,11 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   // auto fix token
   useEffect(() => {
     if (selectToken && fromChainId && toChainId) {
-      const canForm = !selectToken?.[fromChainId]?.onlyTo;
-      const canTo = !selectToken?.[toChainId]?.onlyForm;
-      if (!tokenInfo && canTo && canForm) {
+      const fromItem = selectToken?.[fromChainId];
+      const toItem = selectToken?.[toChainId];
+      const canForm = fromItem && !fromItem?.onlyTo;
+      const canTo = toItem && !toItem?.onlyForm;
+      if (!tokenInfo || !(canTo && canForm)) {
         dispatch(setSelectToken(defaultSelectToken));
       }
     }

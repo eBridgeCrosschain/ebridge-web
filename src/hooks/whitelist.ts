@@ -34,8 +34,10 @@ export function useCurrentWhitelist() {
   return useMemo(() => {
     if (!allList || !toChainId || !fromChainId) return [];
     return allList?.filter((item) => {
-      const canForm = !item?.[fromChainId]?.onlyTo;
-      const canTo = !item?.[toChainId]?.onlyForm;
+      const fromItem = item?.[fromChainId];
+      const toItem = item?.[toChainId];
+      const canForm = fromItem && !fromItem?.onlyTo;
+      const canTo = toItem && !toItem?.onlyForm;
       return canForm && canTo;
     });
   }, [allList, fromChainId, toChainId]);
