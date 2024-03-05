@@ -30,11 +30,8 @@ export function FromCard() {
   const { chainId, account } = fromWallet || {};
   const { token, show } = fromBalance || {};
   const isMD = useMediaQueries('md');
-  const min = useMemo(() => {
-    const min = divDecimals(1, token?.decimals);
-    // if (crossMin && min.lt(crossMin)) return ZERO.plus(crossMin);
-    return min;
-  }, [token?.decimals]);
+  const min = useMemo(() => divDecimals(1, token?.decimals), [token?.decimals]);
+
   const showError = useMemo(
     () =>
       fromInput &&
@@ -58,7 +55,14 @@ export function FromCard() {
           }}
         />
         <SelectButton
-          onClick={() => dispatch(setSelectModal(true))}
+          onClick={() =>
+            dispatch(
+              setSelectModal({
+                open: true,
+                type: 'from',
+              }),
+            )
+          }
           title={selectToken?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}
@@ -95,7 +99,14 @@ export function ToCard() {
           onChange={(e) => dispatch(setTo(parseInputChange(e.target.value, min, token?.decimals)))}
         />
         <SelectButton
-          onClick={() => dispatch(setSelectModal(true))}
+          onClick={() =>
+            dispatch(
+              setSelectModal({
+                open: true,
+                type: 'to',
+              }),
+            )
+          }
           title={selectToken?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}

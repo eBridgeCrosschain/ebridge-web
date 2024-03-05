@@ -96,19 +96,16 @@ export default function Provider({ children }: { children: React.ReactNode }) {
         dispatch(setSelectToken(defaultSelectToken));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromChainId, toChainId, tokenInfo]);
+  }, [fromChainId, selectToken, toChainId, tokenInfo]);
 
-  // auto fix token
   useEffect(() => {
-    if (selectToken && fromChainId && toChainId) {
-      const canForm = !selectToken?.[fromChainId]?.onlyTo;
-      const canTo = !selectToken?.[toChainId]?.onlyForm;
-      if (!tokenInfo && canTo && canForm) {
+    if (tokenInfo && fromChainId && toChainId) {
+      if (tokenInfo[fromChainId]?.onlyForm === false || tokenInfo[toChainId]?.onlyTo === false) {
         dispatch(setSelectToken(defaultSelectToken));
       }
     }
-  }, [fromChainId, selectToken, toChainId, tokenInfo]);
+  }, [fromChainId, toChainId, tokenInfo]);
+
   useEffect(() => {
     dispatch(setTo(fromInput || ''));
   }, [fromInput]);
