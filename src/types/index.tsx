@@ -47,6 +47,8 @@ export type TokenInfo = {
   isBurnable?: boolean;
   totalSupply?: number;
   isNativeToken?: boolean;
+  onlyForm?: boolean;
+  onlyTo?: boolean;
 };
 
 export enum CrossChainType {

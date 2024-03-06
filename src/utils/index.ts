@@ -6,7 +6,7 @@ import { isELFChain } from './aelfUtils';
 export const eventBus = new EventEmitter();
 import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
-import { NATIVE_TOKEN_LIST } from 'constants/index';
+import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST } from 'constants/index';
 
 export const sleep = (time: number) => {
   return new Promise<string>((resolve) => {
@@ -162,6 +162,7 @@ export function formatAddress(value: string) {
 export function formatNativeToken(symbol?: string) {
   if (!symbol) return symbol;
   if (NATIVE_TOKEN_LIST.includes(symbol)) return symbol.slice(1);
+  if (BRIDGE_TOKEN_MAP[symbol]) return BRIDGE_TOKEN_MAP[symbol];
   return symbol;
 }
 

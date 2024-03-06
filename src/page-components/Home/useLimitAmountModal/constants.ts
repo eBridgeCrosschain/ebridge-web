@@ -26,4 +26,6 @@ export interface ICrossInfo {
   fromDecimals?: number;
   toDecimals?: number;
   symbol?: string;
+  fromSymbol?: string;
+  toSymbol?: string;
 }
