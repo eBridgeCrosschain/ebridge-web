@@ -97,24 +97,21 @@
       "name": "Schrodinger Cat",
       "decimals": 6,
       "symbol": "SGR",
-      "address": "0x77c2686501ff82287558fe3c98424c074ca34e4a",
-      "onlyForm": true
+      "address": "0x77c2686501ff82287558fe3c98424c074ca34e4a"
     },
     "tDVV": {
       "name": "Schrodinger Cat",
-      "decimals": 6,
-      "symbol": "SGR",
+      "decimals": 8,
+      "symbol": "TESTSGR-1",
       "address": "",
-      "issueChainId": 9992731,
-      "onlyTo": true
+      "issueChainId": 9992731
     },
     "tDVW": {
       "name": "Schrodinger Cat",
-      "decimals": 6,
-      "symbol": "SGR-1",
+      "decimals": 8,
+      "symbol": "TESTSGR-1",
       "address": "",
-      "issueChainId": 9992731,
-      "onlyTo": true
+      "issueChainId": 9992731
     }
   },
   "WRITE": {
