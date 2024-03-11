@@ -99,6 +99,19 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromChainId, toChainId, tokenInfo]);
 
+  // auto fix token
+  useEffect(() => {
+    if (selectToken && fromChainId && toChainId) {
+      const fromItem = selectToken?.[fromChainId];
+      const toItem = selectToken?.[toChainId];
+      const canForm = fromItem && !fromItem?.onlyTo;
+      const canTo = toItem && !toItem?.onlyForm;
+      if (!tokenInfo || !(canTo && canForm)) {
+        dispatch(setSelectToken(defaultSelectToken));
+      }
+    }
+  }, [fromChainId, selectToken, toChainId, tokenInfo]);
+
   useEffect(() => {
     dispatch(setTo(fromInput || ''));
   }, [fromInput]);
