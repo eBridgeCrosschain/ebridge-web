@@ -25,7 +25,10 @@ export enum HomeActionsEnum {
 }
 
 export type HomeState = {
-  selectModal?: boolean;
+  selectModal?: {
+    open: boolean;
+    type?: 'from' | 'to';
+  };
   addModal?: boolean;
   selectToken?: CurrentWhitelistItem;
   fromInput?: string;
@@ -45,11 +48,15 @@ export type HomeState = {
 };
 
 export const DestroyModal = {
-  selectModal: undefined,
+  selectModal: {
+    open: false,
+  },
   addModal: undefined,
 };
 export const DestroyState = {
-  selectModal: undefined,
+  selectModal: {
+    open: false,
+  },
   addModal: undefined,
   fromInput: '',
   toInput: '',
@@ -60,9 +67,9 @@ export const DestroyState = {
 };
 
 export const HomeActions = {
-  setSelectModal: (selectModal: boolean) => {
+  setSelectModal: (selectModal: HomeState['selectModal']) => {
     const obj: any = { selectModal };
-    if (selectModal) {
+    if (selectModal.open) {
       obj.destroyModal = true;
     }
     return basicActions(HomeActionsEnum['setSelectModal'], obj);

@@ -21,6 +21,7 @@ import useMediaQueries from 'hooks/useMediaQueries';
 import { ZERO } from 'constants/misc';
 import { isChainAddress } from 'utils';
 import { useWalletContext } from 'contexts/useWallet';
+import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
 
 export function FromCard() {
   const [{ selectToken, fromInput, fromBalance, crossMin }, { dispatch }] = useHomeContext();
@@ -30,11 +31,8 @@ export function FromCard() {
   const { chainId, account } = fromWallet || {};
   const { token, show } = fromBalance || {};
   const isMD = useMediaQueries('md');
-  const min = useMemo(() => {
-    const min = divDecimals(1, token?.decimals);
-    // if (crossMin && min.lt(crossMin)) return ZERO.plus(crossMin);
-    return min;
-  }, [token?.decimals]);
+  const min = useMemo(() => divDecimals(1, token?.decimals), [token?.decimals]);
+
   const showError = useMemo(
     () =>
       fromInput &&
@@ -58,15 +56,22 @@ export function FromCard() {
           }}
         />
         <SelectButton
-          onClick={() => dispatch(setSelectModal(true))}
-          title={selectToken?.symbol}
+          onClick={() =>
+            dispatch(
+              setSelectModal({
+                open: true,
+                type: 'from',
+              }),
+            )
+          }
+          title={selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}
         />
       </Row>
       <Row justify={isMD ? 'start' : 'end'} className={styles['balance-row']}>
         <Trans>Balance</Trans>
-        {unitConverter(show)} {selectToken?.symbol}
+        {unitConverter(show)} {selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
       </Row>
     </div>
   );
@@ -85,6 +90,7 @@ export function ToCard() {
     () => !!(toChecked && toAddress && !isChainAddress(toAddress, chainId)),
     [chainId, toAddress, toChecked],
   );
+
   return (
     <div className={clsx(styles.card, { [animation.admin2]: changing })}>
       <ToHeader />
@@ -95,8 +101,15 @@ export function ToCard() {
           onChange={(e) => dispatch(setTo(parseInputChange(e.target.value, min, token?.decimals)))}
         />
         <SelectButton
-          onClick={() => dispatch(setSelectModal(true))}
-          title={selectToken?.symbol}
+          onClick={() =>
+            dispatch(
+              setSelectModal({
+                open: true,
+                type: 'to',
+              }),
+            )
+          }
+          title={selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}
         />

@@ -111,6 +111,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [fromChainId, selectToken, toChainId, tokenInfo]);
+
   useEffect(() => {
     dispatch(setTo(fromInput || ''));
   }, [fromInput]);
