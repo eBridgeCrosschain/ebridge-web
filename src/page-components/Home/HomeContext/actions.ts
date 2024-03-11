@@ -69,7 +69,7 @@ export const DestroyState = {
 export const HomeActions = {
   setSelectModal: (selectModal: HomeState['selectModal']) => {
     const obj: any = { selectModal };
-    if (selectModal.open) {
+    if (selectModal?.open) {
       obj.destroyModal = true;
     }
     return basicActions(HomeActionsEnum['setSelectModal'], obj);
