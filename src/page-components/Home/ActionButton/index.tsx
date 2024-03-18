@@ -18,7 +18,7 @@ import { useUpdateEffect } from 'react-use';
 import { useAllowance } from 'hooks/useAllowance';
 import { isELFChain } from 'utils/aelfUtils';
 import { ACTIVE_CHAIN } from 'constants/index';
-import { formatAddress, isAddress } from 'utils';
+import { formatAddress, formatNativeToken, isAddress } from 'utils';
 import CheckToFillAddressModal from './CheckToFillAddressModal';
 import useLimitAmountModal from '../useLimitAmountModal';
 import CommonMessage from 'components/CommonMessage';
@@ -206,6 +206,7 @@ function Actions() {
       }
 
       const req = await SwapToken({ bridgeOutContract, receiveItem, toAccount });
+
       if (!req.error) {
         addReceivedList(receiveItem.id);
         dispatch(setReceiveId(undefined));
@@ -307,7 +308,7 @@ function Actions() {
         symbol = fromTokenInfo?.symbol;
       }
       if (symbol) {
-        children = t('Approve symbol', { symbol });
+        children = t('Approve symbol', { symbol: formatNativeToken(symbol) });
         disabled = false;
         onClick = () => onApprove(symbol);
         return { children, onClick, disabled };

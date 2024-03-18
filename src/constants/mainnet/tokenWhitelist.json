@@ -133,6 +133,28 @@
       "address": "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3"
     }
   },
+  "SGR": {
+    "1": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR",
+      "address": "0x478156DeAbfAc918369044D52A6BdB5Cc5597994"
+    },
+    "tDVV": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR-1",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR-1",
+      "address": "",
+      "issueChainId": 9992731
+    }
+  },
   "WRITE": {
     "AELF": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
     "tDVV": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },

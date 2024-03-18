@@ -6,15 +6,17 @@ import TokenLogo from 'components/TokenLogo';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { CurrentWhitelistItem, useCurrentWhitelist } from 'hooks/whitelist';
 import { useLanguage } from 'i18n';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useHomeContext } from '../HomeContext';
 import { setSelectModal, setAddModal, setSelectToken, homeModalDestroy } from '../HomeContext/actions';
 import styles from './styles.module.less';
-function SelectToken() {
+import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+function SelectToken({ origin }: { origin?: 'from' | 'to' }) {
   const [{ selectToken }, { dispatch }] = useHomeContext();
-  const { fromWallet, isHomogeneous } = useWallet();
+  const { fromWallet, isHomogeneous, toWallet } = useWallet();
   const { chainId, account } = fromWallet || {};
+  const { chainId: toChainId } = toWallet || {};
   const [searchList, setSearchList] = useState<CurrentWhitelistItem[]>();
   const [value, setValue] = useState<string>();
   const allWhitelist = useCurrentWhitelist();
@@ -30,6 +32,7 @@ function SelectToken() {
   useEffect(() => {
     if (value === '') onSearch();
   }, [onSearch, value]);
+
   return (
     <>
       <Input
@@ -44,20 +47,20 @@ function SelectToken() {
         suffix={<IconFont onClick={onSearch} className="cursor-pointer" type="Icon-search" />}
       />
       <div className={clsx({ [styles['token-list']]: true, [styles['token-list-add']]: isHomogeneous && account })}>
-        {(searchList || allWhitelist).map((i, k) => {
+        {(searchList || allWhitelist).map((item, k) => {
           return (
             <Row
               onClick={() => {
-                dispatch(setSelectToken(i));
+                dispatch(setSelectToken(item));
                 dispatch(homeModalDestroy());
               }}
               key={k}
               className={clsx('cursor-pointer', {
                 [styles['token-item']]: true,
-                [styles['token-item-selected']]: i.symbol === selectToken?.symbol,
+                [styles['token-item-selected']]: item.symbol === selectToken?.symbol,
               })}>
-              <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={i.symbol} />
-              {i.symbol}
+              <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={item.symbol} />
+              {item[(origin === 'from' ? chainId : toChainId) as SupportedChainId | SupportedELFChainId]?.symbol}
             </Row>
           );
         })}
@@ -81,15 +84,16 @@ function SelectToken() {
 export default function SelectTokenModal() {
   const [{ selectModal }, { dispatch }] = useHomeContext();
   const { t } = useLanguage();
+
   return (
     <CommonModal
       className={styles['select-modal']}
-      onCancel={() => dispatch(setSelectModal(false))}
-      visible={selectModal}
+      onCancel={() => dispatch(setSelectModal({ open: false }))}
+      open={selectModal?.open}
       title={t('Select a token')}
       width="auto"
       type="pop-bottom">
-      <SelectToken />
+      <SelectToken origin={selectModal?.type} />
     </CommonModal>
   );
 }

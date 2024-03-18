@@ -250,20 +250,24 @@ export default function useLimitAmountModal() {
         const toTokenInfo = getTokenInfo(toChainId);
         crossInfo = {
           toChainId: toChainId,
-          symbol: fromTokenInfo?.symbol,
+          toSymbol: toTokenInfo?.symbol,
           toDecimals: toTokenInfo?.decimals,
           fromChainId: fromChainId,
           fromDecimals: fromTokenInfo?.decimals,
+          fromSymbol: fromTokenInfo?.symbol,
+          symbol: fromTokenInfo?.symbol,
         };
       } else {
         const fromTokenInfo = getTokenInfoByWhitelist(receiveItem?.fromChainId, receiveItem?.transferToken?.symbol);
         const toTokenInfo = getTokenInfoByWhitelist(receiveItem?.toChainId, receiveItem?.transferToken?.symbol);
         crossInfo = {
           fromChainId: receiveItem?.fromChainId,
-          toChainId: receiveItem?.toChainId,
-          symbol: receiveItem?.transferToken?.symbol,
-          toDecimals: toTokenInfo?.decimals,
           fromDecimals: fromTokenInfo?.decimals,
+          fromSymbol: fromTokenInfo?.symbol,
+          toChainId: receiveItem?.toChainId,
+          toDecimals: toTokenInfo?.decimals,
+          toSymbol: toTokenInfo?.symbol,
+          symbol: receiveItem?.transferToken?.symbol,
         };
       }
 
