@@ -94,22 +94,22 @@
   },
   "SGR": {
     "11155111": {
-      "name": "Schrodinger Cat",
-      "decimals": 6,
+      "name": "Schrodinger",
+      "decimals": 8,
       "symbol": "SGR",
-      "address": "0x77c2686501ff82287558fe3c98424c074ca34e4a"
+      "address": "0x310e7bD119253b9F9F3AC0cD191A1b8b5b1b3b84"
     },
     "tDVV": {
-      "name": "Schrodinger Cat",
+      "name": "Schrodinger",
       "decimals": 8,
-      "symbol": "TESTSGR-1",
+      "symbol": "SGR-1",
       "address": "",
       "issueChainId": 9992731
     },
     "tDVW": {
-      "name": "Schrodinger Cat",
+      "name": "Schrodinger",
       "decimals": 8,
-      "symbol": "TESTSGR-1",
+      "symbol": "SGR-1",
       "address": "",
       "issueChainId": 9992731
     }
