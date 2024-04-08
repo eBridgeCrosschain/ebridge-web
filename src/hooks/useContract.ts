@@ -23,8 +23,13 @@ export function getContract(address: string, ABI: any, library?: provider) {
   });
 }
 
-export function getPortkeyContract(address: string, chainId: ChainId, portkeyChain: IAElfChain) {
-  const key = address + chainId + portkeyChain.rpcUrl;
+export function getPortkeyContract(
+  address: string,
+  chainId: ChainId,
+  portkeyChain: IAElfChain,
+  providerVersion?: string,
+) {
+  const key = address + chainId + portkeyChain.rpcUrl + String(providerVersion);
   if (!ContractMap[key])
     ContractMap[key] = new ContractBasic({
       contractAddress: address,
@@ -120,7 +125,10 @@ export function usePortkeyContract(contractAddress: string, chainId?: ChainId) {
     return (accounts as any)?.[chainId]?.[0];
   }, [accounts, chainId, isActive]);
   const [contracts, { dispatch }] = useAElfContractContext();
-  const key = useMemo(() => contractAddress + '_' + chainId + '_' + account, [account, chainId, contractAddress]);
+  const key = useMemo(
+    () => contractAddress + '_' + chainId + '_' + account + '_' + provider?.providerVersion,
+    [account, chainId, contractAddress, provider?.providerVersion],
+  );
   const getContract = useCallback(
     async (reCount = 0) => {
       if (!provider || !chainId || !isELFChain(chainId)) return;
@@ -128,7 +136,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: ChainId) {
         const portkeyChain = await provider.getChain(chainId as any);
         dispatch(
           setContract({
-            [key]: getPortkeyContract(contractAddress, chainId, portkeyChain),
+            [key]: getPortkeyContract(contractAddress, chainId, portkeyChain, provider.providerVersion),
           }),
         );
       } catch (error) {

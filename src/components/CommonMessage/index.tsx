@@ -14,5 +14,5 @@ class CommonMessage {
     message.error(text);
   }
 }
-
+// eslint-disable-next-line import/no-anonymous-default-export
 export default new CommonMessage();

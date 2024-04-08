@@ -10,6 +10,7 @@ import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
 import { usePortkeyReact } from 'contexts/usePortkey/provider';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
+import { PortkeyNameVersion } from 'contexts/usePortkey/constants';
 import CommonMessage from 'components/CommonMessage';
 export function useAEflConnect() {
   const { activate, connectEagerly } = useAElfReact();
@@ -47,9 +48,13 @@ export function usePortkeyConnect() {
   const { activate, connectEagerly } = usePortkeyReact();
   const chainDispatch = useChainDispatch();
   return useCallback(
-    async (isConnectEagerly?: boolean) => {
-      await (isConnectEagerly ? connectEagerly : activate)();
-      chainDispatch(setSelectELFWallet('PORTKEY'));
+    async (version?: string, isConnectEagerly?: boolean) => {
+      if (version && [PortkeyNameVersion.v2, PortkeyNameVersion.v1].includes(version as PortkeyNameVersion)) {
+        const portkeyVersion: PortkeyNameVersion =
+          version == PortkeyNameVersion.v2 ? PortkeyNameVersion.v2 : PortkeyNameVersion.v1;
+        await (isConnectEagerly ? connectEagerly : activate)(portkeyVersion);
+        chainDispatch(setSelectELFWallet('PORTKEY'));
+      }
     },
     [activate, chainDispatch, connectEagerly],
   );

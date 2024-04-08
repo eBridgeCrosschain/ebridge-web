@@ -179,4 +179,8 @@ export const CrossChainTimeList = [
   },
 ];
 
-export const PORTKEY_NETWORK_TYPE = 'MAIN';
+export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
+  'SGR-1': 'SGR',
+};
+
+export const PORTKEY_NETWORK_TYPE = 'MAINNET';

@@ -7,6 +7,7 @@ import { isERCAddress } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { useTokenContract } from './useContract';
 import useInterval from './useInterval';
+import { getTokenInfoByWhitelist } from 'utils/whitelist';
 
 export const useBalances = (
   wallet?: Web3Type,
@@ -26,7 +27,9 @@ export const useBalances = (
       // elf chain
       promise = tokensList.map((symbol) => {
         if (!tokenContract) return '0';
-        if (symbol) return getELFChainBalance(tokenContract, symbol, account);
+        const tokenInfo = getTokenInfoByWhitelist(chainId, symbol);
+        if (!tokenInfo) return '0';
+        if (symbol) return getELFChainBalance(tokenContract, tokenInfo.symbol, account);
       });
     } else {
       // erc20 chain

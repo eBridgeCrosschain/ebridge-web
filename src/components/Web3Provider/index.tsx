@@ -6,6 +6,7 @@ import { AElfNodes } from 'constants/aelf';
 import { APP_NAME } from 'constants/misc';
 import { useChain } from 'contexts/useChain';
 import { PortkeyReactProvider } from 'contexts/usePortkey/provider';
+import { PortkeyNameVersion } from 'contexts/usePortkey/constants';
 import useOrderedConnections from 'hooks/useOrderedConnections';
 import { useAEflConnect, usePortkeyConnect } from 'hooks/web3';
 import { useCallback, useMemo } from 'react';
@@ -49,7 +50,7 @@ function Web3Manager({ children }: { children: JSX.Element }) {
   const tryPortkey = useCallback(
     async (isConnectEagerly?: boolean) => {
       try {
-        await portkeyConnect(isConnectEagerly);
+        await portkeyConnect(PortkeyNameVersion.v1, isConnectEagerly);
       } catch (error) {
         console.debug(error, '=====error');
       }

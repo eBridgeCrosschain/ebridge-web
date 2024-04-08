@@ -1,4 +1,4 @@
-import LinkOutlined from '@ant-design/icons/LinkOutlined';
+import { LinkOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React from 'react';
 import { isUrl } from '../../utils/reg';

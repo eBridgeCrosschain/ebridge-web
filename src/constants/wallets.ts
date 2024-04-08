@@ -1,5 +1,6 @@
 import { WalletInfo } from 'types';
 import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
+import { PortkeyNameVersion } from '../contexts/usePortkey/constants';
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   METAMASK: {
@@ -20,7 +21,7 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     connector: coinbaseWallet,
     name: 'Coinbase Wallet',
     iconType: 'coinbaseWallet',
-    description: 'Use Coinbase Wallet app on mobile device',
+    description: 'Connect to Coinbase Wallet',
     href: null,
   },
   NIGHT_ELF: {
@@ -32,9 +33,18 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   },
   PORTKEY: {
     connector: 'PORTKEY',
-    name: 'PORTKEY',
+    name: 'Portkey (Deprecated)',
     iconType: 'portkey',
-    description: 'PORTKEY',
+    description: 'Portkey (Deprecated)',
     href: null,
+    version: PortkeyNameVersion.v1,
+  },
+  PORTKEY_V2: {
+    connector: 'PORTKEY',
+    name: 'Portkey Wallet',
+    iconType: 'portkey',
+    description: 'Portkey Wallet',
+    href: null,
+    version: PortkeyNameVersion.v2,
   },
 };

@@ -32,13 +32,13 @@ export default function WalletList() {
     dispatch(basicModalView.setWalletModal(false));
   }, [dispatch]);
   const tryActivation = useCallback(
-    async (connector: Connector | string, key: string) => {
+    async (connector: Connector | string, key: string, version?: string) => {
       if (loading) return;
       setLoading({ [key]: true });
       try {
         if (typeof connector === 'string') {
-          if (isPortkeyConnector(connector)) {
-            await portkeyConnect();
+          if (isPortkeyConnector(connector) && version) {
+            await portkeyConnect(version);
             chainDispatch(setSelectELFWallet('PORTKEY'));
           } else {
             await connect();
@@ -94,7 +94,7 @@ export default function WalletList() {
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
-              tryActivation(option.connector, option.name);
+              tryActivation(option.connector, option.name, option?.version);
             }}>
             <div>{option.name}</div>
             <IconFont className="wallet-icon" type={option.iconType} />
