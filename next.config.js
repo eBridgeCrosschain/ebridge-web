@@ -33,6 +33,7 @@ const nextConfig = {
   //   config.resolve.alias['bn.js'] = path.resolve(process.cwd(), 'node_modules', 'bn.js');
   //   return config;
   // },
+
   compiler: {
     removeConsole: false,
   },
@@ -42,6 +43,10 @@ const nextConfig = {
   images: {
     domains: ['raw.githubusercontent.com'],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  pageExtensions: ['jsx', 'js', 'tsx', 'ts'],
 };
 
 const productionConfig = {

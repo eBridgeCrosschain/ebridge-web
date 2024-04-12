@@ -13,7 +13,7 @@ import { useAsync, useEffectOnce, useTimeoutFn } from 'react-use';
 import { Connection, network } from 'walletConnectors';
 import { getConnection, getConnectionName } from 'walletConnectors/utils';
 import { isPortkeyConnectEagerly } from 'utils/portkey';
-import { WebLoginProvider, getConfig, PortkeyProvider, PortkeyDid, PortkeyDidV1, useWebLogin } from 'aelf-web-login';
+import { WebLoginProvider, getConfig, PortkeyProvider, PortkeyDid, PortkeyDidV1 } from 'aelf-web-login';
 import type { ExtraWalletNames } from 'aelf-web-login';
 import { devicesEnv } from '@portkey/utils';
 import { setPortkeyConfig } from 'utils/setPortkeyConfig';
@@ -87,7 +87,7 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
     [connections],
   );
 
-  useWebLogin();
+  // useWebLogin();
 
   const [{ selectERCWallet, userELFChainId }] = useChain();
 
@@ -114,7 +114,7 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
 
   setPortkeyConfig(userELFChainId);
 
-  console.log('getConfig(): ', getConfig());
+  // console.log('getConfig(): ', getConfig());
 
   return (
     <Web3ReactProvider connectors={connectors} key={key}>
