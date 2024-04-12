@@ -15,6 +15,7 @@ import { SupportedELFChainId } from 'constants/chain';
 import { setUserELFChainId } from 'contexts/useChain/actions';
 import { Accounts } from '@portkey/provider-types';
 import { useThrottleCallback } from 'hooks';
+import { useWebLogin } from 'aelf-web-login';
 
 const INITIAL_STATE = DEFAULT_MODAL_INITIAL_STATE as ModalState;
 const ModalContext = createContext<any>(INITIAL_STATE);
@@ -74,9 +75,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   const { fromOptions, toOptions } = state;
   const [{ selectELFWallet }, { dispatch: chainDispatch }] = useChain();
+  const web3Wallet = useWeb3();
 
   const aelfWallet = useAElf();
-  const web3Wallet = useWeb3();
   const portkeyWallet = usePortkey();
   const [fromWallet, toWallet]: [Web3Type, Web3Type] = useMemo(
     () => [

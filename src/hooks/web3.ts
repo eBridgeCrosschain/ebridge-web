@@ -11,49 +11,50 @@ import { usePortkeyReact } from 'contexts/usePortkey/provider';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import CommonMessage from 'components/CommonMessage';
-export function useAEflConnect() {
-  const { activate, connectEagerly } = useAElfReact();
-  const chainDispatch = useChainDispatch();
+import { useWebLogin } from 'aelf-web-login';
+// export function useAEflConnect() {
+//   const { activate, connectEagerly } = useAElfReact();
+//   const chainDispatch = useChainDispatch();
 
-  return useCallback(
-    async (isConnectEagerly?: boolean) => {
-      try {
-        const bridges = await (isConnectEagerly ? connectEagerly : activate)(AElfNodes);
-        if (bridges) {
-          const status = await Promise.all(
-            Object.values(bridges).map((i) => {
-              if (!i.connect) return i.chain.getChainStatus();
-            }),
-          );
-          status
-            .filter((i) => !!i)
-            .forEach((i, k) => {
-              if (i && i.error) CommonMessage.error(`${Object.keys(bridges)[k]} getChainStatus error`);
-            });
-        }
-        chainDispatch(setSelectELFWallet('NIGHTELF'));
-      } catch (error: any) {
-        let message = error?.message || error;
-        if (Array.isArray(error)) message = error[0]?.errorMessage || error[0];
-        message = typeof message === 'string' ? message : JSON.stringify(message);
-        throw Error(message);
-      }
-    },
-    [activate, chainDispatch, connectEagerly],
-  );
-}
+//   return useCallback(
+//     async (isConnectEagerly?: boolean) => {
+//       try {
+//         const bridges = await (isConnectEagerly ? connectEagerly : activate)(AElfNodes);
+//         if (bridges) {
+//           const status = await Promise.all(
+//             Object.values(bridges).map((i) => {
+//               if (!i.connect) return i.chain.getChainStatus();
+//             }),
+//           );
+//           status
+//             .filter((i) => !!i)
+//             .forEach((i, k) => {
+//               if (i && i.error) CommonMessage.error(`${Object.keys(bridges)[k]} getChainStatus error`);
+//             });
+//         }
+//         chainDispatch(setSelectELFWallet('NIGHTELF'));
+//       } catch (error: any) {
+//         let message = error?.message || error;
+//         if (Array.isArray(error)) message = error[0]?.errorMessage || error[0];
+//         message = typeof message === 'string' ? message : JSON.stringify(message);
+//         throw Error(message);
+//       }
+//     },
+//     [activate, chainDispatch, connectEagerly],
+//   );
+// }
 
-export function usePortkeyConnect() {
-  const { activate, connectEagerly } = usePortkeyReact();
-  const chainDispatch = useChainDispatch();
-  return useCallback(
-    async (isConnectEagerly?: boolean) => {
-      await (isConnectEagerly ? connectEagerly : activate)();
-      chainDispatch(setSelectELFWallet('PORTKEY'));
-    },
-    [activate, chainDispatch, connectEagerly],
-  );
-}
+// export function usePortkeyConnect() {
+//   const { activate, connectEagerly } = usePortkeyReact();
+//   const chainDispatch = useChainDispatch();
+//   return useCallback(
+//     async (isConnectEagerly?: boolean) => {
+//       await (isConnectEagerly ? connectEagerly : activate)();
+//       chainDispatch(setSelectELFWallet('PORTKEY'));
+//     },
+//     [activate, chainDispatch, connectEagerly],
+//   );
+// }
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useWeb3(): Web3Type {
   const web3React = useWeb3React();
@@ -87,16 +88,17 @@ export function useWeb3(): Web3Type {
 
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
-  const aelfReact = useAElfReact();
+  const { wallet } = useWebLogin();
+  const aelfReact = wallet.nightElfInfo;
   const [{ userELFChainId }] = useChain();
   const chainId = userELFChainId;
   const tmpContext = useMemo(() => {
     const contextNetwork: any = {
       ...aelfReact,
-      aelfInstance: aelfReact.defaultAElfBridge,
-      aelfInstances: aelfReact.aelfBridges as Web3Type['aelfInstances'],
+      aelfInstance: aelfReact?.defaultAElfBridge,
+      aelfInstances: aelfReact?.aelfBridges as Web3Type['aelfInstances'],
     };
-    if (chainId && ACTIVE_CHAIN[chainId] && aelfReact.aelfBridges) {
+    if (chainId && ACTIVE_CHAIN[chainId] && aelfReact?.aelfBridges) {
       contextNetwork.aelfInstance = aelfReact.aelfBridges[chainId];
       contextNetwork.walletType = 'NIGHTELF';
     }
@@ -104,14 +106,15 @@ export function useAElf(): Web3Type {
       ...contextNetwork,
       library: undefined,
       provider: undefined,
-      connector: aelfReact.account ? 'NIGHT ELF' : undefined,
+      connector: aelfReact?.account ? 'NIGHT ELF' : undefined,
     };
   }, [aelfReact, chainId]);
   return tmpContext;
 }
 
 export function usePortkey(): Web3Type {
-  const portkeyReact = usePortkeyReact();
+  const { wallet } = useWebLogin();
+  const portkeyReact = wallet.portkeyInfo;
   const tmpContext = useMemo(() => {
     const contextNetwork: any = {
       ...portkeyReact,

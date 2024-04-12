@@ -178,3 +178,22 @@ export const CrossChainTimeList = [
 ];
 
 export const PORTKEY_NETWORK_TYPE = 'TESTNET';
+
+export const PORTKEY_NETWORK_TYPE_V2 = 'TESTNET';
+
+export const PORTKEY_SERVICE = {
+  v1: {
+    graphQLUrl: 'http://192.168.66.203:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+    apiServer: 'http://192.168.66.203:5001',
+    connectServer: 'http://192.168.66.203:8001',
+  },
+  v2: {
+    graphQLUrl: 'http://192.168.67.99:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://test3-applesign-v2.portkey.finance',
+    connectServer: 'http://192.168.67.127:8080',
+  },
+};
+
+export const APP_NAME = 'ebridge.exchange';
+
+export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';

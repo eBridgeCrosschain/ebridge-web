@@ -3,7 +3,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { basicModalView } from 'contexts/useModal/actions';
 import clsx from 'clsx';
-import { useAEflConnect, usePortkeyConnect } from 'hooks/web3';
 import { Connector } from '@web3-react/types';
 import { useChainDispatch } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
@@ -19,11 +18,13 @@ import { sleep } from 'utils';
 import { isPortkey, isPortkeyConnector } from 'utils/portkey';
 import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
+import { useWebLogin } from 'aelf-web-login';
 export default function WalletList() {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
-  const connect = useAEflConnect();
-  const portkeyConnect = usePortkeyConnect();
+
+  const { login } = useWebLogin();
+
   const [loading, setLoading] = useState<any>();
   const dispatch = useModalDispatch();
   const chainDispatch = useChainDispatch();
@@ -38,12 +39,13 @@ export default function WalletList() {
       try {
         if (typeof connector === 'string') {
           if (isPortkeyConnector(connector)) {
-            await portkeyConnect();
+            // await portkeyConnect();
             chainDispatch(setSelectELFWallet('PORTKEY'));
           } else {
-            await connect();
+            // await connect();
             chainDispatch(setSelectELFWallet('NIGHTELF'));
           }
+          login();
         } else {
           try {
             delete (connector as any).eagerConnection;

@@ -126,14 +126,11 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
 
 export const NetworkList = [
   { title: CHAIN_NAME[SupportedChainId.SEPOLIA], icon: CHAIN_ICON[SupportedChainId.SEPOLIA], info: SEPOLIA.CHAIN_INFO },
-  // { title: CHAIN_NAME[SupportedChainId.GORELI], icon: CHAIN_ICON[SupportedChainId.GORELI], info: GORELI.CHAIN_INFO },
-  // { title: CHAIN_NAME[SupportedChainId.KOVAN], icon: CHAIN_ICON[SupportedChainId.KOVAN], info: KOVAN.CHAIN_INFO },
   {
     title: CHAIN_NAME[SupportedELFChainId.AELF],
     icon: CHAIN_ICON[SupportedELFChainId.AELF],
     info: AELF_Test.CHAIN_INFO,
   },
-  // { title: CHAIN_NAME[SupportedELFChainId.tDVV], icon: CHAIN_ICON[SupportedELFChainId.tDVV], info: tDVV.CHAIN_INFO },
   {
     title: CHAIN_NAME[SupportedELFChainId.tDVW],
     icon: CHAIN_ICON[SupportedELFChainId.tDVW],
@@ -197,3 +194,22 @@ export const CrossChainTimeList = [
 ];
 
 export const PORTKEY_NETWORK_TYPE = 'TESTNET';
+
+export const PORTKEY_NETWORK_TYPE_V2 = 'TESTNET';
+
+export const PORTKEY_SERVICE = {
+  v1: {
+    graphQLUrl: 'https://dapp-portkey-test.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://did-portkey-test.portkey.finance',
+    connectServer: 'https://auth-portkey-test.portkey.finance',
+  },
+  v2: {
+    graphQLUrl: 'https://dapp-aa-portkey-test.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://aa-portkey-test.portkey.finance',
+    connectServer: 'https://auth-aa-portkey-test.portkey.finance',
+  },
+};
+
+export const APP_NAME = 'ebridge.exchange';
+
+export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';

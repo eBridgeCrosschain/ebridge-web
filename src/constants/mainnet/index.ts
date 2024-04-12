@@ -180,3 +180,22 @@ export const CrossChainTimeList = [
 ];
 
 export const PORTKEY_NETWORK_TYPE = 'MAIN';
+
+export const PORTKEY_NETWORK_TYPE_V2 = 'MAINNET';
+
+export const PORTKEY_SERVICE = {
+  v1: {
+    graphQLUrl: 'https://dapp-portkey.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://did-portkey.portkey.finance',
+    connectServer: 'https://auth-portkey.portkey.finance',
+  },
+  v2: {
+    graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://aa-portkey.portkey.finance',
+    connectServer: 'https://auth-aa-portkey.portkey.finance',
+  },
+};
+
+export const APP_NAME = 'ebridge.exchange';
+
+export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';

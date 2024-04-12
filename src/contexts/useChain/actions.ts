@@ -25,11 +25,5 @@ export const useChainView = {
   chainProviderDestroy: () => basicActions(ChainActions['destroy']),
 };
 
-export const {
-  setSelectERCWallet,
-  setUserERCChainId,
-  setUserELFChainId,
-  chainProviderDestroy,
-  // setAELFType,
-  setSelectELFWallet,
-} = useChainView;
+export const { setSelectERCWallet, setUserERCChainId, setUserELFChainId, chainProviderDestroy, setSelectELFWallet } =
+  useChainView;
