@@ -7,6 +7,7 @@ import {
   ReducerAction,
 } from './types';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
+import detectProviderV1 from '@portkey-v1/detect-provider';
 import detectProvider from '@portkey/detect-provider';
 import {
   PortkeyDid,
@@ -88,7 +89,8 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
     }
 
     try {
-      const _provider = await detectProvider();
+      const isPortkeyV2 = _webLoginContext.version === 'v2';
+      const _provider = await (isPortkeyV2 ? detectProvider() : detectProviderV1());
       if (!_provider) throw Error('provider init error');
 
       let accounts: Record<string, Array<string>> = {};
@@ -98,7 +100,7 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
       } else {
         // sdk login
         const sdkAccounts = _webLoginContext.wallet.portkeyInfo?.accounts;
-        if (_webLoginContext.version === 'v2') {
+        if (isPortkeyV2) {
           accounts = getPortkeySDKAccount(sdkAccounts);
         } else {
           const caHash = _webLoginContext.wallet.portkeyInfo?.caInfo?.caHash;

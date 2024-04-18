@@ -120,7 +120,7 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
       <PortkeyProvider networkType={PORTKEY_NETWORK_TYPE}>
         <WebLoginProvider
           extraWallets={['discover', 'elf']}
-          nightElf={{ connectEagerly: true }}
+          nightElf={{ connectEagerly: true, useMultiChain: true }}
           portkey={{
             autoShowUnlock: false,
             checkAccountInfoSync: true,
