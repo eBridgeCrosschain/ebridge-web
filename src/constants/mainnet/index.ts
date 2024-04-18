@@ -19,7 +19,7 @@ export const DEFAULT_ERC_CHAIN = SupportedChainId.MAINNET;
 export const DEFAULT_MODAL_INITIAL_STATE = {
   fromOptions: { chainType: 'ERC', chainId: DEFAULT_ERC_CHAIN },
   toOptions: { chainType: 'ELF', chainId: DEFAULT_ELF_CHAIN },
-  switchChainInConnectPorkey: {
+  switchChainInConnectPortkey: {
     status: false,
   },
 };
@@ -29,10 +29,10 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
 };
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
-export const SupportedELFChain: { [k: string | number]: ChainConstantsType } = {
+export type TELFChainConstantsType = typeof AELF | typeof tDVV;
+export const SupportedELFChain: { [k: string | number]: TELFChainConstantsType } = {
   [SupportedELFChainId.AELF]: AELF,
   [SupportedELFChainId.tDVV]: tDVV,
-  [SupportedELFChainId.tDVW]: tDVV,
 };
 
 export const ACTIVE_CHAIN: any = {
@@ -184,3 +184,33 @@ export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
 };
 
 export const PORTKEY_NETWORK_TYPE = 'MAINNET';
+
+export const WEB_LOGIN_CONFIG = {
+  chainId: 'tDVV',
+  networkType: 'MAIN',
+  portkey: {
+    graphQLUrl: 'https://dapp-portkey.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://did-portkey.portkey.finance',
+    connectServer: 'https://auth-portkey.portkey.finance',
+    caContractAddress: {
+      AELF: '28PcLvP41ouUd6UNGsNRvKpkFTe6am34nPy4YPsWUJnZNwUvzM',
+      tDVV: '2cLA9kJW3gdHuGoYNY16Qir69J3Nkn6MSsuYxRkUHbz4SG2hZr',
+    },
+  },
+  portkeyV2: {
+    networkType: 'MAINNET',
+    graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://aa-portkey.portkey.finance',
+    connectServer: 'https://auth-aa-portkey.portkey.finance',
+    caContractAddress: {
+      AELF: '2UthYi7AHRdfrqc1YCfeQnjdChDLaas65bW4WxESMGMojFiXj9',
+      tDVV: '2UthYi7AHRdfrqc1YCfeQnjdChDLaas65bW4WxESMGMojFiXj9',
+    },
+  },
+};
+
+export const APP_NAME = 'ebridge.exchange';
+
+export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';
+
+export const SupportedELFChainList = Object.values(SupportedELFChain);

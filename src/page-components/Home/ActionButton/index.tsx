@@ -239,7 +239,7 @@ function Actions() {
           'approve',
           fromAccount,
           tokenContract.contractType === 'ELF'
-            ? [bridgeContract?.address, symbol, LANG_MAX]
+            ? [bridgeContract?.address, symbol, LANG_MAX.toFixed()]
             : [bridgeContract?.address, MaxUint256],
         );
         if (!approveResult.error) {
@@ -369,6 +369,7 @@ function Actions() {
     onCreateReceipt,
     needConfirm,
   ]);
+
   useUpdateEffect(() => {
     dispatch(setActionLoading(false));
   }, [btnProps.children]);

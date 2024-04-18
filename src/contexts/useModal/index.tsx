@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useReducer } from
 import { ModalActions, ModalState, basicModalView } from './actions';
 import { formatPortkeyWallet } from 'contexts/useWallet/utils';
 import { useWallet } from 'contexts/useWallet/hooks';
-import { setSwitchChainInConnectPorkey } from 'contexts/useWallet/actions';
+import { setSwitchChainInConnectPortkey } from 'contexts/useWallet/actions';
 
 const INITIAL_STATE = {};
 const ModalContext = createContext<any>(INITIAL_STATE);
@@ -34,7 +34,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const aelfWallet = useAElf();
   const web3Wallet = useWeb3();
   const portkeyWallet = usePortkey();
-  const { switchChainInConnectPorkey } = useWallet();
+  const { switchChainInConnectPortkey } = useWallet();
   const [walletWallet, accountWallet] = useMemo(() => {
     let accountWallet, walletWallet;
     switch (accountWalletType) {
@@ -69,19 +69,19 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   }, [accountChainId, accountWalletType, aelfWallet, portkeyWallet, walletChainId, walletWalletType, web3Wallet]);
 
   useEffect(() => {
-    if (switchChainInConnectPorkey?.status) {
+    if (switchChainInConnectPortkey?.status) {
       dispatch(
         basicModalView.setPortketNotConnectModal({
           visible: true,
-          chainId: switchChainInConnectPorkey?.chainId,
+          chainId: switchChainInConnectPortkey?.chainId,
         }),
       );
-      setSwitchChainInConnectPorkey({
+      setSwitchChainInConnectPortkey({
         status: false,
         chainId: undefined,
       });
     }
-  }, [switchChainInConnectPorkey]);
+  }, [switchChainInConnectPortkey]);
 
   return (
     <ModalContext.Provider

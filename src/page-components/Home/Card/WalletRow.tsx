@@ -20,10 +20,12 @@ import { isPortkey, isSelectPortkey } from 'utils/portkey';
 import { Accounts, ChainId } from '@portkey/provider-types';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
+import { useWebLogin } from 'aelf-web-login';
 
 function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: boolean; chainType?: ChainType }) {
   const { dispatch } = useWalletActions();
   const { connector: web3Connector, chainId: web3ChainId, account: web3Account } = useWeb3();
+  const { login } = useWebLogin();
 
   const { chainId, account, connector } = wallet || {};
   const portkeyWallet = usePortkey();
@@ -51,28 +53,32 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
             className={clsx('cursor-pointer', 'flex-row-center', styles['wallet-account-row'])}>
             <WalletIcon connector={connector} className={styles['wallet-icon']} />
             <div className={styles['wallet-address']}>
-              {shortenString(isELFChain(chainId) ? formatAddress(chainId, account) : account, 8, 9)}
+              {shortenString(isELFChain(chainId) ? formatAddress(chainId, account) : account, 8, 8)}
             </div>
           </Row>
         ) : (
           <Button
             className={styles['wallet-row-btn']}
             type="primary"
-            onClick={() =>
+            onClick={() => {
+              if (chainType === 'ELF') {
+                login();
+                return;
+              }
               modalDispatch(
                 setWalletModal(true, {
                   walletWalletType: wallet?.walletType,
                   walletChainType: chainType,
                   walletChainId: chainId,
                 }),
-              )
-            }>
+              );
+            }}>
             <Trans>Connect</Trans>
           </Button>
         )}
       </>
     );
-  }, [account, chainId, chainType, connector, modalDispatch, wallet?.walletType]);
+  }, [account, chainId, chainType, connector, login, modalDispatch, wallet?.walletType]);
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
       const _wallet = portkeyWallet;

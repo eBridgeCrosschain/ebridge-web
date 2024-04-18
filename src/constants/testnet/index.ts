@@ -30,7 +30,7 @@ export const DEFAULT_ERC_CHAIN = SupportedChainId.SEPOLIA;
 export const DEFAULT_MODAL_INITIAL_STATE = {
   fromOptions: { chainType: 'ERC', chainId: DEFAULT_ERC_CHAIN },
   toOptions: { chainType: 'ELF', chainId: DEFAULT_ELF_CHAIN },
-  switchChainInConnectPorkey: {
+  switchChainInConnectPortkey: {
     status: false,
   },
 };
@@ -43,10 +43,10 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
 };
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
-export const SupportedELFChain: { [k: string | number]: ChainConstantsType } = {
+export type TELFChainConstantsType = typeof AELF_Test | typeof tDVW_Test;
+export const SupportedELFChain: { [k: string | number]: TELFChainConstantsType } = {
   [SupportedELFChainId.AELF]: AELF_Test,
   [SupportedELFChainId.tDVW]: tDVW_Test,
-  [SupportedELFChainId.tDVV]: tDVV_Test,
 };
 
 export const ACTIVE_CHAIN: any = {
@@ -202,3 +202,32 @@ export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
   'TESTSGR-1': 'SGR',
   'SGR-1': 'SGR',
 };
+export const WEB_LOGIN_CONFIG = {
+  chainId: 'tDVW',
+  networkType: 'TESTNET',
+  portkey: {
+    graphQLUrl: 'https://dapp-portkey-test.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://did-portkey-test.portkey.finance',
+    connectServer: 'https://auth-portkey-test.portkey.finance',
+    caContractAddress: {
+      AELF: 'iupiTuL2cshxB9UNauXNXe9iyCcqka7jCotodcEHGpNXeLzqG',
+      tDVW: '2WzfRW6KZhAfh3gCZ8Akw4wcti69GUNc1F2sXNa2fgjndv59bE',
+    },
+  },
+  portkeyV2: {
+    networkType: 'TESTNET',
+    graphQLUrl: 'https://dapp-aa-portkey-test.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    apiServer: 'https://aa-portkey-test.portkey.finance',
+    connectServer: 'https://auth-aa-portkey-test.portkey.finance',
+    caContractAddress: {
+      AELF: '238X6iw1j8YKcHvkDYVtYVbuYk2gJnK8UoNpVCtssynSpVC8hb',
+      tDVW: '238X6iw1j8YKcHvkDYVtYVbuYk2gJnK8UoNpVCtssynSpVC8hb',
+    },
+  },
+};
+
+export const APP_NAME = 'ebridge.exchange';
+
+export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
+
+export const SupportedELFChainList = Object.values(SupportedELFChain);

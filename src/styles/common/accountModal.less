@@ -10,13 +10,27 @@
   .@{app-prefix}-modal-body {
     padding: 24px !important;
   }
-  p {
-    line-height: 20px;
-    font-size: 14px;
-    color: @font-5;
+  .account-modal-info-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
-    .font-family-medium();
+
+    .account-modal-info-label {
+      line-height: 20px;
+      font-size: 14px;
+      color: @font-5;
+      .font-family-medium();
+    }
+    .account-modal-info-assets {
+      line-height: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      color: @font-12;
+      .font-family-medium();
+    }
   }
+
   .account-modal-card {
     border: 0;
     border-radius: 2px;
@@ -25,7 +39,7 @@
       .account-modal-account {
         font-size: 14px;
         .font-family-medium();
-        .anticon{
+        .anticon {
           margin-right: 5px;
         }
       }
