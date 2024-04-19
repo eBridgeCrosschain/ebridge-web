@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import CommonImage from 'components/CommonImage';
 import { ebridgeLog } from 'assets/images';
@@ -10,10 +10,13 @@ function Footer() {
   const router = useRouter();
 
   const isHomePage = useMemo(() => router.route === '/', [router]);
+  const goHome = useCallback(() => {
+    router.push('/');
+  }, [router]);
 
   return (
     <div className={clsx(styles['page-footer'], isHomePage && styles['home-page-footer'])}>
-      <div className={styles['ebridge-logo-box']}>
+      <div className={styles['ebridge-logo-box']} onClick={goHome}>
         <CommonImage priority src={ebridgeLog} className={styles['ebridge-logo']} />
         eBridge
       </div>
