@@ -31,7 +31,7 @@
     "@portkey/services": "2.4.5",
     "@portkey/types": "2.4.5",
     "@portkey/utils": "2.4.5",
-    "aelf-web-login": "^2.0.1-beta.7",
+    "aelf-web-login": "^2.0.1-beta.8",
     "next-transpile-modules": "^10.0.1",
     "@sentry/nextjs": "^7.48.0",
     "@walletconnect/ethereum-provider": "^2.9.2",

@@ -37,9 +37,6 @@ setGlobalConfig({
       baseURL: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
       timeout: 20 * 1000,
     },
-    loginConfig: {
-      loginMethodsOrder: ['Google', 'Apple', 'Telegram', 'Email', 'Scan'],
-    },
     serviceUrl: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
     customNetworkType: 'onLine',
   },
@@ -117,7 +114,9 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
   );
   return (
     <Web3ReactProvider connectors={connectors} key={key}>
-      <PortkeyProvider networkType={PORTKEY_NETWORK_TYPE}>
+      <PortkeyProvider
+        networkType={WEB_LOGIN_CONFIG.networkType}
+        networkTypeV2={WEB_LOGIN_CONFIG.portkeyV2.networkType}>
         <WebLoginProvider
           extraWallets={['discover', 'elf']}
           nightElf={{ connectEagerly: true, useMultiChain: true }}
