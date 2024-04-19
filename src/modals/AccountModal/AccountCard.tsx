@@ -18,6 +18,7 @@ import CommonMessage from 'components/CommonMessage';
 import { ILoginWalletContextState } from 'contexts/useLoginWallet/types';
 import { WalletType } from 'aelf-web-login';
 import { useRouter } from 'next/router';
+import IconFont from 'components/IconFont';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
@@ -106,6 +107,7 @@ function AccountCard() {
         {(accountWallet as ILoginWalletContextState)?.loginWalletType === WalletType.portkey && (
           <div onClick={jumpAssets} className="account-modal-info-assets">
             View Assets
+            <IconFont className="account-modal-info-assets-arrow" type="Search" />
           </div>
         )}
       </div>

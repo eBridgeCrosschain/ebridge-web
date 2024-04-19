@@ -17,17 +17,24 @@
     margin-bottom: 16px;
 
     .account-modal-info-label {
-      line-height: 20px;
+      line-height: 22px;
       font-size: 14px;
       color: @font-5;
       .font-family-medium();
     }
     .account-modal-info-assets {
+      display: flex;
+      align-items: center;
       line-height: 20px;
-      font-size: 14px;
+      font-size: 12px;
       cursor: pointer;
       color: @font-12;
       .font-family-medium();
+
+      &-arrow {
+        margin-left: 8px;
+        transform: rotateZ(-90deg);
+      }
     }
   }
 
