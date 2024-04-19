@@ -118,7 +118,7 @@ function AccountCard() {
           <div>
             <Row>
               <Col span={24}>
-                <Row gutter={[8, 0]}>
+                <Row>
                   {account ? (
                     <Col className="flex-row-center account-modal-account">
                       {shortenString(isELF ? formatAddress(accountChainId, account) : account, 8, 9)}
