@@ -121,7 +121,7 @@ function AccountCard() {
                 <Row>
                   {account ? (
                     <Col className="flex-row-center account-modal-account">
-                      {shortenString(isELF ? formatAddress(accountChainId, account) : account, 8, 9)}
+                      {shortenString(isELF ? formatAddress(accountChainId, account) : account, 8, 8)}
                     </Col>
                   ) : null}
                   {account ? (
