@@ -82,6 +82,7 @@ export function useAElf(): Web3Type {
     }
     return {
       ...contextNetwork,
+      chainId,
       library: undefined,
       provider: undefined,
       connector: aelfReact.account ? 'NIGHT ELF' : undefined,
