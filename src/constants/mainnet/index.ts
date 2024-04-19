@@ -183,8 +183,6 @@ export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
   'SGR-1': 'SGR',
 };
 
-export const PORTKEY_NETWORK_TYPE = 'MAINNET';
-
 export const WEB_LOGIN_CONFIG = {
   chainId: 'tDVV',
   networkType: 'MAIN',

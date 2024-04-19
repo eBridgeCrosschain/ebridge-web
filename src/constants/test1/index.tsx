@@ -176,5 +176,3 @@ export const CrossChainTimeList = [
     time: '40',
   },
 ];
-
-export const PORTKEY_NETWORK_TYPE = 'TESTNET';

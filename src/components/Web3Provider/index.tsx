@@ -1,6 +1,6 @@
 import { Web3ReactHooks, Web3ReactProvider } from '@web3-react/core';
 import { Connector } from '@web3-react/types';
-import { AELF_NODES, PORTKEY_NETWORK_TYPE, SupportedELFChain, WEB_LOGIN_CONFIG } from 'constants/index';
+import { AELF_NODES, SupportedELFChain, WEB_LOGIN_CONFIG } from 'constants/index';
 import { APP_NAME } from 'constants/misc';
 import { useChain } from 'contexts/useChain';
 import { LoginWalletProvider } from 'contexts/useLoginWallet/provider';
