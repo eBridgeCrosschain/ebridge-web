@@ -6,5 +6,6 @@ const storages = {
   userELFChainId: 'user-elf-chain-id',
   contractsFileDescriptorBase64: 'contracts-file-descriptor-base64-3',
   crossChainReceived: 'cross-chain-received',
+  portkeyCAAddresses: 'portkey-ca-addresses',
 };
 export default storages;

@@ -9,7 +9,7 @@ import Link from 'next/link';
 import IconFont from 'components/IconFont';
 import CommonSelect from 'components/CommonSelect';
 import useMediaQueries from 'hooks/useMediaQueries';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import CommonImage from 'components/CommonImage';
 import { useRouter } from 'next/router';
 import { IS_MAINNET } from 'constants/index';
@@ -47,7 +47,14 @@ function MDHeader({ selectedHref }: { selectedHref: string[] }) {
   const { t } = useLanguage();
   return (
     <>
-      <CommonImage style={{ width: IS_MAINNET ? 72 : 89, height: 24 }} src={IS_MAINNET ? logo : testLogo} alt="logo" />
+      <CommonImage
+        onClick={() => {
+          push('/');
+        }}
+        style={{ width: IS_MAINNET ? 72 : 89, height: 24 }}
+        src={IS_MAINNET ? logo : testLogo}
+        alt="logo"
+      />
       <IconFont type="more" onClick={() => setVisible(true)} />
       <Drawer
         className={styles.drawer}
@@ -78,12 +85,15 @@ function MDHeader({ selectedHref }: { selectedHref: string[] }) {
 
 export default function Header() {
   const isMd = useMediaQueries('md');
-  const { asPath } = useRouter();
+  const { asPath, push } = useRouter();
   const selectedHref = useMemo(() => {
     if (asPath.includes('nft')) return ['/nft'];
     return ['/'];
   }, [asPath]);
   const { t } = useLanguage();
+  const goHome = useCallback(() => {
+    push('/');
+  }, [push]);
   return (
     <div className={clsx(styles['header-row'])}>
       <div
@@ -97,9 +107,10 @@ export default function Header() {
         {!isMd ? (
           <>
             <CommonImage
-              style={{ width: IS_MAINNET ? 96 : 119, height: 32 }}
+              style={{ width: IS_MAINNET ? 96 : 119, height: 32, cursor: 'pointer' }}
               src={IS_MAINNET ? logo : testLogo}
               alt="logo"
+              onClick={goHome}
             />
             <div className={clsx(styles['header-body'], 'row-center')}>
               {navList.map(({ title, href }, k) => {

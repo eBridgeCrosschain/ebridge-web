@@ -27,10 +27,6 @@ export function getWalletByOptions(
       wallet = formatPortkeyWallet(portkeyWallet, chainId as ChainId);
     } else {
       wallet = { ...aelfWallet };
-      if (chainId) {
-        wallet.aelfInstance = aelfWallet.aelfInstances?.[chainId as AelfInstancesKey];
-        wallet.chainId = chainId;
-      }
     }
   } else {
     wallet = web3Wallet;

@@ -1,12 +1,9 @@
-import { AElfReactProvider } from '@aelf-react/core';
 import { Web3ReactHooks, Web3ReactProvider } from '@web3-react/core';
 import { Connector } from '@web3-react/types';
-import { PORTKEY_NETWORK_TYPE } from 'constants/index';
-import { AElfNodes } from 'constants/aelf';
+import { AELF_NODES, SupportedELFChain, WEB_LOGIN_CONFIG } from 'constants/index';
 import { APP_NAME } from 'constants/misc';
 import { useChain } from 'contexts/useChain';
-import { PortkeyReactProvider } from 'contexts/usePortkey/provider';
-import { PortkeyNameVersion } from 'contexts/usePortkey/constants';
+import { LoginWalletProvider } from 'contexts/useLoginWallet/provider';
 import useOrderedConnections from 'hooks/useOrderedConnections';
 import { useAEflConnect, usePortkeyConnect } from 'hooks/web3';
 import { useCallback, useMemo } from 'react';
@@ -14,6 +11,41 @@ import { useEffectOnce } from 'react-use';
 import { Connection, network } from 'walletConnectors';
 import { getConnection, getConnectionName } from 'walletConnectors/utils';
 import { isPortkeyConnectEagerly } from 'utils/portkey';
+import { PortkeyProvider, WebLoginProvider, setGlobalConfig } from 'aelf-web-login';
+
+setGlobalConfig({
+  appName: APP_NAME,
+  chainId: WEB_LOGIN_CONFIG.chainId,
+  networkType: WEB_LOGIN_CONFIG.networkType as any,
+  onlyShowV2: false,
+  portkey: {
+    useLocalStorage: true,
+    graphQLUrl: WEB_LOGIN_CONFIG.portkey.graphQLUrl,
+    connectUrl: WEB_LOGIN_CONFIG.portkey.connectServer,
+    serviceUrl: WEB_LOGIN_CONFIG.portkey.apiServer,
+    requestDefaults: {
+      baseURL: WEB_LOGIN_CONFIG.portkey.apiServer,
+      timeout: 20 * 1000,
+    },
+  },
+  portkeyV2: {
+    networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType as any,
+    useLocalStorage: true,
+    graphQLUrl: WEB_LOGIN_CONFIG.portkeyV2.graphQLUrl,
+    connectUrl: WEB_LOGIN_CONFIG.portkeyV2.connectServer,
+    requestDefaults: {
+      baseURL: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
+      timeout: 20 * 1000,
+    },
+    serviceUrl: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
+    customNetworkType: 'onLine',
+  },
+  aelfReact: {
+    appName: APP_NAME,
+    nodes: AELF_NODES,
+  },
+  defaultRpcUrl: SupportedELFChain[WEB_LOGIN_CONFIG.chainId].CHAIN_INFO.rpcUrl,
+});
 
 const connect = async (connector: Connector) => {
   try {
@@ -50,7 +82,7 @@ function Web3Manager({ children }: { children: JSX.Element }) {
   const tryPortkey = useCallback(
     async (isConnectEagerly?: boolean) => {
       try {
-        await portkeyConnect(PortkeyNameVersion.v1, isConnectEagerly);
+        await portkeyConnect(isConnectEagerly);
       } catch (error) {
         console.debug(error, '=====error');
       }
@@ -82,11 +114,32 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
   );
   return (
     <Web3ReactProvider connectors={connectors} key={key}>
-      <AElfReactProvider appName={APP_NAME} nodes={AElfNodes}>
-        <PortkeyReactProvider appName={APP_NAME} nodes={AElfNodes} networkType={PORTKEY_NETWORK_TYPE}>
-          <Web3Manager>{children}</Web3Manager>
-        </PortkeyReactProvider>
-      </AElfReactProvider>
+      <PortkeyProvider
+        networkType={WEB_LOGIN_CONFIG.networkType}
+        networkTypeV2={WEB_LOGIN_CONFIG.portkeyV2.networkType}>
+        <WebLoginProvider
+          extraWallets={['discover', 'elf']}
+          nightElf={{ connectEagerly: true, useMultiChain: true }}
+          portkey={{
+            autoShowUnlock: false,
+            checkAccountInfoSync: true,
+            design: 'CryptoDesign',
+          }}
+          discover={{
+            autoRequestAccount: true,
+            autoLogoutOnAccountMismatch: true,
+            autoLogoutOnChainMismatch: true,
+            autoLogoutOnDisconnected: true,
+            autoLogoutOnNetworkMismatch: false,
+            onPluginNotFound: (openStore) => {
+              openStore();
+            },
+          }}>
+          <LoginWalletProvider>
+            <Web3Manager>{children}</Web3Manager>
+          </LoginWalletProvider>
+        </WebLoginProvider>
+      </PortkeyProvider>
     </Web3ReactProvider>
   );
 }

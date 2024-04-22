@@ -1,3 +1,5 @@
+'use client';
+
 import { FromCard, ToCard } from './Card';
 import HomeProvider from './HomeContext';
 import SelectTokenModal from './SelectTokenModal';
@@ -22,8 +24,10 @@ export default function Home() {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
   const { isShowMask, isLoading } = useMaskQuery();
+
   // const isShowMask = false,
   //   isLoading = false;
+
   if (isLoading) {
     return <Skeleton paragraph={{ rows: 10 }} />;
   }

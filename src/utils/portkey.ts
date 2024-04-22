@@ -31,7 +31,7 @@ export function isPortkeyConnectEagerly() {
 }
 
 export function isPortkeyConnector(connector?: string | Connector) {
-  return connector === 'PORTKEY';
+  return connector === 'PORTKEY' || connector === 'PORTKEY V1';
 }
 
 export function isSelectPortkey(type?: string) {

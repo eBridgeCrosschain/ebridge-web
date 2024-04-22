@@ -1,7 +1,7 @@
 export const CHAIN_INFO = {
   chainId: 56,
   exploreUrl: 'https://bscscan.com/',
-  rpcUrl: 'https://bsc-dataseed.binance.org',
+  rpcUrl: 'https://bsc-dataseed1.binance.org',
   chainName: 'Binance Smart Chain Mainnet',
   nativeCurrency: {
     name: 'Binance Chain Native Token',

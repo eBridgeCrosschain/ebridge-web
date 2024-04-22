@@ -1,13 +1,13 @@
 import { useChain } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
-import { usePortkeyReact } from 'contexts/usePortkey/provider';
 import { useCallback } from 'react';
 import { ChainId } from 'types';
 import { isSelectPortkey } from 'utils/portkey';
 import { basicModalView } from 'contexts/useModal/actions';
+import { useLoginWalletContext } from 'contexts/useLoginWallet/provider';
 
 export default function useCheckPortkeyStatus() {
-  const { getWalletManagerStatus } = usePortkeyReact();
+  const { getWalletManagerStatus } = useLoginWalletContext();
   const [{ selectELFWallet }] = useChain();
   const [, { dispatch }] = useModal();
 
@@ -18,6 +18,7 @@ export default function useCheckPortkeyStatus() {
       }
 
       const status = await getWalletManagerStatus(chainId);
+      console.log('getWalletManagerStatus', status);
 
       if (!status) {
         dispatch(
@@ -30,7 +31,7 @@ export default function useCheckPortkeyStatus() {
 
       return status;
     },
-    [getWalletManagerStatus, dispatch, selectELFWallet],
+    [dispatch, getWalletManagerStatus, selectELFWallet],
   );
 
   return { checkPortkeyConnect };

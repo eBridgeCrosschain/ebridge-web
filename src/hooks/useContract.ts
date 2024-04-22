@@ -1,7 +1,7 @@
 import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, LIMIT_ABI } from 'constants/abis';
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
-import { getAElf, getWallet, isELFChain } from 'utils/aelfUtils';
+import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
 import { provider } from 'web3-core';
 import { useAElf, useWeb3 } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
@@ -10,9 +10,14 @@ import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from 'utils/checkAElfBridge';
 import { setContract } from 'contexts/useAElfContract/actions';
 import { useAElfContractContext } from 'contexts/useAElfContract';
-import { usePortkeyReact } from 'contexts/usePortkey/provider';
-import { ContractBasic } from 'utils/contract';
-import { IAElfChain } from '@portkey/provider-types';
+import { ContractBasic, PortkeySDKContractBasic } from 'utils/contract';
+import { WalletType } from 'aelf-web-login';
+import { useLoginWalletContext } from 'contexts/useLoginWallet/provider';
+import { ILoginWalletContextType } from 'contexts/useLoginWallet/types';
+import { getContractBasic } from '@portkey/contracts';
+import { WEB_LOGIN_CONFIG } from 'constants/index';
+import { IContract } from '@portkey/types';
+
 const ContractMap: { [key: string]: ContractBasic } = {};
 
 export function getContract(address: string, ABI: any, library?: provider) {
@@ -23,21 +28,61 @@ export function getContract(address: string, ABI: any, library?: provider) {
   });
 }
 
-export function getPortkeyContract(
-  address: string,
+export const getPortkeyContract = async (
+  contractAddress: string,
   chainId: ChainId,
-  portkeyChain: IAElfChain,
-  providerVersion?: string,
-) {
-  const key = address + chainId + portkeyChain.rpcUrl + String(providerVersion);
-  if (!ContractMap[key])
-    ContractMap[key] = new ContractBasic({
-      contractAddress: address,
+  portkeyWallet: ILoginWalletContextType,
+) => {
+  const { loginWalletType, wallet, version, provider } = portkeyWallet;
+  const key = `${contractAddress}_${chainId}_${wallet?.address}_${version}_${loginWalletType}`;
+  if (loginWalletType === WalletType.discover) {
+    if (ContractMap[key]) return ContractMap[key];
+    if (!provider) throw new Error('Portkey Provider undefined');
+    const portkeyChain = await provider.getChain(chainId as any);
+    const contract = new ContractBasic({
+      contractAddress,
       chainId,
       portkeyChain,
     });
-  return ContractMap[key];
-}
+    ContractMap[key] = contract;
+    return contract;
+  } else {
+    const account = wallet?.portkeyInfo?.walletInfo;
+    let sdkContract: undefined | IContract;
+    let caContract: undefined | IContract;
+    if (account) {
+      const portkeyConfig = version === 'v1' ? WEB_LOGIN_CONFIG.portkey : WEB_LOGIN_CONFIG.portkeyV2;
+      sdkContract = await getContractBasic({
+        chainType: 'aelf',
+        account,
+        contractAddress: contractAddress,
+        caContractAddress: portkeyConfig.caContractAddress[chainId as keyof typeof portkeyConfig.caContractAddress],
+        callType: 'ca',
+        caHash: wallet.portkeyInfo?.caInfo.caHash || '',
+        rpcUrl: getNodeByChainId(chainId).rpcUrl,
+      });
+      caContract = await getContractBasic({
+        chainType: 'aelf',
+        account,
+        contractAddress: portkeyConfig.caContractAddress[chainId as keyof typeof portkeyConfig.caContractAddress],
+        callType: 'eoa',
+        rpcUrl: getNodeByChainId(chainId).rpcUrl,
+      });
+    }
+    const viewInstance = chainId ? getAElf(chainId) : null;
+    const viewContract = await viewInstance?.chain.contractAt(contractAddress, getWallet());
+
+    const sdkContractBasic = new PortkeySDKContractBasic({
+      sdkContract,
+      viewContract,
+      chainId,
+      contractAddress,
+      portkeyWallet,
+      caContract,
+    });
+    return sdkContractBasic as unknown as ContractBasic;
+  }
+};
 export function useERCContract(address: string | undefined, ABI: any, chainId?: ChainId) {
   const { library } = useWeb3();
   return useMemo(() => {
@@ -119,24 +164,24 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
 }
 
 export function usePortkeyContract(contractAddress: string, chainId?: ChainId) {
-  const { provider, accounts, isActive } = usePortkeyReact();
+  const portkeyWallet = useLoginWalletContext();
+  const { accounts, isActive, version } = portkeyWallet;
   const account: string = useMemo(() => {
     if (!chainId || !isActive) return '';
     return (accounts as any)?.[chainId]?.[0];
   }, [accounts, chainId, isActive]);
   const [contracts, { dispatch }] = useAElfContractContext();
   const key = useMemo(
-    () => contractAddress + '_' + chainId + '_' + account + '_' + provider?.providerVersion,
-    [account, chainId, contractAddress, provider?.providerVersion],
+    () => `${contractAddress}_${chainId}_${account}_${version}`,
+    [account, chainId, contractAddress, version],
   );
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!provider || !chainId || !isELFChain(chainId)) return;
+      if (!chainId || !isELFChain(chainId)) return;
       try {
-        const portkeyChain = await provider.getChain(chainId as any);
         dispatch(
           setContract({
-            [key]: getPortkeyContract(contractAddress, chainId, portkeyChain, provider.providerVersion),
+            [key]: await getPortkeyContract(contractAddress, chainId, portkeyWallet),
           }),
         );
       } catch (error) {
@@ -150,7 +195,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: ChainId) {
         }
       }
     },
-    [provider, chainId, contractAddress, dispatch, key],
+    [chainId, contractAddress, dispatch, key, portkeyWallet],
   );
 
   useEffect(() => {
