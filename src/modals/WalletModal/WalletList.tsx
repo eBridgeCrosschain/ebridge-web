@@ -62,6 +62,7 @@ export default function WalletList() {
         const isStringConnector = typeof option.connector === 'string';
         const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
         if (isPortkey()) {
+          if (option.connector instanceof CoinbaseWallet) return false;
           if (isStringChain) return isPortkeyConnector(option.connector as string);
           if (!isStringConnector) return !(option.connector instanceof MetaMask);
         }

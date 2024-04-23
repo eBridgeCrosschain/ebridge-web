@@ -23,6 +23,7 @@ import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/action
 import { sleep } from 'utils';
 import { getPortkeySDKAccount, getPortkeyV1SDKAccount } from './utils';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
+import CommonMessage from 'components/CommonMessage';
 
 const INITIAL_STATE = {
   isActive: false,
@@ -90,12 +91,12 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
 
     try {
       const isPortkeyV2 = _webLoginContext.version === 'v2';
-      const _provider = await (isPortkeyV2 ? detectProvider() : detectProviderV1());
-      if (!_provider) throw Error('provider init error');
-
+      let _provider: any;
       let accounts: Record<string, Array<string>> = {};
       if (_webLoginContext.walletType === WalletType.discover) {
         // discover login
+        _provider = await (isPortkeyV2 ? detectProvider() : detectProviderV1());
+        if (!_provider) throw Error('provider init error');
         accounts = _webLoginContext.wallet.discoverInfo?.accounts || {};
       } else {
         // sdk login
@@ -142,6 +143,14 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
     webLoginContextRef.current?.login();
   }, [chainDispatch]);
   useWebLoginEvent(WebLoginEvents.LOGOUT, onLogout);
+
+  const onLoginError = useCallback((error: any) => {
+    console.log('onLoginError', error);
+    if (error?.message) {
+      CommonMessage.error(error.message);
+    }
+  }, []);
+  useWebLoginEvent(WebLoginEvents.LOGIN_ERROR, onLoginError);
 
   const getWalletManagerStatus = useCallback(
     async (chainId: ChainId) => {
