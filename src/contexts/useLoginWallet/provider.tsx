@@ -23,6 +23,7 @@ import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/action
 import { sleep } from 'utils';
 import { getPortkeySDKAccount, getPortkeyV1SDKAccount } from './utils';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
+import CommonMessage from 'components/CommonMessage';
 
 const INITIAL_STATE = {
   isActive: false,
@@ -142,6 +143,14 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
     webLoginContextRef.current?.login();
   }, [chainDispatch]);
   useWebLoginEvent(WebLoginEvents.LOGOUT, onLogout);
+
+  const onLoginError = useCallback((error: any) => {
+    console.log('onLoginError', error);
+    if (error?.message) {
+      CommonMessage.error(error.message);
+    }
+  }, []);
+  useWebLoginEvent(WebLoginEvents.LOGIN_ERROR, onLoginError);
 
   const getWalletManagerStatus = useCallback(
     async (chainId: ChainId) => {
