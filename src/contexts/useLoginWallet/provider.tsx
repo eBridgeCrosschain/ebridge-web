@@ -91,12 +91,12 @@ export function LoginWalletProvider({ children }: ILoginWalletProviderProps) {
 
     try {
       const isPortkeyV2 = _webLoginContext.version === 'v2';
-      const _provider = await (isPortkeyV2 ? detectProvider() : detectProviderV1());
-      if (!_provider) throw Error('provider init error');
-
+      let _provider: any;
       let accounts: Record<string, Array<string>> = {};
       if (_webLoginContext.walletType === WalletType.discover) {
         // discover login
+        _provider = await (isPortkeyV2 ? detectProvider() : detectProviderV1());
+        if (!_provider) throw Error('provider init error');
         accounts = _webLoginContext.wallet.discoverInfo?.accounts || {};
       } else {
         // sdk login
