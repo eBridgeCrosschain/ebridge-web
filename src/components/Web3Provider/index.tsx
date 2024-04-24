@@ -130,7 +130,7 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
             autoLogoutOnAccountMismatch: true,
             autoLogoutOnChainMismatch: true,
             autoLogoutOnDisconnected: true,
-            autoLogoutOnNetworkMismatch: false,
+            autoLogoutOnNetworkMismatch: true,
             onPluginNotFound: (openStore) => {
               openStore();
             },
