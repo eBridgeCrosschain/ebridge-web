@@ -26,7 +26,7 @@ export function getWalletByOptions(
     if (isSelectPortkey(selectELFWallet)) {
       wallet = formatPortkeyWallet(portkeyWallet, chainId as ChainId);
     } else {
-      wallet = { ...aelfWallet };
+      wallet = { ...aelfWallet, chainId };
     }
   } else {
     wallet = web3Wallet;
