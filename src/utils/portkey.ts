@@ -35,5 +35,5 @@ export function isPortkeyConnector(connector?: string | Connector) {
 }
 
 export function isSelectPortkey(type?: string) {
-  return type === 'PORTKEY';
+  return type?.includes('PORTKEY');
 }

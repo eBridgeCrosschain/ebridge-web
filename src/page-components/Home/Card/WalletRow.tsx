@@ -124,7 +124,7 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
   );
 
   const networkList = useMemo(() => {
-    const selectPortkey = isSelectPortkey(selectELFWallet);
+    const selectPortkey = isSelectPortkey(selectELFWallet) && portkeyWallet.isActive;
     if (!selectPortkey || isELFChain(wallet?.chainId)) {
       return NetworkList;
     }
@@ -134,7 +134,7 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
     }
 
     return NetworkList.filter((item) => !isELFChain(item.info.chainId));
-  }, [chainId, selectELFWallet, wallet?.chainId]);
+  }, [chainId, portkeyWallet.isActive, selectELFWallet, wallet?.chainId]);
 
   return (
     <Row className={styles['wallet-row']}>

@@ -10,7 +10,7 @@ import { getWalletByOptions, isChange } from './utils';
 import { useChain } from 'contexts/useChain';
 import { usePrevious } from 'react-use';
 import { Web3Type } from 'types';
-import { isPortkeyConnector } from 'utils/portkey';
+import { isPortkeyConnector, isSelectPortkey } from 'utils/portkey';
 import { SupportedELFChainId } from 'constants/chain';
 import { setUserELFChainId } from 'contexts/useChain/actions';
 import { Accounts } from '@portkey/provider-types';
@@ -122,12 +122,25 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   }, [dispatch, chainDispatch, fromWallet, toWallet]);
 
   useEffect(() => {
-    if (portkeyActive !== prePortkeyActive && fromOptions?.chainType === toOptions?.chainType) {
+    if (
+      isSelectPortkey(selectELFWallet) &&
+      portkeyActive !== prePortkeyActive &&
+      fromOptions?.chainType === toOptions?.chainType
+    ) {
       dispatch(setToWallet({ chainType: 'ERC' }));
     } else {
       changeWallet();
     }
-  }, [dispatch, fromOptions?.chainType, portkeyActive, prePortkeyActive, toOptions?.chainType, changeWallet]);
+  }, [
+    dispatch,
+    fromOptions?.chainType,
+    portkeyActive,
+    prePortkeyActive,
+    toOptions?.chainType,
+    changeWallet,
+    portkeyWallet,
+    selectELFWallet,
+  ]);
 
   const actions = useMemo(() => ({ dispatch }), [dispatch]);
   const isHomogeneous = useMemo(
