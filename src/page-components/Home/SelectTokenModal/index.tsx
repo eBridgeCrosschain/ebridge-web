@@ -12,6 +12,7 @@ import { useHomeContext } from '../HomeContext';
 import { setSelectModal, setAddModal, setSelectToken, homeModalDestroy } from '../HomeContext/actions';
 import styles from './styles.module.less';
 import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { formatSymbol } from 'utils/token';
 function SelectToken({ origin }: { origin?: 'from' | 'to' }) {
   const [{ selectToken }, { dispatch }] = useHomeContext();
   const { fromWallet, isHomogeneous, toWallet } = useWallet();
@@ -60,7 +61,9 @@ function SelectToken({ origin }: { origin?: 'from' | 'to' }) {
                 [styles['token-item-selected']]: item.symbol === selectToken?.symbol,
               })}>
               <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={item.symbol} />
-              {item[(origin === 'from' ? chainId : toChainId) as SupportedChainId | SupportedELFChainId]?.symbol}
+              {formatSymbol(
+                item[(origin === 'from' ? chainId : toChainId) as SupportedChainId | SupportedELFChainId]?.symbol,
+              )}
             </Row>
           );
         })}
