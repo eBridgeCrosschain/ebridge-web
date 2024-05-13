@@ -22,6 +22,7 @@ import { ZERO } from 'constants/misc';
 import { isChainAddress } from 'utils';
 import { useWalletContext } from 'contexts/useWallet';
 import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { formatSymbol } from 'utils/token';
 
 export function FromCard() {
   const [{ selectToken, fromInput, fromBalance, crossMin }, { dispatch }] = useHomeContext();
@@ -71,7 +72,8 @@ export function FromCard() {
       </Row>
       <Row justify={isMD ? 'start' : 'end'} className={styles['balance-row']}>
         <Trans>Balance</Trans>
-        {unitConverter(show)} {selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
+        {unitConverter(show)}{' '}
+        {formatSymbol(selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol)}
       </Row>
     </div>
   );

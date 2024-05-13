@@ -10,6 +10,7 @@ import { Trans } from 'react-i18next';
 import { ChainId } from 'types';
 import styles from './styles.module.less';
 import { useHomeContext } from '../HomeContext';
+import { formatSymbol } from 'utils/token';
 export function Content() {
   return (
     <div className={clsx(styles['popover-content'])}>
@@ -42,7 +43,7 @@ export function FromHeader() {
       </div>
       {isHomogeneous || !crossFee ? null : (
         <div className={clsx(styles['fee-tip'])}>
-          <Trans tOptions={{ fee: `${crossFee || 0} ELF` }}>Estimated transaction fee</Trans>
+          <Trans tOptions={{ fee: `${crossFee || 0} ${formatSymbol('ELF')}` }}>Estimated transaction fee</Trans>
         </div>
       )}
     </div>
@@ -77,7 +78,7 @@ export function SelectButton({
     <CommonButton onClick={onClick} type="select" className={clsx('flex-row-center', styles['select-token-btn'])}>
       <TokenLogo className={styles['select-token-img']} chainId={chainId} symbol={symbol} />
       <div className={clsx('flex-1', 'flex-row-center', 'flex-row-between', styles['token-title-row'])}>
-        <div className={styles['token-title']}>{title}</div>
+        <div className={styles['token-title']}>{formatSymbol(title)}</div>
         <div>
           <IconFont type="Search" />
         </div>
