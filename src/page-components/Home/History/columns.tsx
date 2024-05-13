@@ -13,6 +13,7 @@ import { getShortNameByChainId, shortenAddressByAPI } from 'utils/chain';
 import { unitConverter } from 'utils/converter';
 import { formatTime } from 'utils/time';
 import styles from './styles.module.less';
+import { formatSymbol } from 'utils/token';
 
 function Address({ address, chainId }: { address?: string; chainId: ChainId }) {
   return (
@@ -37,7 +38,7 @@ function Amount({ amount, chainId, token }: { amount?: number; chainId?: ChainId
     <div className={clsx('row-center')}>
       <TokenLogo style={{ height: 20, width: 20, marginRight: '4px' }} chainId={chainId} symbol={tmpSymbol} />
       <div>
-        {unitConverter({ num: amount, minDecimals: decimals })} {tmpSymbol}
+        {unitConverter({ num: amount, minDecimals: decimals })} {formatSymbol(tmpSymbol)}
       </div>
     </div>
   );

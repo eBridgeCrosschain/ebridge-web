@@ -30,3 +30,7 @@ export const crossTokenMin: any = {
   WETH: 0,
   USDT: 0,
 };
+
+export const SYMBOL_FORMAT_MAP: Record<string, string> = {
+  'SGR-1': 'SGR',
+};
