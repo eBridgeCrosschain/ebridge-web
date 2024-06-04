@@ -119,6 +119,35 @@
     "tDVV": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
     "tDVW": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 }
   },
+  "WUSD": {
+    "11155111": {
+      "name": "WUSD Token",
+      "decimals": 6,
+      "symbol": "WUSDvT1",
+      "address": "0x50A9FC9f46401f2e0AF52835aCD50238431C8ebc"
+    },
+    "tDVV": {
+      "name": "WUSD Token",
+      "decimals": 6,
+      "symbol": "WUSDTEST",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "WUSD Token",
+      "decimals": 6,
+      "symbol": "WUSDTEST",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "AELF": {
+      "name": "WUSD Token",
+      "decimals": 6,
+      "symbol": "WUSDTEST",
+      "address": "",
+      "issueChainId": 9992731
+    }
+  },
   "READ": {
     "AELF": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
     "tDVV": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
