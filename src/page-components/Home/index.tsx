@@ -1,3 +1,5 @@
+'use client';
+
 import { FromCard, ToCard } from './Card';
 import HomeProvider from './HomeContext';
 import SelectTokenModal from './SelectTokenModal';
@@ -11,9 +13,7 @@ import useMediaQueries from 'hooks/useMediaQueries';
 import { useLanguage } from 'i18n';
 import PageHead from 'components/PageHead';
 import { Notification, NotificationForPhone } from 'components/Notification';
-import useMaskQuery from 'hooks/useMaskQuery';
 import Mask from './Mask';
-import { Skeleton } from 'antd';
 import { isPortkey } from 'utils/portkey';
 
 import LimitAmountDescModal from './LimitAmountDescModal';
@@ -21,13 +21,8 @@ import LimitAmountDescModal from './LimitAmountDescModal';
 export default function Home() {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
-  const { isShowMask, isLoading } = useMaskQuery();
-  // const isShowMask = false,
-  //   isLoading = false;
-  if (isLoading) {
-    return <Skeleton paragraph={{ rows: 10 }} />;
-  }
 
+  const isShowMask = false;
   return (
     <HomeProvider>
       <PageHead title={t('Token Bridge')} />

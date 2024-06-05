@@ -1,7 +1,7 @@
 import { provider } from 'web3-core';
 import type { Contract } from 'web3-eth-contract';
 import Web3 from 'web3';
-import { ACTIVE_CHAIN } from '../constants';
+import { ACTIVE_CHAIN, SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
 import { getContractMethods, transformArrayToMap, getTxResult, isELFChain, encodedTransfer } from './aelfUtils';
 import { ChainId, ChainType } from 'types';
@@ -11,6 +11,9 @@ import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
 import { IAElfChain } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
+import { PortkeyDidV1, PortkeyDid } from 'aelf-web-login';
+import { ILoginWalletContextType } from 'contexts/useLoginWallet/types';
+
 export interface AbiType {
   internalType?: string;
   name?: string;
@@ -375,10 +378,8 @@ export class PortkeyContractBasic {
 
   public callSendMethod: AElfCallSendMethod = async (functionName, paramsOption, sendOptions) => {
     const contract = this.contract;
-
     if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
     const { onMethod = 'receipt', ...options } = sendOptions || {};
-
     try {
       await this.checkMethods();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
@@ -397,5 +398,124 @@ export class PortkeyContractBasic {
   };
   public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     throw new Error('Method not implemented.');
+  };
+}
+
+export class PortkeySDKContractBasic {
+  // public contract?: IContract;
+  // public provider?: provider;
+  public chainId: ChainId;
+  // public portkeyChain?: IAElfChain;
+  public contractType: string;
+  public methods?: any;
+  public address: string;
+  public sdkContract?: IContract;
+  public viewContract: any;
+  public portkeyWallet?: ILoginWalletContextType;
+  public caContract?: IContract;
+
+  constructor(
+    options: {
+      sdkContract?: IContract;
+      viewContract: any;
+      portkeyWallet?: ILoginWalletContextType;
+      caContract?: IContract;
+    } & ContractProps,
+  ) {
+    const { sdkContract, contractAddress, chainId, viewContract, portkeyWallet, caContract } = options;
+    // this.portkeyChain = options.portkeyChain;
+    // this.contract = this.portkeyChain?.getContract(options.contractAddress);
+    this.address = contractAddress;
+    // this.provider = provider;
+    this.sdkContract = sdkContract;
+    this.chainId = chainId as ChainId;
+    this.viewContract = viewContract;
+    this.contractType = 'ELF';
+    this.portkeyWallet = portkeyWallet;
+    this.caContract = caContract;
+  }
+
+  getFileDescriptorsSet = async (address: string) => {
+    try {
+      this.methods = await getContractMethods(this.chainId, address);
+    } catch (error) {
+      throw new Error(JSON.stringify(error) + 'address:' + address + 'Contract:' + 'getContractMethods');
+    }
+  };
+  checkMethods = async () => {
+    if (!this.methods) await this.getFileDescriptorsSet(this.address);
+  };
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    const contract = this.viewContract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error1' } };
+    try {
+      await this.checkMethods();
+      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
+      const inputType = this.methods[functionNameUpper];
+
+      const req = await contract[functionNameUpper].call(transformArrayToMap(inputType, paramsOption));
+      if (!req?.error && (req?.result || req?.result === null)) return req.result;
+      return req;
+    } catch (e) {
+      return { error: e };
+    }
+  };
+
+  public callSendMethod: CallSendMethod = async (functionName, _account, paramsOption, sendOptions) => {
+    const { onMethod = 'receipt', ...options } = sendOptions || {};
+    const { TOKEN_CONTRACT } = SupportedELFChain[this.chainId];
+
+    if (this.address === TOKEN_CONTRACT && functionName === 'approve') {
+      const contract = this.caContract;
+      if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
+
+      const caHash = this.portkeyWallet?.wallet?.portkeyInfo?.caInfo.caHash || '';
+      const originChainId = this.portkeyWallet?.wallet?.portkeyInfo?.chainId as any;
+      const managerApprove =
+        this.portkeyWallet?.version === 'v1' ? PortkeyDidV1.managerApprove : PortkeyDid.managerApprove;
+
+      const { amount, guardiansApproved } = await managerApprove({
+        originChainId,
+        targetChainId: this.chainId as any,
+        caHash,
+        symbol: paramsOption[1],
+        amount: paramsOption[2],
+        networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType as any,
+      });
+      const managerApproveProps = {
+        caHash,
+        spender: paramsOption[0],
+        guardiansApproved,
+        symbol: paramsOption[1],
+        amount,
+      };
+      const req = await contract.callSendMethod('ManagerApprove', '', managerApproveProps, {
+        onMethod,
+        ...options,
+      });
+      if (req.error) return req;
+      return req?.data || req;
+    }
+
+    const contract = this.sdkContract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
+
+    try {
+      await this.checkMethods();
+      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
+      const inputType = this.methods[functionNameUpper];
+
+      const paramsOptionMap = transformArrayToMap(inputType, paramsOption);
+
+      const req = await contract.callSendMethod(functionNameUpper, '', paramsOptionMap, {
+        onMethod,
+        ...options,
+      });
+      if (req.error) return req;
+      return req?.data || req;
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
   };
 }

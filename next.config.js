@@ -63,7 +63,9 @@ const productionConfig = {
   resolve: {},
 };
 
+const withTM = require('next-transpile-modules')(['antd-mobile', '@portkey/did-ui-react']);
+
 module.exports = withPlugins(
   plugins,
-  ANALYZE === 'true' || process.env.NEXT_PUBLIC_APP_ENV === 'mainnet' ? productionConfig : nextConfig,
+  ANALYZE === 'true' || process.env.NEXT_PUBLIC_APP_ENV === 'mainnet' ? withTM(productionConfig) : withTM(nextConfig),
 );

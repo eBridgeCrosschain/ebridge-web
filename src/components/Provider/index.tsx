@@ -11,6 +11,7 @@ import Modals from 'modals';
 import type { ReactNode } from 'react';
 import { initLanguage, useLanguage } from 'i18n';
 import { ANTD_LOCAL } from 'i18n/config';
+
 ConfigProvider.config({ prefixCls });
 initLanguage(localStorage);
 export default function Provider({ children }: { children: ReactNode }) {

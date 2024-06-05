@@ -18,7 +18,7 @@ export const DEFAULT_ERC_CHAIN = SupportedChainId.SEPOLIA;
 export const DEFAULT_MODAL_INITIAL_STATE = {
   fromOptions: { chainType: 'ERC', chainId: DEFAULT_ERC_CHAIN },
   toOptions: { chainType: 'ELF', chainId: DEFAULT_ELF_CHAIN },
-  switchChainInConnectPorkey: {
+  switchChainInConnectPortkey: {
     status: false,
   },
 };
@@ -176,5 +176,3 @@ export const CrossChainTimeList = [
     time: '40',
   },
 ];
-
-export const PORTKEY_NETWORK_TYPE = 'TESTNET';

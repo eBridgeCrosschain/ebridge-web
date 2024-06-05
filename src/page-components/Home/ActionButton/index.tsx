@@ -23,6 +23,7 @@ import CheckToFillAddressModal from './CheckToFillAddressModal';
 import useLimitAmountModal from '../useLimitAmountModal';
 import CommonMessage from 'components/CommonMessage';
 import useCheckPortkeyStatus from 'hooks/useCheckPortkeyStatus';
+import { formatSymbol } from 'utils/token';
 
 function Actions() {
   const { fromWallet, toWallet, isHomogeneous } = useWallet();
@@ -239,7 +240,7 @@ function Actions() {
           'approve',
           fromAccount,
           tokenContract.contractType === 'ELF'
-            ? [bridgeContract?.address, symbol, LANG_MAX]
+            ? [bridgeContract?.address, symbol, LANG_MAX.toFixed()]
             : [bridgeContract?.address, MaxUint256],
         );
         if (!approveResult.error) {
@@ -308,7 +309,7 @@ function Actions() {
         symbol = fromTokenInfo?.symbol;
       }
       if (symbol) {
-        children = t('Approve symbol', { symbol: formatNativeToken(symbol) });
+        children = t('Approve symbol', { symbol: formatSymbol(formatNativeToken(symbol)) });
         disabled = false;
         onClick = () => onApprove(symbol);
         return { children, onClick, disabled };
@@ -369,6 +370,7 @@ function Actions() {
     onCreateReceipt,
     needConfirm,
   ]);
+
   useUpdateEffect(() => {
     dispatch(setActionLoading(false));
   }, [btnProps.children]);

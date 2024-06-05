@@ -24,5 +24,5 @@ export function getCrossChainTime(fromChainId?: ChainId, toChainId?: ChainId) {
   const item = CrossChainTimeList.find(
     (i) => isIncludesChainId(i.fromChainId, fromChainId) && isIncludesChainId(i.toChainId, toChainId),
   );
-  return item?.time || '500s';
+  return item?.time || '10';
 }

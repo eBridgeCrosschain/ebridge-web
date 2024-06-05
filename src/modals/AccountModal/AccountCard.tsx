@@ -15,10 +15,15 @@ import { setSelectERCWallet } from 'contexts/useChain/actions';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
+import { ILoginWalletContextState } from 'contexts/useLoginWallet/types';
+import { WalletType } from 'aelf-web-login';
+import { useRouter } from 'next/router';
+import IconFont from 'components/IconFont';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
+  const router = useRouter();
 
   const { connector, account, chainId, deactivate, aelfInstance, walletType } = accountWallet || {};
   const filter = useCallback(
@@ -40,6 +45,7 @@ function AccountCard() {
       .map((k) => SUPPORTED_WALLETS[k].name)[0];
     return `Connected with ${name}`;
   }, [filter]);
+
   const onDisconnect = useCallback(async () => {
     if (typeof connector !== 'string') {
       try {
@@ -54,6 +60,11 @@ function AccountCard() {
     } else {
       deactivate?.();
     }
+    if (walletType !== 'ERC') {
+      dispatch(basicModalView.modalDestroy());
+      return;
+    }
+
     dispatch(
       basicModalView.setWalletModal(true, {
         walletWalletType: walletType,
@@ -64,6 +75,11 @@ function AccountCard() {
   }, [connector, dispatch, walletType, chainId, connection?.connector, chainDispatch, deactivate]);
 
   const changeWallet = useCallback(async () => {
+    if (walletType !== 'ERC') {
+      onDisconnect();
+      return;
+    }
+
     try {
       return dispatch(
         basicModalView.setWalletModal(true, {
@@ -76,22 +92,36 @@ function AccountCard() {
       console.debug(`connection error: ${error}`);
       CommonMessage.error(`connection error: ${error.message}`);
     }
-  }, [chainId, dispatch, walletType]);
+  }, [chainId, dispatch, onDisconnect, walletType]);
+
   const isELF = isELFChain(chainId);
 
+  const jumpAssets = useCallback(() => {
+    dispatch(basicModalView.modalDestroy());
+    router.push('/assets');
+  }, [dispatch, router]);
   return (
     <>
-      <p>{formatConnectorName}</p>
+      <div className="account-modal-info-wrap">
+        <div className="account-modal-info-label">{formatConnectorName}</div>
+        {(accountWallet as ILoginWalletContextState)?.loginWalletType === WalletType.portkey && (
+          <div onClick={jumpAssets} className="account-modal-info-assets">
+            View Assets
+            <IconFont className="account-modal-info-assets-arrow" type="Search" />
+          </div>
+        )}
+      </div>
+
       <Card className="account-modal-card">
         <div className="account-modal-card-box">
           {account && <WalletIcon className="account-modal-card-box-icon" connector={connector} />}
           <div>
             <Row>
               <Col span={24}>
-                <Row gutter={[8, 0]}>
+                <Row>
                   {account ? (
                     <Col className="flex-row-center account-modal-account">
-                      {shortenString(isELF ? formatAddress(accountChainId, account) : account, 8, 9)}
+                      {shortenString(isELF ? formatAddress(accountChainId, account) : account, 8, 8)}
                     </Col>
                   ) : null}
                   {account ? (

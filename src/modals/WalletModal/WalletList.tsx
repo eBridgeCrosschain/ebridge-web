@@ -3,11 +3,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { basicModalView } from 'contexts/useModal/actions';
 import clsx from 'clsx';
-import { useAEflConnect, usePortkeyConnect } from 'hooks/web3';
 import { Connector } from '@web3-react/types';
 import { useChainDispatch } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
-import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/actions';
+import { setSelectERCWallet } from 'contexts/useChain/actions';
 import IconFont from 'components/IconFont';
 import { SUPPORTED_WALLETS } from 'constants/wallets';
 import { getConnection } from 'walletConnectors/utils';
@@ -22,8 +21,6 @@ import CommonMessage from 'components/CommonMessage';
 export default function WalletList() {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
-  const connect = useAEflConnect();
-  const portkeyConnect = usePortkeyConnect();
   const [loading, setLoading] = useState<any>();
   const dispatch = useModalDispatch();
   const chainDispatch = useChainDispatch();
@@ -32,27 +29,18 @@ export default function WalletList() {
     dispatch(basicModalView.setWalletModal(false));
   }, [dispatch]);
   const tryActivation = useCallback(
-    async (connector: Connector | string, key: string, version?: string) => {
-      if (loading) return;
+    async (connector: Connector | string, key: string) => {
+      if (loading || typeof connector === 'string') return;
       setLoading({ [key]: true });
       try {
-        if (typeof connector === 'string') {
-          if (isPortkeyConnector(connector) && version) {
-            await portkeyConnect(version);
-            chainDispatch(setSelectELFWallet('PORTKEY'));
-          } else {
-            await connect();
-            chainDispatch(setSelectELFWallet('NIGHTELF'));
-          }
-        } else {
-          try {
-            delete (connector as any).eagerConnection;
-          } catch (error) {
-            // fix network error
-          }
-          await connector.activate();
-          chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
+        try {
+          delete (connector as any).eagerConnection;
+        } catch (error) {
+          // fix network error
         }
+        await connector.activate();
+        chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
+
         if (connector instanceof CoinbaseWallet) {
           await sleep(500);
           await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
@@ -64,7 +52,7 @@ export default function WalletList() {
       }
       setLoading(undefined);
     },
-    [chainDispatch, connect, loading, onCancel, portkeyConnect],
+    [chainDispatch, loading, onCancel],
   );
 
   const walletList = useMemo(
@@ -74,6 +62,7 @@ export default function WalletList() {
         const isStringConnector = typeof option.connector === 'string';
         const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
         if (isPortkey()) {
+          if (option.connector instanceof CoinbaseWallet) return false;
           if (isStringChain) return isPortkeyConnector(option.connector as string);
           if (!isStringConnector) return !(option.connector instanceof MetaMask);
         }
@@ -94,7 +83,7 @@ export default function WalletList() {
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
-              tryActivation(option.connector, option.name, option?.version);
+              tryActivation(option.connector, option.name);
             }}>
             <div>{option.name}</div>
             <IconFont className="wallet-icon" type={option.iconType} />

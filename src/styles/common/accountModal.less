@@ -8,15 +8,39 @@
     }
   }
   .@{app-prefix}-modal-body {
-    padding: 24px !important;
+    padding: 24px;
   }
-  p {
-    line-height: 20px;
-    font-size: 14px;
-    color: @font-5;
+  .account-modal-info-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
-    .font-family-medium();
+
+    .account-modal-info-label {
+      line-height: 22px;
+      font-size: 14px;
+      color: @font-5;
+      .font-family-medium();
+    }
+    .account-modal-info-assets {
+      display: flex;
+      align-items: center;
+      line-height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      color: @font-12;
+      min-width: 100px;
+      margin-left: 8px;
+      justify-content: flex-end;
+      .font-family-medium();
+
+      &-arrow {
+        margin-left: 8px;
+        transform: rotateZ(-90deg);
+      }
+    }
   }
+
   .account-modal-card {
     border: 0;
     border-radius: 2px;
@@ -25,7 +49,7 @@
       .account-modal-account {
         font-size: 14px;
         .font-family-medium();
-        .anticon{
+        .anticon {
           margin-right: 5px;
         }
       }
@@ -34,6 +58,7 @@
         font-size: 14px;
         height: 18px;
         line-height: 18px;
+        margin-left: 8px;
         .anticon {
           margin-right: 2px;
           font-size: 16px;

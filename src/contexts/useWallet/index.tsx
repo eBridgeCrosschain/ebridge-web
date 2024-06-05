@@ -5,12 +5,12 @@ import useStorageReducer, { StorageOptions } from 'hooks/useStorageReducer';
 import { useAElf, usePortkey, useWeb3 } from 'hooks/web3';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { isELFChain } from 'utils/aelfUtils';
-import { WalletActions, ModalState, setToWallet, setFromWallet, setSwitchChainInConnectPorkey } from './actions';
+import { WalletActions, ModalState, setToWallet, setFromWallet, setSwitchChainInConnectPortkey } from './actions';
 import { getWalletByOptions, isChange } from './utils';
 import { useChain } from 'contexts/useChain';
 import { usePrevious } from 'react-use';
 import { Web3Type } from 'types';
-import { isPortkeyConnector } from 'utils/portkey';
+import { isPortkeyConnector, isSelectPortkey } from 'utils/portkey';
 import { SupportedELFChainId } from 'constants/chain';
 import { setUserELFChainId } from 'contexts/useChain/actions';
 import { Accounts } from '@portkey/provider-types';
@@ -48,9 +48,9 @@ function reducer(state: ModalState, { type, payload }: { type: WalletActions; pa
       if (isChange(fromOptions, payload.toOptions)) newState.fromOptions = toOptions;
       return Object.assign({}, state, newState);
     }
-    case WalletActions.setSwitchChainInConnectPorkey: {
+    case WalletActions.setSwitchChainInConnectPortkey: {
       return Object.assign({}, state, {
-        switchChainInConnectPorkey: payload,
+        switchChainInConnectPortkey: payload,
       });
     }
     default: {
@@ -62,8 +62,8 @@ function reducer(state: ModalState, { type, payload }: { type: WalletActions; pa
 }
 
 const options: StorageOptions = {
-  key: storages.useWallet + process.env.NEXT_PUBLIC_APP_ENV,
-  blacklist: ['switchChainInConnectPorkey'],
+  key: storages.useWallet + (process.env.NEXT_PUBLIC_APP_ENV || ''),
+  blacklist: ['switchChainInConnectPortkey'],
 };
 export default function Provider({ children }: { children: React.ReactNode }) {
   const [state, dispatch]: [ModalState, BasicActions<WalletActions>['dispatch']] = useStorageReducer(
@@ -85,6 +85,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     ],
     [aelfWallet, web3Wallet, portkeyWallet, fromOptions, selectELFWallet, toOptions],
   );
+
   const portkeyActive = useMemo(() => portkeyWallet.isActive, [portkeyWallet.isActive]);
   const prePortkeyActive = usePrevious(portkeyActive);
 
@@ -108,7 +109,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
         (portkeyActive && !isForm && activeChainId !== toOptions?.chainId)
       ) {
         dispatch(
-          setSwitchChainInConnectPorkey({
+          setSwitchChainInConnectPortkey({
             status: true,
             chainId: isForm ? fromOptions?.chainId : toOptions?.chainId,
           }),
@@ -121,12 +122,25 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   }, [dispatch, chainDispatch, fromWallet, toWallet]);
 
   useEffect(() => {
-    if (portkeyActive !== prePortkeyActive && fromOptions?.chainType === toOptions?.chainType) {
+    if (
+      isSelectPortkey(selectELFWallet) &&
+      portkeyActive !== prePortkeyActive &&
+      fromOptions?.chainType === toOptions?.chainType
+    ) {
       dispatch(setToWallet({ chainType: 'ERC' }));
     } else {
       changeWallet();
     }
-  }, [dispatch, fromOptions?.chainType, portkeyActive, prePortkeyActive, toOptions?.chainType, changeWallet]);
+  }, [
+    dispatch,
+    fromOptions?.chainType,
+    portkeyActive,
+    prePortkeyActive,
+    toOptions?.chainType,
+    changeWallet,
+    portkeyWallet,
+    selectELFWallet,
+  ]);
 
   const actions = useMemo(() => ({ dispatch }), [dispatch]);
   const isHomogeneous = useMemo(

@@ -45,7 +45,7 @@
     "Tokens will arrive automatically after being sent": "Please allow some time for tokens to be shown automatically in your wallet.",
     "The cross-chain transaction fee will be covered by AELF": "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.",
     "Estimated time of sending tokens is time. Please select Receipt ID and receive the token(s) transferred": "Estimated time of arrival is {{time}} minutes.",
-    "Once the token is sent cross-chain": "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the \"To\" wallet, and select the \"Receipt ID\" to receive the token. This will incur transaction fees on {{toChain}} so the recipient should ensure there a sufficient balance to pay for the fees.",
+    "Once the token is sent cross-chain": "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the \"To\" wallet, and select the \"Receipt ID\" to receive the token. This will incur transaction fees on {{toChain}} so the recipient should ensure there's a sufficient balance to pay for the fees.",
     "Token not received?": "Token not received?",
     "Initiate cross-chain transfer to the recipient's address": "Enter recipient address and send (no need to connect the \"To\" wallet)",
     "Tips": "Tips",
