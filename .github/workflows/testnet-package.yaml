@@ -58,7 +58,7 @@ jobs:
           github-token: ${{ secrets.TOK }}
           script: |
             await github.rest.actions.createWorkflowDispatch({
-              owner: 'eBridgeWebProject',
+              owner: 'eBridgeCrosschain',
               repo: 'devops',
               workflow_id: 'deployment_testnet.yaml',
               ref: 'main',
