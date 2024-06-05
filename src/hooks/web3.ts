@@ -78,8 +78,8 @@ export function useAElf(): Web3Type {
     };
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
-      contextNetwork.walletType = 'NIGHTELF';
     }
+    contextNetwork.walletType = 'NIGHTELF';
     return {
       ...contextNetwork,
       chainId,
