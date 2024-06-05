@@ -106,27 +106,17 @@ export async function getELFContract(
   const viewInstance = chainId ? getAElf(chainId) : null;
   const wallet = account ? { address: account } : getWallet();
   await checkAElfBridge(aelfInstance);
-  if (aelfInstance.connect) {
-    const [viewContract, aelfContract] = await Promise.all([
-      viewInstance?.chain.contractAt(contractAddress, getWallet()),
-      aelfInstance?.chain.contractAt(contractAddress, wallet),
-    ]);
+  const [viewContract, aelfContract] = await Promise.all([
+    viewInstance?.chain.contractAt(contractAddress, getWallet()),
+    aelfInstance?.chain.contractAt(contractAddress, wallet),
+  ]);
 
-    return new ContractBasic({
-      aelfContract,
-      contractAddress,
-      chainId,
-      aelfInstance,
-      viewContract,
-    });
-  }
-  const aelfContract = await aelfInstance?.chain.contractAt(contractAddress, wallet);
   return new ContractBasic({
     aelfContract,
     contractAddress,
     chainId,
     aelfInstance,
-    viewContract: aelfContract,
+    viewContract,
   });
 }
 
