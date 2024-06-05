@@ -5,7 +5,7 @@ on:
     branches: ['dev']
 jobs:
   build-and-push-image:
-    runs-on: eBridge-web-runner
+    runs-on: eBridge-runner
     permissions:
       contents: read
     outputs:
