@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:18 AS base
 
 ARG web=/opt/workspace/aelf-bridge-frontend
 
@@ -30,6 +30,12 @@ ENV ENV_NAME=${ENV_NAME}
 WORKDIR ${web}
 
 COPY . ${web}
+
+# # add git
+# RUN apk add git
+
+# # add python
+# RUN apk add --no-cache python3 make g++
 
 RUN yarn \
     && NEXT_PUBLIC_SENTRY_DNS=${NEXT_PUBLIC_SENTRY_DNS} NEXT_PUBLIC_ANALYTICS_ID=${NEXT_PUBLIC_ANALYTICS_ID} NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV} NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID} ENV_NAME=${ENV_NAME} yarn build
