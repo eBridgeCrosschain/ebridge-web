@@ -162,7 +162,7 @@ export function formatAddress(value: string) {
 export function formatNativeToken(symbol?: string) {
   if (!symbol) return symbol;
   if (NATIVE_TOKEN_LIST.includes(symbol)) return symbol.slice(1);
-  // if (BRIDGE_TOKEN_MAP[symbol]) return BRIDGE_TOKEN_MAP[symbol];
+  if (BRIDGE_TOKEN_MAP[symbol]) return BRIDGE_TOKEN_MAP[symbol];
   return symbol;
 }
 

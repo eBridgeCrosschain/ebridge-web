@@ -6,6 +6,7 @@ import { divDecimals } from 'utils/calculate';
 import { getChainIdToMap } from 'utils/chain';
 import { useBridgeContract } from './useContract';
 import useInterval from './useInterval';
+import { useReturnLastCallback } from 'hooks';
 
 export function useCrossFee() {
   const { fromWallet, toWallet } = useWallet();
@@ -13,11 +14,25 @@ export function useCrossFee() {
   const bridgeContract = useBridgeContract(fromChainId, fromWallet?.isPortkey);
   const { chainId: toChainId } = toWallet || {};
   const [fee, setFee] = useState<string>();
-  const getFeeByChainId = useCallback(async () => {
-    if (!bridgeContract || !(isELFChain(fromChainId) && !isELFChain(toChainId))) return setFee(undefined);
+  const getFeeByChainId = useReturnLastCallback(async () => {
+    if (!bridgeContract || !(isELFChain(fromChainId) && !isELFChain(toChainId))) return undefined;
+
     const req = await bridgeContract.callViewMethod('GetFeeByChainId', [getChainIdToMap(toChainId)]);
-    if (req && !req.error) setFee(divDecimals(req.value, CrossFeeTokenDecimals).dp(2).toFixed());
+    if (req && !req.error) {
+      return divDecimals(req.value, CrossFeeTokenDecimals).dp(2).toFixed();
+    }
+    return undefined;
   }, [bridgeContract, fromChainId, toChainId]);
-  useInterval(getFeeByChainId, 30000, [getFeeByChainId]);
+
+  const refreshFeeByChainId = useCallback(async () => {
+    try {
+      const result = await getFeeByChainId();
+      setFee(result);
+    } catch (error) {
+      console.log('refreshFeeByChainId error', error);
+    }
+  }, [getFeeByChainId]);
+
+  useInterval(refreshFeeByChainId, 30000, [refreshFeeByChainId]);
   return fee;
 }

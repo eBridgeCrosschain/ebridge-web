@@ -199,6 +199,8 @@ export const CrossChainTimeList = [
 export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
   'TESTSGR-1': 'SGR',
   'SGR-1': 'SGR',
+  WUSDvT1: 'WUSD',
+  WUSDTEST: 'WUSD',
 };
 export const WEB_LOGIN_CONFIG = {
   chainId: 'tDVW',
