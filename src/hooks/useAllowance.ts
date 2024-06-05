@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ZERO } from 'constants/misc';
+import { useReturnLastCallback } from 'hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { ContractBasic } from 'utils/contract';
 export function useAllowance(
@@ -9,27 +10,39 @@ export function useAllowance(
   symbol?: string,
 ): [BigNumber | undefined, () => void] {
   const [allowance, setAllowance] = useState<BigNumber>();
-  const getAllowance = useCallback(async () => {
-    if (!tokenContract) return setAllowance(undefined);
+
+  const getAllowance = useReturnLastCallback(async () => {
+    if (!tokenContract) return undefined;
     if (tokenContract.contractType === 'ELF') {
-      if (!symbol) return setAllowance(undefined);
+      if (!symbol) return undefined;
       const req = await tokenContract?.callViewMethod('GetAllowance', [symbol, account, approveTargetAddress]);
       if (!req.error) {
         const allowanceBN = new BigNumber(req.allowance ?? req.amount ?? 0);
-        setAllowance(allowanceBN);
+        return allowanceBN;
       }
     } else {
       const req = await tokenContract?.callViewMethod('allowance', [account, approveTargetAddress]);
       if (!req.error) {
-        setAllowance(ZERO.plus(req));
+        return ZERO.plus(req);
       }
     }
+    return undefined;
   }, [account, approveTargetAddress, symbol, tokenContract]);
-  useEffect(() => {
-    getAllowance();
+
+  const refreshAllowance = useCallback(async () => {
+    try {
+      const result = await getAllowance();
+      setAllowance(result);
+    } catch (error) {
+      console.log('refreshAllowance', error);
+    }
   }, [getAllowance]);
+
+  useEffect(() => {
+    refreshAllowance();
+  }, [refreshAllowance]);
   useEffect(() => {
     if (!account) setAllowance(undefined);
   }, [account]);
-  return [allowance, getAllowance];
+  return [allowance, refreshAllowance];
 }
