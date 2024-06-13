@@ -2,7 +2,7 @@
 name: Build and Push Image
 on:
   push:
-    branches: ['master']
+    branches: ['feature/test-mainnet-deploy']
 jobs:
   build-and-push-image:
     runs-on: eBridge-runner
