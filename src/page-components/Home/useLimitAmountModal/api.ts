@@ -7,6 +7,7 @@ import { getChainIdToMap, getShortNameByChainId } from 'utils/chain';
 import { isELFChain } from 'utils/aelfUtils';
 import { requestGql } from 'api';
 import CommonMessage from 'components/CommonMessage';
+import { INDEXER_URL } from 'constants/index';
 
 interface LimitDataByGqlProps {
   fromChainId: ChainId;
@@ -60,7 +61,7 @@ export const getLimitData = async ({
 }): Promise<LimitDataProps | undefined> => {
   try {
     const client = requestGql({
-      uri: '/AElfIndexer_eBridge/EbridgeIndexerPluginSchema/graphql',
+      uri: `${INDEXER_URL}/AElfIndexer_eBridge/EbridgeIndexerPluginSchema/graphql`,
     });
     const result = await client.query<{
       queryCrossChainLimitInfos: {
