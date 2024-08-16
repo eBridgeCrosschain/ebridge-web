@@ -25,7 +25,7 @@ export default function Home() {
   const isShowMask = true;
   return (
     <HomeProvider>
-      <PageHead title={t('Token Bridge')} />
+      <PageHead title={t('eBridge: Cross-chain Bridge')} />
       {!isShowMask ? (
         <>
           <div className={styles.body}>

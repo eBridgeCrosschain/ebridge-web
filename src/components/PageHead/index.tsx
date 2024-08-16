@@ -12,7 +12,10 @@ export default function PageHead(props: DefaultHeadProps) {
   );
 }
 
-export function DefaultHead({ title = 'eBridge', description }: DefaultHeadProps) {
+export function DefaultHead({
+  title = 'eBridge: Cross-chain Bridge',
+  description = 'Web3 cross-chain bridge that facilitates seamless token transfer between the aelf blockchain and Ethereum Virtual Machine (EVM) compatible networks.',
+}: DefaultHeadProps) {
   return (
     <Head>
       <title>{title}</title>
@@ -22,6 +25,7 @@ export function DefaultHead({ title = 'eBridge', description }: DefaultHeadProps
         content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"
       />
       <meta name="description" content={description || title} />
+      <meta name="keywords" content="crosschain,blockchain,crypto,transaction,bridge,interoperability" />
     </Head>
   );
 }
