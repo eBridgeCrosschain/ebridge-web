@@ -3,7 +3,7 @@ name: Build and Push Image
 on:
   push:
     tags: ['v*.*.*']
-    branches: ['master']
+    # branches: ['master']
 jobs:
   build-and-push-image:
     runs-on: eBridge-runner

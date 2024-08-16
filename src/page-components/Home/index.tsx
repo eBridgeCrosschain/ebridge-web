@@ -22,10 +22,10 @@ export default function Home() {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
 
-  const isShowMask = true;
+  const isShowMask = false;
   return (
     <HomeProvider>
-      <PageHead title={t('Token Bridge')} />
+      <PageHead title={t('eBridge: Cross-chain Bridge')} />
       {!isShowMask ? (
         <>
           <div className={styles.body}>
