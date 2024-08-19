@@ -70,9 +70,19 @@ export default function LimitAmountDescModal() {
             <Col span={24}>
               <Row gutter={[0, 8]}>
                 {Object.values(t('eBridge rate limits desc', { returnObjects: true })).map((ele: any, idx: number) => (
-                  <Col span={24} key={idx} className={styles['item-text']}>
-                    {ele}
-                  </Col>
+                  <>
+                    <Col span={24} key={idx} className={styles['item-text']}>
+                      {ele}
+                    </Col>
+                    {idx === 0 &&
+                      Object.values(t('eBridge rate limits desc section 1 list', { returnObjects: true })).map(
+                        (ele: any, innerIdx: number) => (
+                          <Col span={24} key={innerIdx} className={styles['item-text']}>
+                            {ele}
+                          </Col>
+                        ),
+                      )}
+                  </>
                 ))}
               </Row>
             </Col>

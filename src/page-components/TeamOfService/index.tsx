@@ -23,7 +23,7 @@ function TeamOfService() {
           <Row gutter={[0, 8]}>
             <Col className={styles['h1-title']}>1. Modification of these Terms</Col>
             <Col>
-              {`eBridge reserves the right, in its sole discretion, to modify these Terms from time to time. If any modifications are made, we will be notified by an updated to the date at the top of the Terms. A current version of the Terms is maintained at `}
+              {`eBridge reserves the right, in its sole discretion, to modify these Terms from time to time. If any modifications are made, we will be notified by an update to the date at the top of the Terms. A current version of the Terms is maintained at `}
               <a target="_blank" href="https://ebridge.exchange/" rel="noreferrer">
                 https://ebridge.exchange/
               </a>
@@ -199,8 +199,8 @@ function TeamOfService() {
             </Col>
             <Col>
               {`eBridge will use our best efforts to resolve any potential disputes through informal, good faith negotiations. If a potential dispute arises, you must contact us by sending an email to notices `}
-              <a target="_blank" href="mailto:ebridge.exchange@gmail.com" rel="noreferrer">
-                ebridge.exchange@gmail.com
+              <a target="_blank" href="mailto:contact@ebridge.exchange" rel="noreferrer">
+                contact@ebridge.exchange
               </a>
               {` so that we can attempt to resolve it without resorting to formal dispute resolution. If we aren't able to reach an informal resolution within sixty days of your email, then you and we both agree to resolve the potential dispute according to the process set forth below.`}
             </Col>

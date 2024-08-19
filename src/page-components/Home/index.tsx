@@ -12,7 +12,7 @@ import History from './History';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useLanguage } from 'i18n';
 import PageHead from 'components/PageHead';
-import { Notification, NotificationForPhone } from 'components/Notification';
+// import { Notification, NotificationForPhone } from 'components/Notification';
 import Mask from './Mask';
 import { isPortkey } from 'utils/portkey';
 
@@ -40,7 +40,7 @@ export default function Home() {
           {isMd && <ActionButton />}
           <SelectTokenModal />
           <AddTokenModal />
-          {isMd ? <NotificationForPhone /> : <Notification />}
+          {/* {isMd ? <NotificationForPhone /> : <Notification />} */}
           <LimitAmountDescModal />
         </>
       ) : (
