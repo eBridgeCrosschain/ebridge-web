@@ -125,7 +125,7 @@
       "section 1": "To keep eBridge secure, we use rate limits for token transfers. Here's how they work:",
       "section 2": "We apply these limits on both the sending and receiving blockchains for extra security.",
       "section 3": "Let's use USDT transfers from Ethereum to aelf as an example:",
-      "section 4": "Maximum capacity: 50,000 USDT.",
+      "section 4": "Maximum capacity: 50,000 USDT",
       "section 5": "Refill rate: 500 USDT per second (up to 50,000 USD every 2 minutes)",
       "Section 6": "If someone transfers 50,000 USDT, the bucket is completely empty. To transfer another 5,000 USDT, you'd need to wait 10 seconds for the bucket to refill enough."
     },
@@ -151,7 +151,7 @@
     "main chain": "MainChain",
     "side chain": "SideChain",
     "Request rejected. eBridge needs your permission to continue": "Request rejected. eBridge needs your permission to continue.",
-    "Learn more about transfer and limits": "Learn more about eBridge's transfer and rate limits",
+    "Learn more about transfer and limits": "Learn more about eBridge's transfer and rate limits ",
     "here": "here",
     "period": "."
   }

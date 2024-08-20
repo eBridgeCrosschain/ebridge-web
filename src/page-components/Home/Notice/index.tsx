@@ -50,7 +50,6 @@ function Heterogeneous() {
           <p>{t('Once finished, You can verify this on the blockchain explorer and wallet')}</p>
           <p>
             {t('Learn more about transfer and limits')}
-            &nbsp;
             <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
               {t('here')}
             </a>
@@ -68,7 +67,6 @@ function Heterogeneous() {
           <p>{t('Once the token is sent cross-chain', { toChain: getChainIdToMap(toChainId) })}</p>
           <p>
             {t('Learn more about transfer and limits')}
-            &nbsp;
             <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
               {t('here')}
             </a>

@@ -41,7 +41,7 @@
     "Estimated time of heterogenous cross-chain arrival is": "異構跨鏈耗時約為{{time}}",
     "Estimated time of homogeneous cross-chain arrival is": "内部跨鏈耗時約為{{time}}",
     "Estimated time of homogeneous cross-chain arrival is2": "内部跨鏈耗時約為{{time}}分鐘完成；",
-    "Your transfer will take about a few minutes to complete": "您的轉帳大約需要{{time}}分鐘。",
+    "Your transfer will take about a few minutes to complete": "您的轉帳大約需要{{time}}分鐘完成。",
     "Cross Chain time": "異構跨鏈耗時約為{{heterogeneous}}，同構跨鏈的耗時約為{{homogeneous}}。",
     "You pay fees for the fromChain transaction. We're covering the fees on aelf for you": "您只需支付{{fromChain}}部分的交易費用。我們為您承擔aelf上的費用。",
     "Tokens will arrive automatically after being sent": "請耐心等待，您的代幣將自動顯示在您的錢包中。",
@@ -126,7 +126,7 @@
       "section 2": "我們在發送和接收的區塊鏈上都應用這些限制，以加強安全性。",
       "section 3": "以 USDT 從以太坊轉到 aelf 為例：",
       "section 4": "最大容量：50,000 USDT",
-      "section 5": "每秒 500 USDT（每 2 分鐘最多補滿 50,000 USDT）",
+      "section 5": "補滿速率：每秒 500 USDT（每 2 分鐘最多補滿 50,000 USDT）",
       "section 6": "如果有人轉帳 50,000 USDT，桶會完全空掉。若想再轉帳 5,000 USDT，您需要等待 10 秒鐘讓桶補滿足夠的容量。"
     },
     "eBridge rate limits desc section 1 list": {
