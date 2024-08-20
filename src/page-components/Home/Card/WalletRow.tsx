@@ -9,7 +9,7 @@ import { setFromWallet, setToWallet } from 'contexts/useWallet/actions';
 import { useWalletActions } from 'contexts/useWallet/hooks';
 import { usePortkey, useWeb3 } from 'hooks/web3';
 import { memo, useCallback, useMemo } from 'react';
-import { Trans } from 'react-i18next';
+import { useLanguage } from 'i18n';
 import { ChainType, NetworkType, Web3Type } from 'types';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
@@ -24,6 +24,7 @@ import { useWebLogin } from 'aelf-web-login';
 
 function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: boolean; chainType?: ChainType }) {
   const { dispatch } = useWalletActions();
+  const { t } = useLanguage();
   const { connector: web3Connector, chainId: web3ChainId, account: web3Account } = useWeb3();
   const { login } = useWebLogin();
 
@@ -73,12 +74,12 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
                 }),
               );
             }}>
-            <Trans>Connect</Trans>
+            {t('Connect')}
           </Button>
         )}
       </>
     );
-  }, [account, chainId, chainType, connector, login, modalDispatch, wallet?.walletType]);
+  }, [account, chainId, chainType, connector, login, modalDispatch, t, wallet?.walletType]);
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
       const _wallet = portkeyWallet;
