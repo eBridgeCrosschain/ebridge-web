@@ -4,12 +4,12 @@
 .header-row {
   background: @bg-2;
   border-bottom: 1px solid @border-3;
+  width: 100%;
 }
 .header {
   margin: auto;
-  max-width: calc(@max-width + 160px);
+  max-width: calc(@max-width + 82px);
   height: @header-height;
-  padding: 0 40px;
 }
 .logo {
   height: 28px;
@@ -33,11 +33,6 @@
   flex: 1;
   height: 100%;
   padding: 10px;
-  :global {
-    // .@{app-prefix}-select-selector{
-
-    // }
-  }
 }
 .md-header {
   justify-content: space-between;
@@ -102,7 +97,7 @@
 }
 @media screen and (max-width: @xl-width) {
   .header {
-    padding: 0 24px;
+    max-width: calc(@max-width + 82px);
   }
   .link {
     margin: 0 3vw;
@@ -111,6 +106,8 @@
 
 @media screen and (max-width: @md-width) {
   .header {
-    padding: 0 16px;
+    margin-left: 16px;
+    margin-right: 16px;
+    max-width: 100%;
   }
 }

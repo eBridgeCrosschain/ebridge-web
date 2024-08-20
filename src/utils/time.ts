@@ -26,3 +26,8 @@ export function getCrossChainTime(fromChainId?: ChainId, toChainId?: ChainId) {
   );
   return item?.time || '10';
 }
+
+export function getFullYear(): number {
+  const data: Date = new Date();
+  return data.getFullYear();
+}

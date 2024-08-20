@@ -41,17 +41,19 @@ function Heterogeneous() {
     <>
       {isHeterogeneousCrossInChain ? (
         <>
-          <p>{t('Estimated time of arrival in AELF is', { time })}</p>
+          <p>{t('Your transfer will take about a few minutes to complete', { time })}</p>
           <p>
-            {t('Tokens will arrive automatically after being sent. Please check them in your wallet', {
+            {t("You pay fees for the fromChain transaction. We're covering the fees on aelf for you", {
               fromChain: getChainIdToMap(fromChainId),
             })}
           </p>
-          <p>{t('The cross-chain transaction fee will be covered by AELF')}</p>
+          <p>{t('Once finished, You can verify this on the blockchain explorer and wallet')}</p>
           <p>
+            {t('Learn more about transfer and limits')}
             <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
-              {t('eBridge limit rules')}
+              {t('here')}
             </a>
+            {t('period')}
           </p>
         </>
       ) : (
@@ -64,9 +66,11 @@ function Heterogeneous() {
           </p>
           <p>{t('Once the token is sent cross-chain', { toChain: getChainIdToMap(toChainId) })}</p>
           <p>
+            {t('Learn more about transfer and limits')}
             <a className={styles['limit-amount-desc']} onClick={() => dispatch(setLimitAmountDescModal(true))}>
-              {t('eBridge limit rules')}
+              {t('here')}
             </a>
+            {t('period')}
           </p>
         </>
       )}

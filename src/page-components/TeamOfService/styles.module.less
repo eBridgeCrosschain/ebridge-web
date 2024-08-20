@@ -4,7 +4,7 @@
 
 .team-of-service {
   margin: 64px auto;
-  max-width: var(--bridge-max-width);
+  max-width: calc(@max-width + 82px);
   padding: 20px 32px;
   background-color: @bg-2;
   border-radius: 20px;
@@ -39,7 +39,9 @@
 @media screen and (max-width: @md-width) {
   .team-of-service {
     padding: 20px 16px;
-    margin: 20px 16px 40px;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 104px;
     max-width: 100%;
   }
 }

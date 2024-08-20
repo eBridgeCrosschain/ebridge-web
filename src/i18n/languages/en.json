@@ -41,11 +41,11 @@
     "Estimated time of heterogenous cross-chain arrival is": "Estimated time of heterogenous cross-chain arrival is {{time}}",
     "Estimated time of homogeneous cross-chain arrival is": "The estimated time of internal cross-chain transaction is {{time}}",
     "Estimated time of homogeneous cross-chain arrival is2": "The estimated time of internal cross-chain transaction is {{time}} minutes.",
-    "Estimated time of arrival in AELF is": "Estimated time of arrival is {{time}} minutes.",
+    "Your transfer will take about a few minutes to complete": "Your transfer will take about {{time}} minutes to complete.",
     "Cross Chain time": "Estimated time of heterogenous cross-chain arrival is {{heterogeneous}}",
-    "Tokens will arrive automatically after being sent. Please check them in your wallet": "You only need to pay for transaction fees generated on {{fromChain}} as fees on aelf will be covered by eBridge.",
+    "You pay fees for the fromChain transaction. We're covering the fees on aelf for you": "You'll only pay fees for the {{fromChain}} part of the transaction. We're covering the fees on aelf for you.",
     "Tokens will arrive automatically after being sent": "Please allow some time for tokens to be shown automatically in your wallet.",
-    "The cross-chain transaction fee will be covered by AELF": "Upon the completion of the transaction, the tokens will automatically reflect in the recipient's wallet and can be checked on the blockchain explorer.",
+    "Once finished, You can verify this on the blockchain explorer and wallet": "Once finished, the tokens will appear automatically in the recipient's wallet. You can verify this on the blockchain explorer.",
     "Estimated time of sending tokens is time. Please select Receipt ID and receive the token(s) transferred": "Estimated time of arrival is {{time}} minutes.",
     "Once the token is sent cross-chain": "Once the token is sent cross-chain, the recipient needs to visit eBridge, connect the \"To\" wallet, and select the \"Receipt ID\" to receive the token. This will incur transaction fees on {{toChain}} so the recipient should ensure there's a sufficient balance to pay for the fees.",
     "Token not received?": "Token not received?",
@@ -119,12 +119,21 @@
     "eBridge limit rules": "About eBridge's transfer/rate limits",
     "eBridge limit rules title": "eBridge's Transfer/Rate Limits",
     "eBridge daily limit specification": "Daily Transfer Limits",
-    "eBridge daily limit specification desc": "For security purposes, eBridge imposes daily transfer limits for each token in each directions. ",
+    "eBridge daily limit specification desc": "To enhance security and protect our users' assets, eBridge imposes daily transfer limits for each token in each direction.",
     "eBridge rate limits": "Rate Limits",
     "eBridge rate limits desc": {
-      "section 1": "Token transfers on eBridge benefit from rate limits for additional security. Rate limits comprise maximum capacity and refill rate, which is the speed at which the maximum capacity is refilled after a token transfer has consumed some or all of the available capacity.",
-      "section 2": "The rate limits are enforced at both the source and destination blockchains to ensure the highest level of security. For each supported token, rate limits effectively manage the total volume of tokens that can be transferred within a specified timeframe.",
-      "section 3": "For example, the maximum capacity of USDT transfer from Ethereum to AELF is 100,000 USDT. The refill rate is 167 USDT per second. If 100,000 USDT is transferred in this direction, the entire capacity is consumed. After that, if a user wants to send 1670 USDT, he/she must wait at least 10 seconds as the capacity refills. This ensures that the maximum throughput for this token in this direction is 100,000 USDT every 10 minutes."
+      "section 1": "To keep eBridge secure, we use rate limits for token transfers. Here's how they work:",
+      "section 2": "We apply these limits on both the sending and receiving blockchains for extra security.",
+      "section 3": "Let's use USDT transfers from Ethereum to aelf as an example:",
+      "section 4": "Maximum capacity: 50,000 USDT",
+      "section 5": "Refill rate: 500 USDT per second (up to 50,000 USD every 2 minutes)",
+      "Section 6": "If someone transfers 50,000 USDT, the bucket is completely empty. To transfer another 5,000 USDT, you'd need to wait 10 seconds for the bucket to refill enough."
+    },
+    "eBridge rate limits desc section 1 list": {
+      "section 1": "1. Each token has a 'bucket' with a maximum capacity.",
+      "section 2": "2. This bucket slowly refills over time.",
+      "section 3": "3. Every transfer uses some of the bucket's capacity.",
+      "section 4": "4. If the bucket is empty, you need to wait for it to refill before making another transfer."
     },
     "Supported tokens": "Tokens:",
     "OK": "OK",
@@ -141,6 +150,9 @@
     "Synchronising data on the chain 2": "Please wait 5-10 minutes before initiating a new transaction.",
     "main chain": "MainChain",
     "side chain": "SideChain",
-    "Request rejected. eBridge needs your permission to continue": "Request rejected. eBridge needs your permission to continue."
+    "Request rejected. eBridge needs your permission to continue": "Request rejected. eBridge needs your permission to continue.",
+    "Learn more about transfer and limits": "Learn more about eBridge's transfer and rate limits ",
+    "here": "here",
+    "period": "."
   }
 }
