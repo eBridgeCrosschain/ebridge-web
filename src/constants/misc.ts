@@ -34,3 +34,5 @@ export const crossTokenMin: any = {
 export const SYMBOL_FORMAT_MAP: Record<string, string> = {
   'SGR-1': 'SGR',
 };
+
+export const WEBSITE_NAME = 'eBridge';
