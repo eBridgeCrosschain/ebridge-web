@@ -107,8 +107,8 @@ function TeamOfService() {
             </Col>
             <Col>
               {`f you have any questions about this page or our data practices generally, please contact notices `}
-              <a target="_blank" href="mailto:contact@ebridge.exchange" rel="noreferrer">
-                contact@ebridge.exchange
+              <a target="_blank" href="mailto:info@ebridge.exchange" rel="noreferrer">
+                info@ebridge.exchange
               </a>
               {`.`}
             </Col>

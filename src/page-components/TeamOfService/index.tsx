@@ -199,8 +199,8 @@ function TeamOfService() {
             </Col>
             <Col>
               {`eBridge will use our best efforts to resolve any potential disputes through informal, good faith negotiations. If a potential dispute arises, you must contact us by sending an email to notices `}
-              <a target="_blank" href="mailto:contact@ebridge.exchange" rel="noreferrer">
-                contact@ebridge.exchange
+              <a target="_blank" href="mailto:info@ebridge.exchange" rel="noreferrer">
+                info@ebridge.exchange
               </a>
               {` so that we can attempt to resolve it without resorting to formal dispute resolution. If we aren't able to reach an informal resolution within sixty days of your email, then you and we both agree to resolve the potential dispute according to the process set forth below.`}
             </Col>
