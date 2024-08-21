@@ -6,8 +6,9 @@ import * as tDVV_Test from '../platform/tDVV_Test';
 import * as tDVW_Test from '../platform/tDVW_Test';
 import * as BSC_TESTNET from '../platform/BSC_Test';
 import * as SEPOLIA from '../platform/sepolia';
+import * as BASE_SEPOLIA from '../platform/base_sepolia';
 import DefaultWhitelistMap from './tokenWhitelist.json';
-import { SupportedChainId, SupportedELFChainId } from '../chain';
+import { DEFAULT_CHAIN_ICON, SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
@@ -19,7 +20,8 @@ export type ChainConstantsType =
   | typeof tDVW_Test
   | typeof GORELI
   | typeof SEPOLIA
-  | typeof BSC_TESTNET;
+  | typeof BSC_TESTNET
+  | typeof BASE_SEPOLIA;
 
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
@@ -40,6 +42,7 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedChainId.GORELI]: GORELI,
   [SupportedChainId.BSC_TESTNET]: BSC_TESTNET,
   [SupportedChainId.SEPOLIA]: SEPOLIA,
+  [SupportedChainId.BASE_SEPOLIA]: BASE_SEPOLIA,
 };
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
@@ -54,6 +57,7 @@ export const ACTIVE_CHAIN: any = {
   [SupportedELFChainId.tDVW]: true,
   [SupportedChainId.BSC_TESTNET]: true,
   [SupportedChainId.SEPOLIA]: true,
+  [SupportedChainId.BASE_SEPOLIA]: true,
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
@@ -73,42 +77,12 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
   [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
+  [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
+  [SupportedChainId.BASE]: 'Base Mainnet',
 };
 
 export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
-  [SupportedChainId.MAINNET]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.KOVAN]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.GORELI]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.BSC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.BSC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_TESTNET]: {
-    type: 'Binance',
-  },
+  ...DEFAULT_CHAIN_ICON,
   [SupportedELFChainId.AELF]: {
     type: 'aelfTestnet',
   },
@@ -118,14 +92,15 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedELFChainId.tDVW]: {
     type: 'aelfTestnet',
   },
-  [SupportedChainId.SEPOLIA]: {
-    // type: 'SEPOLIA',
-    type: 'Ethereum',
-  },
 };
 
 export const NetworkList = [
   { title: CHAIN_NAME[SupportedChainId.SEPOLIA], icon: CHAIN_ICON[SupportedChainId.SEPOLIA], info: SEPOLIA.CHAIN_INFO },
+  {
+    title: CHAIN_NAME[SupportedChainId.BASE_SEPOLIA],
+    icon: CHAIN_ICON[SupportedChainId.BASE_SEPOLIA],
+    info: BASE_SEPOLIA.CHAIN_INFO,
+  },
   // { title: CHAIN_NAME[SupportedChainId.GORELI], icon: CHAIN_ICON[SupportedChainId.GORELI], info: GORELI.CHAIN_INFO },
   // { title: CHAIN_NAME[SupportedChainId.KOVAN], icon: CHAIN_ICON[SupportedChainId.KOVAN], info: KOVAN.CHAIN_INFO },
   {
@@ -161,7 +136,7 @@ export const FormatTokenList = [
     toSymbol: 'BNB',
   },
   {
-    fromChainId: [SupportedChainId.SEPOLIA],
+    fromChainId: [SupportedChainId.SEPOLIA, SupportedChainId.BASE_SEPOLIA],
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     fromSymbol: 'WETH',
     toSymbol: 'ETH',
@@ -232,4 +207,4 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = '';
+export const INDEXER_URL = 'https://test.ebridge.exchange';

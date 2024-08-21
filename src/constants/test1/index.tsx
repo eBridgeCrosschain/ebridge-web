@@ -3,7 +3,7 @@ import * as tDVV_Test from './tDVV';
 import * as BSC_TESTNET from './BSC_Test';
 import * as SEPOLIA from './sepolia';
 import DefaultWhitelistMap from './tokenWhitelist.json';
-import { SupportedChainId, SupportedELFChainId } from '../chain';
+import { DEFAULT_CHAIN_ICON, SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
@@ -57,42 +57,12 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
   [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
+  [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
+  [SupportedChainId.BASE]: 'Base Mainnet',
 };
 
 export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
-  [SupportedChainId.MAINNET]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.KOVAN]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.GORELI]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.BSC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.BSC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_TESTNET]: {
-    type: 'Binance',
-  },
+  ...DEFAULT_CHAIN_ICON,
   [SupportedELFChainId.AELF]: {
     type: 'aelfTestnet',
   },
@@ -101,10 +71,6 @@ export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: 
   },
   [SupportedELFChainId.tDVW]: {
     type: 'aelfTestnet',
-  },
-  [SupportedChainId.SEPOLIA]: {
-    // type: 'SEPOLIA',
-    type: 'Ethereum',
   },
 };
 

@@ -6,7 +6,7 @@ import TokenLogo from 'components/TokenLogo';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { CurrentWhitelistItem, useCurrentWhitelist } from 'hooks/whitelist';
 import { useLanguage } from 'i18n';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useHomeContext } from '../HomeContext';
 import { setSelectModal, setAddModal, setSelectToken, homeModalDestroy } from '../HomeContext/actions';

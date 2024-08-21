@@ -2,13 +2,13 @@ import * as MAINNET from '../platform/main';
 import * as AELF from '../platform/AELF';
 import * as tDVV from '../platform/tDVV';
 import * as BSC from '../platform/BSC';
+import * as BASE from '../platform/base';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 
-import { SupportedChainId, SupportedELFChainId } from '../chain';
+import { DEFAULT_CHAIN_ICON, SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
-import { IconInfo } from 'types/misc';
 
-export type ChainConstantsType = typeof MAINNET | typeof AELF | typeof tDVV | typeof BSC;
+export type ChainConstantsType = typeof MAINNET | typeof AELF | typeof tDVV | typeof BSC | typeof BASE;
 
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
@@ -26,6 +26,7 @@ export const DEFAULT_MODAL_INITIAL_STATE = {
 export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedChainId.MAINNET]: MAINNET,
   [SupportedChainId.BSC_MAINNET]: BSC,
+  [SupportedChainId.BASE]: BASE,
 };
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
@@ -40,6 +41,7 @@ export const ACTIVE_CHAIN: any = {
   [SupportedELFChainId.tDVV]: true,
   [SupportedChainId.BSC_MAINNET]: true,
   [SupportedChainId.MAINNET]: true,
+  [SupportedChainId.BASE]: true,
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
@@ -59,56 +61,11 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Mainnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Mainnet',
   [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
+  [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
+  [SupportedChainId.BASE]: 'Base Mainnet',
 };
 
-export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
-  [SupportedChainId.MAINNET]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.KOVAN]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.GORELI]: {
-    type: 'Ethereum',
-  },
-  [SupportedChainId.BSC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.BSC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.HECO_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.OEC_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_MAINNET]: {
-    type: 'Binance',
-  },
-  [SupportedChainId.POLYGON_TESTNET]: {
-    type: 'Binance',
-  },
-  [SupportedELFChainId.AELF]: {
-    type: 'aelfMainnet',
-  },
-  [SupportedELFChainId.tDVV]: {
-    type: 'aelfMainnet',
-  },
-  [SupportedELFChainId.tDVW]: {
-    type: 'aelfMainnet',
-  },
-  [SupportedChainId.SEPOLIA]: {
-    // type: 'SEPOLIA',
-    type: 'Ethereum',
-  },
-};
+export const CHAIN_ICON = DEFAULT_CHAIN_ICON;
 
 export const NetworkList = [
   {
@@ -127,6 +84,11 @@ export const NetworkList = [
     icon: CHAIN_ICON[SupportedChainId.BSC_MAINNET],
     info: BSC.CHAIN_INFO,
   },
+  {
+    title: CHAIN_NAME[SupportedChainId.BASE],
+    icon: CHAIN_ICON[SupportedChainId.BASE],
+    info: BASE.CHAIN_INFO,
+  },
 ] as unknown as NetworkType[];
 
 export const AELF_NODES = {
@@ -144,7 +106,7 @@ export const FormatTokenList = [
     toSymbol: 'BNB',
   },
   {
-    fromChainId: [SupportedChainId.MAINNET],
+    fromChainId: [SupportedChainId.MAINNET, SupportedChainId.BASE],
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     fromSymbol: 'WETH',
     toSymbol: 'ETH',

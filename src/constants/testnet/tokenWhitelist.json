@@ -79,8 +79,74 @@
       "symbol": "ETH",
       "address": "0x035900292c309d8beCBCAFb3227238bec0EBa253",
       "isNativeToken": true
+    },
+    "84532": {
+      "name": "ETH Token",
+      "decimals": 18,
+      "symbol": "ETH",
+      "address": "0x13aEe64E227af004De02BA2d651E4e3670e15A83",
+      "isNativeToken": true
     }
   },
+  "USDC": {
+    "AELF": {
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "84532": {
+      "name": "USDC Token",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "0xB110e5d737dcfb38CE22E58482F9546D401F0A2D"
+    }
+  },
+  "AGENT": {
+    "AELF": {
+      "name": "AGENT",
+      "decimals": 8,
+      "symbol": "AGENT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "AGENT",
+      "decimals": 8,
+      "symbol": "AGENT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "AGENT",
+      "decimals": 8,
+      "symbol": "AGENT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "84532": {
+      "name": "AGENT Token",
+      "decimals": 18,
+      "symbol": "AGENT",
+      "address": "0x048d64c0b70c16b3f99d01b18e613d24d5dfaeab"
+    }
+  },
+
   "BNB": {
     "AELF": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 },
     "97": {
