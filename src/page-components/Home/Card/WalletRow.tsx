@@ -20,13 +20,13 @@ import { isPortkey, isSelectPortkey } from 'utils/portkey';
 import { Accounts, ChainId } from '@portkey/provider-types';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
-import { useWebLogin } from 'aelf-web-login';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 
 function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: boolean; chainType?: ChainType }) {
   const { dispatch } = useWalletActions();
   const { t } = useLanguage();
   const { connector: web3Connector, chainId: web3ChainId, account: web3Account } = useWeb3();
-  const { login } = useWebLogin();
+  const { connectWallet } = useConnectWallet();
 
   const { chainId, account, connector } = wallet || {};
   const portkeyWallet = usePortkey();
@@ -63,7 +63,7 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
             type="primary"
             onClick={() => {
               if (chainType === 'ELF') {
-                login();
+                connectWallet();
                 return;
               }
               modalDispatch(
@@ -79,7 +79,7 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
         )}
       </>
     );
-  }, [account, chainId, chainType, connector, login, modalDispatch, t, wallet?.walletType]);
+  }, [account, chainId, chainType, connectWallet, connector, modalDispatch, t, wallet?.walletType]);
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
       const _wallet = portkeyWallet;

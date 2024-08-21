@@ -7,6 +7,11 @@ import { SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
+export const MAIN_SIDE_CHAIN_ID = {
+  mainChain: SupportedELFChainId.AELF,
+  sideChain: SupportedELFChainId.tDVV,
+};
+
 export type ChainConstantsType = typeof AELF_Test | typeof tDVV_Test | typeof SEPOLIA | typeof BSC_TESTNET;
 
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
@@ -176,3 +181,5 @@ export const CrossChainTimeList = [
     time: '40',
   },
 ];
+
+export const TELEGRAM_BOT_ID = '';

@@ -7,6 +7,12 @@ import DefaultWhitelistMap from './tokenWhitelist.json';
 import { SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
+import { NetworkEnum } from '@aelf-web-login/wallet-adapter-base';
+
+export const MAIN_SIDE_CHAIN_ID = {
+  mainChain: SupportedELFChainId.AELF,
+  sideChain: SupportedELFChainId.tDVV,
+};
 
 export type ChainConstantsType = typeof MAINNET | typeof AELF | typeof tDVV | typeof BSC;
 
@@ -184,19 +190,9 @@ export const BRIDGE_TOKEN_MAP: { [key: string]: string } = {
 };
 
 export const WEB_LOGIN_CONFIG = {
-  chainId: 'tDVV',
-  networkType: 'MAIN',
-  portkey: {
-    graphQLUrl: 'https://dapp-portkey.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
-    apiServer: 'https://did-portkey.portkey.finance',
-    connectServer: 'https://auth-portkey.portkey.finance',
-    caContractAddress: {
-      AELF: '28PcLvP41ouUd6UNGsNRvKpkFTe6am34nPy4YPsWUJnZNwUvzM',
-      tDVV: '2cLA9kJW3gdHuGoYNY16Qir69J3Nkn6MSsuYxRkUHbz4SG2hZr',
-    },
-  },
+  chainId: SupportedELFChainId.tDVV,
   portkeyV2: {
-    networkType: 'MAINNET',
+    networkType: NetworkEnum.MAINNET,
     graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
     apiServer: 'https://aa-portkey.portkey.finance',
     connectServer: 'https://auth-aa-portkey.portkey.finance',
@@ -214,3 +210,5 @@ export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
 export const INDEXER_URL = '';
+
+export const TELEGRAM_BOT_ID = '';

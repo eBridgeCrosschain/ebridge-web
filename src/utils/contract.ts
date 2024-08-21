@@ -11,8 +11,8 @@ import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
 import { IAElfChain } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
-import { PortkeyDidV1, PortkeyDid } from 'aelf-web-login';
-import { ILoginWalletContextType } from 'contexts/useLoginWallet/types';
+import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
+import { ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
 
 export interface AbiType {
   internalType?: string;
@@ -396,7 +396,8 @@ export class PortkeyContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
-  public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public callSendPromiseMethod: CallSendMethod = async (_functionName, _account, _paramsOption, _sendOptions) => {
     throw new Error('Method not implemented.');
   };
 }
@@ -411,14 +412,14 @@ export class PortkeySDKContractBasic {
   public address: string;
   public sdkContract?: IContract;
   public viewContract: any;
-  public portkeyWallet?: ILoginWalletContextType;
+  public portkeyWallet?: WebLoginWalletInfo;
   public caContract?: IContract;
 
   constructor(
     options: {
       sdkContract?: IContract;
       viewContract: any;
-      portkeyWallet?: ILoginWalletContextType;
+      portkeyWallet?: WebLoginWalletInfo;
       caContract?: IContract;
     } & ContractProps,
   ) {
@@ -468,11 +469,10 @@ export class PortkeySDKContractBasic {
     if (this.address === TOKEN_CONTRACT && functionName === 'approve') {
       const contract = this.caContract;
       if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
-
-      const caHash = this.portkeyWallet?.wallet?.portkeyInfo?.caInfo.caHash || '';
-      const originChainId = this.portkeyWallet?.wallet?.portkeyInfo?.chainId as any;
-      const managerApprove =
-        this.portkeyWallet?.version === 'v1' ? PortkeyDidV1.managerApprove : PortkeyDid.managerApprove;
+      const walletInfo = this.portkeyWallet?.extraInfo as ExtraInfoForPortkeyAA;
+      const caHash = walletInfo?.portkeyInfo?.caInfo.caHash || '';
+      const originChainId = walletInfo?.portkeyInfo?.chainId as any;
+      const managerApprove = PortkeyDid.managerApprove;
 
       const { amount, guardiansApproved } = await managerApprove({
         originChainId,

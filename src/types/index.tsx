@@ -6,6 +6,7 @@ import { AElfNodes } from 'constants/aelf';
 import { CHAIN_NAME } from 'constants/index';
 import type { Connector } from '@web3-react/types';
 import { Accounts } from '@portkey/provider-types';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 export type ChainId = keyof typeof CHAIN_NAME;
 export type ChainType = 'ERC' | 'ELF';
@@ -35,6 +36,7 @@ export type Web3Type = {
   aelfInstances?: { [key in AelfInstancesKey]: AElfDappBridge };
   isPortkey?: boolean;
   walletType?: WalletType;
+  loginWalletType?: WalletTypeEnum;
   accounts?: Accounts;
 };
 export type TokenInfo = {
@@ -65,5 +67,4 @@ export interface WalletInfo {
   mobile?: true;
   mobileOnly?: true;
   iconType: string;
-  version?: string;
 }

@@ -63,7 +63,12 @@ const productionConfig = {
   resolve: {},
 };
 
-const withTM = require('next-transpile-modules')(['antd-mobile', '@portkey/did-ui-react']);
+const withTM = require('next-transpile-modules')([
+  'antd-mobile',
+  // '@aelf-web-login/wallet-adapter-react',
+  // '@aelf-web-login/wallet-adapter-bridge',
+  // '@portkey/did-ui-react',
+]);
 
 module.exports = withPlugins(
   plugins,

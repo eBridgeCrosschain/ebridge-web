@@ -1,51 +1,15 @@
 import { Web3ReactHooks, Web3ReactProvider } from '@web3-react/core';
 import { Connector } from '@web3-react/types';
-import { AELF_NODES, SupportedELFChain, WEB_LOGIN_CONFIG } from 'constants/index';
-import { APP_NAME } from 'constants/misc';
 import { useChain } from 'contexts/useChain';
-import { LoginWalletProvider } from 'contexts/useLoginWallet/provider';
 import useOrderedConnections from 'hooks/useOrderedConnections';
-import { useAEflConnect, usePortkeyConnect } from 'hooks/web3';
+import { useAElfConnect, usePortkeyConnect } from 'hooks/web3';
 import { useCallback, useMemo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { Connection, network } from 'walletConnectors';
 import { getConnection, getConnectionName } from 'walletConnectors/utils';
 import { isPortkeyConnectEagerly } from 'utils/portkey';
-import { PortkeyProvider, WebLoginProvider, setGlobalConfig } from 'aelf-web-login';
-
-setGlobalConfig({
-  appName: APP_NAME,
-  chainId: WEB_LOGIN_CONFIG.chainId,
-  networkType: WEB_LOGIN_CONFIG.networkType as any,
-  onlyShowV2: false,
-  portkey: {
-    useLocalStorage: true,
-    graphQLUrl: WEB_LOGIN_CONFIG.portkey.graphQLUrl,
-    connectUrl: WEB_LOGIN_CONFIG.portkey.connectServer,
-    serviceUrl: WEB_LOGIN_CONFIG.portkey.apiServer,
-    requestDefaults: {
-      baseURL: WEB_LOGIN_CONFIG.portkey.apiServer,
-      timeout: 20 * 1000,
-    },
-  },
-  portkeyV2: {
-    networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType as any,
-    useLocalStorage: true,
-    graphQLUrl: WEB_LOGIN_CONFIG.portkeyV2.graphQLUrl,
-    connectUrl: WEB_LOGIN_CONFIG.portkeyV2.connectServer,
-    requestDefaults: {
-      baseURL: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
-      timeout: 20 * 1000,
-    },
-    serviceUrl: WEB_LOGIN_CONFIG.portkeyV2.apiServer,
-    customNetworkType: 'onLine',
-  },
-  aelfReact: {
-    appName: APP_NAME,
-    nodes: AELF_NODES,
-  },
-  defaultRpcUrl: SupportedELFChain[WEB_LOGIN_CONFIG.chainId].CHAIN_INFO.rpcUrl,
-});
+import dynamic from 'next/dynamic';
+import { useInitWallet } from 'hooks/wallet';
 
 const connect = async (connector: Connector) => {
   try {
@@ -60,12 +24,13 @@ const connect = async (connector: Connector) => {
 };
 
 function Web3Manager({ children }: { children: JSX.Element }) {
-  const aelfConnect = useAEflConnect();
+  useInitWallet();
+  const aelfConnect = useAElfConnect();
   const [{ selectERCWallet, selectELFWallet }] = useChain();
   const portkeyConnect = usePortkeyConnect();
   const tryAElf = useCallback(async () => {
     try {
-      await aelfConnect(true);
+      await aelfConnect();
     } catch (error) {
       console.debug(error, '=====error');
     }
@@ -79,22 +44,19 @@ function Web3Manager({ children }: { children: JSX.Element }) {
     }
   }, [selectERCWallet]);
 
-  const tryPortkey = useCallback(
-    async (isConnectEagerly?: boolean) => {
-      try {
-        await portkeyConnect(isConnectEagerly);
-      } catch (error) {
-        console.debug(error, '=====error');
-      }
-    },
-    [portkeyConnect],
-  );
+  const tryPortkey = useCallback(async () => {
+    try {
+      await portkeyConnect();
+    } catch (error) {
+      console.debug(error, '=====error');
+    }
+  }, [portkeyConnect]);
   useEffectOnce(() => {
     const timer = setTimeout(() => {
       if (isPortkeyConnectEagerly()) {
         tryPortkey();
       } else {
-        selectELFWallet === 'NIGHTELF' ? tryAElf() : tryPortkey(true);
+        selectELFWallet === 'NIGHTELF' ? tryAElf() : tryPortkey();
       }
       tryERC();
     }, 1000);
@@ -105,6 +67,16 @@ function Web3Manager({ children }: { children: JSX.Element }) {
   return children;
 }
 
+const WebLoginProviderDynamic = dynamic(
+  async () => {
+    const WalletProvider = await import('./webLoginV2Provider').then((module) => module);
+    return WalletProvider;
+  },
+  {
+    ssr: false,
+  },
+);
+
 export default function Web3Provider({ children }: { children: JSX.Element }) {
   const connections = useOrderedConnections();
   const connectors: [Connector, Web3ReactHooks][] = connections.map(({ hooks, connector }) => [connector, hooks]);
@@ -114,32 +86,9 @@ export default function Web3Provider({ children }: { children: JSX.Element }) {
   );
   return (
     <Web3ReactProvider connectors={connectors} key={key}>
-      <PortkeyProvider
-        networkType={WEB_LOGIN_CONFIG.networkType}
-        networkTypeV2={WEB_LOGIN_CONFIG.portkeyV2.networkType}>
-        <WebLoginProvider
-          extraWallets={['discover', 'elf']}
-          nightElf={{ connectEagerly: true, useMultiChain: true }}
-          portkey={{
-            autoShowUnlock: false,
-            checkAccountInfoSync: true,
-            design: 'CryptoDesign',
-          }}
-          discover={{
-            autoRequestAccount: true,
-            autoLogoutOnAccountMismatch: true,
-            autoLogoutOnChainMismatch: true,
-            autoLogoutOnDisconnected: true,
-            autoLogoutOnNetworkMismatch: true,
-            onPluginNotFound: (openStore) => {
-              openStore();
-            },
-          }}>
-          <LoginWalletProvider>
-            <Web3Manager>{children}</Web3Manager>
-          </LoginWalletProvider>
-        </WebLoginProvider>
-      </PortkeyProvider>
+      <WebLoginProviderDynamic>
+        <Web3Manager>{children}</Web3Manager>
+      </WebLoginProviderDynamic>
     </Web3ReactProvider>
   );
 }
