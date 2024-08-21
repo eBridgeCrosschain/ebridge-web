@@ -9,4 +9,6 @@ export const CHAIN_SHORT_NAME = {
   [SupportedChainId.GORELI]: 'Goerli',
   [SupportedChainId.BSC_TESTNET]: 'Binance',
   [SupportedChainId.SEPOLIA]: 'Sepolia',
+  [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
+  [SupportedChainId.BASE]: 'Base',
 };
