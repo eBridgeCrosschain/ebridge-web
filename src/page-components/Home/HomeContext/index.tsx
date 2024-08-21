@@ -92,7 +92,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   const [[balance]] = useBalances(fromWallet, tokens);
   useEffect(() => {
-    if (selectToken && fromChainId && toChainId && (!selectToken[fromChainId] || !selectToken[toChainId])) {
+    if (fromChainId && toChainId && (!selectToken?.[fromChainId] || !selectToken?.[toChainId])) {
       if (tokenInfo) {
         dispatch(setSelectToken(tokenInfo));
       } else {
@@ -108,7 +108,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   // auto fix token
   useEffect(() => {
-    if (selectToken && fromChainId && toChainId) {
+    if (fromChainId && toChainId) {
       const fromItem = selectToken?.[fromChainId];
       const toItem = selectToken?.[toChainId];
       const canForm = fromItem && !fromItem?.onlyTo;
