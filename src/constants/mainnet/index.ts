@@ -122,12 +122,12 @@ export const CrossChainTimeList = [
   {
     fromChainId: SupportedChainId.MAINNET,
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
-    time: '40',
+    time: '20',
   },
   {
     fromChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     toChainId: [SupportedChainId.MAINNET],
-    time: '40',
+    time: '20',
   },
   {
     fromChainId: SupportedChainId.BSC_MAINNET,

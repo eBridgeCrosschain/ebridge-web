@@ -162,12 +162,12 @@ export const CrossChainTimeList = [
   {
     fromChainId: SupportedChainId.SEPOLIA,
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
-    time: '40',
+    time: '20',
   },
   {
     fromChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     toChainId: SupportedChainId.SEPOLIA,
-    time: '40',
+    time: '20',
   },
 ];
 
