@@ -99,3 +99,37 @@ export const DEFAULT_CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFCh
     type: 'BaseChain',
   },
 };
+
+export const DEFAULT_CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
+  [SupportedChainId.MAINNET]: 'Ethereum Mainnet',
+  [SupportedChainId.KOVAN]: 'Kovan',
+  [SupportedChainId.GORELI]: 'Goerli',
+  [SupportedChainId.BSC_MAINNET]: 'Binance Smart Chain Mainnet',
+  [SupportedChainId.BSC_TESTNET]: 'Binance Smart Chain Testnet',
+  [SupportedChainId.HECO_MAINNET]: 'HECO',
+  [SupportedChainId.HECO_TESTNET]: 'HECO Testnet',
+  [SupportedChainId.OEC_MAINNET]: 'OEC',
+  [SupportedChainId.OEC_TESTNET]: 'OEC Testnet',
+  [SupportedChainId.POLYGON_MAINNET]: 'Polygon',
+  [SupportedChainId.POLYGON_TESTNET]: 'Polygon Testnet',
+  [SupportedELFChainId.AELF]: 'MainChain AELF Mainnet',
+  [SupportedELFChainId.tDVV]: 'SideChain tDVV Mainnet',
+  [SupportedELFChainId.tDVW]: 'SideChain tDVW Mainnet',
+  [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
+  [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
+  [SupportedChainId.BASE]: 'Base Mainnet',
+};
+
+export const CHAIN_SHORT_NAME = {
+  [SupportedChainId.MAINNET]: 'Ethereum',
+  [SupportedChainId.BSC_MAINNET]: 'Binance',
+  [SupportedELFChainId.AELF]: 'AELF',
+  [SupportedELFChainId.tDVV]: 'tDVV',
+  [SupportedELFChainId.tDVW]: 'tDVW',
+  [SupportedChainId.KOVAN]: 'Kovan',
+  [SupportedChainId.GORELI]: 'Goerli',
+  [SupportedChainId.BSC_TESTNET]: 'Binance',
+  [SupportedChainId.SEPOLIA]: 'Sepolia',
+  [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
+  [SupportedChainId.BASE]: 'Base',
+};

@@ -3,7 +3,7 @@ import * as tDVV_Test from './tDVV';
 import * as BSC_TESTNET from './BSC_Test';
 import * as SEPOLIA from './sepolia';
 import DefaultWhitelistMap from './tokenWhitelist.json';
-import { DEFAULT_CHAIN_ICON, SupportedChainId, SupportedELFChainId } from '../chain';
+import { DEFAULT_CHAIN_ICON, DEFAULT_CHAIN_NAME, SupportedChainId, SupportedELFChainId } from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
@@ -42,23 +42,10 @@ export const ACTIVE_CHAIN: any = {
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
 export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
-  [SupportedChainId.MAINNET]: 'Ethereum',
-  [SupportedChainId.KOVAN]: 'Kovan',
-  [SupportedChainId.GORELI]: 'Goerli',
-  [SupportedChainId.BSC_MAINNET]: 'BSC',
-  [SupportedChainId.BSC_TESTNET]: 'Binance Smart Chain Testnet',
-  [SupportedChainId.HECO_MAINNET]: 'HECO',
-  [SupportedChainId.HECO_TESTNET]: 'HECO Testnet',
-  [SupportedChainId.OEC_MAINNET]: 'OEC',
-  [SupportedChainId.OEC_TESTNET]: 'OEC Testnet',
-  [SupportedChainId.POLYGON_MAINNET]: 'Polygon',
-  [SupportedChainId.POLYGON_TESTNET]: 'Polygon Testnet',
+  ...DEFAULT_CHAIN_NAME,
   [SupportedELFChainId.AELF]: 'MainChain AELF Testnet',
   [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
   [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
-  [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
-  [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
-  [SupportedChainId.BASE]: 'Base Mainnet',
 };
 
 export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
@@ -134,11 +121,11 @@ export const CrossChainTimeList = [
   {
     fromChainId: SupportedChainId.SEPOLIA,
     toChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
-    time: '20',
+    time: '40',
   },
   {
     fromChainId: [SupportedELFChainId.AELF, SupportedELFChainId.tDVV, SupportedELFChainId.tDVW],
     toChainId: SupportedChainId.SEPOLIA,
-    time: '20',
+    time: '40',
   },
 ];
