@@ -36,16 +36,17 @@ export const getPortkeyContract = async (
   const { loginWalletType, wallet, version, provider } = portkeyWallet;
   const key = `${contractAddress}_${chainId}_${wallet?.address}_${version}_${loginWalletType}`;
   if (loginWalletType === WalletType.discover) {
-    if (ContractMap[key]) return ContractMap[key];
     if (!provider) throw new Error('Portkey Provider undefined');
-    const portkeyChain = await provider.getChain(chainId as any);
-    const contract = new ContractBasic({
-      contractAddress,
-      chainId,
-      portkeyChain,
-    });
-    ContractMap[key] = contract;
-    return contract;
+    if (!ContractMap[key]) {
+      const portkeyChain = await provider.getChain(chainId as any);
+      const contract = new ContractBasic({
+        contractAddress,
+        chainId,
+        portkeyChain,
+      });
+      ContractMap[key] = contract;
+    }
+    return ContractMap[key];
   } else {
     const account = wallet?.portkeyInfo?.walletInfo;
     let sdkContract: undefined | IContract;
@@ -103,21 +104,27 @@ export async function getELFContract(
   account?: string,
   chainId?: ChainId,
 ) {
-  const viewInstance = chainId ? getAElf(chainId) : null;
-  const wallet = account ? { address: account } : getWallet();
-  await checkAElfBridge(aelfInstance);
-  const [viewContract, aelfContract] = await Promise.all([
-    viewInstance?.chain.contractAt(contractAddress, getWallet()),
-    aelfInstance?.chain.contractAt(contractAddress, wallet),
-  ]);
+  const key = contractAddress + account + chainId + aelfInstance.chainId;
+  console.log(ContractMap, ContractMap[key], '====ContractMap');
 
-  return new ContractBasic({
-    aelfContract,
-    contractAddress,
-    chainId,
-    aelfInstance,
-    viewContract,
-  });
+  if (!ContractMap[key]) {
+    const viewInstance = chainId ? getAElf(chainId) : null;
+    const wallet = account ? { address: account } : getWallet();
+    await checkAElfBridge(aelfInstance);
+    const [viewContract, aelfContract] = await Promise.all([
+      viewInstance?.chain.contractAt(contractAddress, getWallet()),
+      aelfInstance?.chain.contractAt(contractAddress, wallet),
+    ]);
+
+    ContractMap[key] = new ContractBasic({
+      aelfContract,
+      contractAddress,
+      chainId,
+      aelfInstance,
+      viewContract,
+    });
+  }
+  return ContractMap[key];
 }
 
 export function useAElfContract(contractAddress: string, chainId?: ChainId) {

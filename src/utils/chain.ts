@@ -1,4 +1,4 @@
-import { CHAIN_SHORT_NAME } from 'constants/chainInfo';
+import { CHAIN_SHORT_NAME } from 'constants/chain';
 import { CHAIN_ID_MAP } from 'constants/chain';
 import { ChainId } from 'types';
 import { enumToMap, shortenAddress } from 'utils';

@@ -4,7 +4,7 @@ import { useWallet } from 'contexts/useWallet/hooks';
 import { BasicActions } from 'contexts/utils';
 import { useBalances } from 'hooks/useBalances';
 import useInterval from 'hooks/useInterval';
-import { useUserAddedToken } from 'hooks/whitelist';
+import { useCurrentWhitelist, useUserAddedToken } from 'hooks/whitelist';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { useCookie, usePrevious } from 'react-use';
 import { isELFChain } from 'utils/aelfUtils';
@@ -27,6 +27,7 @@ import { DefaultWhitelistMap } from 'constants/index';
 import { crossTokenMin } from 'constants/misc';
 import { sliceDecimals } from 'utils/input';
 import { useCrossFee } from 'hooks/useCrossFee';
+import { useLatestRef } from 'hooks';
 
 const defaultSelectToken = {
   symbol: 'ELF',
@@ -86,14 +87,20 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     return [address];
   }, [fromChainId, selectToken]);
   const crossFee = useCrossFee();
+  const allWhitelist = useCurrentWhitelist();
+  const latestAllWhitelist = useLatestRef(allWhitelist);
 
   const [[balance]] = useBalances(fromWallet, tokens);
   useEffect(() => {
-    if (selectToken && fromChainId && toChainId && (!selectToken[fromChainId] || !selectToken[toChainId])) {
+    if (fromChainId && toChainId && (!selectToken?.[fromChainId] || !selectToken?.[toChainId])) {
       if (tokenInfo) {
         dispatch(setSelectToken(tokenInfo));
       } else {
-        dispatch(setSelectToken(defaultSelectToken));
+        if (latestAllWhitelist.current.some((i: any) => i[fromChainId]?.symbol === defaultSelectToken)) {
+          dispatch(setSelectToken(defaultSelectToken));
+        } else {
+          dispatch(setSelectToken(allWhitelist[0]));
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,15 +108,20 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   // auto fix token
   useEffect(() => {
-    if (selectToken && fromChainId && toChainId) {
+    if (fromChainId && toChainId) {
       const fromItem = selectToken?.[fromChainId];
       const toItem = selectToken?.[toChainId];
       const canForm = fromItem && !fromItem?.onlyTo;
       const canTo = toItem && !toItem?.onlyForm;
       if (!tokenInfo || !(canTo && canForm)) {
-        dispatch(setSelectToken(defaultSelectToken));
+        if (latestAllWhitelist.current.some((i: any) => i[fromChainId]?.symbol === defaultSelectToken)) {
+          dispatch(setSelectToken(defaultSelectToken));
+        } else {
+          dispatch(setSelectToken(allWhitelist[0]));
+        }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromChainId, selectToken, toChainId, tokenInfo]);
 
   useEffect(() => {
