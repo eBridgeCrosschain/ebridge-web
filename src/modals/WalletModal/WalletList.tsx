@@ -18,8 +18,13 @@ import { sleep } from 'utils';
 import { isPortkey, isPortkeyConnector } from 'utils/portkey';
 import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
+import { TonConnectButton, TonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 export default function WalletList() {
   const [{ walletWallet, walletChainType }] = useModal();
+  const wallet = useTonWallet();
+
+  // TonConnectUI.
+  // wallet?.provider.
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
   const [loading, setLoading] = useState<any>();
   const dispatch = useModalDispatch();
@@ -73,6 +78,7 @@ export default function WalletList() {
 
   return (
     <>
+      <TonConnectButton />
       {walletList.map((key) => {
         const option = SUPPORTED_WALLETS[key];
         const disabled = !!(account && option.connector && option.connector === connectedConnector);
