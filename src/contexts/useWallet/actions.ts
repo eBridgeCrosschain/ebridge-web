@@ -8,6 +8,7 @@ export type Options = {
 };
 
 export enum WalletActions {
+  resetFromToWallet = 'RESET_FROM_TO_WALLET',
   setFromWallet = 'SET_FROM_WALLET',
   setToWallet = 'SET_TO_WALLET',
   changeWallet = 'CHANGE_WALLET',
@@ -31,6 +32,7 @@ export type ModalState = {
 
 export const basicWalletActions = {
   setFromWallet: (options: Options) => basicActions(WalletActions['setFromWallet'], { fromOptions: options }),
+  resetFromToWallet: () => basicActions(WalletActions['resetFromToWallet']),
   setToWallet: (options: Options) => basicActions(WalletActions['setToWallet'], { toOptions: options }),
   changeWallet: () => basicActions(WalletActions.changeWallet),
   changeEnd: () => basicActions(WalletActions.changeEnd),
@@ -40,6 +42,7 @@ export const basicWalletActions = {
 };
 
 export const {
+  resetFromToWallet,
   setFromWallet,
   setToWallet,
   web3ProviderDestroy,

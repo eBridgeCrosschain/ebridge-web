@@ -42,6 +42,9 @@ function reducer(state: ModalState, { type, payload }: { type: WalletActions; pa
       if (isChange(toOptions, payload.fromOptions)) newState.toOptions = fromOptions;
       return Object.assign({}, state, newState);
     }
+    case WalletActions.resetFromToWallet: {
+      return Object.assign({}, state, INITIAL_STATE);
+    }
     case WalletActions.setToWallet: {
       const { toOptions, fromOptions } = state;
       const newState: ModalState = { ...payload };
