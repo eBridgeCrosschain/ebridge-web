@@ -131,6 +131,12 @@
       "decimals": 18,
       "symbol": "DAI",
       "address": "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3"
+    },
+    "8453": {
+      "name": "DAI Token",
+      "decimals": 18,
+      "symbol": "DAI",
+      "address": "0x50c5725949a6f0c72e6c4a641f24049a917db0cb"
     }
   },
   "SGR": {
