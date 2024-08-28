@@ -21,12 +21,16 @@ import { Accounts, ChainId } from '@portkey/provider-types';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
 import { useWebLogin } from 'aelf-web-login';
+import { useHomeContext } from '../HomeContext';
+import { IS_ONLY_SIDE_CHAIN_LIST } from 'constants/misc';
+import { SupportedELFChainId } from 'constants/chain';
 
 function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: boolean; chainType?: ChainType }) {
   const { dispatch } = useWalletActions();
   const { t } = useLanguage();
   const { connector: web3Connector, chainId: web3ChainId, account: web3Account } = useWeb3();
   const { login } = useWebLogin();
+  const [{ selectToken }] = useHomeContext();
 
   const { chainId, account, connector } = wallet || {};
   const portkeyWallet = usePortkey();
@@ -125,17 +129,16 @@ function WalletRow({ wallet, isForm, chainType }: { wallet?: Web3Type; isForm?: 
   );
 
   const networkList = useMemo(() => {
+    let _list = NetworkList.filter((item) => !isELFChain(item.info.chainId));
     const selectPortkey = isSelectPortkey(selectELFWallet) && portkeyWallet.isActive;
     if (!selectPortkey || isELFChain(wallet?.chainId)) {
-      return NetworkList;
+      _list = NetworkList;
+    } else if (isELFChain(chainId)) {
+      _list = NetworkList.filter((item) => isELFChain(item.info.chainId));
     }
-
-    if (isELFChain(chainId)) {
-      return NetworkList.filter((item) => isELFChain(item.info.chainId));
-    }
-
-    return NetworkList.filter((item) => !isELFChain(item.info.chainId));
-  }, [chainId, portkeyWallet.isActive, selectELFWallet, wallet?.chainId]);
+    const isOnlySideChain = IS_ONLY_SIDE_CHAIN_LIST.includes(selectToken?.symbol || '');
+    return _list.filter((i) => (isOnlySideChain ? i.info.chainId !== SupportedELFChainId.AELF : true));
+  }, [chainId, portkeyWallet.isActive, selectELFWallet, selectToken, wallet?.chainId]);
 
   return (
     <Row className={styles['wallet-row']}>

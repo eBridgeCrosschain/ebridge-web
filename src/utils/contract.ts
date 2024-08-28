@@ -13,6 +13,7 @@ import { IAElfChain } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
 import { PortkeyDidV1, PortkeyDid } from 'aelf-web-login';
 import { ILoginWalletContextType } from 'contexts/useLoginWallet/types';
+import { ZERO } from 'constants/misc';
 
 export interface AbiType {
   internalType?: string;
@@ -179,7 +180,13 @@ export class WB3ContractBasic {
       const contract = this.contract;
       const { onMethod = 'receipt', ...options } = sendOptions || {};
 
-      // const gasPrice = (await this.web3?.eth.getGasPrice()) || '10000000000';
+      try {
+        const gasPrice = (await this.web3?.eth.getGasPrice()) || '10000000000';
+        (options as any).gasPrice = ZERO.plus(gasPrice).times(1.15).toFixed();
+      } catch (error) {
+        console.log(error);
+      }
+
       const result: any = await new Promise((resolve, reject) =>
         contract.methods[functionName](...(paramsOption || []))
           .send({ from: account, ...options })

@@ -118,13 +118,6 @@
     }
   },
   "AGENT": {
-    "AELF": {
-      "name": "AGENT",
-      "decimals": 8,
-      "symbol": "AGENT",
-      "address": "",
-      "issueChainId": 1931928
-    },
     "tDVV": {
       "name": "AGENT",
       "decimals": 8,

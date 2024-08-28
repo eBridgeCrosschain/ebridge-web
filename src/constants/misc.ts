@@ -36,3 +36,5 @@ export const SYMBOL_FORMAT_MAP: Record<string, string> = {
 };
 
 export const WEBSITE_NAME = 'eBridge';
+
+export const IS_ONLY_SIDE_CHAIN_LIST = ['AGENT'];
