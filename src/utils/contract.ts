@@ -182,7 +182,7 @@ export class WB3ContractBasic {
 
       try {
         const gasPrice = (await this.web3?.eth.getGasPrice()) || '10000000000';
-        (options as any).gasPrice = ZERO.plus(gasPrice).times(1.15).toFixed();
+        (options as any).gasPrice = ZERO.plus(gasPrice).times(1.15).toFixed(0);
       } catch (error) {
         console.log(error);
       }
