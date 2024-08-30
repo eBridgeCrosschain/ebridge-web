@@ -158,3 +158,5 @@ export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
 export const INDEXER_URL = '';
+
+export const BASE_URL = 'https://ebridge.exchange';
