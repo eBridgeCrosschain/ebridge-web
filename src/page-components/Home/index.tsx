@@ -22,7 +22,7 @@ export default function Home() {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
 
-  const isShowMask = false;
+  const isShowMask = true;
   return (
     <HomeProvider>
       <PageHead title={t('eBridge: Cross-chain Bridge')} />
