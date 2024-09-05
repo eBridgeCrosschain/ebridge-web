@@ -3,7 +3,7 @@
   "version": "2.1.6",
   "private": true,
   "scripts": {
-    "dev": "PORT=4200 next dev",
+    "dev": "PORT=3000 next dev",
     "dev:mainnet": "ENV_NAME=mainnet next dev",
     "dev:test1": "ENV_NAME=test1 next dev",
     "build": "next build",
