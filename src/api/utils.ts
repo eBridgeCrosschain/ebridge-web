@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { BaseConfig, RequestConfig } from './types';
+import { BASE_URL } from 'constants/index';
 
 const axiosInstance = axios.create({
-  baseURL: '/',
+  baseURL: BASE_URL,
   timeout: 50000,
 });
 
