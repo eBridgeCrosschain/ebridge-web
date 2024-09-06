@@ -6,7 +6,7 @@ import { isELFChain } from './aelfUtils';
 export const eventBus = new EventEmitter();
 import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
-import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST } from 'constants/index';
+import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedERCChain } from 'constants/index';
 
 export const sleep = (time: number) => {
   return new Promise<string>((resolve) => {
@@ -24,7 +24,9 @@ export function getExploreLink(
   if (isELFChain(chainId)) {
     prefix = ELFChainConstants.constants[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl;
   } else {
-    prefix = ERCChainConstants.constants.CHAIN_INFO.exploreUrl;
+    prefix =
+      SupportedERCChain?.[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl ||
+      ERCChainConstants.constants.CHAIN_INFO.exploreUrl;
   }
   switch (type) {
     case 'transaction': {
