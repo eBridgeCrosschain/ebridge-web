@@ -1,8 +1,5 @@
 import { Button } from 'antd';
 import { useCallback, useMemo, useState } from 'react';
-import { useModalDispatch } from 'contexts/useModal/hooks';
-import { basicModalView } from 'contexts/useModal/actions';
-import clsx from 'clsx';
 import { Connector } from '@web3-react/types';
 import { useChainDispatch } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
@@ -18,16 +15,16 @@ import { sleep } from 'utils';
 import { isPortkey, isPortkeyConnector } from 'utils/portkey';
 import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
-export default function WalletList() {
+import styles from './styles.module.less';
+export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
   const [loading, setLoading] = useState<any>();
-  const dispatch = useModalDispatch();
   const chainDispatch = useChainDispatch();
   const onCancel = useCallback(() => {
     setLoading(undefined);
-    dispatch(basicModalView.setWalletModal(false));
-  }, [dispatch]);
+    onFinish?.();
+  }, []);
   const tryActivation = useCallback(
     async (connector: Connector | string, key: string) => {
       if (loading || typeof connector === 'string') return;
@@ -72,24 +69,23 @@ export default function WalletList() {
   );
 
   return (
-    <>
+    <div className={styles['wallet-list']}>
       {walletList.map((key) => {
         const option = SUPPORTED_WALLETS[key];
         const disabled = !!(account && option.connector && option.connector === connectedConnector);
         return (
           <Button
-            className={clsx(disabled && 'selected')}
             disabled={disabled}
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
               tryActivation(option.connector, option.name);
             }}>
+            <IconFont className={styles['wallet-icon']} type={option.iconType} />
             <div>{option.name}</div>
-            <IconFont className="wallet-icon" type={option.iconType} />
           </Button>
         );
       })}
-    </>
+    </div>
   );
 }

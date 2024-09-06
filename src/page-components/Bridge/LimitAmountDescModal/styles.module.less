@@ -1,0 +1,74 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+
+.select-amount-desc-modal {
+  :global {
+    .@{app-prefix}-modal-header {
+      .@{app-prefix}-modal-title .@{app-prefix}-col {
+        text-align: left !important;
+      }
+    }
+    .@{app-prefix}-modal-body {
+      padding: 0 24px 24px;
+      width: unset;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .@{app-prefix}-table {
+      & thead > tr > th, & tbody > tr > td {
+        padding: 9px 12px;
+      }
+
+      & thead > tr > th {
+        background-color: @bg-13;
+        color: @font-11;
+      }
+    }
+  }
+
+  .item-title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: @font-2;
+  }
+  .item-text {
+    font-size: 14px;
+    line-height: 22px;
+    color: @font-5;
+  }
+
+  .confirm-btn-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .confirm-btn {
+    flex: 1;
+    font-size: 16px;
+    height: 48px;
+    max-width: 322px;
+    font-weight: 600;
+    margin-top: 24px;
+  }
+  .table-data {
+    font-size: 14px;
+    line-height: 22px;
+    color: @font-5;
+    vertical-align: middle;
+    display: block;
+    &-sub {
+      color: @font-3;
+    }
+  }
+  .scroll-box {
+    padding-top: 24px;
+    overflow-y: scroll;
+    flex: 1;
+    max-height: 480px;
+  }
+}

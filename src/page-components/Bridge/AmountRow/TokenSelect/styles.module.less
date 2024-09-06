@@ -1,0 +1,30 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/font.less';
+
+.token-select {
+  .token-img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 1px solid @border-3;
+  }
+  .token-title-row {
+    gap: 8px;
+  }
+  .token-title {
+    color: @font-15;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24px;
+    .text-overflow(1);
+
+    white-space: nowrap;
+  }
+  .arrow-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

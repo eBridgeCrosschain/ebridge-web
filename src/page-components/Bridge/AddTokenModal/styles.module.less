@@ -1,0 +1,183 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+.add-modal {
+  :global {
+    .@{app-prefix}-modal-header {
+      .@{app-prefix}-modal-title .@{app-prefix}-col {
+        text-align: left !important;
+      }
+    }
+    .@{app-prefix}-modal-body {
+      min-width: 448px;
+      max-width: 448px;
+    }
+  }
+  .input-row {
+    :global {
+      .@{app-prefix}-input {
+        height: 40px;
+        border-radius: 6px;
+      }
+      .@{app-prefix}-btn-default {
+        width: 112px;
+      }
+    }
+  }
+  .error-tip {
+    margin-top: 6px;
+    font-size: 12px;
+    color: @font-6;
+  }
+  .title {
+    color: @font-5;
+    margin-bottom: 8px;
+  }
+  .add-btn {
+    margin-top: 32px;
+    height: 48px;
+    width: 100%;
+  }
+}
+
+.token-row {
+  margin-top: 24px;
+  .token-card {
+    background: @bg-7;
+    border-radius: 8px;
+    padding: 18px 16px;
+    .logo {
+      width: 24px;
+      height: 24px;
+    }
+    .card-title {
+      color: @font-3;
+      margin-bottom: 8px;
+    }
+  }
+}
+.notice-alert {
+  background: @bg-10;
+  color: @font-7;
+  border: 0;
+  padding: 15px 20px;
+  border-radius: 6px;
+  :global {
+    .@{app-prefix}-alert-icon {
+      margin-top: 2px;
+      font-size: 14px;
+      line-height: 24px;
+      margin-right: 10px;
+    }
+    .@{app-prefix}-alert-message {
+      font-size: 14px;
+      color: @font-7;
+    }
+    .@{app-prefix}-alert-description {
+      font-size: 12px;
+    }
+  }
+}
+
+.add-steps {
+  margin: 18px 10px 24px;
+  width: auto;
+
+  :global {
+    .@{app-prefix}-steps-item-description {
+      margin-top: 2px;
+      font-size: 12px;
+    }
+    .@{app-prefix}-steps-item-icon {
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+    }
+    .@{app-prefix}-steps-item-wait .@{app-prefix}-steps-item-container {
+      .@{app-prefix}-steps-item-icon {
+        border-color: @font-3;
+        .@{app-prefix}-steps-icon{
+          color: @font-3;
+        }
+      }
+      .@{app-prefix}-steps-item-title,
+      .@{app-prefix}-steps-item-description {
+        color: @font-3;
+      }
+    }
+  }
+}
+.add-tip {
+  color: @font-3;
+}
+
+.indexing-modal {
+  :global {
+    .@{app-prefix}-modal-content {
+      border-radius: 8px;
+    }
+    .@{app-prefix}-modal-close,
+    .@{app-prefix}-modal-header {
+      display: none;
+    }
+    .@{app-prefix}-modal-body {
+      padding-top: 24px;
+      min-width: 400px;
+      max-width: 400px;
+    }
+  }
+  .transaction-card {
+    margin-top: 10px;
+    background: @bg-7;
+    padding: 16px;
+    padding-right: 30px;
+    border-radius: 4px;
+    div:first-child {
+      color: @font-3;
+    }
+    a {
+      margin-right: 16px;
+    }
+  }
+}
+.progress-row {
+  margin-top: 10px;
+  width: 100%;
+  position: relative;
+  padding-top: 18px;
+  .progress {
+    :global {
+      .@{app-prefix}-progress-success-bg,
+      .@{app-prefix}-progress-bg {
+        background: linear-gradient(90deg, #fdd62d 0%, #fa8814 100%);
+      }
+    }
+  }
+  .progress-text {
+    top: 0;
+    position: absolute;
+    color: @font-7;
+    transition: all 0.4s cubic-bezier(0.08, 0.82, 0.17, 1) 0s;
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .indexing-modal {
+    :global {
+      .@{app-prefix}-modal-content {
+        margin-left: 20px;
+        max-width: calc(100% - 40px);
+      }
+    }
+    .transaction-card {
+      font-size: 12px;
+      flex-direction: column;
+      :global {
+        .flex-row-center {
+          margin-top: 2px;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+}

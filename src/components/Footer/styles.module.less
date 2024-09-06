@@ -3,98 +3,53 @@
 @import '/src/assets/theme/font.less';
 
 .page-footer {
-  max-width: calc(@max-width + 82px);
-  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: @footer-height;
+  padding: 24px 48px;
+  border-top: 1px solid @border-5;
+  background: rgb(255 255 255 / 95%);
+  color: @font-13;
+  font-size: 16px;
 
-  .page-footer-section {
+  .page-footer-left {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    font-size: 16px;
-    flex-wrap: wrap;
-  }
-
-  .page-footer-top-section {
-    padding: 20px 0 32px;
-    gap: 40px;
-  }
-
-  .page-footer-bottom-section {
-    padding: 20px 0;
-    gap: 16px;
-    border-top: 1px solid @bg-5;
-  }
-
-  .ebridge-logo-box {
-    display: flex;
-    align-items: center;
-    height: 32px;
-    cursor: pointer;
-  }
-  .ebridge-logo {
-    width: 38px;
-    height: 27px;
-    margin-right: 8px;
-  }
-  .ebridge-logo-text {
-    font-size: 22px;
-    color: @font-2;
-  }
-  .footer-desc {
-    font-size: 14px;
-    color: @font-13;
-    margin-top: 12px;
-  }
-
-  .page-footer-menu-title {
-    color: @font-3;
-    font-size: 14px;
-  }
-
-  .page-footer-menu-link {
-    font-size: 16px;
-    .font-family-medium();
-
-    display: flex;
-    flex-direction: column;
     gap: 8px;
-    margin-top: 12px;
+    align-items: flex-start;
+  }
 
+  .aelf-logo {
+    width: 53px;
+    height: 16px;
+    margin-top: 2px;
+  }
+
+  .page-footer-right {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .page-footer-menu {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    .font-family-medium();
     & > a {
-      color: @font-5;
+      color: @font-13;
     }
   }
 
   .page-footer-community-group {
     display: flex;
-    align-items: center;
     gap: 24px;
+    align-items: center;
   }
+
   .page-footer-community {
     width: 24px;
     height: 24px;
     cursor: pointer;
-    &:hover {
-      img {
-        filter: invert(100%);
-      }
-    }
-  }
-
-  .page-footer-time {
-    font-size: 14px;
-    color: #8f97a6;
-  }
-}
-
-@media screen and (max-width: @md-width) {
-  .home-page-footer {
-    margin-left: 16px;
-    margin-right: 16px;
-    padding-bottom: 104px;
-    max-width: 100%;
-  }
-  .page-footer-bottom-section {
-    flex-direction: column;
   }
 }

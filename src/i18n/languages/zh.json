@@ -24,7 +24,7 @@
     "Transferred": "進行中",
     "Indexed": "待接收",
     "Received": "已完成",
-    "Estimated transaction fee": "預計會收取{{fee}}作為跨鏈手續費",
+    "Estimated transaction fee": "預計交易手續費",
     "Grant permission to access your funds?": "允許換幣合約使用您的代幣",
     "Confirm": "授權",
     "No cross-chain records found": "未査詢到跨鏈記錄",

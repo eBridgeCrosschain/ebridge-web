@@ -24,7 +24,7 @@
     "Transferred": "Processing",
     "Indexed": "Pending",
     "Received": "Completed",
-    "Estimated transaction fee": "Estimated transaction fee: {{fee}}",
+    "Estimated transaction fee": "Estimated transaction fee",
     "Grant permission to access your funds?": "Grant permission to access your funds?",
     "Confirm": "Confirm",
     "No cross-chain records found": "No cross-chain records found",
