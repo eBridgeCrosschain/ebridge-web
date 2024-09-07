@@ -67,7 +67,7 @@
     "Cross-chain transaction initiated2": "Cross-chain transaction initiated",
     "Balance": "Balance: ",
     "Added": "Added",
-    "records in total": "{{total}} records in total",
+    "records in total": "Total {{total}} items",
     "Select a token": "Select a token",
     "Insufficient balance": "Insufficient balance",
     "Synchronization request has been submitted": "Synchronization request has been submitted",

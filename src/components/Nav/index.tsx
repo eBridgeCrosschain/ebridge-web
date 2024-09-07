@@ -7,12 +7,12 @@ import { NAV_LIST } from 'constants/link';
 import styles from './styles.module.less';
 
 function Nav() {
-  const { asPath, push } = useRouter();
+  const { pathname, push } = useRouter();
   const { t } = useLanguage();
   return (
     <div className={clsx(styles['nav-list'], 'flex-column')}>
       {NAV_LIST.map((item, index) => {
-        const isSelected = asPath === item.href;
+        const isSelected = pathname === item.href;
         return (
           <div
             key={index}

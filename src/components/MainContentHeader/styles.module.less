@@ -1,7 +1,8 @@
 @import '/src/assets/theme/color.less';
 
 .main-content-header {
-  flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
   .header-title {
     flex: 1;
     color: @font-15;
@@ -17,4 +18,14 @@
     width: 16px;
     height: 16px;
   }
+}
+
+.main-content-header-wrap {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.main-content-header-nowrap {
+  justify-content: space-between;
+  align-items: center;
 }

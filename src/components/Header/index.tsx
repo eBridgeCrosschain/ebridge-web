@@ -268,7 +268,7 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
 
 function MobileHeader() {
   const [visible, setVisible] = useState<boolean>(false);
-  const { asPath, push } = useRouter();
+  const { pathname, push } = useRouter();
   const { t } = useLanguage();
   return (
     <>
@@ -295,7 +295,7 @@ function MobileHeader() {
           />
         </div>
         {NAV_LIST.map((item, index) => {
-          const isSelected = asPath === item.href;
+          const isSelected = pathname === item.href;
           return (
             <div
               key={index}

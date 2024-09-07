@@ -14,7 +14,7 @@ const getMillisecond = (time: any) => {
   }
   return tim;
 };
-export function formatTime(t: string | number, formats = 'YYYY-MM-DD') {
+export function formatTime(t: string | number, formats = 'YYYY-MM-DD HH:MM:SS') {
   if (t && typeof t === 'string' && !t.includes('T') && !t.includes('-'))
     return Moment(getMillisecond(t)).format(formats);
   return Moment(t).format(formats);

@@ -6,13 +6,15 @@ import { infoCircleIcon } from 'assets/images';
 import styles from './styles.module.less';
 
 interface IMainContentHeaderProps {
+  className?: string;
+  wrap?: boolean;
   title: string;
   tipConfig?: {
     label: string;
   } & ({ content: React.ReactNode; onClick?: never } | { content?: never; onClick?: () => void });
 }
 
-export default function MainContentHeader({ title, tipConfig }: IMainContentHeaderProps) {
+export default function MainContentHeader({ className, wrap, title, tipConfig }: IMainContentHeaderProps) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const handleTipClick = () => {
@@ -24,7 +26,12 @@ export default function MainContentHeader({ title, tipConfig }: IMainContentHead
   };
 
   return (
-    <div className={clsx(styles['main-content-header'], 'flex-row-center', 'flex-row-between')}>
+    <div
+      className={clsx(
+        styles['main-content-header'],
+        wrap ? styles['main-content-header-wrap'] : styles['main-content-header-nowrap'],
+        className,
+      )}>
       <div className={styles['header-title']}>{title}</div>
       {tipConfig && (
         <div className={clsx(styles['header-tip'], 'flex-row-center', 'cursor-pointer')} onClick={handleTipClick}>

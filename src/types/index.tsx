@@ -52,6 +52,7 @@ export type TokenInfo = {
 };
 
 export enum CrossChainType {
+  all = 'all',
   homogeneous = 'homogeneous',
   heterogeneous = 'heterogeneous',
 }

@@ -1,15 +1,12 @@
-import { request } from 'api';
 import storages from 'constants/storages';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { BasicActions } from 'contexts/utils';
 import { useBalances } from 'hooks/useBalances';
-import useInterval from 'hooks/useInterval';
 import { useCurrentWhitelist, useUserAddedToken } from 'hooks/whitelist';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { useCookie, usePrevious } from 'react-use';
 import { isELFChain } from 'utils/aelfUtils';
 import { divDecimals } from 'utils/calculate';
-import { getChainIdToMap } from 'utils/chain';
 import {
   DestroyModal,
   DestroyState,
@@ -18,11 +15,9 @@ import {
   setFrom,
   setHomeState,
   setReceiveId,
-  setReceiveList,
   setSelectToken,
   setTo,
 } from './actions';
-import { parseCrossChainTransfers } from './utils';
 import { DefaultWhitelistMap } from 'constants/index';
 import { crossTokenMin } from 'constants/misc';
 import { sliceDecimals } from 'utils/input';
@@ -141,29 +136,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     }
     if (preToAccount !== fromAccount) dispatch(setReceiveId(undefined));
   }, [fromAccount, preFromAccount, preToAccount]);
-  const getReceiveList = useCallback(async () => {
-    if (!toChainId || !toAccount) return;
-    // TODO toAddress
-    const req = await request.cross.getCrossChainTransfers({
-      params: { toChainId: getChainIdToMap(toChainId), toAddress: toAccount, status: 1, maxResultCount: 100 },
-    });
-    const list = parseCrossChainTransfers(req);
-    if (list) {
-      const existed = list.some((i) => i.id === receiveId);
-      if (!existed) dispatch(setReceiveId(undefined));
-      dispatch(setReceiveList(list));
-    }
-  }, [receiveId, toAccount, toChainId]);
   useEffect(() => {
     dispatch(setReceiveId(undefined));
   }, [toChainId]);
-  useInterval(
-    () => {
-      getReceiveList();
-    },
-    10000,
-    [toChainId, toAccount, getReceiveList],
-  );
   const receivedList = useMemo(() => {
     let list = [];
     try {
