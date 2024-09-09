@@ -129,7 +129,7 @@ const fromTo = (): ColumnType<CrossChainItem> => {
   return {
     title: () => (
       <>
-        <Trans>From</Trans> - <Trans>To</Trans>
+        <Trans>From Chain</Trans> - <Trans>To Chain</Trans>
       </>
     ),
     dataIndex: 'id',

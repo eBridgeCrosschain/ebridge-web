@@ -229,7 +229,7 @@ export default function ActionButton() {
   const btnProps = useMemo(() => {
     let children: React.ReactNode = (
         <div className={clsx(styles['button-content'], 'flex-center')}>
-          <span>Bridge</span>
+          <span>{t('Bridge')}</span>
           <CommonImage className={styles['arrow-icon']} src={arrowRightWhiteIcon} />
         </div>
       ),
@@ -244,13 +244,11 @@ export default function ActionButton() {
 
     if (isHomogeneous) {
       if (!toAccount) {
-        children = 'Connect Wallet';
         return { children, onClick, disabled };
       }
     } else {
       if (!toChecked) {
         if (!toAccount) {
-          children = 'Connect Wallet';
           return { children, onClick, disabled };
         }
       } else {
@@ -266,7 +264,6 @@ export default function ActionButton() {
       return { children, onClick, disabled };
     }
     if (!fromAccount) {
-      children = 'Connect Wallet';
       return { children, onClick, disabled };
     }
     if (!fromInput) {

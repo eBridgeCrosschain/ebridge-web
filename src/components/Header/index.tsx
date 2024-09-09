@@ -27,7 +27,7 @@ import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG } from 'constants/
 import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
-import { ChainId, ChainType, Web3Type } from 'types';
+import { ChainType, Web3Type } from 'types';
 import { useWebLogin } from 'aelf-web-login';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
@@ -184,6 +184,7 @@ interface IMobileDrawerMenuConfigItem {
 }
 
 function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible: boolean; onCloseDrawer(): void }) {
+  const { t } = useLanguage();
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const { language, changeLanguage } = useLanguage();
 
@@ -223,7 +224,7 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
     label: (
       <div className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}>
         {icon && <CommonImage className={styles['menu-item-icon']} src={icon} />}
-        <span className={styles['menu-item-text']}>{label}</span>
+        <span className={styles['menu-item-text']}>{t(label)}</span>
         <CommonImage
           className={clsx(styles['menu-expand-icon'], {
             [styles['menu-expand-icon-rotate']]: openKeys.includes(label),
@@ -243,7 +244,7 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
               target={isExternalLink ? '_blank' : '_self'}
               onClick={isExternalLink ? undefined : () => onCloseDrawer()}>
               {child.icon && <CommonImage className={styles['menu-item-icon']} src={child.icon} />}
-              <span className={styles['menu-item-text']}>{child.label}</span>
+              <span className={styles['menu-item-text']}>{t(child.label)}</span>
               {child.checked && <CommonImage className={styles['menu-checked-icon']} src={checkBlueIcon} />}
             </a>
           </Link>

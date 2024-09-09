@@ -23,7 +23,7 @@ const STEP_ITEM_CONFIG = {
   ERC: {
     chainType: 'ERC',
     iconList: [ethereumLogo, groupIcon],
-    text: 'Ethereum/BNB Smart Chain',
+    text: 'External Chain',
   },
   ELF: {
     chainType: 'ELF',
@@ -85,7 +85,7 @@ export default function WalletsModal() {
     <CommonModal
       width={438}
       visible={walletsModal}
-      title={t('Select your wallet')}
+      title={t(stepConfig[walletStep].chainType === 'ERC' ? 'Select your wallet' : 'Connect aelf wallet')}
       onCancel={handleCloseModal}
       className={clsx('modals', styles['wallets-modal'])}
       type="pop-bottom">
@@ -123,25 +123,25 @@ export default function WalletsModal() {
           <>
             <div className={clsx(styles['aelf-tip-wrap'], 'flex-column-center')}>
               <CommonImage className={styles['aelf-chain-logo']} src={aelfChainLogo} />
-              <span>Let’s connect your aelf wallet to get started.</span>
+              <span>{t(`Let’s connect your aelf wallet to get started.${isFromERC ? '(stepTwo)' : '(stepOne)'}`)}</span>
             </div>
             <Button type="primary" onClick={handleConnectAELFWallet}>
-              Connect aelf Wallet
+              {t('Connect aelf Wallet')}
             </Button>
           </>
         )}
         {walletStep === WALLET_STEP.FROM && (
           <p className={styles.tip}>
-            By connecting a wallet, you agree to our{' '}
+            {t('By connecting a wallet, you agree to our')}
             <Link href={ROUTE_PATHS.TERMS_OF_SERVICE}>
-              <a onClick={handleCloseModal}>Terms of Service</a>
+              <a onClick={handleCloseModal}>{t('Terms of Service')}</a>
             </Link>
             .
           </p>
         )}
         {walletStep === WALLET_STEP.TO && (
           <Button className={styles['link-button']} type="link" onClick={handleCloseModal}>
-            Skip and enter address manually
+            {t('Skip and enter address manually')}
           </Button>
         )}
       </div>

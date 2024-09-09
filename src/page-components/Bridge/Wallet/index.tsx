@@ -1,3 +1,4 @@
+import { useLanguage } from 'i18n';
 import clsx from 'clsx';
 import ConnectWallet from './ConnectWallet';
 import NetworkSelect from './NetworkSelect';
@@ -6,6 +7,7 @@ import { useWalletContext } from 'contexts/useWallet';
 import styles from './styles.module.less';
 
 export default function Wallet({ className, isFrom = false }: { className?: string; isFrom?: boolean }) {
+  const { t } = useLanguage();
   const [{ fromOptions, toOptions }] = useWalletContext();
   const { fromWallet, toWallet } = useWallet();
 
@@ -15,7 +17,7 @@ export default function Wallet({ className, isFrom = false }: { className?: stri
   return (
     <div className={clsx(styles.wallet, 'flex-column', className)}>
       <div className={clsx(styles['wallet-label'], 'flex-row-center', 'flex-row-between')}>
-        <span className={styles['wallet-label-text']}>{isFrom ? 'From' : 'To'}</span>
+        <span className={styles['wallet-label-text']}>{t(isFrom ? 'From' : 'To')}</span>
         <ConnectWallet wallet={wallet} chainType={chainType} />
       </div>
       <NetworkSelect isFrom={isFrom} wallet={wallet} />

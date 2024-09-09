@@ -77,7 +77,7 @@ function Body({
         <NetworkSelect
           value={fromChainId}
           networkList={networkList}
-          placeholder={t('From')}
+          placeholder={t('From Chain')}
           onChange={(value) => {
             const tmpState: State = { fromChainId: value };
             if (toChainId && toChainId === value) tmpState.toChainId = fromChainId;
@@ -88,7 +88,7 @@ function Body({
         <NetworkSelect
           value={toChainId}
           networkList={networkList}
-          placeholder={t('To')}
+          placeholder={t('To Chain')}
           onChange={(value) => {
             const tmpState: State = { toChainId: value };
             if (fromChainId && fromChainId === value) tmpState.fromChainId = toChainId;
@@ -297,10 +297,15 @@ function History() {
           label: t('Can’t find your token?'),
           content: (
             <div className={styles['tooltip-content']}>
-              <p className={styles['tooltip-title']}>Tips:</p>
+              <p className={styles['tooltip-title']}>
+                {t('Tips')}
+                {t(':')}
+              </p>
               <ol>
-                <li>Check the transaction status from the transaction records.</li>
-                <li>For more details, click on the Receiving Transaction ID to track its progress on the Explorer.</li>
+                <li>{t('Check the transaction status from the transaction records.')}</li>
+                <li>
+                  {t('For more details, click on the Receiving Transaction ID to track its progress on the Explorer.')}
+                </li>
               </ol>
             </div>
           ),
@@ -312,8 +317,10 @@ function History() {
         activeKey={CrossChainType[historyType as CrossChainType] ? historyType : undefined}
         onChange={(v) => setActiveKey({ historyType: v })}>
         <Tabs.TabPane tab={t('All Transactions')} key={CrossChainType.all} />
-        {!isPortkey() && <Tabs.TabPane tab={t('Internal')} key={CrossChainType.homogeneous} />}
-        <Tabs.TabPane tab={t('External')} key={CrossChainType.heterogeneous} />
+        {!isPortkey() && (
+          <Tabs.TabPane tab={t('Homogeneous Chain Cross-Chain History')} key={CrossChainType.homogeneous} />
+        )}
+        <Tabs.TabPane tab={t('Heterogeneous Chain Cross-Chain History')} key={CrossChainType.heterogeneous} />
       </Tabs>
       {!(isPortkey() && historyType === CrossChainType.homogeneous) && (
         <div className={styles['table-box']}>

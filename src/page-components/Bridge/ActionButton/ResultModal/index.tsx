@@ -32,7 +32,7 @@ export default function ResultModal({ open, type, onClose, onRetry }: IResultMod
       icon: checkFilledIcon,
       description: 'The transaction has been approved. You can check it’s status in the “Transactions” page.',
       buttonProps: {
-        children: 'Close',
+        children: t('Close'),
         onClick: onClose,
       },
     },
@@ -41,7 +41,7 @@ export default function ResultModal({ open, type, onClose, onRetry }: IResultMod
       icon: errorFilledIcon,
       description: 'The transaction was not signed. It was rejected.',
       buttonProps: {
-        children: 'Retry',
+        children: t('Retry'),
         onClick: handleRetry,
       },
     },

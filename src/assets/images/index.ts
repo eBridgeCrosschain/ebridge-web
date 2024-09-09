@@ -33,7 +33,7 @@ import transactionsBlueIcon from './transactions-blue.svg';
 import closeIcon from './close.svg';
 import infoCircleIcon from './info-circle.svg';
 import questionFilledIcon from './question-filled.svg';
-import loadingIcon from './loading.svg';
+import loadingIcon from './loading.png';
 
 export {
   metamask,

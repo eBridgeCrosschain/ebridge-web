@@ -19,7 +19,6 @@ export default function LoadingModal({ open }: ILoadingModalProps) {
       closable={false}
       open={open || false}>
       <div className={clsx(styles['loading-modal-body'], 'flex-column-center')}>
-        {/* TODO: loading icon */}
         <CommonImage className={styles['loading-icon']} src={loadingIcon} />
         <div className={styles['loading-text']}>
           {t('Do not refresh or close the page while waiting for the operation to be completed.')}

@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useLanguage } from 'i18n';
 import Link from 'next/link';
 import CommonImage from 'components/CommonImage';
 import { aelfLogo } from 'assets/images';
@@ -7,6 +8,7 @@ import { FOOTER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG } from 'constants/link';
 import useMediaQueries from 'hooks/useMediaQueries';
 
 function Footer() {
+  const { t } = useLanguage();
   const isMd = useMediaQueries('md');
 
   if (isMd) {
@@ -24,7 +26,7 @@ function Footer() {
           {LEGAL_MENU_CONFIG.map((item) => {
             return (
               <Link key={item.label} href={item.link}>
-                {item.label}
+                {t(item.label)}
               </Link>
             );
           })}

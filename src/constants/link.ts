@@ -47,7 +47,7 @@ export const LEGAL_MENU_CONFIG = [
 const COMMUNITY_LINK_MAP = {
   TELEGRAM: 'https://t.me/eBridge_official',
   TWITTER: 'https://x.com/eBridge_Web3',
-  DISCORD: '', // TODO: link
+  DISCORD: 'https://discord.com/invite/MCSP56WV',
 };
 
 export const FOOTER_COMMUNITY_CONFIG = [

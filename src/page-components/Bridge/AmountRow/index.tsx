@@ -35,7 +35,7 @@ export default function AmountRow() {
   return (
     <div className={clsx(styles['amount-row'], 'flex-column')}>
       <div className={clsx(styles['amount-label-wrap'], 'flex-row-between', 'flex-row-center')}>
-        <span className={styles['amount-label']}>Amount</span>
+        <span className={styles['amount-label']}>{t('Amount')}</span>
         <div className={clsx(styles['balance-wrap'], 'flex-row-center')}>
           <span className={styles.balance}>
             {unitConverter(show)}{' '}
