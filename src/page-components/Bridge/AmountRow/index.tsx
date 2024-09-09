@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useLanguage } from 'i18n';
+import BigNumber from 'bignumber.js';
 import clsx from 'clsx';
 import { Button } from 'antd';
 import AmountInput from './AmountInput';
@@ -17,7 +18,7 @@ import styles from './styles.module.less';
 
 export default function AmountRow() {
   const { t } = useLanguage();
-  const [{ selectToken, fromInput, fromBalance, crossMin }, { dispatch }] = useHomeContext();
+  const [{ selectToken, fromInput, fromBalance, crossMin, crossFee }, { dispatch }] = useHomeContext();
   const { fromWallet, changing } = useWallet();
   const { token, show } = fromBalance || {};
   const { chainId, account } = fromWallet || {};
@@ -36,20 +37,28 @@ export default function AmountRow() {
     <div className={clsx(styles['amount-row'], 'flex-column')}>
       <div className={clsx(styles['amount-label-wrap'], 'flex-row-between', 'flex-row-center')}>
         <span className={styles['amount-label']}>{t('Amount')}</span>
-        <div className={clsx(styles['balance-wrap'], 'flex-row-center')}>
-          <span className={styles.balance}>
-            {unitConverter(show)}{' '}
-            {formatSymbol(selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol)}
-          </span>
-          <Button
-            className={styles['max-button']}
-            type="link"
-            onClick={() => {
-              dispatch(setFrom(parseInputChange(unitConverter(show), min, token?.decimals)));
-            }}>
-            {t('MAX')}
-          </Button>
-        </div>
+        {account && (
+          <div className={clsx(styles['balance-wrap'], 'flex-row-center')}>
+            <span className={styles.balance}>
+              {unitConverter(show)}{' '}
+              {formatSymbol(selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol)}
+            </span>
+            <Button
+              className={styles['max-button']}
+              type="link"
+              onClick={() => {
+                const maxAmount = BigNumber.max(
+                  ZERO.plus(show || '')
+                    .minus(crossFee || '')
+                    .minus(0.0041),
+                  0,
+                );
+                dispatch(setFrom(parseInputChange(maxAmount.toFixed(), min, token?.decimals)));
+              }}>
+              {t('MAX')}
+            </Button>
+          </div>
+        )}
       </div>
       <div className={clsx(styles['amount-input-wrap'], 'flex-row-center')}>
         <AmountInput

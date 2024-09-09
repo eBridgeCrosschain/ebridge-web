@@ -32,8 +32,8 @@ export default function Info() {
         label={t('You’ll receive')}
         value={`${sliceDecimals(toInput, token?.decimals ?? 6)} ${formatSymbol(token?.symbol)}`}
       />
-      {!isHomogeneous && (
-        <InfoRow label={t('Estimated transaction fee')} value={`${crossFee || '0'} ${formatSymbol('ELF')}`} />
+      {isHomogeneous || !crossFee ? null : (
+        <InfoRow label={t('Estimated transaction fee')} value={`${crossFee} ${formatSymbol('ELF')}`} />
       )}
       <InfoRow label={t('Expected time')} value={`~40 ${t('minutes')}`} />
     </div>
