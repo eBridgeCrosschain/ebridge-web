@@ -1,22 +1,14 @@
-import dynamic from 'next/dynamic';
+import { ROUTE_PATHS } from 'constants/link';
 
-export default dynamic(() => import('page-components/Home'), {
-  ssr: false,
-  // loading: () => <Skeleton paragraph={{ rows: 10 }} />,
-});
+export async function getServerSideProps() {
+  return {
+    redirect: {
+      destination: ROUTE_PATHS.BRIDGE,
+      permanent: false,
+    },
+  };
+}
 
-// TODO:
-// import { ROUTE_PATHS } from 'constants/link';
+const IndexPage = () => null;
 
-// export async function getServerSideProps() {
-//   return {
-//     redirect: {
-//       destination: ROUTE_PATHS.BRIDGE,
-//       permanent: false,
-//     },
-//   };
-// }
-
-// const IndexPage = () => null;
-
-// export default IndexPage;
+export default IndexPage;

@@ -21,6 +21,7 @@ import { isPortkey } from 'utils/portkey';
 import MainContentHeader from 'components/MainContentHeader';
 import clsx from 'clsx';
 import useMediaQueries from 'hooks/useMediaQueries';
+import PageHead from 'components/PageHead';
 type State = {
   fromChainId?: ChainId;
   toChainId?: ChainId;
@@ -289,51 +290,56 @@ function History() {
     }
   }, [allData, heterogeneousData, historyType, homogeneousData]);
   return (
-    <div className={clsx(styles.history, 'flex-column')}>
-      <MainContentHeader
-        wrap={isMd}
-        title={t('Transactions')}
-        tipConfig={{
-          label: t('Can’t find your token?'),
-          content: (
-            <div className={styles['tooltip-content']}>
-              <p className={styles['tooltip-title']}>
-                {t('Tips')}
-                {t(':')}
-              </p>
-              <ol>
-                <li>{t('Check the transaction status from the transaction records.')}</li>
-                <li>
-                  {t('For more details, click on the Receiving Transaction ID to track its progress on the Explorer.')}
-                </li>
-              </ol>
-            </div>
-          ),
-        }}
-      />
-      <Tabs
-        tabBarGutter={16}
-        defaultActiveKey={CrossChainType.all}
-        activeKey={CrossChainType[historyType as CrossChainType] ? historyType : undefined}
-        onChange={(v) => setActiveKey({ historyType: v })}>
-        <Tabs.TabPane tab={t('All Transactions')} key={CrossChainType.all} />
-        {!isPortkey() && (
-          <Tabs.TabPane tab={t('Homogeneous Chain Cross-Chain History')} key={CrossChainType.homogeneous} />
+    <>
+      <PageHead title={t('eBridge: Cross-chain Bridge')} />
+      <div className={clsx(styles.history, 'flex-column')}>
+        <MainContentHeader
+          wrap={isMd}
+          title={t('Transactions')}
+          tipConfig={{
+            label: t('Can’t find your token?'),
+            content: (
+              <div className={styles['tooltip-content']}>
+                <p className={styles['tooltip-title']}>
+                  {t('Tips')}
+                  {t(':')}
+                </p>
+                <ol>
+                  <li>{t('Check the transaction status from the transaction records.')}</li>
+                  <li>
+                    {t(
+                      'For more details, click on the Receiving Transaction ID to track its progress on the Explorer.',
+                    )}
+                  </li>
+                </ol>
+              </div>
+            ),
+          }}
+        />
+        <Tabs
+          tabBarGutter={16}
+          defaultActiveKey={CrossChainType.all}
+          activeKey={CrossChainType[historyType as CrossChainType] ? historyType : undefined}
+          onChange={(v) => setActiveKey({ historyType: v })}>
+          <Tabs.TabPane tab={t('All Transactions')} key={CrossChainType.all} />
+          {!isPortkey() && (
+            <Tabs.TabPane tab={t('Homogeneous Chain Cross-Chain History')} key={CrossChainType.homogeneous} />
+          )}
+          <Tabs.TabPane tab={t('Heterogeneous Chain Cross-Chain History')} key={CrossChainType.heterogeneous} />
+        </Tabs>
+        {!(isPortkey() && historyType === CrossChainType.homogeneous) && (
+          <div className={styles['table-box']}>
+            <Body
+              networkList={tableData.networkList}
+              state={tableData.state}
+              selectState={tableData.selectState}
+              setSelect={tableData.setSelect}
+              setState={tableData.setState}
+            />
+          </div>
         )}
-        <Tabs.TabPane tab={t('Heterogeneous Chain Cross-Chain History')} key={CrossChainType.heterogeneous} />
-      </Tabs>
-      {!(isPortkey() && historyType === CrossChainType.homogeneous) && (
-        <div className={styles['table-box']}>
-          <Body
-            networkList={tableData.networkList}
-            state={tableData.state}
-            selectState={tableData.selectState}
-            setSelect={tableData.setSelect}
-            setState={tableData.setState}
-          />
-        </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
