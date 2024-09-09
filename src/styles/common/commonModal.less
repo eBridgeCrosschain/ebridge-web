@@ -1,4 +1,5 @@
 @import '../../assets/theme/color.less';
+@import '../../assets/theme/font.less';
 
 .common-modals {
   .@{app-prefix}-modal-content {
@@ -12,7 +13,8 @@
     border-bottom: none;
   }
   .@{app-prefix}-modal-title {
-    font-family: PingFangSC-Medium, sans-serif;
+    .font-family-semibold();
+
     color: @font-15;
     font-size: 16px;
     font-weight: 700;

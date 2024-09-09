@@ -1,8 +1,11 @@
 @import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
 .@{app-prefix}-btn {
   border-radius: 40px;
-  font-family: PingFangSC-Regular, sans-serif;
-  font-weight: 500;
+  .font-family-medium();
+  .anticon {
+    display: inline-flex;
+  }
 }
 .@{app-prefix}-btn-default {
   height: 40px;
