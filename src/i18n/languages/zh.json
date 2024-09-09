@@ -153,6 +153,7 @@
     "Request rejected. eBridge needs your permission to continue": "請求被拒絕。eBridge需要您的授權才能繼續。",
     "Learn more about transfer and limits": "關於",
     "here": "eBridge限額/限速規則",
-    "period": "。"
+    "period": "。",
+    "Enter destination address placeholder": "輸入目標{{networkName}}地址"
   }
 }

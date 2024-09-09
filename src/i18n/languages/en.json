@@ -153,6 +153,7 @@
     "Request rejected. eBridge needs your permission to continue": "Request rejected. eBridge needs your permission to continue.",
     "Learn more about transfer and limits": "Learn more about eBridge's transfer and rate limits ",
     "here": "here",
-    "period": "."
+    "period": ".",
+    "Enter destination address placeholder": "Enter destination {{networkName}} address"
   }
 }

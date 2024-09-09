@@ -8,6 +8,7 @@ import { useWallet } from 'contexts/useWallet/hooks';
 import { useHomeContext } from '../HomeContext';
 import { setToChecked, setToAddress } from '../HomeContext/actions';
 import { isChainAddress } from 'utils';
+import { getNameByChainId } from 'utils/chain';
 import { clearIcon, questionFilledIcon } from 'assets/images';
 import styles from './styles.module.less';
 
@@ -37,6 +38,8 @@ export default function CheckBoxInputRow() {
     setValue('');
     onInputChange('');
   }, [onInputChange]);
+
+  const networkName = chainId ? getNameByChainId(chainId) : '';
 
   if (isHomogeneous) {
     return null;
@@ -68,7 +71,7 @@ export default function CheckBoxInputRow() {
         <Row className={styles['input-box']}>
           <InputEle
             className={clsx(styles['address-input'])}
-            placeholder={t('Enter destination address')}
+            placeholder={t('Enter destination address placeholder', { networkName: networkName || '' })}
             value={value}
             onChange={(e) => {
               setValue(e.target.value);
