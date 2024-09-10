@@ -25,7 +25,7 @@ function Transaction({ transactionId, chainId }: { transactionId: string; chainI
   );
 }
 
-function Amount({ amount, chainId, token }: { amount?: number; chainId?: ChainId; token?: TokenInfo }) {
+function Amount({ amount, token }: { amount?: number; token?: TokenInfo }) {
   const { symbol, decimals } = token || {};
   const tmpSymbol = formatNativeToken(symbol);
   return (
@@ -50,9 +50,7 @@ const sendAmount: ColumnType<CrossChainItem> = {
   width: 100,
   ellipsis: true,
   dataIndex: 'fromChainId',
-  render: (fromChainId, item) => (
-    <Amount amount={item.transferAmount} token={item.transferToken} chainId={fromChainId} />
-  ),
+  render: (_, item) => <Amount amount={item.transferAmount} token={item.transferToken} />,
 };
 
 const acceptedAmount: ColumnType<CrossChainItem> = {
@@ -61,9 +59,9 @@ const acceptedAmount: ColumnType<CrossChainItem> = {
   width: 100,
   ellipsis: true,
   dataIndex: 'toChainId',
-  render: (toChainId, item) => {
+  render: (_, item) => {
     if (!item.receiveAmount) return null;
-    return <Amount amount={item.receiveAmount} token={item.receiveToken} chainId={toChainId} />;
+    return <Amount amount={item.receiveAmount} token={item.receiveToken} />;
   },
 };
 

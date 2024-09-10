@@ -33,7 +33,7 @@ export default function ActionButton() {
   const { fromWallet, toWallet, isHomogeneous } = useWallet();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [
-    { selectToken, fromInput, receiveItem, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
+    { selectToken, fromInput, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
     { dispatch },
   ] = useHomeContext();
   const { chainId: fromChainId, account: fromAccount, library } = fromWallet || {};
@@ -106,8 +106,14 @@ export default function ActionButton() {
     dispatch(setActionLoading(false));
   }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
 
-  const onApprove = useCallback(
-    async (symbol?: string) => {
+  const onCreateReceipt = useCallback(async () => {
+    let symbol: string | undefined;
+    if (feeTokenAllowance?.lte(0)) {
+      symbol = CrossFeeToken;
+    } else if (fromTokenAllowance?.lte(0)) {
+      symbol = fromTokenInfo?.symbol;
+    }
+    const onApprove = async (symbol?: string) => {
       if (!fromAccount || !fromChainId || !tokenContract) return;
       dispatch(setActionLoading(true));
       try {
@@ -128,17 +134,7 @@ export default function ActionButton() {
         dispatch(setActionLoading(false));
         throw new Error('Approval failed');
       }
-    },
-    [bridgeContract?.address, dispatch, fromAccount, fromChainId, getAllowance, getFeeAllowance, tokenContract],
-  );
-
-  const onCreateReceipt = useCallback(async () => {
-    let symbol: string | undefined;
-    if (feeTokenAllowance?.lte(0)) {
-      symbol = CrossFeeToken;
-    } else if (fromTokenAllowance?.lte(0)) {
-      symbol = fromTokenInfo?.symbol;
-    }
+    };
     if (symbol) {
       try {
         await onApprove(symbol);
@@ -198,6 +194,8 @@ export default function ActionButton() {
     }
     dispatch(setActionLoading(false));
   }, [
+    feeTokenAllowance,
+    fromTokenAllowance,
     fromTokenInfo,
     fromAccount,
     bridgeContract,
@@ -213,6 +211,8 @@ export default function ActionButton() {
     checkPortkeyConnect,
     checkLimitAndRate,
     tokenContract,
+    getAllowance,
+    getFeeAllowance,
   ]);
 
   const needConfirm = useMemo(
@@ -301,25 +301,22 @@ export default function ActionButton() {
     }
     return { children, disabled, onClick };
   }, [
-    toAccount,
-    toChecked,
-    toAddress,
-    toChainId,
-    fromAccount,
-    receiveItem,
-    isHomogeneous,
-    feeTokenAllowance,
-    fromTokenAllowance,
-    fromInput,
     t,
-    onApprove,
-    fromTokenInfo?.symbol,
+    fromAccount,
+    toChecked,
+    toAccount,
+    isHomogeneous,
+    toChainId,
+    fromInput,
     fromChainId,
     fromBalance?.show,
+    modalDispatch,
+    toAddress,
     crossMin,
+    fromTokenInfo?.symbol,
     onCrossChainTransfer,
-    onCreateReceipt,
     needConfirm,
+    onCreateReceipt,
   ]);
 
   useUpdateEffect(() => {

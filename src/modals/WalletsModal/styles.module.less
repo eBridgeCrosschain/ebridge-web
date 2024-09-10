@@ -2,6 +2,15 @@
 @import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/font.less';
 
+.wallets-modal {
+  :global {
+    .@{app-prefix}-modal-body {
+      min-width: 100%;
+      max-width: 100%;
+    }
+  }
+}
+
 .modal-content {
   gap: 16px;
 }
