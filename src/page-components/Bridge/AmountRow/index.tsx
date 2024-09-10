@@ -48,8 +48,8 @@ export default function AmountRow() {
               type="link"
               onClick={() => {
                 const maxAmount = BigNumber.max(
-                  ZERO.plus(show || '')
-                    .minus(crossFee || '')
+                  ZERO.plus(show || '0')
+                    .minus(crossFee || '0')
                     .minus(0.0041),
                   0,
                 );
