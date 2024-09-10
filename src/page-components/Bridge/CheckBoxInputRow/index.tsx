@@ -32,7 +32,7 @@ export default function CheckBoxInputRow() {
 
   const status = useMemo(() => (checkBoxInputRowStatus ? 'error' : undefined), [checkBoxInputRowStatus]);
 
-  const onInputChange = useCallback((value: string) => dispatch(setToAddress(value)), []);
+  const onInputChange = useCallback((value: string) => dispatch(setToAddress(value)), [dispatch]);
 
   const clearValue = useCallback(() => {
     setValue('');

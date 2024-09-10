@@ -1,4 +1,4 @@
-import { AelfInstancesKey, WalletType, Web3Type } from 'types';
+import { WalletType, Web3Type } from 'types';
 import { Options } from './actions';
 import { ChainId } from '@portkey/provider-types';
 import { getELFAddress } from 'utils/aelfUtils';
