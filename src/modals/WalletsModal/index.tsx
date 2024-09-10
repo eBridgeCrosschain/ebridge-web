@@ -123,7 +123,13 @@ export default function WalletsModal() {
           <>
             <div className={clsx(styles['aelf-tip-wrap'], 'flex-column-center')}>
               <CommonImage className={styles['aelf-chain-logo']} src={aelfChainLogo} />
-              <span>{t(`Let’s connect your aelf wallet to get started.${isFromERC ? '(stepTwo)' : '(stepOne)'}`)}</span>
+              <span>
+                {t(
+                  isFromERC
+                    ? 'Nice! Now let’s connect your aelf wallet.'
+                    : 'Let’s connect your aelf wallet to get started.',
+                )}
+              </span>
             </div>
             <Button type="primary" onClick={handleConnectAELFWallet}>
               {t('Connect aelf Wallet')}
