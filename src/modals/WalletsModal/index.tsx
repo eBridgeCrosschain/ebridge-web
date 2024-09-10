@@ -39,7 +39,7 @@ export default function WalletsModal() {
   const [{ fromOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);
 
-  const isFromERC = useMemo(() => fromOptions?.chainType === 'ERC', []);
+  const isFromERC = useMemo(() => fromOptions?.chainType === 'ERC', [fromOptions?.chainType]);
 
   const stepConfig = useMemo(() => {
     if (isFromERC) {
@@ -47,7 +47,7 @@ export default function WalletsModal() {
     } else {
       return [STEP_ITEM_CONFIG.ELF, STEP_ITEM_CONFIG.ERC];
     }
-  }, []);
+  }, [isFromERC]);
 
   useEffect(() => {
     if (!walletsModal) {
