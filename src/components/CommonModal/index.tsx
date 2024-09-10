@@ -4,7 +4,8 @@ import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import { ReactNode } from 'react';
 import { useMobile } from 'contexts/useStore/hooks';
 import { prefixCls } from 'constants/misc';
-import IconFont from 'components/IconFont';
+import CommonImage from 'components/CommonImage';
+import { closeIcon } from 'assets/images';
 export default function CommonModal(
   props: ModalProps & {
     children?: any;
@@ -19,7 +20,7 @@ export default function CommonModal(
   const isMobile = useMobile();
   return (
     <Modal
-      closeIcon={<IconFont type="ErrorClose" />}
+      closeIcon={<CommonImage className={clsx('common-modal-close-icon', 'cursor-pointer')} src={closeIcon} />}
       maskClosable={false}
       centered={props.centered ? props.centered : !isMobile}
       destroyOnClose

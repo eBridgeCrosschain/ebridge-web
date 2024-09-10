@@ -1,13 +1,14 @@
 import { Select, SelectProps } from 'antd';
 import clsx from 'clsx';
-import IconFont from 'components/IconFont';
 import React from 'react';
+import CommonImage from 'components/CommonImage';
+import { closeIcon, arrowIcon } from 'assets/images';
 import styles from './styles.module.less';
 export default function CommonSelect({ className, dropdownClassName, ...props }: SelectProps) {
   return (
     <Select
-      clearIcon={<IconFont onClick={(e) => e.stopPropagation()} type="ErrorClose" />}
-      suffixIcon={<IconFont className="pointer-events-none" type="Search" />}
+      clearIcon={<CommonImage className={styles['icon']} src={closeIcon} />}
+      suffixIcon={<CommonImage className={styles['icon']} src={arrowIcon} />}
       getPopupContainer={(triggerNode) => triggerNode}
       dropdownClassName={clsx(styles['select-dropdown'], dropdownClassName)}
       className={clsx(styles.select, className)}

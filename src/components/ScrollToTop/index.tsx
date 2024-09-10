@@ -9,7 +9,7 @@ export default function ScrollToTop() {
 
   useUpdateEffect(() => {
     if (!scrollRef.current) {
-      scrollRef.current = document.getElementsByClassName('page-component')[0];
+      scrollRef.current = document.getElementsByClassName('page-body-wrap')[0];
     }
     scrollRef.current?.scrollTo(0, 0);
   }, [router]);
