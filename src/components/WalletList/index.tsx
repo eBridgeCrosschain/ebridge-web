@@ -24,7 +24,7 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   const onCancel = useCallback(() => {
     setLoading(undefined);
     onFinish?.();
-  }, []);
+  }, [onFinish]);
   const tryActivation = useCallback(
     async (connector: Connector | string, key: string) => {
       if (loading || typeof connector === 'string') return;
