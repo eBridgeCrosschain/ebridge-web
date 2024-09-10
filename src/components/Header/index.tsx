@@ -90,11 +90,13 @@ function ConnectWalletsButton() {
   );
 }
 
-function WalletButton({ wallet, chainType }: { wallet?: Web3Type; chainType?: ChainType }) {
+function WalletButton({ chainType }: { chainType?: ChainType }) {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
   const { login } = useWebLogin();
+  const { fromWallet, toWallet, fromOptions } = useWallet();
+  const wallet = fromOptions?.chainType === chainType ? fromWallet : toWallet;
   const { walletType, chainId, account, connector } = wallet || {};
   const isELF = chainType === 'ELF';
   return account ? (
@@ -154,7 +156,7 @@ function WalletButton({ wallet, chainType }: { wallet?: Web3Type; chainType?: Ch
 }
 
 function WalletButtonList() {
-  const { fromWallet, toWallet, fromOptions, toOptions } = useWallet();
+  const { fromWallet, toWallet } = useWallet();
   const { account: fromAccount } = fromWallet || {};
   const { account: toAccount } = toWallet || {};
   if (!fromAccount && !toAccount) {
@@ -162,8 +164,8 @@ function WalletButtonList() {
   } else {
     return (
       <div className={clsx(styles['wallet-button-list'], 'flex-row')}>
-        <WalletButton wallet={fromWallet} chainType={fromOptions?.chainType} />
-        <WalletButton wallet={toWallet} chainType={toOptions?.chainType} />
+        <WalletButton chainType="ERC" />
+        <WalletButton chainType="ELF" />
       </div>
     );
   }
