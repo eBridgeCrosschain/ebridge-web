@@ -12,6 +12,7 @@ import { unitConverter } from 'utils/converter';
 import { formatSymbol } from 'utils/token';
 import { parseInputChange } from 'utils/input';
 import { divDecimals } from 'utils/calculate';
+import { isELFChain } from 'utils/aelfUtils';
 import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
 import { ZERO } from 'constants/misc';
 import styles from './styles.module.less';
@@ -24,13 +25,25 @@ export default function AmountRow() {
   const { chainId, account } = fromWallet || {};
 
   const min = useMemo(() => divDecimals(1, token?.decimals), [token?.decimals]);
+  const max = useMemo(() => {
+    let value = ZERO;
+    const isELF = isELFChain(chainId);
+    if (!isELF || token?.symbol !== 'ELF') {
+      value = ZERO.plus(show || '0');
+    } else {
+      value = BigNumber.max(
+        ZERO.plus(show || '0')
+          .minus(crossFee || '0')
+          .minus(0.0041),
+        0,
+      );
+    }
+    return value;
+  }, [chainId, crossFee, show, token?.symbol]);
 
   const showError = useMemo(
-    () =>
-      fromInput &&
-      account &&
-      ((fromBalance?.show && fromBalance.show.lt(fromInput)) || (crossMin && ZERO.plus(crossMin).gt(fromInput))),
-    [account, crossMin, fromBalance?.show, fromInput],
+    () => fromInput && account && (max.lt(fromInput) || (crossMin && ZERO.plus(crossMin).gt(fromInput))),
+    [account, crossMin, fromInput, max],
   );
 
   return (
@@ -47,13 +60,7 @@ export default function AmountRow() {
               className={styles['max-button']}
               type="link"
               onClick={() => {
-                const maxAmount = BigNumber.max(
-                  ZERO.plus(show || '0')
-                    .minus(crossFee || '0')
-                    .minus(0.0041),
-                  0,
-                );
-                dispatch(setFrom(parseInputChange(maxAmount.toFixed(), min, token?.decimals)));
+                dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)));
               }}>
               {t('MAX')}
             </Button>
