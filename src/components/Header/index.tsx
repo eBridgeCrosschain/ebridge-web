@@ -23,7 +23,7 @@ import CommonImage from 'components/CommonImage';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { IS_MAINNET } from 'constants/index';
-import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG } from 'constants/link';
+import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS } from 'constants/link';
 import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
@@ -66,12 +66,18 @@ function SelectLanguage() {
   );
 }
 
-function Logo() {
+function Logo({ clickable = false }: { clickable?: boolean }) {
+  const { push } = useRouter();
   return (
     <CommonImage
-      style={{ width: IS_MAINNET ? 96 : 119, height: 32, cursor: 'pointer' }}
+      style={{ width: IS_MAINNET ? 96 : 119, height: 32, cursor: clickable ? 'pointer' : 'default' }}
       src={IS_MAINNET ? logo : testLogo}
       alt="logo"
+      onClick={() => {
+        if (clickable) {
+          push(ROUTE_PATHS.BRIDGE);
+        }
+      }}
     />
   );
 }
@@ -281,7 +287,6 @@ function MobileHeader() {
           src={menuIcon}
           onClick={() => setVisible(true)}
         />
-        <Logo />
       </div>
       <WalletButtonList />
       <Drawer
@@ -290,7 +295,8 @@ function MobileHeader() {
         closable={false}
         onClose={() => setVisible(false)}
         visible={visible}>
-        <div className={clsx(styles['mobile-drawer-header'], 'flex-row-center', 'flex-row-content-end')}>
+        <div className={clsx(styles['mobile-drawer-header'], 'flex-row-center', 'flex-row-between')}>
+          <Logo />
           <CommonImage
             className={clsx(styles['close-icon'], 'cursor-pointer')}
             src={closeIcon}
@@ -341,7 +347,7 @@ export default function Header() {
       )}>
       {!isMd ? (
         <>
-          <Logo />
+          <Logo clickable />
           <div className={clsx(styles['header-right'], 'flex-row-center')}>
             <SelectLanguage />
             <WalletButtonList />

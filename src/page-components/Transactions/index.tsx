@@ -324,11 +324,7 @@ function History() {
                 </p>
                 <ol>
                   <li>{t('Check the transaction status from the transaction records.')}</li>
-                  <li>
-                    {t(
-                      'For more details, click on the Receiving Transaction ID to track its progress on the Explorer.',
-                    )}
-                  </li>
+                  <li>{t('For more details, click on the From/To TXID to track its progress on the Explorer.')}</li>
                 </ol>
               </div>
             ),
