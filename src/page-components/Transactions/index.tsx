@@ -112,7 +112,7 @@ function Body({
   );
 }
 
-function useAllHistory() {
+function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
   const [state, setState] = useSetState<State>(DefaultListState);
   const { page } = state;
   const [selectState, setSelect] = useSetState<State>();
@@ -120,143 +120,47 @@ function useAllHistory() {
   const { fromWallet, toWallet } = useWallet();
   const { account: fromAccount } = fromWallet || {};
   const { account: toAccount } = toWallet || {};
-  const getReceiveList = useCallback(async () => {
-    if (!(fromAccount || toAccount)) return setState({ list: [], totalCount: 0 });
-    const addressProps = {
-      fromAddress: fromAccount,
-      toAddress: toAccount,
-    };
-    if (fromAccount && toAccount) {
-      if (isELFChain(fromWallet?.chainId)) {
-        delete addressProps.toAddress;
-      }
-      if (isELFChain(toWallet?.chainId)) {
-        delete addressProps.fromAddress;
-      }
-    }
-    const skipCount = page ? (page - 1) * PageSize : 0;
-    const req = await request.cross.getCrossChainTransfers({
-      params: {
-        ...addressProps,
-        toChainId: getChainIdToMap(toChainId),
-        fromChainId: getChainIdToMap(fromChainId),
-        status,
-        skipCount,
-        MaxResultCount: PageSize,
-      },
-    });
-    if (req.items) {
-      if (Array.isArray(req.items) && req.items.length === 0 && req.totalCount > 0) {
-        setState({ page: Math.ceil(req.totalCount / PageSize) });
-      } else {
-        const list = parseCrossChainTransfers(req);
-        setState({ list, totalCount: req.totalCount });
-      }
-    }
-  }, [fromAccount, fromChainId, fromWallet?.chainId, page, setState, status, toAccount, toChainId, toWallet?.chainId]);
-  const preFromAccount = usePrevious(fromAccount);
-  const preToAccount = usePrevious(toAccount);
-  useEffect(() => {
-    if (preFromAccount !== fromAccount || preToAccount !== toAccount) setState(DefaultListState);
-  }, [fromAccount, preFromAccount, preToAccount, setState, toAccount]);
-  useInterval(getReceiveList, 10000, [getReceiveList]);
-  return useMemo(
-    () => ({
-      networkList: NetworkList,
-      state,
-      selectState,
-      setSelect,
-      setState,
-    }),
-    [selectState, setSelect, setState, state],
-  );
-}
 
-function useHeterogeneousHistory() {
-  const [state, setState] = useSetState<State>(DefaultListState);
-  const { page } = state;
-  const [selectState, setSelect] = useSetState<State>();
-  const { fromChainId, toChainId, status } = selectState;
-  const { fromWallet, toWallet } = useWallet();
-  const { account: fromAccount } = fromWallet || {};
-  const { account: toAccount } = toWallet || {};
-  const getReceiveList = useCallback(async () => {
-    if (!(fromAccount || toAccount)) return setState({ list: [], totalCount: 0 });
-    const addressProps = {
-      fromAddress: fromAccount,
-      toAddress: toAccount,
-    };
-    if (fromAccount && toAccount) {
-      if (isELFChain(fromWallet?.chainId)) {
-        delete addressProps.toAddress;
-      }
-      if (isELFChain(toWallet?.chainId)) {
-        delete addressProps.fromAddress;
-      }
-    }
-    const skipCount = page ? (page - 1) * PageSize : 0;
-    const req = await request.cross.getCrossChainTransfers({
-      params: {
-        ...addressProps,
-        toChainId: getChainIdToMap(toChainId),
-        fromChainId: getChainIdToMap(fromChainId),
-        status,
-        skipCount,
-        type: '1',
-        MaxResultCount: PageSize,
-      },
-    });
-    if (req.items) {
-      if (Array.isArray(req.items) && req.items.length === 0 && req.totalCount > 0) {
-        setState({ page: Math.ceil(req.totalCount / PageSize) });
-      } else {
-        const list = parseCrossChainTransfers(req);
-        setState({ list, totalCount: req.totalCount });
-      }
-    }
-  }, [fromAccount, fromChainId, fromWallet?.chainId, page, setState, status, toAccount, toChainId, toWallet?.chainId]);
-  const preFromAccount = usePrevious(fromAccount);
-  const preToAccount = usePrevious(toAccount);
-  useEffect(() => {
-    if (preFromAccount !== fromAccount || preToAccount !== toAccount) setState(DefaultListState);
-  }, [fromAccount, preFromAccount, preToAccount, setState, toAccount]);
-  useInterval(getReceiveList, 10000, [getReceiveList]);
-  return useMemo(
-    () => ({
-      networkList: NetworkList,
-      state,
-      selectState,
-      setSelect,
-      setState,
-    }),
-    [selectState, setSelect, setState, state],
-  );
-}
-
-const isomorphismNetworkList = NetworkList.filter((i) => isELFChain(i.info.chainId));
-
-function useHomogeneousHistory() {
-  const [state, setState] = useSetState<State>(DefaultListState);
-  const { page } = state;
-  const [selectState, setSelect] = useSetState<State>();
-  const { fromChainId, toChainId, status } = selectState;
-  const { fromWallet, toWallet } = useWallet();
-  const fromAddress = useMemo(() => {
+  const ELFAddress = useMemo(() => {
     if (isELFChain(fromWallet?.chainId)) return fromWallet?.account;
     if (isELFChain(toWallet?.chainId)) return toWallet?.account;
   }, [fromWallet?.account, fromWallet?.chainId, toWallet?.account, toWallet?.chainId]);
+
   const getReceiveList = useCallback(async () => {
-    if (!fromAddress) return setState({ list: [], totalCount: 0 });
+    if (
+      (crossChainType === CrossChainType.homogeneous && !ELFAddress) ||
+      (crossChainType !== CrossChainType.homogeneous && !(fromAccount || toAccount))
+    ) {
+      return setState({ list: [], totalCount: 0 });
+    }
+    const addressProps = {
+      fromAddress: fromAccount,
+      toAddress: toAccount,
+    };
+    if (fromAccount && toAccount) {
+      if (isELFChain(fromWallet?.chainId)) {
+        delete addressProps.toAddress;
+      }
+      if (isELFChain(toWallet?.chainId)) {
+        delete addressProps.fromAddress;
+      }
+    }
     const skipCount = page ? (page - 1) * PageSize : 0;
+    let type;
+    if (crossChainType === CrossChainType.homogeneous) {
+      type = '0';
+    } else if (crossChainType === CrossChainType.heterogeneous) {
+      type = '1';
+    }
     const req = await request.cross.getCrossChainTransfers({
       params: {
-        fromAddress,
+        ...addressProps,
         toChainId: getChainIdToMap(toChainId),
         fromChainId: getChainIdToMap(fromChainId),
         status,
         skipCount,
+        type,
         MaxResultCount: PageSize,
-        type: '0',
       },
     });
     if (req.items) {
@@ -267,22 +171,35 @@ function useHomogeneousHistory() {
         setState({ list, totalCount: req.totalCount });
       }
     }
-  }, [fromAddress, fromChainId, page, setState, status, toChainId]);
-  const preFromAddress = usePrevious(fromAddress);
+  }, [
+    ELFAddress,
+    crossChainType,
+    fromAccount,
+    fromChainId,
+    fromWallet?.chainId,
+    page,
+    setState,
+    status,
+    toAccount,
+    toChainId,
+    toWallet?.chainId,
+  ]);
+  const preFromAccount = usePrevious(fromAccount);
+  const preToAccount = usePrevious(toAccount);
   useEffect(() => {
-    if (preFromAddress !== fromAddress) setState(DefaultListState);
-  }, [fromAddress, preFromAddress, setState]);
+    if (preFromAccount !== fromAccount || preToAccount !== toAccount) setState(DefaultListState);
+  }, [fromAccount, preFromAccount, preToAccount, setState, toAccount]);
   useInterval(getReceiveList, 10000, [getReceiveList]);
-
+  const isomorphismNetworkList = useMemo(() => NetworkList.filter((i) => isELFChain(i.info.chainId)), []);
   return useMemo(
     () => ({
-      networkList: isomorphismNetworkList,
+      networkList: crossChainType === CrossChainType.homogeneous ? isomorphismNetworkList : NetworkList,
       state,
       selectState,
       setSelect,
       setState,
     }),
-    [selectState, setSelect, setState, state],
+    [crossChainType, isomorphismNetworkList, selectState, setSelect, setState, state],
   );
 }
 
@@ -292,9 +209,9 @@ function History() {
   const { t } = useLanguage();
   const isMd = useMediaQueries('md');
 
-  const allData = useAllHistory();
-  const heterogeneousData = useHeterogeneousHistory();
-  const homogeneousData = useHomogeneousHistory();
+  const allData = useHistory({ crossChainType: CrossChainType.all });
+  const heterogeneousData = useHistory({ crossChainType: CrossChainType.heterogeneous });
+  const homogeneousData = useHistory({ crossChainType: CrossChainType.homogeneous });
 
   const tableData = useMemo(() => {
     switch (historyType) {
