@@ -9,7 +9,6 @@ import '@portkey/did-ui-react/dist/assets/index.css';
 import 'aelf-web-login/dist/assets/index.css';
 import dynamic from 'next/dynamic';
 import { DefaultHead } from 'components/PageHead';
-import { isPortkey } from 'utils/portkey';
 import Footer from 'components/Footer';
 import ScrollToTop from 'components/ScrollToTop';
 import Nav from 'components/Nav';
@@ -56,7 +55,7 @@ export default function APP({ Component, pageProps }: AppProps) {
       <DefaultHead />
       <ScrollToTop />
       <Provider>
-        {!isPortkey() && !isFull && <Header />}
+        {!isFull && <Header />}
         <div className={clsx('page-body-wrap', isFull && 'page-full')}>{renderPageBody()}</div>
       </Provider>
     </>
