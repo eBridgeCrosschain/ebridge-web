@@ -126,11 +126,22 @@ function useAllHistory() {
   const { account: toAccount } = toWallet || {};
   const getReceiveList = useCallback(async () => {
     if (!(fromAccount || toAccount)) return setState({ list: [], totalCount: 0 });
+    const addressProps = {
+      fromAddress: fromAccount,
+      toAddress: toAccount,
+    };
+    if (fromAccount && toAccount) {
+      if (isELFChain(fromWallet?.chainId)) {
+        delete addressProps.toAddress;
+      }
+      if (isELFChain(toWallet?.chainId)) {
+        delete addressProps.fromAddress;
+      }
+    }
     const skipCount = page ? (page - 1) * PageSize : 0;
     const req = await request.cross.getCrossChainTransfers({
       params: {
-        fromAddress: fromAccount,
-        toAddress: toAccount,
+        ...addressProps,
         toChainId: getChainIdToMap(toChainId),
         fromChainId: getChainIdToMap(fromChainId),
         status,
@@ -146,7 +157,7 @@ function useAllHistory() {
         setState({ list, totalCount: req.totalCount });
       }
     }
-  }, [fromAccount, fromChainId, page, setState, status, toAccount, toChainId]);
+  }, [fromAccount, fromChainId, fromWallet?.chainId, page, setState, status, toAccount, toChainId, toWallet?.chainId]);
   const preFromAccount = usePrevious(fromAccount);
   const preToAccount = usePrevious(toAccount);
   useEffect(() => {
@@ -175,11 +186,22 @@ function useHeterogeneousHistory() {
   const { account: toAccount } = toWallet || {};
   const getReceiveList = useCallback(async () => {
     if (!(fromAccount || toAccount)) return setState({ list: [], totalCount: 0 });
+    const addressProps = {
+      fromAddress: fromAccount,
+      toAddress: toAccount,
+    };
+    if (fromAccount && toAccount) {
+      if (isELFChain(fromWallet?.chainId)) {
+        delete addressProps.toAddress;
+      }
+      if (isELFChain(toWallet?.chainId)) {
+        delete addressProps.fromAddress;
+      }
+    }
     const skipCount = page ? (page - 1) * PageSize : 0;
     const req = await request.cross.getCrossChainTransfers({
       params: {
-        fromAddress: fromAccount,
-        toAddress: toAccount,
+        ...addressProps,
         toChainId: getChainIdToMap(toChainId),
         fromChainId: getChainIdToMap(fromChainId),
         status,
@@ -196,7 +218,7 @@ function useHeterogeneousHistory() {
         setState({ list, totalCount: req.totalCount });
       }
     }
-  }, [fromAccount, fromChainId, page, setState, status, toAccount, toChainId]);
+  }, [fromAccount, fromChainId, fromWallet?.chainId, page, setState, status, toAccount, toChainId, toWallet?.chainId]);
   const preFromAccount = usePrevious(fromAccount);
   const preToAccount = usePrevious(toAccount);
   useEffect(() => {
