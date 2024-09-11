@@ -27,7 +27,7 @@ import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG } from 'constants/
 import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
-import { ChainType, Web3Type } from 'types';
+import { ChainType } from 'types';
 import { useWebLogin } from 'aelf-web-login';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
