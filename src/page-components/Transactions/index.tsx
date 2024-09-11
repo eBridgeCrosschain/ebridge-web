@@ -65,11 +65,12 @@ function Body({
 }) {
   const { t } = useLanguage();
   const { page, totalCount, list } = state;
-  const { fromChainId, toChainId } = selectState;
+  const { fromChainId, toChainId, status } = selectState;
   return (
     <>
       <Row className="flex-row">
         <StatusSelect
+          value={status}
           onChange={(value) => {
             setSelect({ status: value });
             setState(DefaultListState);
