@@ -13,6 +13,7 @@ import { DEFAULT_ERC_CHAIN_INFO } from 'constants/index';
 import { switchChain } from 'utils/network';
 import { sleep } from 'utils';
 import { isPortkey, isPortkeyConnector } from 'utils/portkey';
+import { isMobileDevices } from 'utils/isMobile';
 import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
@@ -58,6 +59,7 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         const option = SUPPORTED_WALLETS[key];
         const isStringConnector = typeof option.connector === 'string';
         const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
+        if (isMobileDevices() && key === 'METAMASK') return false;
         if (isPortkey()) {
           if (option.connector instanceof CoinbaseWallet) return false;
           if (isStringChain) return isPortkeyConnector(option.connector as string);
