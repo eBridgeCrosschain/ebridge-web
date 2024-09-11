@@ -20,7 +20,6 @@ import { ACTIVE_CHAIN } from 'constants/index';
 import { formatAddress, isAddress } from 'utils';
 import CheckToFillAddressModal from './CheckToFillAddressModal';
 import useLimitAmountModal from '../useLimitAmountModal';
-import CommonMessage from 'components/CommonMessage';
 import useCheckPortkeyStatus from 'hooks/useCheckPortkeyStatus';
 import { arrowRightWhiteIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
@@ -103,7 +102,6 @@ export default function ActionButton() {
         setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
       }
     } catch (error: any) {
-      CommonMessage.error(error.message);
       setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
     }
     dispatch(setActionLoading(false));
@@ -119,22 +117,17 @@ export default function ActionButton() {
     const onApprove = async (symbol?: string) => {
       if (!fromAccount || !fromChainId || !tokenContract) return;
       dispatch(setActionLoading(true));
-      try {
-        const approveResult = await tokenContract.callSendMethod(
-          'approve',
-          fromAccount,
-          tokenContract.contractType === 'ELF'
-            ? [bridgeContract?.address, symbol, LANG_MAX.toFixed()]
-            : [bridgeContract?.address, MaxUint256],
-        );
-        if (!approveResult.error) {
-          getAllowance();
-          getFeeAllowance();
-        }
-      } catch (error: any) {
-        CommonMessage.error(error.message);
-        setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
-        dispatch(setActionLoading(false));
+      const approveResult = await tokenContract.callSendMethod(
+        'approve',
+        fromAccount,
+        tokenContract.contractType === 'ELF'
+          ? [bridgeContract?.address, symbol, LANG_MAX.toFixed()]
+          : [bridgeContract?.address, MaxUint256],
+      );
+      if (!approveResult.error) {
+        getAllowance();
+        getFeeAllowance();
+      } else {
         throw new Error('Approval failed');
       }
     };
@@ -142,6 +135,8 @@ export default function ActionButton() {
       try {
         await onApprove(symbol);
       } catch (error) {
+        setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
+        dispatch(setActionLoading(false));
         return;
       }
     }
@@ -192,7 +187,6 @@ export default function ActionButton() {
         setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
       }
     } catch (error: any) {
-      error?.message && CommonMessage.error(error.message);
       setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
     }
     dispatch(setActionLoading(false));
