@@ -22,10 +22,13 @@
 }
 
 .select-dropdown {
+  overflow: hidden;
+  border: 1px solid @border-5;
+  border-radius: 6px;
   :global {
     .@{app-prefix}-select-item {
       min-height: 40px;
-      padding: 12px 16px;
+      padding: 13px 12px;
       &:hover:not(.@{app-prefix}-select-item-option-selected) {
         background: @bg-3;
       }

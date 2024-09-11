@@ -31,8 +31,12 @@
 }
 .dropdown-overlay {
   width: auto;
-  box-shadow: 0 9px 20px 8px @shadow-2;
+  border: 1px solid @border-5;
+  border-radius: 6px;
   :global {
+    .@{app-prefix}-dropdown-menu {
+      border-radius: 6px;
+    }
     .@{app-prefix}-dropdown-menu-item {
       min-height: 40px;
       &:hover:not(.@{app-prefix}-dropdown-menu-item-selected) {
