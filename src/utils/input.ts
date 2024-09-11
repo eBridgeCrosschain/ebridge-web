@@ -1,4 +1,8 @@
 import BigNumber from 'bignumber.js';
+import { isELFChain } from 'utils/aelfUtils';
+import { ZERO } from 'constants/misc';
+import { ChainId } from 'types';
+
 export function parseInputChange(value: string, min?: BigNumber, maxLength?: number) {
   const pivot = new BigNumber(value);
   if (pivot.gt(0)) {
@@ -25,4 +29,30 @@ export function sliceDecimals(value?: string, decimals?: number) {
   if (!value) return '';
   const [integer, dec] = value.split('.');
   return integer + (value.includes('.') ? '.' : '') + (dec ? dec.slice(0, decimals) : '');
+}
+
+export function getMaxAmount({
+  chainId,
+  symbol,
+  balance,
+  crossFee,
+}: {
+  chainId?: ChainId;
+  symbol?: string;
+  balance?: BigNumber;
+  crossFee?: string;
+}) {
+  let value = ZERO;
+  const isELF = isELFChain(chainId);
+  if (!isELF || symbol !== 'ELF') {
+    value = ZERO.plus(balance || '0');
+  } else {
+    value = BigNumber.max(
+      ZERO.plus(balance || '0')
+        .minus(crossFee || '0')
+        .minus(0.0041),
+      0,
+    );
+  }
+  return value;
 }

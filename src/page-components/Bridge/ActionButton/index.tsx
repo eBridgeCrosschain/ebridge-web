@@ -25,12 +25,15 @@ import useCheckPortkeyStatus from 'hooks/useCheckPortkeyStatus';
 import { arrowRightWhiteIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
 import { useModalDispatch } from 'contexts/useModal/hooks';
-import { setWalletsModal } from 'contexts/useModal/actions';
+import { setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
 import LoadingModal from './LoadingModal';
 import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
+import { useWebLogin } from 'aelf-web-login';
+import { getMaxAmount } from 'utils/input';
 
 export default function ActionButton() {
-  const { fromWallet, toWallet, isHomogeneous } = useWallet();
+  const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
+  const { login } = useWebLogin();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [
     { selectToken, fromInput, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
@@ -226,6 +229,32 @@ export default function ActionButton() {
     [isHomogeneous, toAccount, toChecked, toAddress, toChainId],
   );
 
+  const getWalletBtnProps = useCallback(
+    ({ isFrom = false }: { isFrom?: boolean }) => {
+      const chainType = isFrom ? fromOptions?.chainType : toOptions?.chainType;
+      const wallet = isFrom ? fromWallet : toWallet;
+      const { walletType, chainId } = wallet || {};
+      const isELF = chainType === 'ELF';
+      const children = isELF ? 'Connect aelf Wallet' : 'Connect External Wallet';
+      const disabled = false;
+      const onClick = () => {
+        if (isELF) {
+          login();
+        } else {
+          modalDispatch(
+            setWalletModal(true, {
+              walletWalletType: walletType,
+              walletChainType: chainType,
+              walletChainId: chainId,
+            }),
+          );
+        }
+      };
+      return { children, onClick, disabled };
+    },
+    [fromOptions?.chainType, fromWallet, login, modalDispatch, toOptions?.chainType, toWallet],
+  );
+
   const btnProps = useMemo(() => {
     let children: React.ReactNode = (
         <div className={clsx(styles['button-content'], 'flex-center')}>
@@ -242,28 +271,33 @@ export default function ActionButton() {
       return { children, onClick, disabled };
     }
 
+    if (!fromAccount) {
+      const props = getWalletBtnProps({ isFrom: true });
+      return { children: props.children, onClick: props.onClick, disabled: props.disabled };
+    }
+
     if (isHomogeneous) {
       if (!toAccount) {
-        return { children, onClick, disabled };
+        const props = getWalletBtnProps({ isFrom: false });
+        return { children: props.children, onClick: props.onClick, disabled: props.disabled };
       }
     } else {
       if (!toChecked) {
         if (!toAccount) {
-          return { children, onClick, disabled };
+          const props = getWalletBtnProps({ isFrom: false });
+          return { children: props.children, onClick: props.onClick, disabled: props.disabled };
         }
       } else {
-        if ((toAddress && !isAddress(toAddress, toChainId)) || (!toAddress && !toAccount))
+        if ((toAddress && !isAddress(toAddress, toChainId)) || !toAddress) {
           children = 'Enter destination address';
-        return { children, onClick, disabled };
+          return { children, onClick, disabled };
+        }
       }
     }
 
     // invalid to chain
     if (toChainId && !ACTIVE_CHAIN[toChainId]) {
       children = 'Invalid to chain';
-      return { children, onClick, disabled };
-    }
-    if (!fromAccount) {
       return { children, onClick, disabled };
     }
     if (!fromInput) {
@@ -275,7 +309,13 @@ export default function ActionButton() {
       children = 'Invalid from chain';
       return { children, onClick, disabled };
     }
-    if (!fromBalance?.show || fromBalance?.show.lt(fromInput)) {
+    const max = getMaxAmount({
+      chainId: fromWallet?.chainId,
+      symbol: fromBalance?.token?.symbol,
+      balance: fromBalance?.show,
+      crossFee,
+    });
+    if (max.lt(fromInput)) {
       children = 'Insufficient balance';
       return { children, onClick, disabled };
     } else if (ZERO.lt(fromInput)) {
@@ -309,8 +349,12 @@ export default function ActionButton() {
     toChainId,
     fromInput,
     fromChainId,
+    fromWallet?.chainId,
+    fromBalance?.token?.symbol,
     fromBalance?.show,
+    crossFee,
     modalDispatch,
+    getWalletBtnProps,
     toAddress,
     crossMin,
     fromTokenInfo?.symbol,

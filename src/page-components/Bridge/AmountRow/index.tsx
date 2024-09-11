@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useLanguage } from 'i18n';
-import BigNumber from 'bignumber.js';
 import clsx from 'clsx';
 import { Button } from 'antd';
 import AmountInput from './AmountInput';
@@ -10,9 +9,8 @@ import { setFrom, setSelectModal } from '../HomeContext/actions';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { unitConverter } from 'utils/converter';
 import { formatSymbol } from 'utils/token';
-import { parseInputChange } from 'utils/input';
+import { getMaxAmount, parseInputChange } from 'utils/input';
 import { divDecimals } from 'utils/calculate';
-import { isELFChain } from 'utils/aelfUtils';
 import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
 import { ZERO } from 'constants/misc';
 import styles from './styles.module.less';
@@ -25,21 +23,7 @@ export default function AmountRow() {
   const { chainId, account } = fromWallet || {};
 
   const min = useMemo(() => divDecimals(1, token?.decimals), [token?.decimals]);
-  const max = useMemo(() => {
-    let value = ZERO;
-    const isELF = isELFChain(chainId);
-    if (!isELF || token?.symbol !== 'ELF') {
-      value = ZERO.plus(show || '0');
-    } else {
-      value = BigNumber.max(
-        ZERO.plus(show || '0')
-          .minus(crossFee || '0')
-          .minus(0.0041),
-        0,
-      );
-    }
-    return value;
-  }, [chainId, crossFee, show, token?.symbol]);
+  const max = getMaxAmount({ chainId, symbol: token?.symbol, balance: show, crossFee });
 
   const showError = useMemo(
     () => fromInput && account && (max.lt(fromInput) || (crossMin && ZERO.plus(crossMin).gt(fromInput))),
