@@ -1,27 +1,58 @@
+import { Progress } from 'antd';
 import type { ColumnType } from 'antd/lib/table';
 import CommonLink from 'components/CommonLink';
+import CommonImage from 'components/CommonImage';
+import IconFont from 'components/IconFont';
 import { Trans } from 'react-i18next';
+import { useHover } from 'react-use';
 import { ChainId, TokenInfo } from 'types';
 import { CrossChainItem } from 'types/api';
+import { CrossChainStatus } from 'types/misc';
 import { formatNativeToken, getExploreLink, shortenString } from 'utils';
-import { getShortNameByChainId, shortenAddressByAPI } from 'utils/chain';
+import { shortenAddressByAPI, getIconByChainId } from 'utils/chain';
 import { unitConverter } from 'utils/converter';
 import { formatTime } from 'utils/time';
 import { formatSymbol } from 'utils/token';
+import { arrowRightGrayIcon } from 'assets/images';
+import clsx from 'clsx';
+import styles from './styles.module.less';
 
-function Address({ address, chainId }: { address?: string; chainId: ChainId }) {
-  return (
-    <CommonLink isTagA href={getExploreLink(address || '', 'address', chainId)}>
-      {shortenAddressByAPI(address || '', chainId)}
-    </CommonLink>
-  );
-}
+function Info({
+  isFrom = false,
+  address,
+  chainId,
+  transactionId,
+}: {
+  isFrom?: boolean;
+  address?: string;
+  chainId: ChainId;
+  transactionId?: string;
+}) {
+  const iconProps = getIconByChainId(chainId);
 
-function Transaction({ transactionId, chainId }: { transactionId: string; chainId?: ChainId }) {
   return (
-    <CommonLink isTagA href={getExploreLink(transactionId, 'transaction', chainId)}>
-      {shortenString(transactionId, 6)}
-    </CommonLink>
+    <div className={clsx(styles['info-wrap'], 'flex-row-center', 'flex-row-between')}>
+      <div className={clsx(styles['info-content'], 'flex-column')}>
+        <div className={clsx(styles['info-address'], 'flex-row-center')}>
+          <IconFont className={styles['info-address-icon']} type={iconProps?.type || ''} />
+          <CommonLink
+            className={styles['info-address-link']}
+            isTagA
+            href={getExploreLink(address || '', 'address', chainId)}>
+            {shortenAddressByAPI(address || '', chainId)}
+          </CommonLink>
+        </div>
+        {transactionId && (
+          <div className={clsx(styles['info-txid'])}>
+            <span>TXID: </span>
+            <CommonLink isTagA href={getExploreLink(transactionId, 'transaction', chainId)}>
+              {shortenString(transactionId, 6)}
+            </CommonLink>
+          </div>
+        )}
+      </div>
+      {isFrom && <CommonImage className={styles['info-arrow']} src={arrowRightGrayIcon} />}
+    </div>
   );
 }
 
@@ -36,103 +67,71 @@ function Amount({ amount, token }: { amount?: number; token?: TokenInfo }) {
 }
 
 function FromTo({ items }: { items: CrossChainItem }) {
-  const { fromChainId, toChainId } = items;
-  return (
-    <div>
-      {getShortNameByChainId(fromChainId)} - {getShortNameByChainId(toChainId)}
-    </div>
-  );
+  const { progress, status, transferTime } = items;
+  const [hoverable] = useHover((hovered: boolean) => {
+    const success = status === CrossChainStatus.Received;
+    return (
+      <div className={clsx(styles['from-to-wrap'], 'flex-column', 'cursor-pointer')}>
+        {transferTime && <div className={styles['transfer-time']}>{formatTime(transferTime)}</div>}
+        <div
+          className={clsx('flex-row-center', {
+            [styles['from-to']]: !hovered,
+            [styles['from-to-hovered']]: hovered,
+            [styles['from-to-success']]: success,
+            [styles['from-to-hovered-success']]: hovered && success,
+          })}>
+          {hovered ? (
+            <div className={styles['progress-wrap']}>
+              <div className={styles['progress-text']}>{Math.floor(progress ?? 0)} %</div>
+              <Progress className={styles.progress} showInfo={false} percent={progress} size="small" strokeWidth={16} />
+            </div>
+          ) : (
+            <Trans>{success ? 'Success' : 'Confirming'}</Trans>
+          )}
+        </div>
+      </div>
+    );
+  });
+  return hoverable;
 }
 
 const sendAmount: ColumnType<CrossChainItem> = {
   title: () => <Trans>Amount</Trans>,
   key: 'Send amount',
-  width: 100,
+  width: 119,
   ellipsis: true,
   dataIndex: 'fromChainId',
   render: (_, item) => <Amount amount={item.transferAmount} token={item.transferToken} />,
 };
 
-const acceptedAmount: ColumnType<CrossChainItem> = {
-  title: () => <Trans>Amount Received</Trans>,
-  key: 'Accepted amount',
-  width: 100,
-  ellipsis: true,
-  dataIndex: 'toChainId',
-  render: (_, item) => {
-    if (!item.receiveAmount) return null;
-    return <Amount amount={item.receiveAmount} token={item.receiveToken} />;
-  },
-};
-
 const sendingAddress: ColumnType<CrossChainItem> = {
   title: () => <Trans>From Address</Trans>,
   key: 'Sending address',
-  width: 100,
+  width: 236,
   ellipsis: true,
   dataIndex: 'fromChainId',
-  render: (fromChainId, item) => <Address address={item.fromAddress} chainId={fromChainId} />,
+  render: (fromChainId, item) => (
+    <Info address={item.fromAddress} chainId={fromChainId} transactionId={item.transferTransactionId} isFrom />
+  ),
 };
 
 const receivingAddress: ColumnType<CrossChainItem> = {
   title: () => <Trans>To Address</Trans>,
   key: 'Receiving address',
-  width: 100,
+  width: 236,
   ellipsis: true,
   dataIndex: 'toChainId',
-  render: (toChainId, item) => <Address address={item.toAddress} chainId={toChainId} />,
-};
-const sendTime: ColumnType<CrossChainItem> = {
-  title: () => <Trans>Sent At</Trans>,
-  dataIndex: 'transferTime',
-  key: 'Send time',
-  width: 100,
-  ellipsis: true,
-  render: (transferTime) => {
-    if (!transferTime) return null;
-    return formatTime(transferTime);
-  },
-};
-const receivingTime: ColumnType<CrossChainItem> = {
-  title: () => <Trans>Receive At</Trans>,
-  dataIndex: 'receiveTime',
-  key: 'Receiving time',
-  width: 100,
-  ellipsis: true,
-  render: (receiveTime) => {
-    if (!receiveTime) return null;
-    return formatTime(receiveTime);
-  },
-};
-const sendTransaction: ColumnType<CrossChainItem> = {
-  title: () => <Trans>Sending TXID</Trans>,
-  dataIndex: 'transferTransactionId',
-  key: 'Send transaction',
-  width: 100,
-  ellipsis: true,
-  render: (transferTransactionId, item) => (
-    <Transaction transactionId={transferTransactionId} chainId={item.fromChainId} />
+  render: (toChainId, item) => (
+    <Info address={item.toAddress} chainId={toChainId} transactionId={item.receiveTransactionId} />
   ),
-};
-const receiveTransaction: ColumnType<CrossChainItem> = {
-  title: () => <Trans>Receiving TXID</Trans>,
-  dataIndex: 'receiveTransactionId',
-  key: 'Receive transaction',
-  width: 100,
-  ellipsis: true,
-  render: (receiveTransactionId, item) => <Transaction transactionId={receiveTransactionId} chainId={item.toChainId} />,
 };
 
 const fromTo = (): ColumnType<CrossChainItem> => {
   return {
-    title: () => (
-      <>
-        <Trans>From Chain</Trans> - <Trans>To Chain</Trans>
-      </>
-    ),
+    title: () => <Trans>Sent At</Trans>,
     dataIndex: 'id',
     key: 'From - To',
-    width: 100,
+    width: 236,
     ellipsis: true,
     render: (_, items) => {
       return <FromTo items={items} />;
@@ -141,13 +140,8 @@ const fromTo = (): ColumnType<CrossChainItem> => {
 };
 const columns = {
   sendAmount,
-  acceptedAmount,
   receivingAddress,
   sendingAddress,
-  sendTime,
-  receivingTime,
-  sendTransaction,
-  receiveTransaction,
   fromTo,
 };
 

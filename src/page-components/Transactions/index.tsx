@@ -35,13 +35,8 @@ const PageSize = 10;
 
 const columns: ColumnsType<any> = [
   Columns.sendAmount,
-  // Columns.acceptedAmount,
   Columns.sendingAddress,
   Columns.receivingAddress,
-  Columns.sendTime,
-  Columns.receivingTime,
-  Columns.sendTransaction,
-  Columns.receiveTransaction,
   Columns.fromTo(),
 ];
 

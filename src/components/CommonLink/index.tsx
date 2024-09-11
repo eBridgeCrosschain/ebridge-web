@@ -21,7 +21,7 @@ export default function CommonLink({
   const target = isMobile ? '_self' : '_blank';
   if (isTagA)
     return (
-      <a target={target} href={href} rel="noreferrer">
+      <a className={className} target={target} href={href} rel="noreferrer">
         {children}
       </a>
     );
