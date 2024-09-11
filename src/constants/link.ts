@@ -14,8 +14,8 @@ import {
 export const ROUTE_PATHS = {
   BRIDGE: '/bridge',
   TRANSACTIONS: '/transactions',
-  TERMS_OF_SERVICE: '/teamOfService',
-  PRIVACY_POLICY: '/privacyPolicy',
+  TERMS_OF_SERVICE: '/terms-of-service',
+  PRIVACY_POLICY: '/privacy-policy',
 };
 
 export const NAV_LIST = [

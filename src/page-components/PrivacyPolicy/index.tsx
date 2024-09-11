@@ -3,7 +3,7 @@ import { Row, Col } from 'antd';
 
 import styles from './styles.module.less';
 
-function TeamOfService() {
+function PrivacyPolicy() {
   return (
     <div className={styles['privacy-policy']}>
       <div className={styles['title']}>Privacy Policy</div>
@@ -179,4 +179,4 @@ function TeamOfService() {
   );
 }
 
-export default memo(TeamOfService);
+export default memo(PrivacyPolicy);

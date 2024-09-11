@@ -3,9 +3,9 @@ import { Row, Col } from 'antd';
 
 import styles from './styles.module.less';
 
-function TeamOfService() {
+function TermsOfService() {
   return (
-    <div className={styles['team-of-service']}>
+    <div className={styles['terms-of-service']}>
       <div className={styles['title']}>Terms of Service</div>
       <div className={styles['sub-title']}>Last updated: September 2024</div>
       <Row gutter={[0, 16]} className={styles['content']}>
@@ -20,8 +20,8 @@ function TeamOfService() {
             </Col>
             <Col>
               {`Please note that by accessing, browsing or otherwise using the Site, or by acknowledging agreement to the Terms and the eBridge Privacy Policy (`}
-              <a target="_blank" href="https://ebridge.exchange/privacyPolicy" rel="noreferrer">
-                https://ebridge.exchange/privacyPolicy
+              <a target="_blank" href="https://ebridge.exchange/privacy-policy" rel="noreferrer">
+                https://ebridge.exchange/privacy-policy
               </a>
               {`, you are accepting and agreeing to these Terms and the policies and guidelines referenced in these Terms. If you do not agree to these Terms, you are not authorized to access or use the Site and should not use the Site.`}
             </Col>
@@ -259,4 +259,4 @@ function TeamOfService() {
   );
 }
 
-export default memo(TeamOfService);
+export default memo(TermsOfService);
