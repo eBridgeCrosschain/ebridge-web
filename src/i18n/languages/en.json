@@ -29,7 +29,7 @@
     "Estimated transaction fee": "Estimated transaction fee",
     "Grant permission to access your funds?": "Grant permission to access your funds?",
     "Confirm": "Confirm",
-    "No cross-chain records found": "No cross-chain records found",
+    "No cross-chain records found.": "No cross-chain records found.",
     "Transfer": "Transfer",
     "Heterogeneous chain cross-chain": "External: ",
     "cross-chain transfer between aelf and other public chains (e.g. aelf to Ethereum)": "cross-chain transfer between aelf and other public chains (e.g. MainChain AELF to Ethereum).",
@@ -193,7 +193,7 @@
     "Retry": "Retry",
     "Can’t find your token?": "Can’t find your token?",
     "Check the transaction status from the transaction records.": "Check the transaction status from the transaction records.",
-    "For more details, click on the Receiving Transaction ID to track its progress on the Explorer.": "For more details, click on the Receiving Transaction ID to track its progress on the Explorer.",
+    "For more details, click on the From/To TXID to track its progress on the Explorer.": "For more details, click on the From/To TXID to track its progress on the Explorer.",
     "All Transactions": "All Transactions"
   }
 }

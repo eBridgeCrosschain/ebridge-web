@@ -29,7 +29,7 @@
     "Estimated transaction fee": "預計交易手續費",
     "Grant permission to access your funds?": "允許換幣合約使用您的代幣",
     "Confirm": "授權",
-    "No cross-chain records found": "未査詢到跨鏈記錄",
+    "No cross-chain records found.": "未査詢到跨鏈記錄",
     "Transfer": "發送",
     "Heterogeneous chain cross-chain": "異構跨鏈：",
     "cross-chain transfer between aelf and other public chains (e.g. aelf to Ethereum)": "AELF與其他公鏈（如MainChain AELF到Ethereum）之間的跨鏈轉帳",
@@ -193,7 +193,7 @@
     "Retry": "重試",
     "Can’t find your token?": "找不到您的代幣？",
     "Check the transaction status from the transaction records.": "從交易記錄中檢查交易狀態。",
-    "For more details, click on the Receiving Transaction ID to track its progress on the Explorer.": "欲了解更多詳情，請點擊接收交易 ID，在區塊瀏覽器上追蹤其進度。",
+    "For more details, click on the From/To TXID to track its progress on the Explorer.": "欲了解更多詳情，請點擊發送/接收的交易編號 (TXID) 在區塊瀏覽器上追蹤其進度。",
     "All Transactions": "所有交易"
   }
 }

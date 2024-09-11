@@ -86,7 +86,7 @@ function FromTo({ items }: { items: CrossChainItem }) {
               <Progress className={styles.progress} showInfo={false} percent={progress} size="small" strokeWidth={16} />
             </div>
           ) : (
-            <Trans>{success ? 'Success' : 'Confirming'}</Trans>
+            <span>{success ? 'Success' : 'Confirming'}</span>
           )}
         </div>
       </div>
