@@ -183,7 +183,7 @@ function TermsOfService() {
           <Row gutter={[0, 8]}>
             <Col className={styles['h1-title']}>14. Release of Claims</Col>
             <Col>
-              {`You expressly assume all risks in connection with your access and use of the Site and your interaction with the Protocol. You further expressly waive and release us from any and all liability, claims, causes of action, or damages arising from or in any way relating to your use of the Site and your interaction with the Protocol. If you are a California resident, you waive the benefits and protections of California Civil Code § 1542, which provides: "[a] general release does not extend to claims that the creditor or releasing party does not know or suspect to exist in his or her favor at the time of executing the release and that, if known by him or her, would have materially affected his or her settlement with the debtor or released party."`}
+              {`You expressly assume all risks in connection with your access and use of the Site and your interaction with the Protocol. You further expressly waive and release us from any liability, claims, causes of action, or damages arising from or in any way relating to your use of the Site and your interaction with the Protocol. If you are a California resident, you waive the benefits and protections of California Civil Code § 1542, which provides: "[a] general release does not extend to claims that the creditor or releasing party does not know or suspect to exist in his or her favor at the time of executing the release and that, if known by him or her, would have materially affected his or her settlement with the debtor or released party."`}
             </Col>
           </Row>
         </Col>
