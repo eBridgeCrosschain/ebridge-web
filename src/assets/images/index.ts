@@ -22,6 +22,7 @@ import arrowIcon from './arrow.svg';
 import arrowGrayIcon from './arrow-gray.svg';
 import arrowBlueIcon from './arrow-blue.svg';
 import arrowRightWhiteIcon from './arrow_right_white.svg';
+import arrowRightGrayIcon from './arrow_right_gray.svg';
 import checkBlueIcon from './check-blue.svg';
 import checkFilledIcon from './check-filled.svg';
 import errorFilledIcon from './error-filled.svg';
@@ -60,6 +61,7 @@ export {
   arrowGrayIcon,
   arrowBlueIcon,
   arrowRightWhiteIcon,
+  arrowRightGrayIcon,
   checkBlueIcon,
   checkFilledIcon,
   errorFilledIcon,
