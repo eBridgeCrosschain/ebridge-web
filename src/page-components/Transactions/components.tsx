@@ -49,9 +49,15 @@ export function TablePagination(props: PaginationProps) {
   const isMd = useMediaQueries('md');
   const { t } = useTranslation();
   return (
-    <div className={clsx(styles.pagination, 'flex-row-center', isMd ? 'flex-center' : 'flex-row-between')}>
-      {!isMd && <div className={styles['pagination-total']}>{t('records in total', { total: props.total })}</div>}
+    <div
+      className={clsx(
+        styles.pagination,
+        'flex-row-center',
+        'flex-row-wrap',
+        isMd ? 'flex-center' : 'flex-row-between',
+      )}>
       <Pagination {...props} />
+      {!isMd && <div className={styles['pagination-total']}>{t('records in total', { total: props.total })}</div>}
     </div>
   );
 }
