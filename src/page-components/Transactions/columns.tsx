@@ -51,7 +51,7 @@ function Info({
           </div>
         )}
       </div>
-      {isFrom && <CommonImage className={styles['info-arrow']} src={arrowRightGrayIcon} />}
+      {isFrom && <CommonImage priority className={styles['info-arrow']} src={arrowRightGrayIcon} />}
     </div>
   );
 }

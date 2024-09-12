@@ -23,7 +23,7 @@ export default function TokenSelect({
       <TokenLogo className={styles['token-img']} chainId={chainId} symbol={symbol} />
       <div className={clsx('flex-1', 'flex-row-center', 'flex-row-between', styles['token-title-row'])}>
         <div className={styles['token-title']}>{formatSymbol(title)}</div>
-        <CommonImage className={styles['arrow-icon']} src={arrowIcon} />
+        <CommonImage priority className={styles['arrow-icon']} src={arrowIcon} />
       </div>
     </div>
   );
