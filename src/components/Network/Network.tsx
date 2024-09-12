@@ -54,7 +54,7 @@ export default function Network({
       <Row>
         <IconFont type={iconProps?.type || ''} />
         <div className={styles['network-name']}>{name || 'Wrong Network'}</div>
-        <CommonImage className={styles['arrow-icon']} src={arrowIcon} />
+        <CommonImage priority className={styles['arrow-icon']} src={arrowIcon} />
       </Row>
     </Dropdown>
   );

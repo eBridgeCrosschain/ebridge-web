@@ -253,7 +253,7 @@ export default function ActionButton() {
     let children: React.ReactNode = (
         <div className={clsx(styles['button-content'], 'flex-center')}>
           <span>{t('Bridge')}</span>
-          <CommonImage className={styles['arrow-icon']} src={arrowRightWhiteIcon} />
+          <CommonImage priority className={styles['arrow-icon']} src={arrowRightWhiteIcon} />
         </div>
       ),
       onClick: any,

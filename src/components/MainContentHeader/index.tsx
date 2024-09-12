@@ -61,7 +61,7 @@ export default function MainContentHeader({ className, wrap, title, tipConfig }:
             title={tipConfig.content}
             open={isTooltipOpen}
             onOpenChange={(open) => setIsTooltipOpen(open)}>
-            <CommonImage className={styles['info-icon']} src={infoCircleIcon} />
+            <CommonImage priority className={styles['info-icon']} src={infoCircleIcon} />
           </Tooltip>
           <span>{tipConfig.label}</span>
         </div>

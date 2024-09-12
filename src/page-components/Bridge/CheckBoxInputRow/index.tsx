@@ -62,7 +62,7 @@ export default function CheckBoxInputRow() {
               placement="topLeft"
               arrowPointAtCenter
               title={t('Choose this option if you wish to send to an address without connecting wallet.')}>
-              <CommonImage className={styles['question-icon']} src={questionFilledIcon} />
+              <CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />
             </Tooltip>
           </span>
         </Checkbox>
