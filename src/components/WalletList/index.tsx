@@ -84,7 +84,10 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
               tryActivation(option.connector, option.name);
             }}>
             <IconFont className={styles['wallet-icon']} type={option.iconType} />
-            <div>{option.name}</div>
+            <div>
+              {option.name}
+              {disabled && ' (Connected)'}
+            </div>
           </Button>
         );
       })}
