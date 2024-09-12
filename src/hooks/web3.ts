@@ -7,30 +7,27 @@ import { useChain, useChainDispatch } from 'contexts/useChain';
 import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
-import { useLoginWalletContext } from 'contexts/useLoginWallet/provider';
-export function useAEflConnect() {
-  const { activate, connectEagerly } = useLoginWalletContext();
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { ExtraInfoForNightElf } from 'types/wallet';
+import { useLogin } from './wallet';
+
+export function useAElfConnect() {
+  const login = useLogin();
   const chainDispatch = useChainDispatch();
 
-  return useCallback(
-    async (isConnectEagerly?: boolean) => {
-      await (isConnectEagerly ? connectEagerly : activate)();
-      chainDispatch(setSelectELFWallet('NIGHTELF'));
-    },
-    [activate, chainDispatch, connectEagerly],
-  );
+  return useCallback(async () => {
+    await login();
+    chainDispatch(setSelectELFWallet('NIGHTELF'));
+  }, [chainDispatch, login]);
 }
 
 export function usePortkeyConnect() {
-  const { activate, connectEagerly } = useLoginWalletContext();
+  const login = useLogin();
   const chainDispatch = useChainDispatch();
-  return useCallback(
-    async (isConnectEagerly?: boolean) => {
-      await (isConnectEagerly ? connectEagerly : activate)();
-      chainDispatch(setSelectELFWallet('PORTKEY'));
-    },
-    [activate, chainDispatch, connectEagerly],
-  );
+  return useCallback(async () => {
+    await login();
+    chainDispatch(setSelectELFWallet('PORTKEY'));
+  }, [chainDispatch, login]);
 }
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useWeb3(): Web3Type {
@@ -65,46 +62,50 @@ export function useWeb3(): Web3Type {
 
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
-  const aelfReact = useLoginWalletContext();
+  const { walletInfo, walletType } = useConnectWallet();
   const [{ userELFChainId }] = useChain();
   const chainId = userELFChainId;
   const tmpContext = useMemo(() => {
-    const aelfBridges = aelfReact.wallet?.nightElfInfo?.aelfBridges as Web3Type['aelfInstances'];
+    const aelfWalletInfo = walletInfo?.extraInfo as ExtraInfoForNightElf;
+    const aelfBridges = aelfWalletInfo?.nightElfInfo?.aelfBridges as Web3Type['aelfInstances'];
 
     const contextNetwork: any = {
-      ...aelfReact,
-      aelfInstance: aelfReact.wallet?.nightElfInfo?.defaultAElfBridge,
+      ...walletInfo,
+      aelfInstance: aelfWalletInfo?.nightElfInfo?.defaultAElfBridge,
       aelfInstances: aelfBridges,
     };
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
-    contextNetwork.walletType = 'NIGHTELF';
     return {
       ...contextNetwork,
       chainId,
       library: undefined,
       provider: undefined,
-      connector: aelfReact.account ? 'NIGHT ELF' : undefined,
+      loginWalletType: walletType,
+      walletType: 'NIGHTELF',
+      connector: walletInfo?.address ? 'NIGHT ELF' : undefined,
     };
-  }, [aelfReact, chainId]);
+  }, [chainId, walletInfo, walletType]);
   return tmpContext;
 }
 
 export function usePortkey(): Web3Type {
-  const portkeyReact = useLoginWalletContext();
+  const { walletInfo, walletType } = useConnectWallet();
   const tmpContext = useMemo(() => {
     const contextNetwork: any = {
-      ...portkeyReact,
+      ...walletInfo,
     };
     return {
       ...contextNetwork,
       library: undefined,
       provider: undefined,
+      loginWalletType: walletType,
       walletType: 'PORTKEY',
-      connector: portkeyReact.version === 'v1' ? 'PORTKEY V1' : 'PORTKEY',
+      connector: 'PORTKEY',
       isPortkey: true,
     };
-  }, [portkeyReact]);
+  }, [walletInfo, walletType]);
+
   return tmpContext;
 }

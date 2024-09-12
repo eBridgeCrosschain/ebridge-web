@@ -15,8 +15,7 @@ import { setSelectERCWallet } from 'contexts/useChain/actions';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
-import { ILoginWalletContextState } from 'contexts/useLoginWallet/types';
-import { WalletType } from 'aelf-web-login';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
 
@@ -25,7 +24,7 @@ function AccountCard() {
   const chainDispatch = useChainDispatch();
   const router = useRouter();
 
-  const { connector, account, chainId, deactivate, aelfInstance, walletType } = accountWallet || {};
+  const { connector, account, chainId, deactivate, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -104,7 +103,7 @@ function AccountCard() {
     <>
       <div className="account-modal-info-wrap">
         <div className="account-modal-info-label">{formatConnectorName}</div>
-        {(accountWallet as ILoginWalletContextState)?.loginWalletType === WalletType.portkey && (
+        {loginWalletType === WalletTypeEnum.aa && (
           <div onClick={jumpAssets} className="account-modal-info-assets">
             View Assets
             <IconFont className="account-modal-info-assets-arrow" type="Search" />

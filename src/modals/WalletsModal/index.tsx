@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
-import { useWebLogin, useWebLoginEvent, WebLoginEvents } from 'aelf-web-login';
+import { useLogin } from 'hooks/wallet';
 import { useModal } from 'contexts/useModal';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import { useWalletContext } from 'contexts/useWallet';
@@ -34,7 +34,7 @@ const STEP_ITEM_CONFIG = {
 
 export default function WalletsModal() {
   const { t } = useLanguage();
-  const { login } = useWebLogin();
+  const login = useLogin();
   const [{ walletsModal }, { dispatch }] = useModal();
   const [{ fromOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);
@@ -71,15 +71,16 @@ export default function WalletsModal() {
     login();
   };
 
-  const handleConnectAELFWalletFinish = () => {
-    if (isFromERC) {
-      handleCloseModal();
-    } else {
-      setWalletStep(WALLET_STEP.TO);
-    }
-  };
+  // const handleConnectAELFWalletFinish = () => {
+  //   if (isFromERC) {
+  //     handleCloseModal();
+  //   } else {
+  //     setWalletStep(WALLET_STEP.TO);
+  //   }
+  // };
 
-  useWebLoginEvent(WebLoginEvents.LOGINED, handleConnectAELFWalletFinish);
+  // TODO
+  // useWebLoginEvent(WebLoginEvents.LOGINED, handleConnectAELFWalletFinish);
 
   return (
     <CommonModal

@@ -28,7 +28,7 @@ import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useMo
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { ChainType } from 'types';
-import { useWebLogin } from 'aelf-web-login';
+import { useLogin } from 'hooks/wallet';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
@@ -100,7 +100,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const { login } = useWebLogin();
+  const login = useLogin();
   const { fromWallet, toWallet, fromOptions } = useWallet();
   const wallet = fromOptions?.chainType === chainType ? fromWallet : toWallet;
   const { walletType, chainId, account, connector } = wallet || {};

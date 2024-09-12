@@ -4,10 +4,11 @@ import { useCallback } from 'react';
 import { ChainId } from 'types';
 import { isSelectPortkey } from 'utils/portkey';
 import { basicModalView } from 'contexts/useModal/actions';
-import { useLoginWalletContext } from 'contexts/useLoginWallet/provider';
+import { useGetWalletManagerStatus } from './wallet';
+import { ChainId as TChainId } from '@portkey/types';
 
 export default function useCheckPortkeyStatus() {
-  const { getWalletManagerStatus } = useLoginWalletContext();
+  const getWalletManagerStatus = useGetWalletManagerStatus();
   const [{ selectELFWallet }] = useChain();
   const [, { dispatch }] = useModal();
 
@@ -17,7 +18,7 @@ export default function useCheckPortkeyStatus() {
         return true;
       }
 
-      const status = await getWalletManagerStatus(chainId);
+      const status = await getWalletManagerStatus(chainId as TChainId);
       console.log('getWalletManagerStatus', status);
 
       if (!status) {
