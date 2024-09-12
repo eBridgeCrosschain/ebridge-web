@@ -107,6 +107,7 @@ function Body({
         onChange={(page: number) => setState({ page })}
         pageSize={PageSize}
         total={totalCount}
+        showSizeChanger={false}
       />
     </>
   );
@@ -121,30 +122,11 @@ function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
   const { account: fromAccount } = fromWallet || {};
   const { account: toAccount } = toWallet || {};
 
-  const ELFAddress = useMemo(() => {
-    if (isELFChain(fromWallet?.chainId)) return fromWallet?.account;
-    if (isELFChain(toWallet?.chainId)) return toWallet?.account;
-  }, [fromWallet?.account, fromWallet?.chainId, toWallet?.account, toWallet?.chainId]);
-
   const getReceiveList = useCallback(async () => {
-    if (
-      (crossChainType === CrossChainType.homogeneous && !ELFAddress) ||
-      (crossChainType !== CrossChainType.homogeneous && !(fromAccount || toAccount))
-    ) {
+    if (!(fromAccount || toAccount)) {
       return setState({ list: [], totalCount: 0 });
     }
-    const addressProps = {
-      fromAddress: fromAccount,
-      toAddress: toAccount,
-    };
-    if (fromAccount && toAccount) {
-      if (isELFChain(fromWallet?.chainId)) {
-        delete addressProps.toAddress;
-      }
-      if (isELFChain(toWallet?.chainId)) {
-        delete addressProps.fromAddress;
-      }
-    }
+    const addresses = [fromAccount, toAccount].filter(Boolean).join(',');
     const skipCount = page ? (page - 1) * PageSize : 0;
     let type;
     if (crossChainType === CrossChainType.homogeneous) {
@@ -154,7 +136,7 @@ function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
     }
     const req = await request.cross.getCrossChainTransfers({
       params: {
-        ...addressProps,
+        addresses,
         toChainId: getChainIdToMap(toChainId),
         fromChainId: getChainIdToMap(fromChainId),
         status,
@@ -171,19 +153,7 @@ function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
         setState({ list, totalCount: req.totalCount });
       }
     }
-  }, [
-    ELFAddress,
-    crossChainType,
-    fromAccount,
-    fromChainId,
-    fromWallet?.chainId,
-    page,
-    setState,
-    status,
-    toAccount,
-    toChainId,
-    toWallet?.chainId,
-  ]);
+  }, [crossChainType, fromAccount, fromChainId, page, setState, status, toAccount, toChainId]);
   const preFromAccount = usePrevious(fromAccount);
   const preToAccount = usePrevious(toAccount);
   useEffect(() => {

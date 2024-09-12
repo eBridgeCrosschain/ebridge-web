@@ -58,7 +58,7 @@ export default function CheckBoxInputRow() {
           <span className={clsx(styles['check-box-label-wrap'], 'flex-row-center')}>
             <span className={styles['check-box-label']}>{t('Send to another address manually')}</span>
             <Tooltip
-              trigger="click"
+              trigger="hover"
               placement="topLeft"
               arrowPointAtCenter
               title={t('Choose this option if you wish to send to an address without connecting wallet.')}>
