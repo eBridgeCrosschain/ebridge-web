@@ -22,7 +22,11 @@ function Nav() {
             onClick={() => {
               push(item.href);
             }}>
-            <CommonImage className={styles['nav-item-icon']} src={isSelected ? item.selectedIcon : item.icon} />
+            <CommonImage
+              priority
+              className={styles['nav-item-icon']}
+              src={isSelected ? item.selectedIcon : item.icon}
+            />
             <span>{t(item.title)}</span>
           </div>
         );

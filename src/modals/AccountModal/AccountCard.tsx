@@ -138,9 +138,7 @@ function AccountCard() {
                     showIcon={false}
                     className="account-modal-card-box-link"
                     href={getExploreLink(account, 'address', accountChainId)}>
-                    {isELF
-                      ? `View on ${new URL(getExploreLink(account, 'address', accountChainId)).host}`
-                      : 'View on Etherscan'}
+                    {`View on ${new URL(getExploreLink(account, 'address', accountChainId)).host}`}
                   </CommonLink>
                 ) : null}
               </Col>

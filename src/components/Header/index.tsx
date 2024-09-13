@@ -70,6 +70,7 @@ function Logo({ clickable = false }: { clickable?: boolean }) {
   const { push } = useRouter();
   return (
     <CommonImage
+      priority
       style={{ width: IS_MAINNET ? 96 : 119, height: 32, cursor: clickable ? 'pointer' : 'default' }}
       src={IS_MAINNET ? logo : testLogo}
       alt="logo"
@@ -118,7 +119,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
       }>
       <WalletIcon connector={connector} className={styles['wallet-icon']} />
       {isMd ? (
-        <CommonImage className={styles['wallet-arrow-icon']} src={arrowBlueIcon} />
+        <CommonImage priority className={styles['wallet-arrow-icon']} src={arrowBlueIcon} />
       ) : (
         <div className={styles['wallet-address']}>
           {isELFChain(chainId) ? shortenString(formatAddress(chainId, account), 7, 8) : shortenString(account, 5, 3)}
@@ -283,6 +284,7 @@ function MobileHeader() {
     <>
       <div className={clsx(styles['mobile-header-left'], 'flex-row-center')}>
         <CommonImage
+          priority
           className={clsx(styles['menu-icon'], 'cursor-pointer')}
           src={menuIcon}
           onClick={() => setVisible(true)}
