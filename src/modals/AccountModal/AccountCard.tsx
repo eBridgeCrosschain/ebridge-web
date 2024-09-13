@@ -18,13 +18,15 @@ import CommonMessage from 'components/CommonMessage';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
+import { useLogout } from 'hooks/wallet';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
+  const logoutWebLogin = useLogout();
 
-  const { connector, account, chainId, deactivate, aelfInstance, walletType, loginWalletType } = accountWallet || {};
+  const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -47,6 +49,7 @@ function AccountCard() {
 
   const onDisconnect = useCallback(async () => {
     if (typeof connector !== 'string') {
+      // WEB3
       try {
         await connection?.connector?.deactivate?.();
         await connection?.connector?.resetState?.();
@@ -57,7 +60,8 @@ function AccountCard() {
         clearWCStorageByDisconnect();
       }
     } else {
-      deactivate?.();
+      // Aelf
+      logoutWebLogin?.();
     }
     if (walletType !== 'ERC') {
       dispatch(basicModalView.modalDestroy());
@@ -71,7 +75,7 @@ function AccountCard() {
         walletChainId: chainId,
       }),
     );
-  }, [connector, dispatch, walletType, chainId, connection?.connector, chainDispatch, deactivate]);
+  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, logoutWebLogin]);
 
   const changeWallet = useCallback(async () => {
     if (walletType !== 'ERC') {

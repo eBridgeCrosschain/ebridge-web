@@ -14,7 +14,7 @@ import { clearWCStorageByDisconnect } from 'utils/localStorage';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
-  const { walletType, loginError } = useConnectWallet();
+  const { walletType } = useConnectWallet();
   const isLogin = useIsLogin();
 
   const init = useCallback(async () => {
@@ -27,16 +27,18 @@ export function useInitWallet() {
     }
   }, [chainDispatch, walletType]);
 
-  useEffect(() => {
-    if (!isLogin) return;
-    init();
-  }, [init, isLogin]);
+  const onLogoutClearData = useCallback(async () => {
+    chainDispatch(setSelectERCWallet(undefined));
+    clearWCStorageByDisconnect();
+  }, [chainDispatch]);
 
   useEffect(() => {
-    if (loginError) {
-      CommonMessage.error(handleWebLoginErrorMessage(loginError.message));
+    if (!isLogin) {
+      onLogoutClearData();
+    } else {
+      init();
     }
-  }, [loginError]);
+  }, [init, isLogin, onLogoutClearData]);
 }
 
 export function useIsLogin() {
@@ -78,16 +80,18 @@ export function useGetAccount() {
 
 export function useLogout() {
   const chainDispatch = useChainDispatch();
-  const { connectWallet } = useConnectWallet();
+  const { disConnectWallet, connectWallet } = useConnectWallet();
 
   return useCallback(async () => {
-    console.log('onLogout');
+    Promise.resolve(disConnectWallet()).then(async () => {
+      console.log('onLogout');
 
-    chainDispatch(setSelectERCWallet(undefined));
-    clearWCStorageByDisconnect();
-    await sleep(500);
-    connectWallet();
-  }, [chainDispatch, connectWallet]);
+      chainDispatch(setSelectERCWallet(undefined));
+      clearWCStorageByDisconnect();
+      await sleep(500);
+      connectWallet();
+    });
+  }, [chainDispatch, connectWallet, disConnectWallet]);
 }
 
 export function useGetWalletManagerStatus() {

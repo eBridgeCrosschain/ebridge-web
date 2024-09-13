@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
@@ -13,6 +13,8 @@ import WalletList from '../../components/WalletList';
 import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon } from 'assets/images';
 import { ROUTE_PATHS } from 'constants/link';
 import styles from './styles.module.less';
+import { eventBus } from 'utils';
+import storages from 'constants/storages';
 
 const WALLET_STEP = {
   FROM: 0,
@@ -55,9 +57,9 @@ export default function WalletsModal() {
     }
   }, [walletsModal]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     dispatch(setWalletsModal(false));
-  };
+  }, [dispatch]);
 
   const handleConnectExternalWalletFinish = () => {
     if (isFromERC) {
@@ -67,20 +69,25 @@ export default function WalletsModal() {
     }
   };
 
-  const handleConnectAELFWallet = () => {
-    login();
-  };
+  const handleConnectAELFWallet = useCallback(async () => {
+    await login();
+    eventBus.emit(storages.aelfWebLoginSucceed);
+  }, [login]);
 
-  // const handleConnectAELFWalletFinish = () => {
-  //   if (isFromERC) {
-  //     handleCloseModal();
-  //   } else {
-  //     setWalletStep(WALLET_STEP.TO);
-  //   }
-  // };
+  const handleConnectAELFWalletFinish = useCallback(() => {
+    if (isFromERC) {
+      handleCloseModal();
+    } else {
+      setWalletStep(WALLET_STEP.TO);
+    }
+  }, [handleCloseModal, isFromERC]);
 
-  // TODO
-  // useWebLoginEvent(WebLoginEvents.LOGINED, handleConnectAELFWalletFinish);
+  useEffect(() => {
+    eventBus.addListener(storages.aelfWebLoginSucceed, handleConnectAELFWalletFinish);
+    return () => {
+      eventBus.removeListener(storages.aelfWebLoginSucceed, handleConnectAELFWalletFinish);
+    };
+  }, [handleConnectAELFWalletFinish]);
 
   return (
     <CommonModal

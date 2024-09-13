@@ -7,5 +7,6 @@ const storages = {
   contractsFileDescriptorBase64: 'contracts-file-descriptor-base64-3',
   crossChainReceived: 'cross-chain-received',
   portkeyCAAddresses: 'portkey-ca-addresses',
+  aelfWebLoginSucceed: 'aelf-web-login-succeed',
 };
 export default storages;

@@ -8,8 +8,9 @@ import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import { ExtraInfoForNightElf } from 'types/wallet';
+import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
 import { useLogin } from './wallet';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 
 export function useAElfConnect() {
   const login = useLogin();
@@ -62,7 +63,7 @@ export function useWeb3(): Web3Type {
 
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
-  const { walletInfo, walletType } = useConnectWallet();
+  const { walletInfo, walletType, isConnected } = useConnectWallet();
   const [{ userELFChainId }] = useChain();
   const chainId = userELFChainId;
   const tmpContext = useMemo(() => {
@@ -79,6 +80,8 @@ export function useAElf(): Web3Type {
     }
     return {
       ...contextNetwork,
+      account: walletInfo?.address,
+      isActive: isConnected,
       chainId,
       library: undefined,
       provider: undefined,
@@ -86,26 +89,45 @@ export function useAElf(): Web3Type {
       walletType: 'NIGHTELF',
       connector: walletInfo?.address ? 'NIGHT ELF' : undefined,
     };
-  }, [chainId, walletInfo, walletType]);
+  }, [chainId, isConnected, walletInfo, walletType]);
   return tmpContext;
 }
 
 export function usePortkey(): Web3Type {
-  const { walletInfo, walletType } = useConnectWallet();
+  const { walletInfo, walletType, isConnected } = useConnectWallet();
   const tmpContext = useMemo(() => {
     const contextNetwork: any = {
       ...walletInfo,
     };
+    const _walletAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
+    const _walletDiscoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
+
+    let _accounts;
+
+    switch (walletType) {
+      case WalletTypeEnum.aa:
+        _accounts = _walletAAInfo.portkeyInfo.accounts;
+        break;
+
+      case WalletTypeEnum.discover:
+        _accounts = _walletDiscoverInfo.accounts;
+        break;
+      default:
+        break;
+    }
     return {
       ...contextNetwork,
+      accounts: _accounts,
+      wallet: { ...contextNetwork },
+      isActive: isConnected,
       library: undefined,
-      provider: undefined,
+      provider: walletInfo?.extraInfo?.provider,
       loginWalletType: walletType,
       walletType: 'PORTKEY',
       connector: 'PORTKEY',
       isPortkey: true,
     };
-  }, [walletInfo, walletType]);
+  }, [isConnected, walletInfo, walletType]);
 
   return tmpContext;
 }
