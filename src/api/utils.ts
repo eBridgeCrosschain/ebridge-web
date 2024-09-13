@@ -7,8 +7,6 @@ const axiosInstance = axios.create({
   timeout: 50000,
 });
 
-axiosInstance.defaults.headers.common['x-csrf-token'] = 'AUTH_TOKEN';
-
 axiosInstance.interceptors.request.use(
   (config) => {
     return config;
