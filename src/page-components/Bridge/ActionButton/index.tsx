@@ -259,9 +259,14 @@ export default function ActionButton() {
       onClick: any,
       disabled = true;
     if (!fromAccount && !toChecked && !toAccount) {
-      children = 'Connect Wallets';
       disabled = false;
-      onClick = () => modalDispatch(setWalletsModal(true));
+      if (isHomogeneous) {
+        children = 'Connect Wallet';
+        onClick = () => login();
+      } else {
+        children = 'Connect Wallets';
+        onClick = () => modalDispatch(setWalletsModal(true));
+      }
       return { children, onClick, disabled };
     }
 
@@ -347,6 +352,7 @@ export default function ActionButton() {
     fromBalance?.token?.symbol,
     fromBalance?.show,
     crossFee,
+    login,
     modalDispatch,
     getWalletBtnProps,
     toAddress,
