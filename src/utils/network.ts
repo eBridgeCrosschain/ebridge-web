@@ -142,7 +142,7 @@ export const switchChain = async (
       if (
         !getSupportedChainIdsFromWalletConnectSession((connector as WalletConnect).provider?.session).includes(chainId)
       ) {
-        CommonMessage.error(`Unsupported ${chainName} by your wallet`);
+        CommonMessage.error(`${chainName} is unsupported by your wallet.`);
       } else {
         await connector.activate(chainId);
       }
