@@ -1,10 +1,8 @@
 import {
   telegramIcon,
   twitterIcon,
-  discordIcon,
   telegramDarkIcon,
   twitterDarkIcon,
-  discordDarkIcon,
   bridgeIcon,
   bridgeBlueIcon,
   transactionsIcon,
@@ -61,11 +59,6 @@ export const FOOTER_COMMUNITY_CONFIG = [
     icon: twitterIcon,
     link: COMMUNITY_LINK_MAP.TWITTER,
   },
-  {
-    label: 'Discord',
-    icon: discordIcon,
-    link: COMMUNITY_LINK_MAP.DISCORD,
-  },
 ];
 
 export const HEADER_COMMUNITY_CONFIG = [
@@ -78,10 +71,5 @@ export const HEADER_COMMUNITY_CONFIG = [
     label: 'X (Twitter)',
     icon: twitterDarkIcon,
     link: COMMUNITY_LINK_MAP.TWITTER,
-  },
-  {
-    label: 'Discord',
-    icon: discordDarkIcon,
-    link: COMMUNITY_LINK_MAP.DISCORD,
   },
 ];
