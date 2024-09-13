@@ -1,22 +1,37 @@
 @import '../../assets/theme/color.less';
+@import '../../assets/theme/font.less';
 
 .common-modals {
   .@{app-prefix}-modal-content {
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: auto;
     padding: 0;
   }
   .@{app-prefix}-modal-header {
-    font-family: PingFangSC-Medium, sans-serif;
-    height: auto;
-    border-bottom: 1px solid @border-3;
-    color: @font-2;
-    padding: 16px 24px;
+    height: 52px;
+    padding: 24px 24px 0;
+    border-bottom: none;
+  }
+  .@{app-prefix}-modal-title {
+    .font-family-semibold();
+
+    color: @font-15;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    & > .@{app-prefix}-row > .@{app-prefix}-col {
+      text-align: left !important;
+    }
   }
   .@{app-prefix}-modal-close-x {
-    height: 56px;
-    line-height: 56px;
-    color: @font-5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 24px;
+  }
+  .common-modal-close-icon {
+    width: 16px;
+    height: 16px;
   }
   .common-modal-left-icon {
     cursor: pointer;
@@ -34,7 +49,7 @@
   .@{app-prefix}-modal-body {
     display: flex;
     flex: 1;
-    padding: 16px 32px 25px;
+    padding: 16px 24px 24px;
     width: 35vw;
     min-width: 500px;
     max-width: 500px;
@@ -45,7 +60,7 @@
 
 .mobile-site {
   .@{app-prefix}-modal-wrap {
-    overflow: scroll;
+    overflow: auto;
     overflow-y: hidden;
   }
   .common-modals {
@@ -73,10 +88,10 @@
       width: auto;
       min-width: auto;
       padding: 16px 16px 24px;
-      overflow: scroll;
+      overflow: auto;
     }
   }
-  .common-bottom-modals {
+  .common-modals.common-bottom-modals {
     top: 0;
     margin: 0;
     padding: 0;
@@ -85,10 +100,33 @@
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-start;
+    .common-modal-close-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .@{app-prefix}-modal-header {
+      height: 56px;
+      padding: 16px 0;
+      .@{app-prefix}-modal-title {
+        font-weight: 500;
+        line-height: 24px;
+        & > .@{app-prefix}-row > .@{app-prefix}-col {
+          text-align: center !important;
+        }
+      }
+    }
+    .@{app-prefix}-modal-close-x {
+      padding-top: 1px;
+    }
+    .@{app-prefix}-modal-body {
+      max-width: 100%;
+      padding: 0;
+    }
     .@{app-prefix}-modal-content {
+      padding: 0 16px 16px;
       border-radius: 0;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
   }
 }

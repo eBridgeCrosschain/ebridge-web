@@ -1,6 +1,6 @@
 export const breakpointMap = {
   xs: 370,
-  md: 580,
+  md: 799,
   xl: 942,
   xxl: 1160,
 };

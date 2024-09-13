@@ -6,7 +6,8 @@ import { getIconByChainId, getNameByChainId } from 'utils/chain';
 import IconFont from 'components/IconFont';
 import styles from './styles.module.less';
 import clsx from 'clsx';
-import useMediaQueries from 'hooks/useMediaQueries';
+import { arrowIcon } from 'assets/images';
+import CommonImage from 'components/CommonImage';
 
 export default function Network({
   networkList,
@@ -41,36 +42,19 @@ export default function Network({
     return getIconByChainId(chainId);
   }, [chainId]);
 
-  const isMd = useMediaQueries('md');
   const name = getNameByChainId(chainId);
 
-  const IconName = useMemo(() => {
-    const props = { nameSize: 14, marginRight: 16 };
-
-    if (isMd) {
-      props.nameSize = 12;
-      props.marginRight = 8;
-    }
-
-    return (
-      <Row className="flex-row-center network-row" style={{ fontSize: props.nameSize }}>
-        <IconFont type={iconProps?.type || ''} style={{ marginRight: props.marginRight }} />
-        <div className="network-name">{name || 'Wrong Network'}</div>
-      </Row>
-    );
-  }, [iconProps?.type, isMd, name]);
   return (
     <Dropdown
-      className={clsx(styles.dropdown, 'cursor-pointer', className)}
+      className={clsx(styles.dropdown, 'cursor-pointer', 'flex-row-center', className)}
       overlayClassName={clsx(styles['dropdown-overlay'], overlayClassName)}
       overlay={menu}
       trigger={['click']}
       getPopupContainer={(triggerNode) => triggerNode}>
-      <Row className="flex-row-center">
-        {IconName}
-        <div className="network-icon">
-          <IconFont type="Search" />
-        </div>
+      <Row>
+        <IconFont type={iconProps?.type || ''} />
+        <div className={styles['network-name']}>{name || 'Wrong Network'}</div>
+        <CommonImage priority className={styles['arrow-icon']} src={arrowIcon} />
       </Row>
     </Dropdown>
   );

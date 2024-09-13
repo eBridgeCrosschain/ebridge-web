@@ -1,0 +1,48 @@
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.terms-of-service {
+  margin: 64px auto;
+  max-width: calc(@max-width + 82px);
+  padding: 20px 32px;
+  background-color: @bg-2;
+  border-radius: 20px;
+  .title {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    color: @font-4;
+  }
+  .sub-title {
+    font-size: 12px;
+    color: @font-3;
+    margin: 20px 0;
+  }
+  .content {
+    color: @font-5;
+    line-height: 22px;
+    font-size: 14px;
+  }
+  .h1-title {
+    flex: 0 0 100%;
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 4px;
+    .font-family-medium();
+  }
+  a {
+    color: @font-12;
+    word-wrap: break-word;
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .terms-of-service {
+    padding: 20px 16px;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 193px;
+    max-width: 100%;
+  }
+}

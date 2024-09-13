@@ -1,36 +1,42 @@
 @import '/src/assets/theme/color.less';
 @import '/src/assets/theme/constants.less';
 .dropdown {
-  justify-content: space-between;
-  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid @border-5;
+  border-radius: 6px;
+  .network-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .network-name {
+    flex: 1;
+    color: @font-15;
+    .text-overflow(1);
+
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+  }
+  .arrow-icon {
+    width: 16px;
+    height: 16px;
+  }
   :global {
-    .network-icon {
-      margin-left: 5px;
-      .anticon {
-        font-size: 12px;
-      }
-    }
     .anticon {
-      font-size: 40px;
-      @media screen and (max-width: @md-width) {
-        font-size: 20px;
-      }
-      // @media screen and (max-width: @xs-width) {
-      //   font-size: 24px;
-      // }
-    }
-    .network-row {
-      flex: 1;
-    }
-    .network-name {
-      flex: 1;
+      font-size: 24px;
     }
   }
 }
 .dropdown-overlay {
   width: auto;
-  box-shadow: 0 9px 20px 8px @shadow-2;
+  border: 1px solid @border-5;
+  border-radius: 6px;
   :global {
+    .@{app-prefix}-dropdown-menu {
+      border-radius: 6px;
+    }
     .@{app-prefix}-dropdown-menu-item {
       min-height: 40px;
       &:hover:not(.@{app-prefix}-dropdown-menu-item-selected) {

@@ -20,7 +20,7 @@ export default function CommonTable(props: TableProps<any>) {
               <CommonImage priority src={isConnect ? EmptyWallet : Empty} className={styles.icon} />
               <div>
                 {!isConnect ? (
-                  <Trans>No cross-chain records found</Trans>
+                  <Trans>No cross-chain records found.</Trans>
                 ) : (
                   <>
                     <Trans>Connect2</Trans>

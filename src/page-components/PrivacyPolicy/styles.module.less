@@ -11,7 +11,7 @@
   .title {
     font-size: 24px;
     font-weight: 500;
-    line-height: 32px; 
+    line-height: 32px;
     color: @font-4;
   }
   .sub-title {
@@ -23,26 +23,30 @@
     color: @font-5;
     line-height: 22px;
     font-size: 14px;
-    word-break: break-all;
+  }
+  .list-item {
+    display: list-item;
+    margin-left: 20px;
   }
   .h1-title {
+    flex: 0 0 100%;
     font-size: 16px;
-    line-height: 24px; 
+    line-height: 24px;
     margin-bottom: 4px;
     .font-family-medium();
   }
   a {
-    color: @font-12; 
+    color: @font-12;
+    word-wrap: break-word;
   }
 }
 
-@media screen and (max-width: 580px) {
+@media screen and (max-width: @md-width) {
   .privacy-policy {
     padding: 20px 16px;
     margin-left: 16px;
     margin-right: 16px;
-    margin-bottom: 40px;
+    margin-bottom: 193px;
     max-width: 100%;
   }
 }
-

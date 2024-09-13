@@ -13,7 +13,7 @@ import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
 import { formatAddress, isIncludesChainId } from 'utils';
 import { FormatTokenList } from 'constants/index';
-import { LimitDataProps } from 'page-components/Home/useLimitAmountModal/constants';
+import { LimitDataProps } from 'page-components/Bridge/useLimitAmountModal/constants';
 import BigNumber from 'bignumber.js';
 import CommonMessage from 'components/CommonMessage';
 export async function CrossChainTransfer({
