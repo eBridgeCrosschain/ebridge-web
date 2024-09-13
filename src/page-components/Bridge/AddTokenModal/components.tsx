@@ -280,7 +280,7 @@ export function SyncToken({
         <Steps.Step title={`${t('Transaction')} 2`} description={t('Synchronize token info')} />
       </Steps>
       <div className={styles['add-tip']}>* {t('Create Tip', { fee: '1 ELF', time: '150 S' })}</div>
-      <CommonModal width="auto" className={styles['indexing-modal']} visible={transactionResult && visibleModal}>
+      <CommonModal width="auto" className={styles['indexing-modal']} open={transactionResult && visibleModal}>
         <TransactionModal
           sendChainID={sendChainID}
           progress={crossChainProgress}

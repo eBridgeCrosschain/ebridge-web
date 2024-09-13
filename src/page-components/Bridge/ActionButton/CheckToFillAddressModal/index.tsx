@@ -57,7 +57,7 @@ export default function CheckToFillAddressModal({
       className={styles['confirm-modal']}
       width="auto"
       title={t("Please confirm the recipient's address")}
-      visible={visible}
+      open={visible}
       onCancel={() => propsSetVisible(false)}>
       <div>
         <div className={styles['confirm-modal-content']}>

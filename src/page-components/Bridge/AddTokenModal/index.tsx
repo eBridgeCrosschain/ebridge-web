@@ -131,7 +131,7 @@ export default function AddTokenModal() {
     <CommonModal
       className={styles['add-modal']}
       onCancel={() => dispatch(setAddModal(false))}
-      visible={addModal}
+      open={addModal}
       title={t('Import custom tokens')}
       width="auto">
       <AddToken />

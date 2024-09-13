@@ -300,7 +300,7 @@ export default function useLimitAmountModal() {
   const limitAmountModal = useMemo(() => {
     return (
       <CommonModal
-        visible={visible}
+        open={visible}
         onCancel={closeModal}
         title={t('Please Notice')}
         className={styles['limit-amount-modal']}>

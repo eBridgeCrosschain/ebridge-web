@@ -296,7 +296,7 @@ function MobileHeader() {
         width={'100%'}
         closable={false}
         onClose={() => setVisible(false)}
-        visible={visible}>
+        open={visible}>
         <div className={clsx(styles['mobile-drawer-header'], 'flex-row-center', 'flex-row-between')}>
           <Logo />
           <CommonImage

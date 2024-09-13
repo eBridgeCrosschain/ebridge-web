@@ -40,7 +40,7 @@ export const getPortkeyContract = async (
   const key = `${contractAddress}_${chainId}_${walletInfo?.address}_${walletInfo}`;
   if (walletType === WalletTypeEnum.discover) {
     if (!ContractMap[key]) {
-      const portkeyDiscoverInfo = walletInfo.extraInfo as ExtraInfoForDiscover;
+      const portkeyDiscoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
       if (!portkeyDiscoverInfo.provider) throw new Error('Portkey Provider undefined');
       const portkeyChain = await portkeyDiscoverInfo.provider.getChain(chainId as any);
       const contract = new ContractBasic({
@@ -52,8 +52,8 @@ export const getPortkeyContract = async (
     }
     return ContractMap[key];
   } else {
-    const portkeyAAInfo = walletInfo.extraInfo as ExtraInfoForPortkeyAA;
-    const account = portkeyAAInfo.portkeyInfo.walletInfo;
+    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
+    const account = portkeyAAInfo?.portkeyInfo?.walletInfo;
     let sdkContract: undefined | IContract;
     let caContract: undefined | IContract;
     if (account) {
@@ -64,7 +64,7 @@ export const getPortkeyContract = async (
         contractAddress: contractAddress,
         caContractAddress: portkeyConfig.caContractAddress[chainId as keyof typeof portkeyConfig.caContractAddress],
         callType: 'ca',
-        caHash: portkeyAAInfo.portkeyInfo?.caInfo.caHash || '',
+        caHash: portkeyAAInfo?.portkeyInfo?.caInfo.caHash || '',
         rpcUrl: getNodeByChainId(chainId).rpcUrl,
       });
       caContract = await getContractBasic({

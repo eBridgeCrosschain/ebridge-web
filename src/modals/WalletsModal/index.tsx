@@ -85,7 +85,7 @@ export default function WalletsModal() {
   return (
     <CommonModal
       width={438}
-      visible={walletsModal}
+      open={walletsModal}
       title={t(stepConfig[walletStep].chainType === 'ERC' ? 'Select your wallet' : 'Connect aelf wallet')}
       onCancel={handleCloseModal}
       className={clsx('modals', styles['wallets-modal'])}

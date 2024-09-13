@@ -21,7 +21,7 @@ export default function PortkeyNotConnectModal() {
     );
   return (
     <CommonModal
-      visible={portketNotConnectModal?.visible}
+      open={portketNotConnectModal?.visible}
       onCancel={closeModal}
       title={t('Please Notice')}
       className={styles['portkey-not-connect-modal']}>
