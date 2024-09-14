@@ -19,6 +19,7 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
 import { useLogout } from 'hooks/wallet';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
@@ -46,6 +47,10 @@ function AccountCard() {
       .map((k) => SUPPORTED_WALLETS[k].name)[0];
     return `Connected with ${name}`;
   }, [filter]);
+
+  const showAelfDisconnectButton = useMemo(() => {
+    return !(TelegramPlatform.isTelegramPlatform() && walletType !== 'ERC');
+  }, [walletType]);
 
   const onDisconnect = useCallback(async () => {
     if (typeof connector !== 'string') {
@@ -153,12 +158,16 @@ function AccountCard() {
       {aelfInstance?.connect ? null : (
         <Col span={24}>
           <Row justify="space-between" className="account-modal-button">
-            <Button type="primary" onClick={onDisconnect}>
-              Disconnect
-            </Button>
-            <Button type="primary" onClick={changeWallet}>
-              Change
-            </Button>
+            {showAelfDisconnectButton && (
+              <>
+                <Button type="primary" onClick={onDisconnect}>
+                  Disconnect
+                </Button>
+                <Button type="primary" onClick={changeWallet}>
+                  Change
+                </Button>
+              </>
+            )}
           </Row>
         </Col>
       )}
