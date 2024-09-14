@@ -11,6 +11,7 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
 import { useLogin } from './wallet';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { getPortkeySDKAccount } from 'utils/wallet';
 
 export function useAElfConnect() {
   const login = useLogin();
@@ -81,7 +82,7 @@ export function useAElf(): Web3Type {
     return {
       ...contextNetwork,
       account: walletInfo?.address,
-      isActive: isConnected,
+      isActive: isConnected && !!walletInfo,
       chainId,
       library: undefined,
       provider: undefined,
@@ -106,7 +107,8 @@ export function usePortkey(): Web3Type {
 
     switch (walletType) {
       case WalletTypeEnum.aa:
-        _accounts = _walletAAInfo.portkeyInfo.accounts;
+        // sdk login
+        _accounts = getPortkeySDKAccount(_walletAAInfo.portkeyInfo.accounts);
         break;
 
       case WalletTypeEnum.discover:
@@ -119,7 +121,7 @@ export function usePortkey(): Web3Type {
       ...contextNetwork,
       accounts: _accounts,
       wallet: { ...contextNetwork },
-      isActive: isConnected,
+      isActive: isConnected && !!walletInfo,
       library: undefined,
       provider: walletInfo?.extraInfo?.provider,
       loginWalletType: walletType,

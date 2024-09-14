@@ -17,6 +17,7 @@ import { isMobileDevices } from 'utils/isMobile';
 import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
@@ -60,6 +61,9 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         const isStringConnector = typeof option.connector === 'string';
         const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
         if (isMobileDevices() && key === 'METAMASK') return false;
+        if (TelegramPlatform.isTelegramPlatform()) {
+          if (option.connector instanceof CoinbaseWallet) return false;
+        }
         if (isPortkey()) {
           if (option.connector instanceof CoinbaseWallet) return false;
           if (isStringChain) return isPortkeyConnector(option.connector as string);

@@ -102,9 +102,8 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
     if (selectWallet) {
       const isForm = selectWallet === 'from';
-      const activeChainId = Object.keys(
-        ((isForm ? fromWallet : toWallet) as { accounts: Accounts }).accounts,
-      )[0] as SupportedELFChainId;
+      const _wallet = ((isForm ? fromWallet : toWallet) as { accounts: Accounts })?.accounts || {};
+      const activeChainId = Object.keys(_wallet)?.[0] as SupportedELFChainId;
       if (!ACTIVE_CHAIN[activeChainId]) return;
 
       if (

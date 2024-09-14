@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
-import { useLogin } from 'hooks/wallet';
+import { useIsLogin, useLogin } from 'hooks/wallet';
 import { useModal } from 'contexts/useModal';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import { useWalletContext } from 'contexts/useWallet';
@@ -13,8 +13,6 @@ import WalletList from '../../components/WalletList';
 import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon } from 'assets/images';
 import { ROUTE_PATHS } from 'constants/link';
 import styles from './styles.module.less';
-import { eventBus } from 'utils';
-import storages from 'constants/storages';
 
 const WALLET_STEP = {
   FROM: 0,
@@ -37,6 +35,7 @@ const STEP_ITEM_CONFIG = {
 export default function WalletsModal() {
   const { t } = useLanguage();
   const login = useLogin();
+  const isLogin = useIsLogin();
   const [{ walletsModal }, { dispatch }] = useModal();
   const [{ fromOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);
@@ -71,7 +70,6 @@ export default function WalletsModal() {
 
   const handleConnectAELFWallet = useCallback(async () => {
     await login();
-    eventBus.emit(storages.aelfWebLoginSucceed);
   }, [login]);
 
   const handleConnectAELFWalletFinish = useCallback(() => {
@@ -83,11 +81,10 @@ export default function WalletsModal() {
   }, [handleCloseModal, isFromERC]);
 
   useEffect(() => {
-    eventBus.addListener(storages.aelfWebLoginSucceed, handleConnectAELFWalletFinish);
-    return () => {
-      eventBus.removeListener(storages.aelfWebLoginSucceed, handleConnectAELFWalletFinish);
-    };
-  }, [handleConnectAELFWalletFinish]);
+    if (isLogin) {
+      handleConnectAELFWalletFinish();
+    }
+  }, [handleConnectAELFWalletFinish, isLogin]);
 
   return (
     <CommonModal

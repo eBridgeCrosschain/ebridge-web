@@ -39,7 +39,7 @@ const isTelegramPlatform = TelegramPlatform.isTelegramPlatform();
 const portkeyAAWallet = new PortkeyAAWallet({
   appName: APP_NAME,
   chainId: defaultChainId,
-  autoShowUnlock: false,
+  autoShowUnlock: true,
 });
 const isMobileDevices = devices.isMobileDevices();
 

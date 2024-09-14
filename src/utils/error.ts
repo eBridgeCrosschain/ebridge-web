@@ -28,7 +28,7 @@ export const handleErrorMessage = (error: any, errorText?: string) => {
 };
 
 export const handleWebLoginErrorMessage = (error: any, errorText?: string) => {
-  if (error.nativeError && error.nativeError.message) {
+  if (error.nativeError) {
     error = error.nativeError;
   }
 

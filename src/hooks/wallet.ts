@@ -6,7 +6,7 @@ import CommonMessage from 'components/CommonMessage';
 import { MAIN_SIDE_CHAIN_ID } from 'constants/index';
 import { useChainDispatch } from 'contexts/useChain';
 import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/actions';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, TAelfAccounts } from 'types/wallet';
 import { sleep } from 'utils';
 import { handleWebLoginErrorMessage } from 'utils/error';
@@ -14,7 +14,9 @@ import { clearWCStorageByDisconnect } from 'utils/localStorage';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
-  const { walletType } = useConnectWallet();
+  const { connectWallet, walletType } = useConnectWallet();
+  const connectWalletRef = useRef(connectWallet);
+  connectWalletRef.current = connectWallet;
   const isLogin = useIsLogin();
 
   const init = useCallback(async () => {
@@ -30,15 +32,19 @@ export function useInitWallet() {
   const onLogoutClearData = useCallback(async () => {
     chainDispatch(setSelectERCWallet(undefined));
     clearWCStorageByDisconnect();
+    // await sleep(500);
+    // connectWalletRef.current();
   }, [chainDispatch]);
 
   useEffect(() => {
     if (!isLogin) {
-      onLogoutClearData();
+      if (localStorage.getItem('connectedWallet') !== WalletTypeEnum.aa) {
+        onLogoutClearData();
+      }
     } else {
       init();
     }
-  }, [init, isLogin, onLogoutClearData]);
+  }, [init, isLogin, onLogoutClearData, walletType]);
 }
 
 export function useIsLogin() {
