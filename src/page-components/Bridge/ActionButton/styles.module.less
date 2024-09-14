@@ -7,6 +7,17 @@
   font-size: 16px;
 }
 
+.action-btn-loading {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  &[disabled] {
+    cursor: not-allowed;
+  }
+}
+
 .button-content {
   gap: 8px;
 }
