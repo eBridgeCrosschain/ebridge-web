@@ -87,7 +87,7 @@ function Logo({ clickable = false }: { clickable?: boolean }) {
 function ConnectWalletsButton() {
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const { login } = useWebLogin();
+  const login = useLogin();
   const { isHomogeneous } = useWallet();
 
   return (
