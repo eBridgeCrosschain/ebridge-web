@@ -125,8 +125,8 @@ export default function ActionButton() {
           : [bridgeContract?.address, MaxUint256],
       );
       if (!approveResult.error) {
-        getAllowance();
-        getFeeAllowance();
+        await getAllowance();
+        await getFeeAllowance();
       } else {
         throw new Error('Approval failed');
       }
