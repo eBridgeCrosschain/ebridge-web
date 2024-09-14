@@ -174,7 +174,8 @@ function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
 }
 
 function History() {
-  const [{ historyType = CrossChainType.all }, setActiveKey] = useUrlSearchState();
+  const [{ historyType = isPortkey() ? CrossChainType.heterogeneous : CrossChainType.all }, setActiveKey] =
+    useUrlSearchState();
 
   const { t } = useLanguage();
   const isMd = useMediaQueries('md');
@@ -222,13 +223,15 @@ function History() {
           defaultActiveKey={CrossChainType.all}
           activeKey={CrossChainType[historyType as CrossChainType] ? historyType : undefined}
           onChange={(v) => setActiveKey({ historyType: v })}>
-          <Tabs.TabPane tab={t('All Transactions')} key={CrossChainType.all} />
           {!isPortkey() && (
-            <Tabs.TabPane tab={t('Homogeneous Chain Cross-Chain History')} key={CrossChainType.homogeneous} />
+            <>
+              <Tabs.TabPane tab={t('All Transactions')} key={CrossChainType.all} />
+              <Tabs.TabPane tab={t('Homogeneous Chain Cross-Chain History')} key={CrossChainType.homogeneous} />
+            </>
           )}
           <Tabs.TabPane tab={t('Heterogeneous Chain Cross-Chain History')} key={CrossChainType.heterogeneous} />
         </Tabs>
-        {!(isPortkey() && historyType === CrossChainType.homogeneous) && (
+        {!(isPortkey() && (historyType === CrossChainType.all || historyType === CrossChainType.homogeneous)) && (
           <div className={styles['table-box']}>
             <Body
               networkList={tableData.networkList}

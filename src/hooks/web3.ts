@@ -41,7 +41,7 @@ export function useWeb3(): Web3Type {
       if (typeof window === 'object') {
         contextNetwork.chainId = DEFAULT_ERC_CHAIN;
         const chainId = ZERO.plus(window.ethereum?.chainId ?? '');
-        if (!chainId.isNaN()) {
+        if (!chainId.isNaN() && contextNetwork.account) {
           contextNetwork.chainId = chainId.toNumber();
         } else if (userERCChainId) {
           contextNetwork.chainId = userERCChainId;

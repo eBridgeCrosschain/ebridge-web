@@ -33,6 +33,7 @@ import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
+import { isPortkey } from 'utils/portkey';
 import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
 
 function SelectLanguage() {
@@ -86,13 +87,20 @@ function Logo({ clickable = false }: { clickable?: boolean }) {
 function ConnectWalletsButton() {
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
+  const { login } = useWebLogin();
+  const { isHomogeneous } = useWallet();
+
   return (
     <Button
       type="primary"
       onClick={() => {
-        dispatch(setWalletsModal(true));
+        if (isHomogeneous) {
+          login();
+        } else {
+          dispatch(setWalletsModal(true));
+        }
       }}>
-      {t('Connect Wallets')}
+      {t(isHomogeneous ? 'Connect Wallet' : 'Connect Wallets')}
     </Button>
   );
 }
@@ -148,9 +156,9 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
             <WalletIcon connector="PORTKEY" className={styles['wallet-icon']} />
           ) : (
             <div className="flex-row-center">
-              <WalletIcon connector={injected} className={styles['wallet-icon']} />
+              {!isPortkey() && <WalletIcon connector={injected} className={styles['wallet-icon']} />}
               <WalletIcon connector={walletConnect} className={styles['wallet-icon']} />
-              <WalletIcon connector={coinbaseWallet} className={styles['wallet-icon']} />
+              {!isPortkey() && <WalletIcon connector={coinbaseWallet} className={styles['wallet-icon']} />}
             </div>
           )}
           <span>{t('Connect')}</span>
