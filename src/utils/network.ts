@@ -140,12 +140,18 @@ export const switchChain = async (
     if (!isChainAllowed(connector, chainId)) {
       throw new Error(`Chain ${chainId} not supported for connector (${typeof connector})`);
     } else if (connector === walletConnectConnection.connector) {
-      if (
-        !getSupportedChainIdsFromWalletConnectSession((connector as WalletConnect).provider?.session).includes(chainId)
-      ) {
-        CommonMessage.error(`${chainName} is unsupported by your wallet.`);
-      } else {
-        await connector.activate(chainId);
+      try {
+        await switchChainByWalletConnect(info, connector.provider);
+      } catch (error) {
+        if (
+          !getSupportedChainIdsFromWalletConnectSession((connector as WalletConnect).provider?.session).includes(
+            chainId,
+          )
+        ) {
+          CommonMessage.error(`${chainName} is unsupported by your wallet.`);
+        } else {
+          await connector.activate(chainId);
+        }
       }
     } else if (connector === networkConnection.connector) {
       await connector.activate(chainId);
@@ -170,4 +176,33 @@ export const switchChain = async (
 
 export const getNetworkInfo = (chainId: ChainId) => {
   return NetworkList.find((info) => info.info.chainId === chainId);
+};
+
+export const switchChainByWalletConnect = async (info: NetworkType['info'] & Info, provider: any) => {
+  const { chainId, chainName, nativeCurrency, rpcUrls, blockExplorerUrls, iconUrls } = info;
+  try {
+    await provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${chainId.toString(16)}` }],
+    });
+  } catch (err) {
+    const error = err as any;
+
+    if (/(user rejected)/i.test(error.message)) throw error;
+
+    // Indicates chain is not added to provider
+    await provider.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: `0x${chainId.toString(16)}`,
+          chainName,
+          nativeCurrency,
+          rpcUrls,
+          iconUrls,
+          blockExplorerUrls,
+        },
+      ],
+    });
+  }
 };
