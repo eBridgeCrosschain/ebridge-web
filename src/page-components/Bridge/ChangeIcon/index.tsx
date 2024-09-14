@@ -14,13 +14,8 @@ export default function ChangeIcon({ className }: { className?: string }) {
   }, [dispatch, changeWallet]);
 
   return (
-    <div className={clsx('flex-center', styles['change-body'], className)}>
-      <CommonImage
-        priority
-        className={clsx('cursor-pointer', styles['change-icon'])}
-        src={bridgeIcon}
-        onClick={() => onChange()}
-      />
+    <div className={clsx('flex-center', 'cursor-pointer', styles['change-body'], className)} onClick={() => onChange()}>
+      <CommonImage priority className={styles['change-icon']} src={bridgeIcon} />
     </div>
   );
 }
