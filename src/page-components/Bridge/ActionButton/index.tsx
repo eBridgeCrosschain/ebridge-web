@@ -13,7 +13,6 @@ import { Trans } from 'react-i18next';
 import { CrossFeeToken, LANG_MAX, MaxUint256, ZERO } from 'constants/misc';
 import { useLanguage } from 'i18n';
 import useLockCallback from 'hooks/useLockCallback';
-import { useUpdateEffect } from 'react-use';
 import { useAllowance } from 'hooks/useAllowance';
 import { isELFChain } from 'utils/aelfUtils';
 import { ACTIVE_CHAIN } from 'constants/index';
@@ -54,6 +53,7 @@ export default function ActionButton() {
     onRetry: undefined,
   };
   const [resultModalProps, setResultModalProps] = useState<Omit<IResultModalProps, 'onClose'>>(INIT_RESULT_MODAL_PROPS);
+  const [isBridgeButtonLoading, setIsBridgeButtonLoading] = useState(false);
 
   const tokenContract = useTokenContract(fromChainId, fromTokenInfo?.address, fromWallet?.isPortkey);
   const bridgeContract = useBridgeContract(fromChainId, fromWallet?.isPortkey);
@@ -81,8 +81,10 @@ export default function ActionButton() {
     const token = selectToken?.[fromChainId] || selectToken?.[toChainId];
     if (!(tokenContract && fromAccount && toAccount && token && fromInput)) return;
     dispatch(setActionLoading(true));
+    setIsBridgeButtonLoading(true);
 
     if (!(await checkPortkeyConnect(isELFChain(fromChainId) ? fromChainId : toChainId))) {
+      setIsBridgeButtonLoading(false);
       dispatch(setActionLoading(false));
       return;
     }
@@ -117,6 +119,7 @@ export default function ActionButton() {
     const onApprove = async (symbol?: string) => {
       if (!fromAccount || !fromChainId || !tokenContract) return;
       dispatch(setActionLoading(true));
+      setIsBridgeButtonLoading(true);
       const approveResult = await tokenContract.callSendMethod(
         'approve',
         fromAccount,
@@ -153,6 +156,7 @@ export default function ActionButton() {
     )
       return;
     dispatch(setActionLoading(true));
+    setIsBridgeButtonLoading(true);
     const params: any = {
       library,
       fromToken: fromTokenInfo?.address || fromTokenInfo?.symbol,
@@ -165,12 +169,15 @@ export default function ActionButton() {
     };
 
     if (!(await checkPortkeyConnect(isELFChain(fromChainId) ? fromChainId : toChainId))) {
+      setIsBridgeButtonLoading(false);
       dispatch(setActionLoading(false));
       return;
     }
 
     if (await checkLimitAndRate('transfer', fromInput)) {
+      setIsBridgeButtonLoading(false);
       dispatch(setActionLoading(false));
+
       return;
     }
 
@@ -258,6 +265,11 @@ export default function ActionButton() {
       ),
       onClick: any,
       disabled = true;
+    if (isBridgeButtonLoading) {
+      children = 'Bridge';
+      disabled = true;
+      return { children, onClick, disabled, loading: true };
+    }
     if (!fromAccount && !toChecked && !toAccount) {
       disabled = false;
       if (isHomogeneous) {
@@ -341,6 +353,7 @@ export default function ActionButton() {
     return { children, disabled, onClick };
   }, [
     t,
+    isBridgeButtonLoading,
     fromAccount,
     toChecked,
     toAccount,
@@ -363,12 +376,12 @@ export default function ActionButton() {
     onCreateReceipt,
   ]);
 
-  useUpdateEffect(() => {
-    dispatch(setActionLoading(false));
-  }, [btnProps.children]);
   return (
     <>
-      <CommonButton {...btnProps} className={styles['action-btn']} type="primary">
+      <CommonButton
+        {...btnProps}
+        className={clsx(styles['action-btn'], isBridgeButtonLoading && styles['action-btn-loading'])}
+        type="primary">
         <Trans>{btnProps.children}</Trans>
       </CommonButton>
       <CheckToFillAddressModal
@@ -381,7 +394,13 @@ export default function ActionButton() {
       />
       {limitAmountModal}
       <LoadingModal open={actionLoading} />
-      <ResultModal {...resultModalProps} onClose={() => setResultModalProps(INIT_RESULT_MODAL_PROPS)} />
+      <ResultModal
+        {...resultModalProps}
+        onClose={() => {
+          setIsBridgeButtonLoading(false);
+          setResultModalProps(INIT_RESULT_MODAL_PROPS);
+        }}
+      />
     </>
   );
 }
