@@ -174,28 +174,6 @@
       "issueChainId": 9992731
     }
   },
-  "AGENT": {
-    "tDVV": {
-      "name": "AGENT",
-      "decimals": 8,
-      "symbol": "AGENT",
-      "address": "",
-      "issueChainId": 1866392
-    },
-    "tDVW": {
-      "name": "AGENT",
-      "decimals": 8,
-      "symbol": "AGENT",
-      "address": "",
-      "issueChainId": 1866392
-    },
-    "8453": {
-      "name": "AGENT Token",
-      "decimals": 18,
-      "symbol": "AGENT",
-      "address": "0xF5Bc3439f53A45607cCaD667AbC7DAF5A583633F"
-    }
-  },
   "WRITE": {
     "AELF": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
     "tDVV": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
