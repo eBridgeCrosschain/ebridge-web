@@ -31,4 +31,9 @@ export class TelegramPlatform {
       Telegram.WebApp.platform !== 'web'
     );
   }
+
+  static isTelegramPlatformDesktop() {
+    const Telegram = TelegramPlatform.getTelegram();
+    return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform.includes('desktop'));
+  }
 }

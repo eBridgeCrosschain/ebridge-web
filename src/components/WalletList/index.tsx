@@ -29,18 +29,20 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   }, [onFinish]);
   const timerRef = useRef<NodeJS.Timer | number>();
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      const wcmModalNode = document.getElementsByTagName('wcm-modal');
-      const idIsWcmModalElement = wcmModalNode?.[0]?.shadowRoot?.querySelector('#wcm-modal');
-      const wcmModalRouterNode = idIsWcmModalElement?.getElementsByTagName('wcm-modal-router');
-      const wcmModalRouterNodeShadowRoot = wcmModalRouterNode?.[0]?.shadowRoot?.querySelector('.wcm-content');
-      wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
+    if (TelegramPlatform.isTelegramPlatformWeb() || TelegramPlatform.isTelegramPlatformDesktop()) {
+      timerRef.current = setInterval(() => {
+        const wcmModalNode = document.getElementsByTagName('wcm-modal');
+        const idIsWcmModalElement = wcmModalNode?.[0]?.shadowRoot?.querySelector('#wcm-modal');
+        const wcmModalRouterNode = idIsWcmModalElement?.getElementsByTagName('wcm-modal-router');
+        const wcmModalRouterNodeShadowRoot = wcmModalRouterNode?.[0]?.shadowRoot?.querySelector('.wcm-content');
+        wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
 
-      if (wcmModalRouterNodeShadowRoot) {
-        clearInterval(timerRef.current);
-        timerRef.current = undefined;
-      }
-    }, 1000);
+        if (wcmModalRouterNodeShadowRoot) {
+          clearInterval(timerRef.current);
+          timerRef.current = undefined;
+        }
+      }, 1000);
+    }
 
     return () => {
       clearInterval(timerRef.current);
