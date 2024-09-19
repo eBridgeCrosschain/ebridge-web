@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Connector } from '@web3-react/types';
 import { useChain } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
@@ -27,6 +27,27 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
     setLoading(undefined);
     onFinish?.();
   }, [onFinish]);
+  const timerRef = useRef<NodeJS.Timer | number>();
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      const wcmModalNode = document.getElementsByTagName('wcm-modal');
+      const idIsWcmModalElement = wcmModalNode?.[0]?.shadowRoot?.querySelector('#wcm-modal');
+      const wcmModalRouterNode = idIsWcmModalElement?.getElementsByTagName('wcm-modal-router');
+      const wcmModalRouterNodeShadowRoot = wcmModalRouterNode?.[0]?.shadowRoot?.querySelector('.wcm-content');
+      wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
+
+      if (wcmModalRouterNodeShadowRoot) {
+        clearInterval(timerRef.current);
+        timerRef.current = undefined;
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(timerRef.current);
+      timerRef.current = undefined;
+    };
+  }, []);
+
   const tryActivation = useCallback(
     async (connector: Connector | string, key: string) => {
       if (loading || typeof connector === 'string') return;
@@ -67,8 +88,8 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         const option = SUPPORTED_WALLETS[key];
         const isStringConnector = typeof option.connector === 'string';
         const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
-        if (isMobileDevices() && key === 'METAMASK') return false;
-        if (TelegramPlatform.isTelegramPlatform()) {
+        if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === 'METAMASK') return false;
+        if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
           if (option.connector instanceof CoinbaseWallet) return false;
         }
         if (isPortkey()) {

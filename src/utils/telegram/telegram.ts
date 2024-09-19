@@ -16,4 +16,19 @@ export class TelegramPlatform {
     const Telegram = TelegramPlatform.getTelegram();
     return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform !== 'unknown');
   }
+
+  static isTelegramPlatformWeb() {
+    const Telegram = TelegramPlatform.getTelegram();
+    return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform === 'web');
+  }
+
+  static isTelegramPlatformAndNotWeb() {
+    const Telegram = TelegramPlatform.getTelegram();
+    return !!(
+      Telegram &&
+      Telegram.WebApp.platform &&
+      Telegram.WebApp.platform !== 'unknown' &&
+      Telegram.WebApp.platform !== 'web'
+    );
+  }
 }
