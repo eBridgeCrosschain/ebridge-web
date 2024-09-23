@@ -49,10 +49,10 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
 
         wcmModalFooterNode?.setAttribute('style', 'display: none;');
 
-        if (wcmModalRouterNodeShadowRoot && wcmModalFooterNode) {
-          clearInterval(timerRef.current);
-          timerRef.current = undefined;
-        }
+        // if (wcmModalRouterNodeShadowRoot && wcmModalFooterNode) {
+        //   clearInterval(timerRef.current);
+        //   timerRef.current = undefined;
+        // }
       }, 1000);
     }
 
