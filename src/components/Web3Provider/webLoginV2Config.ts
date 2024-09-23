@@ -31,7 +31,7 @@ const didConfig = {
 };
 
 const baseConfig = {
-  showVconsole: true, // TODO: turn to false
+  showVconsole: false, // TODO: turn to false
   networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
   chainId: defaultChainId,
   keyboard: true,

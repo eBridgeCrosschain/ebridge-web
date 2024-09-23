@@ -18,6 +18,7 @@ import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
+import { WalletConnect } from '@web3-react/walletconnect-v2';
 export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
@@ -72,6 +73,9 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         } catch (error) {
           // fix network error
         }
+
+        if (connector instanceof WalletConnect) document.getElementsByTagName('wcm-modal')?.[0]?.remove();
+
         await connector.activate();
         chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
         if (connector instanceof CoinbaseWallet) {
