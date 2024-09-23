@@ -29,15 +29,27 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   }, [onFinish]);
   const timerRef = useRef<NodeJS.Timer | number>();
   useEffect(() => {
-    if (TelegramPlatform.isTelegramPlatformWeb() || TelegramPlatform.isTelegramPlatformDesktop()) {
+    if (TelegramPlatform.isTelegramPlatform()) {
       timerRef.current = setInterval(() => {
         const wcmModalNode = document.getElementsByTagName('wcm-modal');
         const idIsWcmModalElement = wcmModalNode?.[0]?.shadowRoot?.querySelector('#wcm-modal');
         const wcmModalRouterNode = idIsWcmModalElement?.getElementsByTagName('wcm-modal-router');
         const wcmModalRouterNodeShadowRoot = wcmModalRouterNode?.[0]?.shadowRoot?.querySelector('.wcm-content');
-        wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
+        if (TelegramPlatform.isTelegramPlatformWeb() || TelegramPlatform.isTelegramPlatformDesktop()) {
+          wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
+        }
 
-        if (wcmModalRouterNodeShadowRoot) {
+        const wcmConnectWalletViewNode = wcmModalRouterNodeShadowRoot?.getElementsByTagName('wcm-connect-wallet-view');
+        const wcmConnectWalletViewNodeShadowRoot = wcmConnectWalletViewNode?.[0]?.shadowRoot;
+        const wcmDesktopWalletSelectionNode = wcmConnectWalletViewNodeShadowRoot?.querySelector(
+          '#wcm-desktop-wallet-selection',
+        );
+        const wcmDesktopWalletSelectionNodeShadowRoot = wcmDesktopWalletSelectionNode?.shadowRoot;
+        const wcmModalFooterNode = wcmDesktopWalletSelectionNodeShadowRoot?.querySelector('wcm-modal-footer');
+
+        wcmModalFooterNode?.setAttribute('style', 'display: none;');
+
+        if (wcmModalRouterNodeShadowRoot && wcmModalFooterNode) {
           clearInterval(timerRef.current);
           timerRef.current = undefined;
         }
