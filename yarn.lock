@@ -2550,10 +2550,9 @@
   dependencies:
     valtio "1.11.2"
 
-"@walletconnect/modal-ui@2.6.2":
+"@walletconnect/modal-ui@2.6.2", "@walletconnect/modal-ui@git+https://github.com/kled-bridge/modal-ui#a066b0241c9874d975cde1483218094391ba42e9":
   version "2.6.2"
-  resolved "https://registry.npmjs.org/@walletconnect/modal-ui/-/modal-ui-2.6.2.tgz#fa57c087c57b7f76aaae93deab0f84bb68b59cf9"
-  integrity sha512-rbdstM1HPGvr7jprQkyPggX7rP4XiCG85ZA+zWBEX0dVQg8PpAgRUqpeub4xQKDgY7pY/xLRXSiCVdWGqvG2HA==
+  resolved "git+https://github.com/kled-bridge/modal-ui#a066b0241c9874d975cde1483218094391ba42e9"
   dependencies:
     "@walletconnect/modal-core" "2.6.2"
     lit "2.8.0"

@@ -30,6 +30,7 @@
     "@portkey/did-ui-react": "^2.10.6-alpha.1",
     "@sentry/nextjs": "^7.48.0",
     "@walletconnect/ethereum-provider": "^2.9.2",
+    "@walletconnect/modal-ui": "git+https://github.com/kled-bridge/modal-ui#a066b0241c9874d975cde1483218094391ba42e9",
     "@web3-react/coinbase-wallet": "^8.2.2",
     "@web3-react/core": "^8.2.2",
     "@web3-react/metamask": "^8.2.3",
@@ -98,6 +99,7 @@
   "resolutions": {
     "@types/react": "18.2.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "@walletconnect/modal-ui": "git+https://github.com/kled-bridge/modal-ui#a066b0241c9874d975cde1483218094391ba42e9"
   }
 }
