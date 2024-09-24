@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
-import { useWebLogin, useWebLoginEvent, WebLoginEvents } from 'aelf-web-login';
+import { useIsLogin, useLogin } from 'hooks/wallet';
 import { useModal } from 'contexts/useModal';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import { useWalletContext } from 'contexts/useWallet';
@@ -34,7 +34,8 @@ const STEP_ITEM_CONFIG = {
 
 export default function WalletsModal() {
   const { t } = useLanguage();
-  const { login } = useWebLogin();
+  const login = useLogin();
+  const isLogin = useIsLogin();
   const [{ walletsModal }, { dispatch }] = useModal();
   const [{ fromOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);
@@ -55,9 +56,9 @@ export default function WalletsModal() {
     }
   }, [walletsModal]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     dispatch(setWalletsModal(false));
-  };
+  }, [dispatch]);
 
   const handleConnectExternalWalletFinish = () => {
     if (isFromERC) {
@@ -67,24 +68,28 @@ export default function WalletsModal() {
     }
   };
 
-  const handleConnectAELFWallet = () => {
-    login();
-  };
+  const handleConnectAELFWallet = useCallback(async () => {
+    await login();
+  }, [login]);
 
-  const handleConnectAELFWalletFinish = () => {
+  const handleConnectAELFWalletFinish = useCallback(() => {
     if (isFromERC) {
       handleCloseModal();
     } else {
       setWalletStep(WALLET_STEP.TO);
     }
-  };
+  }, [handleCloseModal, isFromERC]);
 
-  useWebLoginEvent(WebLoginEvents.LOGINED, handleConnectAELFWalletFinish);
+  useEffect(() => {
+    if (isLogin) {
+      handleConnectAELFWalletFinish();
+    }
+  }, [handleConnectAELFWalletFinish, isLogin]);
 
   return (
     <CommonModal
       width={438}
-      visible={walletsModal}
+      open={walletsModal}
       title={t(stepConfig[walletStep].chainType === 'ERC' ? 'Select your wallet' : 'Connect aelf wallet')}
       onCancel={handleCloseModal}
       className={clsx('modals', styles['wallets-modal'])}

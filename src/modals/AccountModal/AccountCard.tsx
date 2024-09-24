@@ -15,17 +15,19 @@ import { setSelectERCWallet } from 'contexts/useChain/actions';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
-import { ILoginWalletContextState } from 'contexts/useLoginWallet/types';
-import { WalletType } from 'aelf-web-login';
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
+import { useLogout } from 'hooks/wallet';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
+  const logoutWebLogin = useLogout();
 
-  const { connector, account, chainId, deactivate, aelfInstance, walletType } = accountWallet || {};
+  const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -46,8 +48,13 @@ function AccountCard() {
     return `Connected with ${name}`;
   }, [filter]);
 
+  const showAelfDisconnectButton = useMemo(() => {
+    return !(TelegramPlatform.isTelegramPlatform() && walletType !== 'ERC');
+  }, [walletType]);
+
   const onDisconnect = useCallback(async () => {
     if (typeof connector !== 'string') {
+      // WEB3
       try {
         await connection?.connector?.deactivate?.();
         await connection?.connector?.resetState?.();
@@ -58,7 +65,8 @@ function AccountCard() {
         clearWCStorageByDisconnect();
       }
     } else {
-      deactivate?.();
+      // Aelf
+      logoutWebLogin?.();
     }
     if (walletType !== 'ERC') {
       dispatch(basicModalView.modalDestroy());
@@ -72,7 +80,7 @@ function AccountCard() {
         walletChainId: chainId,
       }),
     );
-  }, [connector, dispatch, walletType, chainId, connection?.connector, chainDispatch, deactivate]);
+  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, logoutWebLogin]);
 
   const changeWallet = useCallback(async () => {
     if (walletType !== 'ERC') {
@@ -104,7 +112,7 @@ function AccountCard() {
     <>
       <div className="account-modal-info-wrap">
         <div className="account-modal-info-label">{formatConnectorName}</div>
-        {(accountWallet as ILoginWalletContextState)?.loginWalletType === WalletType.portkey && (
+        {loginWalletType === WalletTypeEnum.aa && (
           <div onClick={jumpAssets} className="account-modal-info-assets">
             View Assets
             <IconFont className="account-modal-info-assets-arrow" type="Search" />
@@ -150,12 +158,16 @@ function AccountCard() {
       {aelfInstance?.connect ? null : (
         <Col span={24}>
           <Row justify="space-between" className="account-modal-button">
-            <Button type="primary" onClick={onDisconnect}>
-              Disconnect
-            </Button>
-            <Button type="primary" onClick={changeWallet}>
-              Change
-            </Button>
+            {showAelfDisconnectButton && (
+              <>
+                <Button type="primary" onClick={onDisconnect}>
+                  Disconnect
+                </Button>
+                <Button type="primary" onClick={changeWallet}>
+                  Change
+                </Button>
+              </>
+            )}
           </Row>
         </Col>
       )}

@@ -10,7 +10,7 @@ export default function WalletModal() {
   return (
     <CommonModal
       width="auto"
-      visible={walletModal}
+      open={walletModal}
       title={t('Select your wallet')}
       onCancel={handleCloseModal}
       className="modals">

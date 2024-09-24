@@ -30,13 +30,6 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     description: 'NIGHT ELF',
     href: null,
   },
-  PORTKEY_V1: {
-    connector: 'PORTKEY V1',
-    name: 'Portkey (Deprecated)',
-    iconType: 'portkeyV1',
-    description: 'Portkey (Deprecated)',
-    href: null,
-  },
   PORTKEY: {
     connector: 'PORTKEY',
     name: 'Portkey Wallet',

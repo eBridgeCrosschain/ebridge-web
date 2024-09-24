@@ -64,7 +64,7 @@ export function NotificationForPhone() {
       title={title}
       placement="bottom"
       closeIcon={closeIcon}
-      visible={visible}
+      open={visible}
       onClose={onClose}>
       {content}
     </Drawer>

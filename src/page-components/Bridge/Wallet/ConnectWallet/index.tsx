@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useWebLogin } from 'aelf-web-login';
+import { useLogin } from 'hooks/wallet';
 import { Button } from 'antd';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useLanguage } from 'i18n';
@@ -18,7 +18,7 @@ interface IConnectWalletProps {
 export default function ConnectWallet({ wallet, chainType }: IConnectWalletProps) {
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const { login } = useWebLogin();
+  const login = useLogin();
   const { walletType, chainId, account } = wallet || {};
   const isELF = chainType === 'ELF';
 

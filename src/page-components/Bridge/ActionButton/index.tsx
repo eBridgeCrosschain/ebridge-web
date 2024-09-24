@@ -26,12 +26,12 @@ import { useModalDispatch } from 'contexts/useModal/hooks';
 import { setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
 import LoadingModal from './LoadingModal';
 import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
-import { useWebLogin } from 'aelf-web-login';
+import { useLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
-  const { login } = useWebLogin();
+  const login = useLogin();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [
     { selectToken, fromInput, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
