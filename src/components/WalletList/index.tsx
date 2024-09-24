@@ -37,7 +37,7 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         const wcmModalRouterNode = idIsWcmModalElement?.getElementsByTagName('wcm-modal-router');
         const wcmModalRouterNodeShadowRoot = wcmModalRouterNode?.[0]?.shadowRoot?.querySelector('.wcm-content');
         if (TelegramPlatform.isTelegramPlatformWeb() || TelegramPlatform.isTelegramPlatformDesktop()) {
-          wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 500px; overflow-y: auto');
+          wcmModalRouterNodeShadowRoot?.setAttribute('style', 'height: 70vh; min-height: 400px; overflow-y: auto');
         }
 
         const wcmConnectWalletViewNode = wcmModalRouterNodeShadowRoot?.getElementsByTagName('wcm-connect-wallet-view');
