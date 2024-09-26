@@ -14,6 +14,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import { NAV_LIST } from 'constants/link';
 import useMediaQueries from 'hooks/useMediaQueries';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 const Provider = dynamic(import('components/Provider'), { ssr: false });
 const Header = dynamic(import('components/Header'), { ssr: false });
 export default function APP({ Component, pageProps }: AppProps) {
@@ -28,7 +29,12 @@ export default function APP({ Component, pageProps }: AppProps) {
     } else if (isMainPage) {
       return (
         <div className="page-body">
-          <div className={clsx('page-content', 'main-page-content-wrap')}>
+          <div
+            className={clsx(
+              'page-content',
+              'main-page-content-wrap',
+              TelegramPlatform.isTelegramPlatform() && 'tg-page-content',
+            )}>
             {!isMd && <Nav />}
             <div className="main-page-component-wrap">
               <Component {...pageProps} />

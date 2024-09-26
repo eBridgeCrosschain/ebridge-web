@@ -63,6 +63,9 @@ a {
 .page-content {
   min-height: calc(100vh - (@header-height + @footer-height));
 }
+.tg-page-content {
+  min-height: unset !important;
+}
 @media screen and (max-width: @md-width) {
   .page-body {
     background-position: center calc(100% + 14px);
@@ -76,5 +79,8 @@ a {
   }
   .page-content {
     min-height: calc(100vh - @header-height);
+  }
+  .tg-page-content {
+    min-height: unset !important;
   }
 }
