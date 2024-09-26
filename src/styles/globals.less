@@ -27,9 +27,13 @@ a {
 * {
   box-sizing: border-box;
 }
+/* stylelint-disable-next-line selector-id-pattern */
+div#__next {
+  height: 100%;
+}
 .page-body-wrap {
   overflow: auto;
-  height: calc(100vh - @header-height);
+  height: calc(100% - @header-height);
   background-image: none;
 }
 .page-full {
@@ -38,6 +42,7 @@ a {
 
 .page-body {
   overflow: hidden;
+  min-height: 100%;
   background-image: url('../assets/images/background.png');
   background-repeat: no-repeat;
   background-position: center calc(100% + 50px);
@@ -61,7 +66,7 @@ a {
   border: 1px solid @border-5;
 }
 .page-content {
-  min-height: calc(100vh - (@header-height + @footer-height));
+  min-height: calc(100% - @footer-height);
 }
 .tg-page-content {
   min-height: unset !important;
@@ -78,7 +83,7 @@ a {
     padding: 24px 12px;
   }
   .page-content {
-    min-height: calc(100vh - @header-height);
+    min-height: 100%;
   }
   .tg-page-content {
     min-height: unset !important;
