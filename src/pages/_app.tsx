@@ -28,7 +28,7 @@ export default function APP({ Component, pageProps }: AppProps) {
       return <Component {...pageProps} />;
     } else if (isMainPage) {
       return (
-        <div className="page-body">
+        <div className={clsx('page-body', TelegramPlatform.isTelegramPlatform() && 'tg-page-body')}>
           <div
             className={clsx(
               'page-content',
@@ -45,7 +45,7 @@ export default function APP({ Component, pageProps }: AppProps) {
       );
     } else {
       return (
-        <div className="page-body">
+        <div className={clsx('page-body', TelegramPlatform.isTelegramPlatform() && 'tg-page-body')}>
           <Component {...pageProps} />
           <Footer />
         </div>
