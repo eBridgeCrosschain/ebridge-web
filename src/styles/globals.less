@@ -42,6 +42,8 @@ div#__next {
 
 .page-body {
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   background-image: url('../assets/images/background.png');
   background-repeat: no-repeat;
@@ -66,6 +68,7 @@ div#__next {
   border: 1px solid @border-5;
 }
 .page-content {
+  flex: 1;
   min-height: calc(100% - @footer-height);
 }
 @media screen and (max-width: @md-width) {
