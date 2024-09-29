@@ -25,8 +25,8 @@ interface LimitDataByGqlProps {
 }
 
 const limitQuery = gql`
-  query queryCrossChainLimitInfos($dto: GetCrossChainLimitInfoDto!) {
-    queryCrossChainLimitInfos(dto: $dto) {
+  query queryCrossChainLimitInfos($input: GetCrossChainLimitInfoInput!) {
+    queryCrossChainLimitInfos(input: $input) {
       totalRecordCount
       totalRecordCount
       dataList: data {
@@ -61,7 +61,7 @@ export const getLimitData = async ({
 }): Promise<LimitDataProps | undefined> => {
   try {
     const client = requestGql({
-      uri: `${INDEXER_URL}/AElfIndexer_eBridge/EbridgeIndexerPluginSchema/graphql`,
+      uri: INDEXER_URL,
     });
     const result = await client.query<{
       queryCrossChainLimitInfos: {
@@ -70,7 +70,7 @@ export const getLimitData = async ({
     }>({
       query: limitQuery,
       variables: {
-        dto: {
+        input: {
           fromChainId: isELFChain(fromChainId) ? getShortNameByChainId(fromChainId) : getChainIdToMap(fromChainId),
           toChainId: isELFChain(toChainId) ? getShortNameByChainId(toChainId) : getChainIdToMap(toChainId),
           symbol: isELFChain(fromChainId) ? fromSymbol : toSymbol,

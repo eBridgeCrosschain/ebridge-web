@@ -90,6 +90,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   );
 
   const portkeyActive = useMemo(() => portkeyWallet.isActive, [portkeyWallet.isActive]);
+
   const prePortkeyActive = usePrevious(portkeyActive);
 
   const changeWallet = useThrottleCallback(() => {
@@ -124,11 +125,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   }, [dispatch, chainDispatch, fromWallet, toWallet]);
 
   useEffect(() => {
-    if (
-      isSelectPortkey(selectELFWallet) &&
-      portkeyActive !== prePortkeyActive &&
-      fromOptions?.chainType === toOptions?.chainType
-    ) {
+    if (isSelectPortkey(selectELFWallet) && portkeyActive && fromOptions?.chainType === toOptions?.chainType) {
       dispatch(setToWallet({ chainType: 'ERC' }));
     } else {
       changeWallet();
