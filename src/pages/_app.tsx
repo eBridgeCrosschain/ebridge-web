@@ -59,7 +59,13 @@ export default function APP({ Component, pageProps }: AppProps) {
       <ScrollToTop />
       <Provider>
         {!isFull && <Header />}
-        <div className={clsx('page-body-wrap', isFull && 'page-full')}>{renderPageBody()}</div>
+        <div
+          className={clsx(
+            TelegramPlatform.isTelegramPlatform() ? 'tg-page-body-wrap' : 'page-body-wrap',
+            isFull && 'page-full',
+          )}>
+          {renderPageBody()}
+        </div>
       </Provider>
     </>
   );
