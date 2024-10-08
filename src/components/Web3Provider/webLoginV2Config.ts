@@ -4,7 +4,7 @@ import { NightElfWallet } from '@aelf-web-login/wallet-adapter-night-elf';
 import { IConfigProps } from '@aelf-web-login/wallet-adapter-bridge';
 import { SignInDesignEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
 import { APP_NAME, EBRIDGE_PORTKEY_PROJECT_CODE } from 'constants/misc';
-import { AELF_NODES, SupportedELFChain, TELEGRAM_BOT_ID, WEB_LOGIN_CONFIG } from 'constants/index';
+import { AELF_NODES, SHOW_V_CONSOLE, SupportedELFChain, TELEGRAM_BOT_ID, WEB_LOGIN_CONFIG } from 'constants/index';
 import { devices } from '@portkey/utils';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 
@@ -31,7 +31,7 @@ const didConfig = {
 };
 
 const baseConfig = {
-  showVconsole: false, // TODO: turn to false
+  showVconsole: SHOW_V_CONSOLE,
   networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
   chainId: defaultChainId,
   keyboard: true,
