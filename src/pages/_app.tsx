@@ -14,6 +14,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import { NAV_LIST } from 'constants/link';
 import useMediaQueries from 'hooks/useMediaQueries';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 const Provider = dynamic(import('components/Provider'), { ssr: false });
 const Header = dynamic(import('components/Header'), { ssr: false });
 export default function APP({ Component, pageProps }: AppProps) {
@@ -27,8 +28,13 @@ export default function APP({ Component, pageProps }: AppProps) {
       return <Component {...pageProps} />;
     } else if (isMainPage) {
       return (
-        <div className="page-body">
-          <div className={clsx('page-content', 'main-page-content-wrap')}>
+        <div className={clsx('page-body', TelegramPlatform.isTelegramPlatform() && 'tg-page-body')}>
+          <div
+            className={clsx(
+              'page-content',
+              'main-page-content-wrap',
+              TelegramPlatform.isTelegramPlatform() && 'tg-page-content',
+            )}>
             {!isMd && <Nav />}
             <div className="main-page-component-wrap">
               <Component {...pageProps} />
@@ -39,7 +45,7 @@ export default function APP({ Component, pageProps }: AppProps) {
       );
     } else {
       return (
-        <div className="page-body">
+        <div className={clsx('page-body', TelegramPlatform.isTelegramPlatform() && 'tg-page-body')}>
           <Component {...pageProps} />
           <Footer />
         </div>
@@ -53,7 +59,13 @@ export default function APP({ Component, pageProps }: AppProps) {
       <ScrollToTop />
       <Provider>
         {!isFull && <Header />}
-        <div className={clsx('page-body-wrap', isFull && 'page-full')}>{renderPageBody()}</div>
+        <div
+          className={clsx(
+            TelegramPlatform.isTelegramPlatform() ? 'tg-page-body-wrap' : 'page-body-wrap',
+            isFull && 'page-full',
+          )}>
+          {renderPageBody()}
+        </div>
       </Provider>
     </>
   );

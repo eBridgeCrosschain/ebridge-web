@@ -6,6 +6,8 @@ import { useMobile } from 'contexts/useStore/hooks';
 import { prefixCls } from 'constants/misc';
 import CommonImage from 'components/CommonImage';
 import { closeIcon } from 'assets/images';
+import { TelegramPlatform } from 'utils/telegram/telegram';
+
 export default function CommonModal(
   props: ModalProps & {
     children?: any;
@@ -32,6 +34,8 @@ export default function CommonModal(
         {
           'common-modal-center': isMobile && props.centered,
           'common-bottom-modals': type === 'pop-bottom',
+          'tg-common-modals': TelegramPlatform.isTelegramPlatform(),
+          'tg-common-bottom-modals': type === 'pop-bottom' && TelegramPlatform.isTelegramPlatform(),
         },
         props.className,
       )}
