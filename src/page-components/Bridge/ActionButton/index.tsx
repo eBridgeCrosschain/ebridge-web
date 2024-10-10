@@ -10,10 +10,9 @@ import { useHomeContext } from '../HomeContext';
 import { timesDecimals } from 'utils/calculate';
 import { setActionLoading, setFrom } from '../HomeContext/actions';
 import { Trans } from 'react-i18next';
-import { CrossFeeToken, CrossFeeTokenDecimals, MaxUint256, ZERO } from 'constants/misc';
+import { ZERO } from 'constants/misc';
 import { useLanguage } from 'i18n';
 import useLockCallback from 'hooks/useLockCallback';
-import { useAllowance } from 'hooks/useAllowance';
 import { isELFChain } from 'utils/aelfUtils';
 import { ACTIVE_CHAIN } from 'constants/index';
 import { formatAddress, isAddress } from 'utils';
@@ -59,19 +58,6 @@ export default function ActionButton() {
   const tokenContract = useTokenContract(fromChainId, fromTokenInfo?.address, fromWallet?.isPortkey);
   const bridgeContract = useBridgeContract(fromChainId, fromWallet?.isPortkey);
 
-  const [fromTokenAllowance, getAllowance] = useAllowance(
-    tokenContract,
-    fromAccount,
-    bridgeContract?.address,
-    fromTokenInfo?.symbol,
-  );
-  const [feeTokenAllowance, getFeeAllowance] = useAllowance(
-    isELFChain(fromChainId) ? tokenContract : undefined,
-    fromAccount,
-    bridgeContract?.address,
-    CrossFeeToken === fromTokenInfo?.symbol ? undefined : CrossFeeToken,
-  );
-
   const [limitAmountModal, checkLimitAndRate] = useLimitAmountModal();
 
   const { checkPortkeyConnect } = useCheckPortkeyStatus();
@@ -111,46 +97,6 @@ export default function ActionButton() {
   }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
 
   const onCreateReceipt = useCallback(async () => {
-    let symbol: string | undefined;
-    let decimals: number | undefined;
-    let amount: string | undefined;
-    if (feeTokenAllowance?.lte(0)) {
-      symbol = CrossFeeToken;
-      decimals = CrossFeeTokenDecimals;
-      amount = crossFee;
-    } else if (fromTokenAllowance?.lte(0)) {
-      symbol = fromTokenInfo?.symbol;
-      decimals = fromTokenInfo?.decimals;
-      amount = fromInput;
-    }
-    const onApprove = async (symbol?: string) => {
-      if (!fromAccount || !fromChainId || !tokenContract) return;
-      dispatch(setActionLoading(true));
-      setIsBridgeButtonLoading(true);
-      const approveResult = await tokenContract.callSendMethod(
-        'approve',
-        fromAccount,
-        tokenContract.contractType === 'ELF'
-          ? [bridgeContract?.address, symbol, timesDecimals(amount, decimals).toFixed(0)]
-          : [bridgeContract?.address, MaxUint256],
-      );
-      if (!approveResult.error) {
-        await getAllowance();
-        await getFeeAllowance();
-      } else {
-        throw new Error('Approval failed');
-      }
-    };
-    if (symbol) {
-      try {
-        await onApprove(symbol);
-      } catch (error) {
-        setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
-        dispatch(setActionLoading(false));
-        return;
-      }
-    }
-
     if (
       !(
         fromTokenInfo &&
@@ -205,8 +151,6 @@ export default function ActionButton() {
     }
     dispatch(setActionLoading(false));
   }, [
-    feeTokenAllowance,
-    fromTokenAllowance,
     fromTokenInfo,
     fromAccount,
     bridgeContract,
@@ -222,8 +166,6 @@ export default function ActionButton() {
     checkPortkeyConnect,
     checkLimitAndRate,
     tokenContract,
-    getAllowance,
-    getFeeAllowance,
   ]);
 
   const needConfirm = useMemo(
