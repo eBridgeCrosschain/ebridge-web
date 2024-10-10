@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ContractBasic } from '../utils/contract';
-import { LANG_MAX, REQ_CODE } from 'constants/misc';
+import { REQ_CODE } from 'constants/misc';
 import { timesDecimals } from 'utils/calculate';
 import { isUserDenied } from 'utils/provider';
 import CommonMessage from 'components/CommonMessage';
@@ -43,7 +43,7 @@ export const checkElfChainAllowanceAndApprove = async ({
     const approveResult = await tokenContract.callSendMethod('approve', account, [
       approveTargetAddress,
       symbol,
-      LANG_MAX.minus(allowanceBN).toFixed(0),
+      pivotBalanceBN.toFixed(0),
     ]);
     if (approveResult.error) {
       return approveResult;

@@ -10,7 +10,7 @@ import { useHomeContext } from '../HomeContext';
 import { timesDecimals } from 'utils/calculate';
 import { setActionLoading, setFrom } from '../HomeContext/actions';
 import { Trans } from 'react-i18next';
-import { CrossFeeToken, LANG_MAX, MaxUint256, ZERO } from 'constants/misc';
+import { CrossFeeToken, CrossFeeTokenDecimals, MaxUint256, ZERO } from 'constants/misc';
 import { useLanguage } from 'i18n';
 import useLockCallback from 'hooks/useLockCallback';
 import { useAllowance } from 'hooks/useAllowance';
@@ -28,6 +28,7 @@ import LoadingModal from './LoadingModal';
 import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
 import { useLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
+import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
@@ -111,10 +112,13 @@ export default function ActionButton() {
 
   const onCreateReceipt = useCallback(async () => {
     let symbol: string | undefined;
+    let decimals: number | undefined;
     if (feeTokenAllowance?.lte(0)) {
       symbol = CrossFeeToken;
+      decimals = CrossFeeTokenDecimals;
     } else if (fromTokenAllowance?.lte(0)) {
       symbol = fromTokenInfo?.symbol;
+      decimals = fromTokenInfo?.decimals;
     }
     const onApprove = async (symbol?: string) => {
       if (!fromAccount || !fromChainId || !tokenContract) return;
@@ -124,7 +128,7 @@ export default function ActionButton() {
         'approve',
         fromAccount,
         tokenContract.contractType === 'ELF'
-          ? [bridgeContract?.address, symbol, LANG_MAX.toFixed()]
+          ? [bridgeContract?.address, symbol, timesDecimals(fromInput, decimals).toFixed(0)]
           : [bridgeContract?.address, MaxUint256],
       );
       if (!approveResult.error) {
@@ -256,6 +260,7 @@ export default function ActionButton() {
     [fromOptions?.chainType, fromWallet, login, modalDispatch, toOptions?.chainType, toWallet],
   );
 
+  const { isShowTxnFeeEnoughTip, checkTxnFeeEnough } = useCheckTxnFeeEnough();
   const btnProps = useMemo(() => {
     let children: React.ReactNode = (
         <div className={clsx(styles['button-content'], 'flex-center')}>
@@ -265,6 +270,18 @@ export default function ActionButton() {
       ),
       onClick: any,
       disabled = true;
+    if (
+      fromWallet &&
+      fromWallet?.walletType !== 'ERC' &&
+      fromAccount &&
+      fromInput &&
+      crossFee &&
+      ZERO.plus(crossFee).gt(ZERO) &&
+      tokenContract
+    ) {
+      checkTxnFeeEnough();
+    }
+
     if (isBridgeButtonLoading) {
       children = 'Bridge';
       disabled = true;
@@ -320,6 +337,7 @@ export default function ActionButton() {
       children = 'Invalid from chain';
       return { children, onClick, disabled };
     }
+
     const max = getMaxAmount({
       chainId: fromWallet?.chainId,
       symbol: fromBalance?.token?.symbol,
@@ -334,6 +352,13 @@ export default function ActionButton() {
       if (crossMin && ZERO.plus(crossMin).gt(fromInput)) {
         children = `${t('The minimum crosschain amount is2')}${crossMin} ${fromTokenInfo?.symbol}`;
         return { children, onClick, disabled };
+      } else if (isShowTxnFeeEnoughTip) {
+        return {
+          disabled: true,
+          loading: false,
+          onClick: undefined,
+          children: 'Not enough ELF for Txn fee',
+        };
       } else {
         disabled = false;
         if (isHomogeneous) {
@@ -352,19 +377,22 @@ export default function ActionButton() {
     }
     return { children, disabled, onClick };
   }, [
+    fromInput,
     t,
-    isBridgeButtonLoading,
+    fromWallet,
     fromAccount,
+    crossFee,
+    tokenContract,
+    isBridgeButtonLoading,
     toChecked,
     toAccount,
     isHomogeneous,
     toChainId,
-    fromInput,
     fromChainId,
-    fromWallet?.chainId,
     fromBalance?.token?.symbol,
     fromBalance?.show,
-    crossFee,
+    isShowTxnFeeEnoughTip,
+    checkTxnFeeEnough,
     login,
     modalDispatch,
     getWalletBtnProps,
