@@ -14,7 +14,6 @@ import { divDecimals } from 'utils/calculate';
 import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
 import { ZERO } from 'constants/misc';
 import styles from './styles.module.less';
-import { useCheckTxnFeeEnoughAuto } from 'hooks/checkTxnFee';
 
 export default function AmountRow() {
   const { t } = useLanguage();
@@ -26,13 +25,9 @@ export default function AmountRow() {
   const min = useMemo(() => divDecimals(1, token?.decimals), [token?.decimals]);
   const max = getMaxAmount({ chainId, symbol: token?.symbol, balance: show, crossFee });
 
-  const isShowTxnFeeEnoughTip = useCheckTxnFeeEnoughAuto();
   const showError = useMemo(
-    () =>
-      fromInput &&
-      account &&
-      (max.lt(fromInput) || (crossMin && ZERO.plus(crossMin).gt(fromInput)) || isShowTxnFeeEnoughTip),
-    [account, crossMin, fromInput, isShowTxnFeeEnoughTip, max],
+    () => fromInput && account && (max.lt(fromInput) || (crossMin && ZERO.plus(crossMin).gt(fromInput))),
+    [account, crossMin, fromInput, max],
   );
 
   return (

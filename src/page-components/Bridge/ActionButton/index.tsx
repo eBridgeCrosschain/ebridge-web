@@ -113,12 +113,15 @@ export default function ActionButton() {
   const onCreateReceipt = useCallback(async () => {
     let symbol: string | undefined;
     let decimals: number | undefined;
+    let amount: string | undefined;
     if (feeTokenAllowance?.lte(0)) {
       symbol = CrossFeeToken;
       decimals = CrossFeeTokenDecimals;
+      amount = crossFee;
     } else if (fromTokenAllowance?.lte(0)) {
       symbol = fromTokenInfo?.symbol;
       decimals = fromTokenInfo?.decimals;
+      amount = fromInput;
     }
     const onApprove = async (symbol?: string) => {
       if (!fromAccount || !fromChainId || !tokenContract) return;
@@ -128,7 +131,7 @@ export default function ActionButton() {
         'approve',
         fromAccount,
         tokenContract.contractType === 'ELF'
-          ? [bridgeContract?.address, symbol, timesDecimals(fromInput, decimals).toFixed(0)]
+          ? [bridgeContract?.address, symbol, timesDecimals(amount, decimals).toFixed(0)]
           : [bridgeContract?.address, MaxUint256],
       );
       if (!approveResult.error) {
