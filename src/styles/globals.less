@@ -36,6 +36,9 @@ div#__next {
   height: calc(100% - @header-height);
   background-image: none;
 }
+.tg-page-body-wrap {
+  background-image: none;
+}
 .page-full {
   height: 100vh !important;
 }
@@ -50,6 +53,9 @@ div#__next {
   background-position: center calc(100% + 50px);
   background-size: 100% auto;
   background-color: @bg-14;
+}
+.tg-page-body {
+  min-height: unset !important;
 }
 .main-page-content-wrap {
   display: flex;
@@ -71,6 +77,9 @@ div#__next {
   flex: 1;
   min-height: calc(100% - @footer-height);
 }
+.tg-page-content {
+  min-height: unset !important;
+}
 @media screen and (max-width: @md-width) {
   .page-body {
     background-position: center calc(100% + 14px);
@@ -84,5 +93,8 @@ div#__next {
   }
   .page-content {
     min-height: 100%;
+  }
+  .tg-page-content {
+    min-height: unset !important;
   }
 }

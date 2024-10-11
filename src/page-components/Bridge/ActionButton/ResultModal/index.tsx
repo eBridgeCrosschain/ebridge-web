@@ -30,7 +30,7 @@ export default function ResultModal({ open, type, onClose, onRetry }: IResultMod
     [ResultType.APPROVED]: {
       title: 'Transaction approved',
       icon: checkFilledIcon,
-      description: 'The transaction has been approved. You can check it’s status in the “Transactions” page.',
+      description: "The transaction has been approved. You can check it's status in the “Transactions” page.",
       buttonProps: {
         children: t('Close'),
         onClick: onClose,

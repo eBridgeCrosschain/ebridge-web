@@ -194,3 +194,5 @@ export const INDEXER_URL = 'https://test.ebridge.exchange';
 export const BASE_URL = 'https://test.ebridge.exchange';
 
 export const TELEGRAM_BOT_ID = '7220041137';
+
+export const SHOW_V_CONSOLE = true;

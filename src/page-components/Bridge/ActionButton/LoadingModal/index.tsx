@@ -21,7 +21,9 @@ export default function LoadingModal({ open }: ILoadingModalProps) {
       <div className={clsx(styles['loading-modal-body'], 'flex-column-center')}>
         <CommonImage className={styles['loading-icon']} src={loadingIcon} />
         <div className={styles['loading-text']}>
-          {t('Do not refresh or close the page while waiting for the operation to be completed.')}
+          {t(
+            "The Transaction fee also needs to be approved. Don't refresh or close the page until the operation is complete.",
+          )}
         </div>
       </div>
     </CommonModal>
