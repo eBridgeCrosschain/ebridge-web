@@ -153,7 +153,7 @@ export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = '';
+export const INDEXER_URL = 'https://app.aefinder.io/ebridge_indexer/1a77c00769894bf1aaf0f8ae37e0aed0/graphql';
 
 export const BASE_URL = 'https://ebridge.exchange';
 

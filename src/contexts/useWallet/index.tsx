@@ -90,6 +90,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   );
 
   const portkeyActive = useMemo(() => portkeyWallet.isActive, [portkeyWallet.isActive]);
+
   const prePortkeyActive = usePrevious(portkeyActive);
 
   const changeWallet = useThrottleCallback(() => {
