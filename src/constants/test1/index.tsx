@@ -136,3 +136,5 @@ export const CrossChainTimeList = [
 ];
 
 export const TELEGRAM_BOT_ID = '';
+
+export const SHOW_V_CONSOLE = true;

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import assetsBackImg from './images/assetsBack.svg';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
+import { LoginStatusEnum } from '@portkey/types';
 
 export default function Assets() {
   const router = useRouter();
@@ -45,7 +46,8 @@ export default function Assets() {
       <PortkeyDid.PortkeyAssetProvider
         originChainId={portkeyAAInfo?.portkeyInfo.chainId}
         caHash={portkeyAAInfo?.portkeyInfo.caInfo.caHash}
-        pin={portkeyAAInfo?.portkeyInfo.pin}>
+        pin={portkeyAAInfo?.portkeyInfo.pin}
+        isLoginOnChain={PortkeyDid.did.didWallet.isLoginStatus === LoginStatusEnum.SUCCESS}>
         <PortkeyDid.Asset
           backIcon={<CommonImage className={styles['assets-back-wrap']} src={assetsBackImg} alt="" />}
           onLifeCycleChange={(lifeCycle: any) => {
