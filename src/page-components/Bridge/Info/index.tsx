@@ -6,6 +6,8 @@ import { formatSymbol } from 'utils/token';
 import { sliceDecimals } from 'utils/input';
 import styles from './styles.module.less';
 import { useCheckTxnFeeEnoughAuto } from 'hooks/checkTxnFee';
+import { getCrossChainTime } from 'utils/time';
+import { useMemo } from 'react';
 
 function InfoRow({ label, value, valueClassName }: { label: string; value?: string; valueClassName?: string }) {
   return (
@@ -19,9 +21,12 @@ function InfoRow({ label, value, valueClassName }: { label: string; value?: stri
 export default function Info() {
   const { t } = useLanguage();
   const [{ crossFee, fromInput, toInput, selectToken }] = useHomeContext();
-  const { isHomogeneous, toWallet } = useWallet();
-  const { chainId } = toWallet || {};
-  const token = chainId ? selectToken?.[chainId] : undefined;
+  const { isHomogeneous, toWallet, fromWallet } = useWallet();
+  const { chainId: toChainId } = toWallet || {};
+  const { chainId: fromChainId } = fromWallet || {};
+  const token = toChainId ? selectToken?.[toChainId] : undefined;
+
+  const time = useMemo(() => getCrossChainTime(fromChainId, toChainId), [toChainId, fromChainId]);
 
   const isShowTxnFeeEnoughTip = useCheckTxnFeeEnoughAuto();
 
@@ -42,7 +47,7 @@ export default function Info() {
           valueClassName={isShowTxnFeeEnoughTip ? styles['error-display'] : ''}
         />
       )}
-      <InfoRow label={t('Expected time')} value={`~40 ${t('minutes')}`} />
+      <InfoRow label={t('Expected time')} value={`~${time} ${t('minutes')}`} />
     </div>
   );
 }
