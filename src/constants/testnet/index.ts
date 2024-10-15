@@ -190,7 +190,7 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = 'https://app-testnet.aefinder.io/ebridge_server/39233c7e2f3c416880246b062b894ed9/graphql';
+export const INDEXER_URL = 'https://app-testnet.aefinder.io/ebridge_server/5942ddbd260f44a0a23375693b9d5873/graphql';
 export const BASE_URL = 'https://test.ebridge.exchange';
 
 export const TELEGRAM_BOT_ID = '7220041137';
