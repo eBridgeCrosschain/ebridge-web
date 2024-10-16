@@ -14,7 +14,7 @@ export default function LoadingModal({ open }: ILoadingModalProps) {
   return (
     <CommonModal
       className={styles['loading-modal']}
-      width={377}
+      width={380}
       title={t('Wait for wallet confirmation...')}
       closable={false}
       open={open || false}>

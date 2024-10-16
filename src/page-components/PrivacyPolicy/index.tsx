@@ -19,8 +19,8 @@ function PrivacyPolicy() {
                 https://ebridge.exchange/
               </a>
               {` and/or `}
-              <a target="_blank" href="https://test.ebridge.exchange/" rel="noreferrer">
-                https://test.ebridge.exchange/
+              <a target="_blank" href="https://test-app.ebridge.exchange/" rel="noreferrer">
+                https://test-app.ebridge.exchange/
               </a>
               {` (the "`}
               <span className="font-family-medium">{`Site`}</span>
