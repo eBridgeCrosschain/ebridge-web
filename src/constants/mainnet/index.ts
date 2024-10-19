@@ -137,7 +137,7 @@ export const WEB_LOGIN_CONFIG = {
   chainId: SupportedELFChainId.tDVV,
   portkeyV2: {
     networkType: NetworkEnum.MAINNET,
-    graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/aefinder-v2/api/app/graphql/portkey',
     apiServer: 'https://aa-portkey.portkey.finance',
     connectServer: 'https://auth-aa-portkey.portkey.finance',
     caContractAddress: {
