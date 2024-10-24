@@ -174,7 +174,7 @@ export const WEB_LOGIN_CONFIG = {
   chainId: SupportedELFChainId.tDVW,
   portkeyV2: {
     networkType: NetworkEnum.TESTNET,
-    graphQLUrl: 'https://dapp-aa-portkey-test.portkey.finance/Portkey_V2_DID/PortKeyIndexerCASchema/graphql',
+    graphQLUrl: 'https://dapp-aa-portkey-test.portkey.finance/aefinder-v2/api/app/graphql/portkey',
     apiServer: 'https://aa-portkey-test.portkey.finance',
     connectServer: 'https://auth-aa-portkey-test.portkey.finance',
     caContractAddress: {
@@ -191,6 +191,7 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
 export const INDEXER_URL = 'https://app-testnet.aefinder.io/ebridge_server/5942ddbd260f44a0a23375693b9d5873/graphql';
+
 export const BASE_URL = 'https://test.ebridge.exchange';
 
 export const TELEGRAM_BOT_ID = '7220041137';
