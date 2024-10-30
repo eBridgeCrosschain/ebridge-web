@@ -1,4 +1,4 @@
-import { CHAIN_SHORT_NAME } from 'constants/chain';
+import { CHAIN_SHORT_NAME, SupportedELFChainId } from 'constants/chain';
 import { CHAIN_ID_MAP } from 'constants/chain';
 import { ChainId } from 'types';
 import { enumToMap, shortenAddress } from 'utils';
@@ -67,3 +67,16 @@ export function shortenAddressByAPI(address?: string, chainId?: ChainId, chars?:
   const tmpAddress = isELF ? formatAddress(chainId, address) : address;
   return shortenAddress(tmpAddress, chars, isELF ? 58 : undefined);
 }
+
+export const formatNetworkName = (item: string) => {
+  switch (item) {
+    case SupportedELFChainId.AELF:
+      return CHAIN_NAME[SupportedELFChainId.AELF];
+    case SupportedELFChainId.tDVV:
+      return CHAIN_NAME[SupportedELFChainId.tDVV];
+    case SupportedELFChainId.tDVW:
+      return CHAIN_NAME[SupportedELFChainId.tDVW];
+    default:
+      return item;
+  }
+};
