@@ -93,12 +93,10 @@ export default function LimitAmountDescModal() {
             <Col span={24}>
               <Row gutter={[0, 16]}>
                 {rateLimitData?.value?.map((symoblItem: RateLimitItem) => (
-                  <Col
-                    span={24}
-                    key={`${formatNetworkName(symoblItem.fromChain)}_${formatNetworkName(symoblItem.toChain)}`}>
+                  <Col span={24} key={`${symoblItem.fromChain}_${symoblItem.toChain}`}>
                     <Row gutter={[0, 16]}>
                       <Col span={24} className={styles['item-text']}>
-                        {`${symoblItem.fromChain} -> ${symoblItem.toChain}`}
+                        {`${formatNetworkName(symoblItem.fromChain)} -> ${formatNetworkName(symoblItem.toChain)}`}
                       </Col>
                       <Col span={24}>
                         <CommonTable
