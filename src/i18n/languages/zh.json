@@ -34,7 +34,6 @@
     "Heterogeneous chain cross-chain": "異構跨鏈：",
     "cross-chain transfer between aelf and other public chains (e.g. aelf to Ethereum)": "AELF與其他公鏈（如MainChain AELF到Ethereum）之間的跨鏈轉帳",
     "Homogeneous chain cross-chain": "同構跨鏈：",
-    "cross-chain transfer within aelf ecosystem, between MainChain and SideChains (e.g. MainChain AELF to SideChain tDVV) or between different SideChains (e.g. SideChain tDVV to SideChain tDVW)": "AELF生態內部主鏈與側鏈（如MainChain AELF到SideChain tDVV）、側鏈與側鏈（如SideChain tDVV到SideChain tDVW）之間的跨鏈轉帳",
     "Please note": "請注意：",
     "When the network is not congested": "在沒有出現擁堵的情況下",
     "The minimum crosschain transaction fee is around": "最小跨鏈手續費約",

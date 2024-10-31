@@ -34,7 +34,6 @@
     "Heterogeneous chain cross-chain": "External: ",
     "cross-chain transfer between aelf and other public chains (e.g. aelf to Ethereum)": "cross-chain transfer between aelf and other public chains (e.g. MainChain AELF to Ethereum).",
     "Homogeneous chain cross-chain": "Internal:",
-    "cross-chain transfer within aelf ecosystem, between MainChain and SideChains (e.g. MainChain AELF to SideChain tDVV) or between different SideChains (e.g. SideChain tDVV to SideChain tDVW)": "cross-chain transfer within aelf ecosystem, between MainChain and SideChains (e.g. MainChain AELF to SideChain tDVV) or between different SideChains (e.g. SideChain tDVV to SideChain tDVW).",
     "Please note": "Please note:",
     "When the network is not congested": "When the network is not congested:",
     "The minimum crosschain transaction fee is around": "The minimum crosschain transaction fee is around",
