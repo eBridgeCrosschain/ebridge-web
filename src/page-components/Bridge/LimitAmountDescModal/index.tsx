@@ -10,6 +10,7 @@ import { setLimitAmountDescModal } from '../HomeContext/actions';
 import { RateLimitItem } from './contants';
 import { useReceiptColumns, useSwapColumns } from './columns';
 import styles from './styles.module.less';
+import { formatNetworkName } from 'utils/chain';
 
 export default function LimitAmountDescModal() {
   const { t } = useLanguage();
@@ -95,7 +96,7 @@ export default function LimitAmountDescModal() {
                   <Col span={24} key={`${symoblItem.fromChain}_${symoblItem.toChain}`}>
                     <Row gutter={[0, 16]}>
                       <Col span={24} className={styles['item-text']}>
-                        {`${symoblItem.fromChain} -> ${symoblItem.toChain}`}
+                        {`${formatNetworkName(symoblItem.fromChain)} -> ${formatNetworkName(symoblItem.toChain)}`}
                       </Col>
                       <Col span={24}>
                         <CommonTable

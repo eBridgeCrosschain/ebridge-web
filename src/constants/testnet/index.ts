@@ -69,9 +69,9 @@ export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
 export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
   ...DEFAULT_CHAIN_NAME,
-  [SupportedELFChainId.AELF]: 'MainChain AELF Testnet',
-  [SupportedELFChainId.tDVV]: 'SideChain tDVV Testnet',
-  [SupportedELFChainId.tDVW]: 'SideChain tDVW Testnet',
+  [SupportedELFChainId.AELF]: 'aelf MainChain Testnet',
+  [SupportedELFChainId.tDVV]: 'aelf dAppChain Testnet',
+  [SupportedELFChainId.tDVW]: 'aelf dAppChain Testnet',
 };
 
 export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
@@ -190,7 +190,7 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = 'https://app-testnet.aefinder.io/ebridge_server/5942ddbd260f44a0a23375693b9d5873/graphql';
+export const INDEXER_URL = 'https://test-indexer-api.aefinder.io/api/app/graphql/ebridge_server';
 
 export const BASE_URL = 'https://test.ebridge.exchange';
 
