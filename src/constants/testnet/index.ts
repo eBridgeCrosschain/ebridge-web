@@ -190,7 +190,7 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = 'https://app-testnet.aefinder.io/ebridge_server/5942ddbd260f44a0a23375693b9d5873/graphql';
+export const INDEXER_URL = 'https://test-indexer-api.aefinder.io/api/app/graphql/ebridge_server';
 
 export const BASE_URL = 'https://test.ebridge.exchange';
 
