@@ -78,13 +78,13 @@ export const DEFAULT_CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFCh
     type: 'Binance',
   },
   [SupportedELFChainId.AELF]: {
-    type: 'aelfMainnet',
+    type: 'MainChain',
   },
   [SupportedELFChainId.tDVV]: {
-    type: 'aelfMainnet',
+    type: 'dAppChain',
   },
   [SupportedELFChainId.tDVW]: {
-    type: 'aelfMainnet',
+    type: 'dAppChain',
   },
   [SupportedChainId.SEPOLIA]: {
     // type: 'SEPOLIA',
