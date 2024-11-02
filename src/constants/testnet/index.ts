@@ -74,18 +74,7 @@ export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: 
   [SupportedELFChainId.tDVW]: 'aelf dAppChain Testnet',
 };
 
-export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
-  ...DEFAULT_CHAIN_ICON,
-  [SupportedELFChainId.AELF]: {
-    type: 'aelfTestnet',
-  },
-  [SupportedELFChainId.tDVV]: {
-    type: 'aelfTestnet',
-  },
-  [SupportedELFChainId.tDVW]: {
-    type: 'aelfTestnet',
-  },
-};
+export const CHAIN_ICON = DEFAULT_CHAIN_ICON;
 
 export const NetworkList = [
   { title: CHAIN_NAME[SupportedChainId.SEPOLIA], icon: CHAIN_ICON[SupportedChainId.SEPOLIA], info: SEPOLIA.CHAIN_INFO },
