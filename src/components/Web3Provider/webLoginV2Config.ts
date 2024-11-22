@@ -30,10 +30,11 @@ const didConfig = {
   },
 };
 
-const baseConfig = {
+const baseConfig: IConfigProps['baseConfig'] = {
   showVconsole: SHOW_V_CONSOLE,
   networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
   chainId: defaultChainId,
+  sideChainId: defaultChainId,
   keyboard: true,
   noCommonBaseModal: false,
   design: SignInDesignEnum.CryptoDesign,
@@ -45,6 +46,7 @@ const portkeyAAWallet = new PortkeyAAWallet({
   appName: APP_NAME,
   chainId: defaultChainId,
   autoShowUnlock: true,
+  enableAcceleration: true,
 });
 const isMobileDevices = devices.isMobileDevices();
 
