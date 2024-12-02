@@ -171,7 +171,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
 }
 
 function WalletButtonList() {
-  const { fromWallet, toWallet } = useWallet();
+  const { fromWallet, toWallet, fromOptions, toOptions } = useWallet();
   const { account: fromAccount } = fromWallet || {};
   const { account: toAccount } = toWallet || {};
   if (!fromAccount && !toAccount) {
@@ -179,8 +179,8 @@ function WalletButtonList() {
   } else {
     return (
       <div className={clsx(styles['wallet-button-list'], 'flex-row')}>
-        <WalletButton chainType="ERC" />
-        <WalletButton chainType="ELF" />
+        <WalletButton chainType={fromOptions?.chainType} />
+        <WalletButton chainType={toOptions?.chainType} />
       </div>
     );
   }
@@ -236,40 +236,44 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
     [changeLanguage, language],
   );
 
-  const items = mobileDrawerMenuConfig.map(({ icon, label, children }) => ({
-    key: label,
-    label: (
-      <div className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}>
-        {icon && <CommonImage className={styles['menu-item-icon']} src={icon} />}
-        <span className={styles['menu-item-text']}>{t(label)}</span>
-        <CommonImage
-          className={clsx(styles['menu-expand-icon'], {
-            [styles['menu-expand-icon-rotate']]: openKeys.includes(label),
-          })}
-          src={arrowGrayIcon}
-        />
-      </div>
-    ),
-    children: children?.map((child) => {
-      const isExternalLink = child.link?.startsWith('https:');
-      return {
-        key: child.label,
+  const items = useMemo(
+    () =>
+      mobileDrawerMenuConfig.map(({ icon, label, children }) => ({
+        key: label,
         label: (
-          <Link href={child.link || ''}>
-            <a
-              className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}
-              target={isExternalLink ? '_blank' : '_self'}
-              onClick={isExternalLink ? undefined : () => onCloseDrawer()}>
-              {child.icon && <CommonImage className={styles['menu-item-icon']} src={child.icon} />}
-              <span className={styles['menu-item-text']}>{t(child.label)}</span>
-              {child.checked && <CommonImage className={styles['menu-checked-icon']} src={checkBlueIcon} />}
-            </a>
-          </Link>
+          <div className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}>
+            {icon && <CommonImage className={styles['menu-item-icon']} src={icon} />}
+            <span className={styles['menu-item-text']}>{t(label)}</span>
+            <CommonImage
+              className={clsx(styles['menu-expand-icon'], {
+                [styles['menu-expand-icon-rotate']]: openKeys.includes(label),
+              })}
+              src={arrowGrayIcon}
+            />
+          </div>
         ),
-        onClick: child.onClick,
-      };
-    }),
-  }));
+        children: children?.map((child) => {
+          const isExternalLink = child.link?.startsWith('https:');
+          return {
+            key: child.label,
+            label: (
+              <Link href={child.link || ''}>
+                <a
+                  className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}
+                  target={isExternalLink ? '_blank' : '_self'}
+                  onClick={isExternalLink ? undefined : () => onCloseDrawer()}>
+                  {child.icon && <CommonImage className={styles['menu-item-icon']} src={child.icon} />}
+                  <span className={styles['menu-item-text']}>{t(child.label)}</span>
+                  {child.checked && <CommonImage className={styles['menu-checked-icon']} src={checkBlueIcon} />}
+                </a>
+              </Link>
+            ),
+            onClick: child.onClick,
+          };
+        }),
+      })),
+    [mobileDrawerMenuConfig, onCloseDrawer, openKeys, t],
+  );
 
   return (
     <Menu

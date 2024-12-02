@@ -7,6 +7,7 @@ import aelfLogo from './logo-aelf.svg';
 import aelfChainLogo from './logo-aelf-chain.svg';
 import ethereumLogo from './ethereum.svg';
 import groupIcon from './group.svg';
+import tonLogo from './ton.svg';
 import clearIcon from './clear-icon.svg';
 import discordIcon from './discord.svg';
 import discordDarkIcon from './discord-dark.svg';
@@ -74,4 +75,5 @@ export {
   infoCircleIcon,
   questionFilledIcon,
   loadingIcon,
+  tonLogo,
 };

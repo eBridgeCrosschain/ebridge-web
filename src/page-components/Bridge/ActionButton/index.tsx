@@ -31,6 +31,8 @@ import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
+  console.log(isHomogeneous, '===isHomogeneous');
+
   const login = useLogin();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [
@@ -97,6 +99,15 @@ export default function ActionButton() {
   }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
 
   const onCreateReceipt = useCallback(async () => {
+    console.log(
+      fromTokenInfo,
+      fromAccount,
+      bridgeContract,
+      toChainId,
+      fromChainId,
+      (toChecked && (toAccount || isAddress(toAddress, toChainId))) || toAccount,
+    );
+
     if (
       !(
         fromTokenInfo &&
@@ -127,12 +138,12 @@ export default function ActionButton() {
       return;
     }
 
-    if (await checkLimitAndRate('transfer', fromInput)) {
-      setIsBridgeButtonLoading(false);
-      dispatch(setActionLoading(false));
+    // if (await checkLimitAndRate('transfer', fromInput)) {
+    //   setIsBridgeButtonLoading(false);
+    //   dispatch(setActionLoading(false));
 
-      return;
-    }
+    //   return;
+    // }
 
     if (tokenContract) {
       params.tokenContract = tokenContract;
@@ -289,6 +300,8 @@ export default function ActionButton() {
       balance: fromBalance?.show,
       crossFee,
     });
+    console.log(max, max.toFixed(), '=====max');
+
     if (max.lt(fromInput)) {
       children = 'Insufficient balance';
       return { children, onClick, disabled };
@@ -310,6 +323,8 @@ export default function ActionButton() {
           onClick = onCrossChainTransfer;
           return { children, onClick, disabled };
         } else {
+          console.log(needConfirm, '===needConfirm');
+
           if (needConfirm) {
             onClick = () => setToConfirmModal(true);
             return { children, onClick, disabled };
@@ -348,6 +363,8 @@ export default function ActionButton() {
     needConfirm,
     onCreateReceipt,
   ]);
+
+  console.log(btnProps, '===btnProps');
 
   return (
     <>

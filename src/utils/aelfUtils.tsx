@@ -297,7 +297,6 @@ export const isElfChainSymbol = (symbol?: string | null) => {
 export const isELFChain = (chainId?: ChainId) => {
   return !!(typeof chainId === 'string' && SupportedELFChainId[chainId as SupportedELFChainId]);
 };
-
 export const getRawTx = ({
   blockHeight,
   blockHash,

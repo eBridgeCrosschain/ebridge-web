@@ -86,6 +86,8 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const latestAllWhitelist = useLatestRef(allWhitelist);
 
   const [[balance]] = useBalances(fromWallet, tokens);
+  console.log(fromWallet, '====fromWallet');
+
   useEffect(() => {
     if (fromChainId && toChainId && (!selectToken?.[fromChainId] || !selectToken?.[toChainId])) {
       if (tokenInfo) {

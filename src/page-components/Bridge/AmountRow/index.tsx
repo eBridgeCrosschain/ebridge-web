@@ -11,7 +11,7 @@ import { unitConverter } from 'utils/converter';
 import { formatSymbol } from 'utils/token';
 import { getMaxAmount, parseInputChange } from 'utils/input';
 import { divDecimals } from 'utils/calculate';
-import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { TBridgeChainId } from 'constants/chain';
 import { ZERO } from 'constants/misc';
 import styles from './styles.module.less';
 
@@ -37,8 +37,7 @@ export default function AmountRow() {
         {account && (
           <div className={clsx(styles['balance-wrap'], 'flex-row-center')}>
             <span className={styles.balance}>
-              {unitConverter(show)}{' '}
-              {formatSymbol(selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol)}
+              {unitConverter(show)} {formatSymbol(selectToken && selectToken[chainId as TBridgeChainId]?.symbol)}
             </span>
             <Button
               className={styles['max-button']}
@@ -61,7 +60,7 @@ export default function AmountRow() {
         />
         <div className={styles.divider} />
         <TokenSelect
-          title={selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
+          title={selectToken && selectToken[chainId as TBridgeChainId]?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}
           onClick={() =>

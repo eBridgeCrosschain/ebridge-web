@@ -220,7 +220,9 @@ export async function CreateReceipt({
   tokenContract: ContractBasic;
   crossFee?: string;
 }) {
+  console.log(bridgeContract, '=====bridgeContract');
   const toAddress = formatAddress(to);
+  const fromTonChain = bridgeContract.contractType === 'TON';
   const fromELFChain = bridgeContract.contractType === 'ELF';
   if (fromELFChain && fromToken !== CrossFeeToken) {
     const req = await checkApprove(
@@ -234,26 +236,28 @@ export async function CreateReceipt({
     );
     if (req !== REQ_CODE.Success) throw req;
   }
-  let checkAmount = amount;
-  if (fromToken === CrossFeeToken) {
-    if (crossFee) {
-      // fee ELF decimals 8
-      crossFee = timesDecimals(crossFee, 8).toFixed(0);
+  if (!fromTonChain) {
+    let checkAmount = amount;
+    if (fromToken === CrossFeeToken) {
+      if (crossFee) {
+        // fee ELF decimals 8
+        crossFee = timesDecimals(crossFee, 8).toFixed(0);
+      }
+      checkAmount = ZERO.plus(amount)
+        .plus(crossFee || 0)
+        .toFixed(0);
     }
-    checkAmount = ZERO.plus(amount)
-      .plus(crossFee || 0)
-      .toFixed(0);
+    const req = await checkApprove(
+      library,
+      fromToken,
+      account,
+      bridgeContract.address || '',
+      checkAmount,
+      undefined,
+      fromELFChain ? tokenContract : undefined,
+    );
+    if (req !== REQ_CODE.Success) throw req;
   }
-  const req = await checkApprove(
-    library,
-    fromToken,
-    account,
-    bridgeContract.address || '',
-    checkAmount,
-    undefined,
-    fromELFChain ? tokenContract : undefined,
-  );
-  if (req !== REQ_CODE.Success) throw req;
   if (fromELFChain) {
     return bridgeContract.callSendMethod('createReceipt', account, [
       fromToken,

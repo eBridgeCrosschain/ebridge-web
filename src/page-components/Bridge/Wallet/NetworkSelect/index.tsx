@@ -14,7 +14,7 @@ import { isSelectPortkey } from 'utils/portkey';
 import { Accounts, ChainId } from '@portkey/provider-types';
 import CommonMessage from 'components/CommonMessage';
 import { useHomeContext } from '../../HomeContext';
-import { IS_ONLY_SIDE_CHAIN_LIST } from 'constants/misc';
+import { IS_ONLY_SIDE_CHAIN_LIST, ZERO } from 'constants/misc';
 import { SupportedELFChainId } from 'constants/chain';
 
 function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean }) {
@@ -29,6 +29,8 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
 
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
+      console.log(info, '===info');
+
       const _wallet = portkeyWallet;
       const selectPortkey = isSelectPortkey(selectELFWallet);
       if (selectPortkey && _wallet?.isActive && isELFChain(info.chainId)) {
@@ -50,7 +52,11 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
           setWallet({ chainType: 'ELF', chainId: info.chainId, isPortkey: selectPortkey && portkeyWallet.isActive }),
         );
       } else {
-        dispatch(setWallet({ chainType: 'ERC' }));
+        if (ZERO.plus(info.chainId).lt(0)) {
+          dispatch(setWallet({ chainType: 'TON' }));
+        } else {
+          dispatch(setWallet({ chainType: 'ERC' }));
+        }
       }
       try {
         await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
@@ -82,6 +88,8 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
     const isOnlySideChain = IS_ONLY_SIDE_CHAIN_LIST.includes(selectToken?.symbol || '');
     return _list.filter((i) => (isOnlySideChain ? i.info.chainId !== SupportedELFChainId.AELF : true));
   }, [chainId, portkeyWallet.isActive, selectELFWallet, selectToken, wallet?.chainId]);
+
+  console.log(networkList, chainId, '====networkList');
 
   return <Network chainId={chainId} networkList={networkList} onChange={onChange} />;
 }

@@ -1,5 +1,5 @@
 import { BasicActions } from 'contexts/utils';
-import { useAElf, usePortkey, useWeb3 } from 'hooks/web3';
+import { useAElf, usePortkey, useTon, useWeb3 } from 'hooks/web3';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import { ModalActions, ModalState, basicModalView } from './actions';
 import { formatPortkeyWallet } from 'contexts/useWallet/utils';
@@ -34,6 +34,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const aelfWallet = useAElf();
   const web3Wallet = useWeb3();
   const portkeyWallet = usePortkey();
+  const tonWallet = useTon();
   const { switchChainInConnectPortkey } = useWallet();
   const [walletWallet, accountWallet] = useMemo(() => {
     let accountWallet, walletWallet;
@@ -46,6 +47,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
         break;
       case 'NIGHTELF':
         accountWallet = aelfWallet;
+        break;
+      case 'TON':
+        accountWallet = tonWallet;
         break;
       default:
         break;
@@ -61,12 +65,24 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       case 'NIGHTELF':
         walletWallet = aelfWallet;
         break;
+      case 'TON':
+        walletWallet = tonWallet;
+        break;
       default:
         break;
     }
 
     return [walletWallet, accountWallet];
-  }, [accountChainId, accountWalletType, aelfWallet, portkeyWallet, walletChainId, walletWalletType, web3Wallet]);
+  }, [
+    accountChainId,
+    accountWalletType,
+    aelfWallet,
+    portkeyWallet,
+    tonWallet,
+    walletChainId,
+    walletWalletType,
+    web3Wallet,
+  ]);
 
   useEffect(() => {
     if (switchChainInConnectPortkey?.status) {

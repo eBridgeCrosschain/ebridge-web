@@ -30,6 +30,9 @@
     "@portkey/did-ui-react": "^2.15.0",
     "@portkey/types": "^2.15.0",
     "@sentry/nextjs": "^7.48.0",
+    "@ton/core": "^0.59.0",
+    "@ton/crypto": "^3.3.0",
+    "@tonconnect/ui-react": "^2.0.9",
     "@walletconnect/ethereum-provider": "^2.9.2",
     "@walletconnect/modal-ui": "git+https://github.com/kled-bridge/modal-ui#37b7aedc0aa659d44f8abb72e56f75108940732f",
     "@web3-react/coinbase-wallet": "^8.2.2",
@@ -59,6 +62,7 @@
     "react-ga": "^3.3.1",
     "react-i18next": "^11.18.0",
     "react-use": "^17.4.0",
+    "tonweb": "^0.0.66",
     "web3": "^1.7.4",
     "web3-core": "^1.7.4"
   },

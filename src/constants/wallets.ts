@@ -37,4 +37,12 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     description: 'Portkey Wallet',
     href: null,
   },
+  TON: {
+    chainType: 'TON',
+    connector: 'TON',
+    name: 'Ton connect',
+    iconType: 'ton',
+    description: 'Ton connect',
+    href: null,
+  },
 };

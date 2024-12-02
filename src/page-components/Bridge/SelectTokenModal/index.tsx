@@ -11,7 +11,7 @@ import { Trans } from 'react-i18next';
 import { useHomeContext } from '../HomeContext';
 import { setSelectModal, setAddModal, setSelectToken, homeModalDestroy } from '../HomeContext/actions';
 import styles from './styles.module.less';
-import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { TBridgeChainId } from 'constants/chain';
 import { formatSymbol } from 'utils/token';
 function SelectToken({ origin }: { origin?: 'from' | 'to' }) {
   const [{ selectToken }, { dispatch }] = useHomeContext();
@@ -61,9 +61,7 @@ function SelectToken({ origin }: { origin?: 'from' | 'to' }) {
                 [styles['token-item-selected']]: item.symbol === selectToken?.symbol,
               })}>
               <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={item.symbol} />
-              {formatSymbol(
-                item[(origin === 'from' ? chainId : toChainId) as SupportedChainId | SupportedELFChainId]?.symbol,
-              )}
+              {formatSymbol(item[(origin === 'from' ? chainId : toChainId) as TBridgeChainId]?.symbol)}
             </Row>
           );
         })}

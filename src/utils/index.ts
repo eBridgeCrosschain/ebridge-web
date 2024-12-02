@@ -6,7 +6,7 @@ import { isELFChain } from './aelfUtils';
 export const eventBus = new EventEmitter();
 import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
-import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedERCChain } from 'constants/index';
+import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedExternalChain } from 'constants/index';
 
 export const sleep = (time: number) => {
   return new Promise<string>((resolve) => {
@@ -25,7 +25,7 @@ export function getExploreLink(
     prefix = ELFChainConstants.constants[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl;
   } else {
     prefix =
-      SupportedERCChain?.[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl ||
+      SupportedExternalChain?.[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl ||
       ERCChainConstants.constants.CHAIN_INFO.exploreUrl;
   }
   switch (type) {
@@ -40,6 +40,10 @@ export function getExploreLink(
     }
     case 'address':
     default: {
+      // TON
+      if (isTonChain(chainId)) {
+        return `${prefix}${data}`;
+      }
       return `${prefix}address/${data}`;
     }
   }
@@ -172,3 +176,7 @@ export function isIncludesChainId(list: ChainId[] | ChainId, chainId?: ChainId) 
   if (!chainId) return false;
   return Array.isArray(list) ? list.includes(chainId) : chainId === list;
 }
+
+export const isTonChain = (chainId?: ChainId) => {
+  return typeof chainId === 'number' && chainId < 0;
+};

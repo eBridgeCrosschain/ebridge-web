@@ -7,11 +7,12 @@ import { CHAIN_NAME } from 'constants/index';
 import type { Connector } from '@web3-react/types';
 import { Accounts } from '@portkey/provider-types';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { Wallet as TonWallet } from '@tonconnect/ui-react';
 
 export type ChainId = keyof typeof CHAIN_NAME;
-export type ChainType = 'ERC' | 'ELF';
+export type ChainType = 'ERC' | 'ELF' | 'TON';
 
-export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC';
+export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC' | 'TON';
 
 export type NetworkType = {
   title: string;
@@ -38,6 +39,7 @@ export type Web3Type = {
   walletType?: WalletType;
   loginWalletType?: WalletTypeEnum;
   accounts?: Accounts;
+  baseAccount?: TonWallet['account'];
 };
 export type TokenInfo = {
   decimals: number;
@@ -68,4 +70,5 @@ export interface WalletInfo {
   mobile?: true;
   mobileOnly?: true;
   iconType: string;
+  chainType?: ChainType;
 }

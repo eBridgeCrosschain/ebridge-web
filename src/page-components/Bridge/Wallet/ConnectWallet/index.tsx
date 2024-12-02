@@ -9,6 +9,7 @@ import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import styles from './styles.module.less';
+import { useTonConnectModal } from '@tonconnect/ui-react';
 
 interface IConnectWalletProps {
   wallet?: Web3Type;
@@ -19,8 +20,10 @@ export default function ConnectWallet({ wallet, chainType }: IConnectWalletProps
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
   const login = useLogin();
+
+  const { open } = useTonConnectModal();
+
   const { walletType, chainId, account } = wallet || {};
-  const isELF = chainType === 'ELF';
 
   return account ? (
     <div className={clsx(styles['wallet-address-wrap'], 'flex-row-center')}>
@@ -34,17 +37,21 @@ export default function ConnectWallet({ wallet, chainType }: IConnectWalletProps
       className={styles['connect-button']}
       type="link"
       onClick={() => {
-        if (isELF) {
-          login();
-        } else {
-          dispatch(
-            setWalletModal(true, {
-              walletWalletType: walletType,
-              walletChainType: chainType,
-              walletChainId: chainId,
-            }),
-          );
+        const isELF = chainType === 'ELF';
+        const isTON = chainType === 'TON';
+        if (isTON) {
+          return open();
         }
+        if (isELF) {
+          return login();
+        }
+        dispatch(
+          setWalletModal(true, {
+            walletWalletType: walletType,
+            walletChainType: chainType,
+            walletChainId: chainId,
+          }),
+        );
       }}>
       {t('Connect')}
     </Button>

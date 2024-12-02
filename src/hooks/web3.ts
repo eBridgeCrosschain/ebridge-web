@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { getProvider } from 'utils/provider';
 import { Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
-import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
+import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, IS_MAINNET } from 'constants/index';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
@@ -12,6 +12,8 @@ import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } fro
 import { useLogin } from './wallet';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
+import { useTonWallet } from '@tonconnect/ui-react';
+import { toUserFriendlyAddress } from '@tonconnect/sdk';
 
 export function useAElfConnect() {
   const login = useLogin();
@@ -132,4 +134,26 @@ export function usePortkey(): Web3Type {
   }, [isConnected, walletInfo, walletType]);
 
   return tmpContext;
+}
+
+export function useTon(): Web3Type {
+  const wallet = useTonWallet();
+  console.log(wallet, '====wallet');
+
+  return useMemo(() => {
+    return {
+      ...wallet,
+      account: wallet?.account.address ? toUserFriendlyAddress(wallet?.account.address, !IS_MAINNET) : undefined,
+      wallet: { ...wallet },
+      isActive: !!wallet?.account,
+      library: undefined,
+      provider: undefined,
+      loginWalletType: undefined,
+      walletType: 'TON',
+      connector: 'TON',
+      isTON: true,
+      chainId: -1,
+      baseAccount: wallet?.account,
+    } as any;
+  }, [wallet]);
 }

@@ -5,7 +5,13 @@ import * as BSC from '../platform/BSC';
 import * as BASE from '../platform/base';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 
-import { DEFAULT_CHAIN_ICON, DEFAULT_CHAIN_NAME, SupportedChainId, SupportedELFChainId } from '../chain';
+import {
+  DEFAULT_CHAIN_ICON,
+  DEFAULT_CHAIN_NAME,
+  SupportedChainId,
+  SupportedELFChainId,
+  TBridgeChainId,
+} from '../chain';
 import { NetworkType } from 'types';
 import { NetworkEnum } from '@aelf-web-login/wallet-adapter-base';
 
@@ -51,7 +57,7 @@ export const ACTIVE_CHAIN: any = {
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
-export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = DEFAULT_CHAIN_NAME;
+export const CHAIN_NAME: { [chainId in TBridgeChainId]: string } = DEFAULT_CHAIN_NAME;
 
 export const CHAIN_ICON = DEFAULT_CHAIN_ICON;
 
