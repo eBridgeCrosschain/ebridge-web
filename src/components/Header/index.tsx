@@ -142,6 +142,8 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
         <div className={clsx(styles['mobile-wallet-button-content'], 'flex-row-center')}>
           {isELF ? (
             <WalletIcon connector="PORTKEY" className={styles['wallet-icon']} />
+          ) : chainType === 'TON' ? (
+            <WalletIcon connector={'TON'} className={styles['wallet-icon']} type="ton-wallet-white" />
           ) : (
             <div className="flex-row-center">
               {!isPortkey() && <WalletIcon connector={injected} className={styles['wallet-icon']} />}

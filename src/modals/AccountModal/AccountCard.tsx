@@ -21,12 +21,14 @@ import IconFont from 'components/IconFont';
 import { useLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useConnect } from 'hooks/useConnect';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
   const logoutWebLogin = useLogout();
+  const connect = useConnect();
   const [tonConnectUI] = useTonConnectUI();
 
   const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
@@ -68,6 +70,7 @@ function AccountCard() {
       }
     } else if (connector === 'TON') {
       tonConnectUI.disconnect?.();
+      connect('TON');
     } else {
       // Aelf
       logoutWebLogin?.();
@@ -84,7 +87,17 @@ function AccountCard() {
         walletChainId: chainId,
       }),
     );
-  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, tonConnectUI, logoutWebLogin]);
+  }, [
+    connector,
+    walletType,
+    dispatch,
+    chainId,
+    connection?.connector,
+    chainDispatch,
+    tonConnectUI,
+    connect,
+    logoutWebLogin,
+  ]);
 
   const changeWallet = useCallback(async () => {
     if (walletType !== 'ERC') {

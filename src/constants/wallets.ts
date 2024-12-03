@@ -41,7 +41,7 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     chainType: 'TON',
     connector: 'TON',
     name: 'Ton connect',
-    iconType: 'ton',
+    iconType: 'ton-wallet',
     description: 'Ton connect',
     href: null,
   },

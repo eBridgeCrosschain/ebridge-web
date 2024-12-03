@@ -7,7 +7,15 @@ import { injected } from 'walletConnectors';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
-export default function WalletIcon({ connector, className }: { connector: Web3Type['connector']; className?: string }) {
+export default function WalletIcon({
+  connector,
+  className,
+  type,
+}: {
+  connector: Web3Type['connector'];
+  className?: string;
+  type?: string;
+}) {
   const filter = useCallback(
     (k: string) => {
       const isTelegramPlatformAndNotWeb = TelegramPlatform.isTelegramPlatformAndNotWeb();
@@ -31,5 +39,5 @@ export default function WalletIcon({ connector, className }: { connector: Web3Ty
       .filter((k) => filter(k))
       .map((k) => SUPPORTED_WALLETS[k].iconType)[0];
   }, [filter]);
-  return <IconFont className={clsx(styles.icon, className)} type={iconType} />;
+  return <IconFont className={clsx(styles.icon, className)} type={type || iconType} />;
 }
