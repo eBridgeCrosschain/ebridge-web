@@ -13,7 +13,7 @@ import WalletList from '../../components/WalletList';
 import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon, tonLogo } from 'assets/images';
 import { ROUTE_PATHS } from 'constants/link';
 import styles from './styles.module.less';
-import { TonConnectButton } from '@tonconnect/ui-react';
+import { ChainType } from 'types';
 
 const WALLET_STEP = {
   FROM: 0,
@@ -143,7 +143,9 @@ export default function WalletsModal() {
         {stepConfig[walletStep].chainType !== 'ELF' ? (
           <WalletList
             onFinish={handleConnectExternalWalletFinish}
-            chainType={stepConfig[walletStep].chainType === 'TON' ? stepConfig[walletStep].chainType : undefined}
+            chainType={
+              (stepConfig[walletStep].chainType === 'TON' ? stepConfig[walletStep].chainType : undefined) as ChainType
+            }
           />
         ) : (
           <>
