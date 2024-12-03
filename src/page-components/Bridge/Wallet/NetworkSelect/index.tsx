@@ -88,8 +88,6 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
     return _list.filter((i) => (isOnlySideChain ? i.info.chainId !== SupportedELFChainId.AELF : true));
   }, [chainId, portkeyWallet.isActive, selectELFWallet, selectToken, wallet?.chainId]);
 
-  console.log(networkList, chainId, '====networkList');
-
   return <Network chainId={chainId} networkList={networkList} onChange={onChange} />;
 }
 
