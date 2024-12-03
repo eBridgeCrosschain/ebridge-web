@@ -53,7 +53,7 @@ function AccountCard() {
   }, [filter]);
 
   const showAelfDisconnectButton = useMemo(() => {
-    return !(TelegramPlatform.isTelegramPlatform() && walletType !== 'ERC');
+    return !(TelegramPlatform.isTelegramPlatform() && walletType === 'PORTKEY');
   }, [walletType]);
 
   const onDisconnect = useCallback(async () => {
