@@ -2,7 +2,7 @@ import { ACTIVE_CHAIN, DEFAULT_MODAL_INITIAL_STATE } from 'constants/index';
 import storages from 'constants/storages';
 import { BasicActions } from 'contexts/utils';
 import useStorageReducer, { StorageOptions } from 'hooks/useStorageReducer';
-import { useAElf, usePortkey, useWeb3 } from 'hooks/web3';
+import { useAElf, usePortkey, useTon, useWeb3 } from 'hooks/web3';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { isELFChain } from 'utils/aelfUtils';
 import { WalletActions, ModalState, setToWallet, setFromWallet, setSwitchChainInConnectPortkey } from './actions';
@@ -76,18 +76,26 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   );
 
   const { fromOptions, toOptions } = state;
+  console.log(state, '==state');
+
   const [{ selectELFWallet }, { dispatch: chainDispatch }] = useChain();
 
   const aelfWallet = useAElf();
   const web3Wallet = useWeb3();
   const portkeyWallet = usePortkey();
+  const tonWallet = useTon();
+  console.log(tonWallet, '====tonWallet');
+  console.log(fromOptions, tonWallet, '====fromOptions');
+
   const [fromWallet, toWallet]: [Web3Type, Web3Type] = useMemo(
     () => [
-      getWalletByOptions(aelfWallet, web3Wallet, portkeyWallet, fromOptions, selectELFWallet),
-      getWalletByOptions(aelfWallet, web3Wallet, portkeyWallet, toOptions, selectELFWallet),
+      getWalletByOptions(aelfWallet, web3Wallet, portkeyWallet, tonWallet, fromOptions, selectELFWallet),
+      getWalletByOptions(aelfWallet, web3Wallet, portkeyWallet, tonWallet, toOptions, selectELFWallet),
     ],
-    [aelfWallet, web3Wallet, portkeyWallet, fromOptions, selectELFWallet, toOptions],
+    [aelfWallet, web3Wallet, portkeyWallet, tonWallet, fromOptions, selectELFWallet, toOptions],
   );
+
+  console.log(fromWallet, '===fromWallet');
 
   const portkeyActive = useMemo(() => portkeyWallet.isActive, [portkeyWallet.isActive]);
 

@@ -20,12 +20,14 @@ import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
 import { useLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
   const logoutWebLogin = useLogout();
+  const [tonConnectUI] = useTonConnectUI();
 
   const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
@@ -64,6 +66,8 @@ function AccountCard() {
         chainDispatch(setSelectERCWallet(undefined));
         clearWCStorageByDisconnect();
       }
+    } else if (connector === 'TON') {
+      tonConnectUI.disconnect?.();
     } else {
       // Aelf
       logoutWebLogin?.();
@@ -80,7 +84,7 @@ function AccountCard() {
         walletChainId: chainId,
       }),
     );
-  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, logoutWebLogin]);
+  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, tonConnectUI, logoutWebLogin]);
 
   const changeWallet = useCallback(async () => {
     if (walletType !== 'ERC') {
@@ -163,9 +167,11 @@ function AccountCard() {
                 <Button type="primary" onClick={onDisconnect}>
                   Disconnect
                 </Button>
-                <Button type="primary" onClick={changeWallet}>
-                  Change
-                </Button>
+                {walletType !== 'TON' && (
+                  <Button type="primary" onClick={changeWallet}>
+                    Change
+                  </Button>
+                )}
               </>
             )}
           </Row>

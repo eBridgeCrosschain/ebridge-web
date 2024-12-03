@@ -3,7 +3,13 @@ import * as tDVV_Test from './tDVV';
 import * as BSC_TESTNET from './BSC_Test';
 import * as SEPOLIA from './sepolia';
 import DefaultWhitelistMap from './tokenWhitelist.json';
-import { DEFAULT_CHAIN_ICON, DEFAULT_CHAIN_NAME, SupportedChainId, SupportedELFChainId } from '../chain';
+import {
+  DEFAULT_CHAIN_ICON,
+  DEFAULT_CHAIN_NAME,
+  SupportedChainId,
+  SupportedELFChainId,
+  TBridgeChainId,
+} from '../chain';
 import { NetworkType } from 'types';
 import { IconInfo } from 'types/misc';
 
@@ -46,14 +52,14 @@ export const ACTIVE_CHAIN: any = {
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
-export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
+export const CHAIN_NAME: { [chainId in TBridgeChainId]: string } = {
   ...DEFAULT_CHAIN_NAME,
   [SupportedELFChainId.AELF]: 'aelf MainChain Testnet',
   [SupportedELFChainId.tDVV]: 'aelf dAppChain Testnet',
   [SupportedELFChainId.tDVW]: 'aelf dAppChain Testnet',
 };
 
-export const CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
+export const CHAIN_ICON: { [chainId in TBridgeChainId]: IconInfo } = {
   ...DEFAULT_CHAIN_ICON,
   [SupportedELFChainId.AELF]: {
     type: 'aelfTestnet',

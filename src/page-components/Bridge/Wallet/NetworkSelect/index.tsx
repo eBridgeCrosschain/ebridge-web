@@ -16,6 +16,7 @@ import CommonMessage from 'components/CommonMessage';
 import { useHomeContext } from '../../HomeContext';
 import { IS_ONLY_SIDE_CHAIN_LIST } from 'constants/misc';
 import { SupportedELFChainId } from 'constants/chain';
+import { isTonChain } from 'utils';
 
 function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean }) {
   const { dispatch } = useWalletActions();
@@ -50,12 +51,16 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
           setWallet({ chainType: 'ELF', chainId: info.chainId, isPortkey: selectPortkey && portkeyWallet.isActive }),
         );
       } else {
-        dispatch(setWallet({ chainType: 'ERC' }));
-      }
-      try {
-        await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
-      } catch (error: any) {
-        CommonMessage.error(error.message);
+        if (isTonChain(info.chainId)) {
+          dispatch(setWallet({ chainType: 'TON' }));
+        } else {
+          dispatch(setWallet({ chainType: 'ERC' }));
+          try {
+            await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
+          } catch (error: any) {
+            CommonMessage.error(error.message);
+          }
+        }
       }
     },
     [
@@ -82,6 +87,8 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
     const isOnlySideChain = IS_ONLY_SIDE_CHAIN_LIST.includes(selectToken?.symbol || '');
     return _list.filter((i) => (isOnlySideChain ? i.info.chainId !== SupportedELFChainId.AELF : true));
   }, [chainId, portkeyWallet.isActive, selectELFWallet, selectToken, wallet?.chainId]);
+
+  console.log(networkList, chainId, '====networkList');
 
   return <Network chainId={chainId} networkList={networkList} onChange={onChange} />;
 }

@@ -16,11 +16,18 @@ export enum SupportedChainId {
   BASE = 8453,
 }
 
+export enum SupportedTONChainId {
+  TESTNET = 1100,
+  MAINNET = -239,
+}
+
 export enum SupportedELFChainId {
   AELF = 'AELF',
   tDVV = 'tDVV',
   tDVW = 'tDVW',
 }
+
+export type TBridgeChainId = SupportedChainId | SupportedELFChainId | SupportedTONChainId;
 
 export const CHAIN_ID_MAP = {
   [SupportedChainId.MAINNET]: 'Ethereum',
@@ -34,6 +41,7 @@ export const CHAIN_ID_MAP = {
   [SupportedChainId.SEPOLIA]: 'Sepolia',
   [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
   [SupportedChainId.BASE]: 'Base',
+  [SupportedTONChainId.TESTNET]: 'TonTest',
 };
 
 /**
@@ -43,7 +51,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
   (id) => typeof id === 'number',
 ) as SupportedChainId[];
 
-export const DEFAULT_CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFChainId]: IconInfo } = {
+export const DEFAULT_CHAIN_ICON: { [chainId in TBridgeChainId]: IconInfo } = {
   [SupportedChainId.MAINNET]: {
     type: 'Ethereum',
   },
@@ -98,9 +106,19 @@ export const DEFAULT_CHAIN_ICON: { [chainId in SupportedChainId | SupportedELFCh
     // type: 'BASE_SEPOLIA',
     type: 'BaseChain',
   },
+  [SupportedTONChainId.TESTNET]: {
+    // type: 'BASE_SEPOLIA',
+    // TODO: icon
+    type: 'ton',
+  },
+  [SupportedTONChainId.MAINNET]: {
+    // type: 'BASE_SEPOLIA',
+    // TODO: icon
+    type: 'ton',
+  },
 };
 
-export const DEFAULT_CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
+export const DEFAULT_CHAIN_NAME: { [chainId in TBridgeChainId]: string } = {
   [SupportedChainId.MAINNET]: 'Ethereum',
   [SupportedChainId.KOVAN]: 'Kovan',
   [SupportedChainId.GORELI]: 'Goerli',
@@ -118,6 +136,8 @@ export const DEFAULT_CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFCh
   [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
   [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
   [SupportedChainId.BASE]: 'Base',
+  [SupportedTONChainId.MAINNET]: 'Ton',
+  [SupportedTONChainId.TESTNET]: 'Ton Testnet',
 };
 
 export const CHAIN_SHORT_NAME = {
@@ -132,4 +152,7 @@ export const CHAIN_SHORT_NAME = {
   [SupportedChainId.SEPOLIA]: 'Sepolia',
   [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
   [SupportedChainId.BASE]: 'Base',
+  // TODO
+  [SupportedTONChainId.MAINNET]: 'Ton',
+  [SupportedTONChainId.TESTNET]: 'Ton Testnet',
 };

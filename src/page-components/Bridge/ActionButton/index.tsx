@@ -15,23 +15,25 @@ import { useLanguage } from 'i18n';
 import useLockCallback from 'hooks/useLockCallback';
 import { isELFChain } from 'utils/aelfUtils';
 import { ACTIVE_CHAIN } from 'constants/index';
-import { formatAddress, isAddress } from 'utils';
+import { formatAddress, isAddress, isChainAddress } from 'utils';
 import CheckToFillAddressModal from './CheckToFillAddressModal';
 import useLimitAmountModal from '../useLimitAmountModal';
 import useCheckPortkeyStatus from 'hooks/useCheckPortkeyStatus';
 import { arrowRightWhiteIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
 import { useModalDispatch } from 'contexts/useModal/hooks';
-import { setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
+import { setWalletsModal } from 'contexts/useModal/actions';
 import LoadingModal from './LoadingModal';
 import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
 import { useLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
 import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
+import { useConnect } from 'hooks/useConnect';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
   const login = useLogin();
+  const connect = useConnect();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [
     { selectToken, fromInput, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
@@ -97,6 +99,15 @@ export default function ActionButton() {
   }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
 
   const onCreateReceipt = useCallback(async () => {
+    console.log(
+      fromTokenInfo,
+      fromAccount,
+      bridgeContract,
+      toChainId,
+      fromChainId,
+      (toChecked && (toAccount || isAddress(toAddress, toChainId))) || toAccount,
+    );
+
     if (
       !(
         fromTokenInfo &&
@@ -183,26 +194,16 @@ export default function ActionButton() {
     ({ isFrom = false }: { isFrom?: boolean }) => {
       const chainType = isFrom ? fromOptions?.chainType : toOptions?.chainType;
       const wallet = isFrom ? fromWallet : toWallet;
-      const { walletType, chainId } = wallet || {};
+      const { chainId } = wallet || {};
       const isELF = chainType === 'ELF';
       const children = isELF ? 'Connect aelf Wallet' : 'Connect External Wallet';
       const disabled = false;
       const onClick = () => {
-        if (isELF) {
-          login();
-        } else {
-          modalDispatch(
-            setWalletModal(true, {
-              walletWalletType: walletType,
-              walletChainType: chainType,
-              walletChainId: chainId,
-            }),
-          );
-        }
+        connect(chainType, chainId);
       };
       return { children, onClick, disabled };
     },
-    [fromOptions?.chainType, fromWallet, login, modalDispatch, toOptions?.chainType, toWallet],
+    [connect, fromOptions?.chainType, fromWallet, toOptions?.chainType, toWallet],
   );
 
   const { isShowTxnFeeEnoughTip, checkTxnFeeEnough } = useCheckTxnFeeEnough();
@@ -261,7 +262,7 @@ export default function ActionButton() {
           return { children: props.children, onClick: props.onClick, disabled: props.disabled };
         }
       } else {
-        if ((toAddress && !isAddress(toAddress, toChainId)) || !toAddress) {
+        if ((toAddress && !isChainAddress(toAddress, toChainId)) || !toAddress) {
           children = 'Enter destination address';
           return { children, onClick, disabled };
         }
@@ -289,6 +290,8 @@ export default function ActionButton() {
       balance: fromBalance?.show,
       crossFee,
     });
+    console.log(max, max.toFixed(), '=====max');
+
     if (max.lt(fromInput)) {
       children = 'Insufficient balance';
       return { children, onClick, disabled };
@@ -310,6 +313,8 @@ export default function ActionButton() {
           onClick = onCrossChainTransfer;
           return { children, onClick, disabled };
         } else {
+          console.log(needConfirm, '===needConfirm');
+
           if (needConfirm) {
             onClick = () => setToConfirmModal(true);
             return { children, onClick, disabled };

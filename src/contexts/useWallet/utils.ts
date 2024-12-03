@@ -17,17 +17,23 @@ export function getWalletByOptions(
   aelfWallet: Web3Type,
   web3Wallet: Web3Type,
   portkeyWallet: Web3Type,
+  tonWallet: Web3Type,
   options?: Options,
   selectELFWallet?: WalletType,
 ) {
   const { chainType, chainId } = options || {};
+  console.log(chainType, '====chainType');
+
   let wallet: any;
+
   if (chainType === 'ELF') {
     if (isSelectPortkey(selectELFWallet)) {
       wallet = formatPortkeyWallet(portkeyWallet, chainId as ChainId);
     } else {
       wallet = { ...aelfWallet, chainId };
     }
+  } else if (chainType === 'TON') {
+    wallet = tonWallet;
   } else {
     wallet = web3Wallet;
   }

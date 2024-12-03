@@ -139,24 +139,13 @@ export default function useLimitAmountModal() {
     [bridgeOutContract, limitContract],
   );
 
-  const getElfLimitDataFn = useCallback(
-    (type: 'transfer' | 'swap', crossInfo: ICrossInfo): Array<any> => {
-      const promiseList = [getLimitDataByContract('swap', crossInfo, crossInfo.toDecimals)];
-      if (type === 'transfer') {
-        promiseList.unshift(getLimitDataByGQL(crossInfo, crossInfo?.fromDecimals));
-      }
-      return promiseList;
-    },
-    [getLimitDataByContract],
-  );
+  const getElfLimitDataFn = useCallback((type: 'transfer' | 'swap', crossInfo: ICrossInfo): Array<any> => {
+    return [getLimitDataByGQL(crossInfo, crossInfo?.fromDecimals)];
+  }, []);
 
   const getEvmLimitDataFn = useCallback(
     (type: 'transfer' | 'swap', crossInfo: ICrossInfo): Array<any> => {
-      const promiseList = [getLimitDataByGQL(crossInfo, crossInfo?.toDecimals)];
-      if (type === 'transfer') {
-        promiseList.unshift(getLimitDataByContract(type, crossInfo, crossInfo?.fromDecimals));
-      }
-      return promiseList;
+      return [getLimitDataByContract(type, crossInfo, crossInfo?.fromDecimals)];
     },
     [getLimitDataByContract],
   );
@@ -275,7 +264,6 @@ export default function useLimitAmountModal() {
         ? getElfLimitDataFn(type, crossInfo)
         : getEvmLimitDataFn(type, crossInfo);
       const results: Array<LimitDataProps> = await Promise.all(promistList);
-
       if (results.some((item) => !item)) {
         return true;
       }

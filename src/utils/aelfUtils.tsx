@@ -262,8 +262,7 @@ export function transformArrayToMap(inputType: any, origin: any[]) {
     const i = fieldsArray[0];
     return { [i.name]: origin[0] };
   }
-
-  let result = origin;
+  let result = {};
   Array.isArray(fieldsArray) &&
     Array.isArray(origin) &&
     fieldsArray.forEach((i, k) => {
@@ -297,7 +296,6 @@ export const isElfChainSymbol = (symbol?: string | null) => {
 export const isELFChain = (chainId?: ChainId) => {
   return !!(typeof chainId === 'string' && SupportedELFChainId[chainId as SupportedELFChainId]);
 };
-
 export const getRawTx = ({
   blockHeight,
   blockHash,

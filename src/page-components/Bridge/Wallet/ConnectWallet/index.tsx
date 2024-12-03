@@ -1,14 +1,12 @@
 import clsx from 'clsx';
-import { useLogin } from 'hooks/wallet';
 import { Button } from 'antd';
-import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useLanguage } from 'i18n';
 import { ChainType, Web3Type } from 'types';
-import { setWalletModal } from 'contexts/useModal/actions';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import styles from './styles.module.less';
+import { useConnect } from 'hooks/useConnect';
 
 interface IConnectWalletProps {
   wallet?: Web3Type;
@@ -17,10 +15,8 @@ interface IConnectWalletProps {
 
 export default function ConnectWallet({ wallet, chainType }: IConnectWalletProps) {
   const { t } = useLanguage();
-  const dispatch = useModalDispatch();
-  const login = useLogin();
-  const { walletType, chainId, account } = wallet || {};
-  const isELF = chainType === 'ELF';
+  const connect = useConnect();
+  const { chainId, account } = wallet || {};
 
   return account ? (
     <div className={clsx(styles['wallet-address-wrap'], 'flex-row-center')}>
@@ -34,17 +30,7 @@ export default function ConnectWallet({ wallet, chainType }: IConnectWalletProps
       className={styles['connect-button']}
       type="link"
       onClick={() => {
-        if (isELF) {
-          login();
-        } else {
-          dispatch(
-            setWalletModal(true, {
-              walletWalletType: walletType,
-              walletChainType: chainType,
-              walletChainId: chainId,
-            }),
-          );
-        }
+        connect(chainType, chainId);
       }}>
       {t('Connect')}
     </Button>
