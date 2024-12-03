@@ -17,7 +17,7 @@ export enum SupportedChainId {
 }
 
 export enum SupportedTONChainId {
-  TESTNET = -1,
+  TESTNET = 1100,
   MAINNET = -239,
 }
 
@@ -41,6 +41,7 @@ export const CHAIN_ID_MAP = {
   [SupportedChainId.SEPOLIA]: 'Sepolia',
   [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
   [SupportedChainId.BASE]: 'Base',
+  [SupportedTONChainId.TESTNET]: 'TonTest',
 };
 
 /**

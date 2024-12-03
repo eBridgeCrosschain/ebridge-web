@@ -5,7 +5,7 @@ import { ChainId } from 'types';
 import AElf from 'aelf-sdk';
 import { ZERO } from 'constants/misc';
 import { CHAIN, SendTransactionRequest } from '@tonconnect/ui-react';
-import { getTONJettonMinter, packCreateReceiptBody } from './ton';
+import { getTONJettonMinter, packCreateReceiptBody, tonWeb } from './ton';
 export class TonContractCallData {
   static async createReceipt(contractAddress: string, account: string, paramsOption: any[]) {
     const forwardTonAmount = '0.15';
@@ -48,5 +48,32 @@ export class TonContractCallData {
       ],
     };
     return transaction;
+  }
+}
+
+export class CallTonContract {
+  static async getReceiptDailyLimit(contractAddress: string, paramsOption: any[]) {
+    const req = await tonWeb.provider.call(contractAddress, 'get_receipt_daily_limit', [
+      ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],
+    ]);
+    return {
+      tokenAmount: ZERO.plus(req.stack[0][1]),
+      refreshTime: ZERO.plus(req.stack[1][1]),
+      dailyLimit: ZERO.plus(req.stack[2][1]),
+    };
+  }
+  static async getCurrentReceiptTokenBucketState(contractAddress: string, paramsOption: any[]) {
+    const req = await tonWeb.provider.call(contractAddress, 'get_receipt_rate_limit_state', [
+      ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],
+    ]);
+    console.log(req, '====req');
+
+    return {
+      currentTokenAmount: ZERO.plus(req.stack[0][1]),
+      refreshTime: ZERO.plus(req.stack[1][1]),
+      tokenCapacity: ZERO.plus(req.stack[2][1]),
+      isEnable: Boolean(ZERO.plus(req.stack[3][1]).toNumber()),
+      rate: ZERO.plus(req.stack[4][1]),
+    };
   }
 }

@@ -170,6 +170,7 @@ export function useTonContract(contractAddress: string, chainId?: ChainId) {
   const [tonConnectUI] = useTonConnectUI();
 
   return useMemo(() => {
+    if (!isTonChain(chainId)) return;
     return new ContractBasic({ contractAddress, chainId, tonConnectUI });
   }, [chainId, contractAddress, tonConnectUI]);
 }
@@ -246,7 +247,6 @@ export function useCrossChainContract(chainId?: ChainId, address?: string, isPor
 export function useBridgeContract(chainId?: ChainId, isPortkey?: boolean) {
   const contractAddress = useMemo(() => {
     if (isELFChain(chainId)) return ELFChainConstants.constants[chainId as AelfInstancesKey]?.BRIDGE_CONTRACT;
-
     if (chainId && isTonChain(chainId)) return SupportedTONChain[chainId].BRIDGE_CONTRACT;
     return ERCChainConstants.constants?.BRIDGE_CONTRACT;
   }, [chainId]);
@@ -262,9 +262,10 @@ export function useBridgeOutContract(chainId?: ChainId, isPortkey?: boolean) {
 }
 
 export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
-  return useERCContract(
-    ERCChainConstants?.constants?.LIMIT_CONTRACT || '',
-    LIMIT_ABI,
-    isELFChain(fromChainId) ? toChainId : fromChainId,
-  );
+  const contractAddress = useMemo(() => {
+    if (fromChainId && isTonChain(fromChainId)) return (SupportedTONChain[fromChainId] as any).LIMIT_CONTRACT;
+    return ERCChainConstants?.constants?.LIMIT_CONTRACT || '';
+  }, [fromChainId]);
+
+  return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
 }

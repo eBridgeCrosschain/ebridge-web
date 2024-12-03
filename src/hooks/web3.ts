@@ -14,6 +14,7 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { toUserFriendlyAddress } from '@tonconnect/sdk';
+import { SupportedTONChainId } from 'constants/chain';
 
 export function useAElfConnect() {
   const login = useLogin();
@@ -138,8 +139,6 @@ export function usePortkey(): Web3Type {
 
 export function useTon(): Web3Type {
   const wallet = useTonWallet();
-  console.log(wallet, '====wallet');
-
   return useMemo(() => {
     return {
       ...wallet,
@@ -152,7 +151,7 @@ export function useTon(): Web3Type {
       walletType: 'TON',
       connector: 'TON',
       isTON: true,
-      chainId: -1,
+      chainId: IS_MAINNET ? SupportedTONChainId.MAINNET : SupportedTONChainId.TESTNET,
       baseAccount: wallet?.account,
     } as any;
   }, [wallet]);

@@ -1,15 +1,13 @@
 import { IS_MAINNET } from 'constants/index';
 import TonWeb from 'tonweb';
 import * as TON_TESTNET from 'constants/platform/TON_Test';
-import { Address, beginCell, Cell } from '@ton/core';
+import { Address, beginCell } from '@ton/core';
 import { SendTransactionResponse } from '@tonconnect/ui-react';
-
 export const mainnetTonWeb = new TonWeb();
 
 export const testnetTonWeb = new TonWeb(new TonWeb.HttpProvider(TON_TESTNET.CHAIN_INFO.rpcUrl));
 
 export const tonWeb = IS_MAINNET ? mainnetTonWeb : testnetTonWeb;
-
 export const getTONJettonMinter = (tokenContractAddress: string) => {
   const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonWeb.provider, {
     address: tokenContractAddress,
@@ -40,4 +38,8 @@ export const packCreateReceiptBody = (targetChainId: number, targetAddress: Buff
 export async function getTransactionResponseHash(result: SendTransactionResponse) {
   const bocCellBytes = await TonWeb.boc.Cell.oneFromBoc(TonWeb.utils.base64ToBytes(result.boc)).hash();
   return TonWeb.utils.bytesToBase64(bocCellBytes);
+}
+
+export function isTonAddress(addr: string) {
+  return Address.isFriendly(addr) || Address.isAddress(addr);
 }

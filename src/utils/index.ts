@@ -1,4 +1,4 @@
-import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { SupportedChainId, SupportedELFChainId, SupportedTONChainId } from 'constants/chain';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
 import EventEmitter from 'events';
 import { AelfInstancesKey, ChainId, TokenInfo } from 'types';
@@ -7,6 +7,7 @@ export const eventBus = new EventEmitter();
 import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
 import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedExternalChain } from 'constants/index';
+import { isTonAddress } from './ton';
 
 export const sleep = (time: number) => {
   return new Promise<string>((resolve) => {
@@ -28,8 +29,10 @@ export function getExploreLink(
       SupportedExternalChain?.[chainId as AelfInstancesKey]?.CHAIN_INFO?.exploreUrl ||
       ERCChainConstants.constants.CHAIN_INFO.exploreUrl;
   }
+  const isTON = isTonChain(chainId);
   switch (type) {
     case 'transaction': {
+      if (isTON) return `${prefix}transaction/${Buffer.from(data, 'base64').toString('hex')}`;
       return `${prefix}tx/${data}`;
     }
     case 'token': {
@@ -41,9 +44,7 @@ export function getExploreLink(
     case 'address':
     default: {
       // TON
-      if (isTonChain(chainId)) {
-        return `${prefix}${data}`;
-      }
+      if (isTON) return `${prefix}${data}`;
       return `${prefix}address/${data}`;
     }
   }
@@ -140,15 +141,17 @@ export const isELFAddress = (value: string) => {
 };
 
 export function isAddress(value?: string, chainId?: ChainId) {
-  if (!value) return false;
-  if (isELFChain(chainId)) return isELFAddress(value);
-  return isERCAddress(value);
+  return isChainAddress(value, chainId);
 }
 
 export function isChainAddress(address?: string, chainId?: ChainId) {
   if (!address || !chainId) {
     return false;
   }
+  console.log(isTonChain(chainId), '====isTonChain(chainId)');
+
+  if (isTonChain(chainId)) return isTonAddress(address);
+
   if (!isELFChain(chainId)) {
     return isERCAddress(address);
   }
@@ -178,5 +181,5 @@ export function isIncludesChainId(list: ChainId[] | ChainId, chainId?: ChainId) 
 }
 
 export const isTonChain = (chainId?: ChainId) => {
-  return typeof chainId === 'number' && chainId < 0;
+  return typeof chainId === 'number' && chainId === SupportedTONChainId.TESTNET;
 };

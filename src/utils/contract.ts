@@ -17,7 +17,7 @@ import { ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
 import { ZERO } from 'constants/misc';
 import { TonConnectUI } from '@tonconnect/ui-react';
 import { getTransactionResponseHash } from './ton';
-import { TonContractCallData } from './tonContractCall';
+import { CallTonContract, TonContractCallData } from './tonContractCall';
 
 export interface AbiType {
   internalType?: string;
@@ -93,15 +93,15 @@ export class ContractBasic {
   constructor(options: ContractProps) {
     this.address = options.contractAddress;
     const isELF = isELFChain(options.chainId);
-    const isTon = isTonChain(options.chainId);
+    const isTON = isTonChain(options.chainId);
     this.callContract = options.portkeyChain
       ? new PortkeyContractBasic(options)
       : isELF
       ? new AElfContractBasic(options)
-      : isTon
+      : isTON
       ? new TONContractBasic(options)
       : new WB3ContractBasic(options);
-    this.contractType = isELF ? 'ELF' : isTon ? 'TON' : 'ERC';
+    this.contractType = isELF ? 'ELF' : isTON ? 'TON' : 'ERC';
   }
 
   public callViewMethod: CallViewMethod = async (
@@ -140,6 +140,8 @@ export class WB3ContractBasic {
   public chainId?: number;
   public web3?: Web3;
   constructor(options: ContractProps) {
+    console.log(options, '====options');
+
     const { contractABI, provider, contractAddress, chainId } = options;
     const contactABITemp = contractABI;
 
@@ -157,6 +159,8 @@ export class WB3ContractBasic {
     return new this.web3.eth.Contract(ABI as any, address);
   };
   public initViewOnlyContract: InitViewOnlyContract = (address, ABI) => {
+    console.log(address, ABI, '======ABI');
+
     const defaultProvider = getDefaultProvider();
     const defaultWeb3 = new Web3(defaultProvider);
     return new defaultWeb3.eth.Contract(ABI as any, address);
@@ -286,8 +290,9 @@ export class AElfContractBasic {
       await this.checkConnected();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
-      console.log(transformArrayToMap(inputType, paramsOption), '=Option');
-      const req = await this.aelfContract[functionNameUpper](transformArrayToMap(inputType, paramsOption));
+      const params = transformArrayToMap(inputType, paramsOption);
+      if (!params.targetChainType) delete params.targetChainType;
+      const req = await this.aelfContract[functionNameUpper](params);
       if (req.error) {
         return {
           error: {
@@ -411,6 +416,7 @@ export class PortkeyContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public callSendPromiseMethod: CallSendMethod = async (_functionName, _account, _paramsOption, _sendOptions) => {
     throw new Error('Method not implemented.');
   };
@@ -548,7 +554,14 @@ export class TONContractBasic {
     this.address = contractAddress;
   }
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {};
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    try {
+      return (CallTonContract as any)[functionName](this.address, paramsOption);
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   public callSendMethod: CallSendMethod = async (functionName, _account, paramsOption, _sendOptions) => {
@@ -565,6 +578,6 @@ export class TONContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public callSendPromiseMethod: CallSendMethod = async (_functionName, account, paramsOption, sendOptions) => {};
 }

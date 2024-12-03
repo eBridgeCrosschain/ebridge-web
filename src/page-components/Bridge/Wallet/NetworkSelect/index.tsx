@@ -14,8 +14,9 @@ import { isSelectPortkey } from 'utils/portkey';
 import { Accounts, ChainId } from '@portkey/provider-types';
 import CommonMessage from 'components/CommonMessage';
 import { useHomeContext } from '../../HomeContext';
-import { IS_ONLY_SIDE_CHAIN_LIST, ZERO } from 'constants/misc';
+import { IS_ONLY_SIDE_CHAIN_LIST } from 'constants/misc';
 import { SupportedELFChainId } from 'constants/chain';
+import { isTonChain } from 'utils';
 
 function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean }) {
   const { dispatch } = useWalletActions();
@@ -29,8 +30,6 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
 
   const onChange = useCallback(
     async (info: NetworkType['info']) => {
-      console.log(info, '===info');
-
       const _wallet = portkeyWallet;
       const selectPortkey = isSelectPortkey(selectELFWallet);
       if (selectPortkey && _wallet?.isActive && isELFChain(info.chainId)) {
@@ -52,16 +51,16 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
           setWallet({ chainType: 'ELF', chainId: info.chainId, isPortkey: selectPortkey && portkeyWallet.isActive }),
         );
       } else {
-        if (ZERO.plus(info.chainId).lt(0)) {
+        if (isTonChain(info.chainId)) {
           dispatch(setWallet({ chainType: 'TON' }));
         } else {
           dispatch(setWallet({ chainType: 'ERC' }));
+          try {
+            await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
+          } catch (error: any) {
+            CommonMessage.error(error.message);
+          }
         }
-      }
-      try {
-        await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
-      } catch (error: any) {
-        CommonMessage.error(error.message);
       }
     },
     [

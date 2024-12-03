@@ -11,7 +11,7 @@ import type { provider } from 'web3-core';
 import { CrossFeeToken, REQ_CODE, ZERO } from 'constants/misc';
 import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
-import { formatAddress, isIncludesChainId } from 'utils';
+import { formatAddress, isIncludesChainId, isTonChain } from 'utils';
 import { FormatTokenList } from 'constants/index';
 import { LimitDataProps } from 'page-components/Bridge/useLimitAmountModal/constants';
 import BigNumber from 'bignumber.js';
@@ -265,6 +265,7 @@ export async function CreateReceipt({
       toAddress,
       amount,
       getChainIdToMap(toChainId),
+      isTonChain(toChainId) ? 1 : 0,
     ]);
   }
   return bridgeContract.callSendMethod(

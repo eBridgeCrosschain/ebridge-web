@@ -30,8 +30,6 @@ function AccountCard() {
   const [tonConnectUI] = useTonConnectUI();
 
   const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
-  console.log(connector, '====connector');
-
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -45,8 +43,6 @@ function AccountCard() {
     if (!connector || typeof connector === 'string') return;
     return getConnection(connector);
   }, [connector]);
-  console.log(SUPPORTED_WALLETS, '====SUPPORTED_WALLETS');
-
   const formatConnectorName = useMemo(() => {
     const name = Object.keys(SUPPORTED_WALLETS)
       .filter((k) => filter(k))
@@ -171,9 +167,11 @@ function AccountCard() {
                 <Button type="primary" onClick={onDisconnect}>
                   Disconnect
                 </Button>
-                <Button type="primary" onClick={changeWallet}>
-                  Change
-                </Button>
+                {walletType !== 'TON' && (
+                  <Button type="primary" onClick={changeWallet}>
+                    Change
+                  </Button>
+                )}
               </>
             )}
           </Row>

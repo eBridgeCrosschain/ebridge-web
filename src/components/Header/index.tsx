@@ -24,7 +24,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { IS_MAINNET } from 'constants/index';
 import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS } from 'constants/link';
-import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
+import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { ChainType } from 'types';
@@ -35,6 +35,7 @@ import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import { isPortkey } from 'utils/portkey';
 import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
+import { useConnect } from 'hooks/useConnect';
 
 function SelectLanguage() {
   const { language, changeLanguage } = useLanguage();
@@ -109,7 +110,8 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const login = useLogin();
+  const connect = useConnect();
+
   const { fromWallet, toWallet, fromOptions } = useWallet();
   const wallet = fromOptions?.chainType === chainType ? fromWallet : toWallet;
   const { walletType, chainId, account, connector } = wallet || {};
@@ -135,21 +137,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
       )}
     </Button>
   ) : (
-    <Button
-      type="primary"
-      onClick={() => {
-        if (isELF) {
-          login();
-        } else {
-          dispatch(
-            setWalletModal(true, {
-              walletWalletType: walletType,
-              walletChainType: chainType,
-              walletChainId: chainId,
-            }),
-          );
-        }
-      }}>
+    <Button type="primary" onClick={() => connect(chainType, chainId)}>
       {isMd ? (
         <div className={clsx(styles['mobile-wallet-button-content'], 'flex-row-center')}>
           {isELF ? (
