@@ -22,8 +22,6 @@ export function getWalletByOptions(
   selectELFWallet?: WalletType,
 ) {
   const { chainType, chainId } = options || {};
-  console.log(chainType, '====chainType');
-
   let wallet: any;
 
   if (chainType === 'ELF') {
@@ -44,9 +42,12 @@ export function isChange(stateOptions?: Options, payloadOptions?: Options) {
   const { chainType: stateType, chainId: stateChainId } = stateOptions || {};
   const { chainType, chainId, isPortkey } = payloadOptions || {};
 
+  const isExternalState = stateType !== 'ELF';
+  const isExternalPayload = chainType !== 'ELF';
+
   return (
     (isPortkey && stateType === 'ELF' && chainType === 'ELF') ||
-    ((stateType === 'ERC' || chainType === 'ERC') && stateType === chainType) ||
+    ((isExternalState || isExternalPayload) && isExternalState === isExternalPayload) ||
     (stateType === 'ELF' && chainType === 'ELF' && stateChainId === chainId)
   );
 }

@@ -76,7 +76,6 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   );
 
   const { fromOptions, toOptions } = state;
-  console.log(state, '==state');
 
   const [{ selectELFWallet }, { dispatch: chainDispatch }] = useChain();
 
@@ -84,8 +83,6 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const web3Wallet = useWeb3();
   const portkeyWallet = usePortkey();
   const tonWallet = useTon();
-  console.log(tonWallet, '====tonWallet');
-  console.log(fromOptions, tonWallet, '====fromOptions');
 
   const [fromWallet, toWallet]: [Web3Type, Web3Type] = useMemo(
     () => [
@@ -94,8 +91,6 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     ],
     [aelfWallet, web3Wallet, portkeyWallet, tonWallet, fromOptions, selectELFWallet, toOptions],
   );
-
-  console.log(fromWallet, '===fromWallet');
 
   const portkeyActive = useMemo(() => portkeyWallet.isActive, [portkeyWallet.isActive]);
 

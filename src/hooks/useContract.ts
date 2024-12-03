@@ -5,7 +5,7 @@ import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtil
 import { provider } from 'web3-core';
 import { useAElf, useWeb3 } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
-import { isTonChain, sleep } from 'utils';
+import { isAddress, isELFAddress, isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from 'utils/checkAElfBridge';
 import { setContract } from 'contexts/useAElfContract/actions';
@@ -111,8 +111,6 @@ export async function getELFContract(
   chainId?: ChainId,
 ) {
   const key = contractAddress + account + chainId + aelfInstance.chainId;
-  console.log(ContractMap, ContractMap[key], '====ContractMap');
-
   if (!ContractMap[key]) {
     const viewInstance = chainId ? getAElf(chainId) : null;
     const wallet = account ? { address: account } : getWallet();
@@ -187,7 +185,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
   const key = useMemo(() => `${contractAddress}_${chainId}_${account}`, [account, chainId, contractAddress]);
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!chainId || !isELFChain(chainId)) return;
+      if (!chainId || !isELFChain(chainId) || !isELFAddress(contractAddress)) return;
       try {
         dispatch(
           setContract({
@@ -195,7 +193,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
           }),
         );
       } catch (error) {
-        console.log(error, '====error');
+        console.log(error, '====error-getContract');
         await sleep(1000);
         reCount++;
         if (reCount < 5) {
