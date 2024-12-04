@@ -1,3 +1,3 @@
-export const IS_MAINNET = false;
+export const IS_MAINNET = true;
 
-export * from './testnet';
+export * from './mainnet';
