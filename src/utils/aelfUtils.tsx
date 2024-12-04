@@ -3,7 +3,7 @@ import { getExploreLink, isELFAddress, shortenString, sleep } from 'utils';
 import BigNumber from 'bignumber.js';
 import { ContractBasic } from './contract';
 import AElf from 'aelf-sdk';
-import { AElfNodes, COMMON_PRIVATE } from 'constants/aelf';
+import { AElfNodes } from 'constants/aelf';
 import { baseRequest } from 'api';
 import descriptor from '@aelfqueen/protobufjs/ext/descriptor';
 import { timesDecimals } from './calculate';
@@ -30,7 +30,7 @@ export function getAElf(chainId: ChainId) {
 }
 
 export function getWallet() {
-  if (!wallet) wallet = Wallet.getWalletByPrivateKey(COMMON_PRIVATE);
+  if (!wallet) wallet = Wallet.createNewWallet();
   return wallet;
 }
 

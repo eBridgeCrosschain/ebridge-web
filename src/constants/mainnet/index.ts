@@ -137,7 +137,7 @@ export const WEB_LOGIN_CONFIG = {
   chainId: SupportedELFChainId.tDVV,
   portkeyV2: {
     networkType: NetworkEnum.MAINNET,
-    graphQLUrl: 'https://dapp-aa-portkey.portkey.finance/aefinder-v2/api/app/graphql/portkey',
+    graphQLUrl: 'https://indexer-api.aefinder.io/api/app/graphql/portkey',
     apiServer: 'https://aa-portkey.portkey.finance',
     connectServer: 'https://auth-aa-portkey.portkey.finance',
     caContractAddress: {
@@ -153,7 +153,7 @@ export const WEBSITE_ICON = 'https://ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = 'https://app.aefinder.io/ebridge_indexer/1a77c00769894bf1aaf0f8ae37e0aed0/graphql';
+export const INDEXER_URL = 'https://indexer-api.aefinder.io/api/app/graphql/ebridge_indexer';
 
 export const BASE_URL = 'https://ebridge.exchange';
 
