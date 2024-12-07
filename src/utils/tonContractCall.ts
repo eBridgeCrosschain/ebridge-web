@@ -66,13 +66,12 @@ export class CallTonContract {
     const req = await tonWeb.provider.call(contractAddress, 'get_receipt_rate_limit_state', [
       ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],
     ]);
-    console.log(req, '====req');
 
     return {
       currentTokenAmount: ZERO.plus(req.stack[0][1]),
       refreshTime: ZERO.plus(req.stack[1][1]),
       tokenCapacity: ZERO.plus(req.stack[2][1]),
-      isEnable: Boolean(ZERO.plus(req.stack[3][1]).toNumber()),
+      isEnable: ZERO.plus(req.stack[3][1]).toNumber() === -1,
       rate: ZERO.plus(req.stack[4][1]),
     };
   }

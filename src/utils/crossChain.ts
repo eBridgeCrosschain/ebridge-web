@@ -394,12 +394,14 @@ export async function getReceiptLimit({
       throw new Error(receiptDailyLimit.error || receiptTokenBucket.error);
     }
 
+    const isEnable = receiptTokenBucket.isEnable;
+
     return {
       remain: new BigNumber(receiptDailyLimit.tokenAmount),
       maxCapcity: new BigNumber(receiptTokenBucket.tokenCapacity),
       currentCapcity: new BigNumber(receiptTokenBucket.currentTokenAmount),
       fillRate: new BigNumber(receiptTokenBucket.rate),
-      isEnable: receiptTokenBucket.isEnabled,
+      isEnable,
     };
   } catch (error: any) {
     CommonMessage.error(error.message);
