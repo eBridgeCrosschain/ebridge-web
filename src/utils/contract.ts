@@ -291,7 +291,7 @@ export class AElfContractBasic {
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
       const params = transformArrayToMap(inputType, paramsOption);
-      if (!params.targetChainType) delete params.targetChainType;
+      console.log(params, functionNameUpper, '=======params', paramsOption, inputType);
       const req = await this.aelfContract[functionNameUpper](params);
       if (req.error) {
         return {

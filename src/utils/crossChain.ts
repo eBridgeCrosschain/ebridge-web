@@ -258,6 +258,12 @@ export async function CreateReceipt({
     );
     if (req !== REQ_CODE.Success) throw req;
   }
+  console.log(
+    fromELFChain,
+    toChainId,
+    [fromToken, account, toAddress, amount, getChainIdToMap(toChainId), isTonChain(toChainId) ? 1 : 0],
+    '======toChainId',
+  );
   if (fromELFChain) {
     return bridgeContract.callSendMethod('createReceipt', account, [
       fromToken,
