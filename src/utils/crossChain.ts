@@ -220,8 +220,8 @@ export async function CreateReceipt({
   tokenContract: ContractBasic;
   crossFee?: string;
 }) {
-  console.log(bridgeContract, '=====bridgeContract');
-  const toAddress = formatAddress(to);
+  let toAddress = to;
+  if (bridgeContract.contractType !== 'ELF') toAddress = formatAddress(to);
   const fromTonChain = bridgeContract.contractType === 'TON';
   const fromELFChain = bridgeContract.contractType === 'ELF';
   if (fromELFChain && fromToken !== CrossFeeToken) {

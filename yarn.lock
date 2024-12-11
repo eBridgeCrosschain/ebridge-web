@@ -3039,9 +3039,9 @@ aelf-sdk-cross-chain@^1.0.14:
   dependencies:
     chalk "^2.4.2"
 
-aelf-sdk@^3.2.40:
+aelf-sdk@^3.4.15:
   version "3.4.15"
-  resolved "https://registry.npmjs.org/aelf-sdk/-/aelf-sdk-3.4.15.tgz#dd507db52cc69b1cced325a9c939ffaadaebab8f"
+  resolved "https://registry.yarnpkg.com/aelf-sdk/-/aelf-sdk-3.4.15.tgz#dd507db52cc69b1cced325a9c939ffaadaebab8f"
   integrity sha512-pWtuTNkv5HSQsFskqPXcvp4NsUOt3Trfl1n/g3mFGjkP5MrqvPBO9D7AULRSqF7fxZmFNyDyTPGV7kM4rCtTbg==
   dependencies:
     "@aelfqueen/protobufjs" "^6.8.9"
