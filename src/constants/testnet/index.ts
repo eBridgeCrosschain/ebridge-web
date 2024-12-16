@@ -121,11 +121,6 @@ export const NetworkList = [
     icon: CHAIN_ICON[SupportedChainId.BSC_TESTNET],
     info: BSC_TESTNET.CHAIN_INFO,
   },
-  {
-    title: CHAIN_NAME[SupportedTONChainId.TESTNET],
-    icon: CHAIN_ICON[SupportedChainId.BSC_TESTNET],
-    info: TON_TESTNET.CHAIN_INFO,
-  },
 ] as unknown as NetworkType[];
 
 export const AELF_NODES = {
