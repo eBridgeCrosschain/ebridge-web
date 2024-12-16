@@ -28,7 +28,7 @@ const CrossApiList = {
 };
 
 const CMSApiList = {
-  getToggleReslutOfMask: '/cms/items/home',
+  getToggleResultOfMask: '/cms/items/home',
 };
 /**
  * api request extension configuration directory

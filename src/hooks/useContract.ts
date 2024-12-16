@@ -5,12 +5,12 @@ import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtil
 import { provider } from 'web3-core';
 import { useAElf, useWeb3 } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
-import { isAddress, isELFAddress, isTonChain, sleep } from 'utils';
+import { isELFAddress, isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from 'utils/checkAElfBridge';
 import { setContract } from 'contexts/useAElfContract/actions';
 import { useAElfContractContext } from 'contexts/useAElfContract';
-import { ContractBasic, PortkeySDKContractBasic, TONContractBasic } from 'utils/contract';
+import { ContractBasic, PortkeySDKContractBasic } from 'utils/contract';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { getContractBasic } from '@portkey/contracts';
@@ -266,4 +266,8 @@ export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
   }, [fromChainId]);
 
   return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
+}
+
+export function useCreateTokenContract(contractAddress: string, chainId?: ChainId) {
+  return useContract(contractAddress, ERC20_ABI, chainId, false);
 }

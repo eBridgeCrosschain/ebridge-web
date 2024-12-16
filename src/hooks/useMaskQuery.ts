@@ -8,7 +8,7 @@ export default function useMaskQuery() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const rs = await request.cms.getToggleReslutOfMask();
+        const rs = await request.cms.getToggleResultOfMask();
         setIsShowMask(rs?.data?.isShowMask);
         // eslint-disable-next-line no-empty
       } catch (e) {}

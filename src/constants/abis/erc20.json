@@ -194,6 +194,19 @@
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "string", "name": "symbol", "type": "string" },
+      { "internalType": "uint256", "name": "initialSupply", "type": "uint256" }
+    ],
+    "name": "createToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "payable": true,
     "stateMutability": "payable",
     "type": "fallback"
