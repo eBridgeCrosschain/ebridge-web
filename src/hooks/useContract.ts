@@ -1,4 +1,4 @@
-import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, LIMIT_ABI } from 'constants/abis';
+import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, CREATE_TOKEN_ABI, LIMIT_ABI } from 'constants/abis';
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
 import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
@@ -269,5 +269,5 @@ export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
 }
 
 export function useCreateTokenContract(contractAddress: string, chainId?: ChainId) {
-  return useContract(contractAddress, ERC20_ABI, chainId, false);
+  return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
 }

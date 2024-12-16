@@ -129,19 +129,19 @@ export const checkAllowanceAndApprove = async ({
 };
 
 export const createToken = async ({
-  erc20Contract,
+  createTokenContract,
   account,
   name,
   symbol,
   initialSupply,
 }: {
-  erc20Contract: ContractBasic;
+  createTokenContract: ContractBasic;
   account: string;
   name: string;
   symbol: string;
   initialSupply: number;
 }): Promise<any> => {
-  return await erc20Contract.callSendMethod('createToken', account, [name, symbol, initialSupply]);
+  return await createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply]);
 };
 
 export const getETHBalance = async (address: string, library?: provider) => {
