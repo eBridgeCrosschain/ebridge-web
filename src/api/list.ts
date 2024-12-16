@@ -27,6 +27,31 @@ const CrossApiList = {
   getRateLimits: 'api/app/limiter/rateLimits',
 };
 
+const ApplicationApiList = {
+  getTokenList: '/api/etransfer/application/tokens',
+  commitTokenInfo: {
+    target: '/api/etransfer/application/commit-basic-info',
+    baseConfig: { method: 'POST' },
+  },
+  getTokenInfo: '/api/etransfer/application/user-token-access-info',
+  getChainStatus: '/api/etransfer/application/check-chain-access-status',
+  addChain: {
+    target: '/api/etransfer/application/add-chain',
+    baseConfig: { method: 'POST' },
+  },
+  prepareBindIssue: {
+    target: '/api/etransfer/application/prepare-binding-issue',
+    baseConfig: { method: 'POST' },
+  },
+  getIssue: {
+    target: '/api/etransfer/application/issue-binding',
+    baseConfig: { method: 'POST' },
+  },
+  getMyApplicationList: '/api/etransfer/application/list',
+  getApplicationDetail: '/api/etransfer/application/detail',
+  getTokenConfig: '/api/etransfer/application/token/config',
+};
+
 const CMSApiList = {
   getToggleResultOfMask: '/cms/items/home',
 };
@@ -34,7 +59,7 @@ const CMSApiList = {
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList };
+export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, application: ApplicationApiList };
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;
