@@ -268,6 +268,10 @@ export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
   return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
 }
 
-export function useCreateTokenContract(contractAddress: string, chainId?: ChainId) {
+export function useCreateTokenContract(chainId?: ChainId) {
+  const contractAddress = useMemo(() => {
+    if (isELFChain(chainId) || isTonChain(chainId)) return '';
+    return ERCChainConstants.constants.CREATE_TOKEN_CONTRACT || '';
+  }, [chainId]);
   return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
 }

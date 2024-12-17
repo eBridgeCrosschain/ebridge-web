@@ -230,6 +230,7 @@ export type TApplicationDetailItemChainTokenInfo = {
   icon: string;
   poolAddress: string;
   contractAddress: string;
+  tokenContractAddress: string;
   status: ApplicationChainStatusEnum;
   balanceAmount: string;
   minAmount: string;
