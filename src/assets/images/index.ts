@@ -36,6 +36,7 @@ import closeIcon from './close.svg';
 import infoCircleIcon from './info-circle.svg';
 import questionFilledIcon from './question-filled.svg';
 import loadingIcon from './loading.png';
+import completeIcon from './complete.svg';
 
 export {
   metamask,
@@ -76,4 +77,5 @@ export {
   questionFilledIcon,
   loadingIcon,
   tonLogo,
+  completeIcon,
 };
