@@ -1,16 +1,16 @@
-import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, LIMIT_ABI } from 'constants/abis';
+import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, LIMIT_ABI, POOLS_ABI } from 'constants/abis';
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
 import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
 import { provider } from 'web3-core';
 import { useAElf, useWeb3 } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
-import { isAddress, isELFAddress, isTonChain, sleep } from 'utils';
+import { isELFAddress, isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from 'utils/checkAElfBridge';
 import { setContract } from 'contexts/useAElfContract/actions';
 import { useAElfContractContext } from 'contexts/useAElfContract';
-import { ContractBasic, PortkeySDKContractBasic, TONContractBasic } from 'utils/contract';
+import { ContractBasic, PortkeySDKContractBasic } from 'utils/contract';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { getContractBasic } from '@portkey/contracts';
@@ -21,6 +21,7 @@ import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 
 import { useGetAccount } from './wallet';
 import { SupportedELFChainId } from 'constants/chain';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { getBridgeChainInfo } from 'utils/chain';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
@@ -266,4 +267,12 @@ export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
   }, [fromChainId]);
 
   return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
+}
+
+export function usePoolContract(chainId?: ChainId, address?: string) {
+  const contractAddress = useMemo(() => {
+    return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
+  }, [chainId]);
+
+  return useContract(address || contractAddress, POOLS_ABI, chainId);
 }

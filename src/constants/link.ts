@@ -14,6 +14,7 @@ export const ROUTE_PATHS = {
   TRANSACTIONS: '/transactions',
   TERMS_OF_SERVICE: '/terms-of-service',
   PRIVACY_POLICY: '/privacy-policy',
+  POOLS: '/pools',
 };
 
 export const NAV_LIST = [
@@ -28,6 +29,12 @@ export const NAV_LIST = [
     selectedIcon: transactionsBlueIcon,
     title: 'Transactions',
     href: ROUTE_PATHS.TRANSACTIONS,
+  },
+  {
+    icon: transactionsIcon,
+    selectedIcon: transactionsBlueIcon,
+    title: 'Pools',
+    href: ROUTE_PATHS.POOLS,
   },
 ];
 

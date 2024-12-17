@@ -116,7 +116,7 @@ export class ContractBasic {
   };
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    console.log(paramsOption, '++++paramsOption');
+    console.log(functionName, paramsOption, '++++paramsOption');
     if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
       return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
     return this.callContract.callSendMethod(functionName, account, paramsOption, sendOptions);
@@ -156,6 +156,8 @@ export class WB3ContractBasic {
 
   public initContract: InitContract = (provider, address, ABI) => {
     this.web3 = new Web3(provider);
+    console.log(ABI, '=====ABI', address);
+
     return new this.web3.eth.Contract(ABI as any, address);
   };
   public initViewOnlyContract: InitViewOnlyContract = (address, ABI) => {
@@ -189,6 +191,8 @@ export class WB3ContractBasic {
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     if (!this.contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
+      console.log(this.provider, '===provider');
+
       const contract = this.contract;
       const { onMethod = 'receipt', ...options } = sendOptions || {};
 
@@ -198,6 +202,8 @@ export class WB3ContractBasic {
       } catch (error) {
         console.log(error);
       }
+
+      console.log({ from: account, ...options }, '====options');
 
       const result: any = await new Promise((resolve, reject) =>
         contract.methods[functionName](...(paramsOption || []))
