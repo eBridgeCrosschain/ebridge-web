@@ -1,0 +1,70 @@
+import { Row } from 'antd';
+import type { ColumnType } from 'antd/lib/table';
+import { Trans } from 'react-i18next';
+import { APIPoolItem } from 'types/api';
+import { getChainIdByAPI, getIconByChainId } from 'utils/chain';
+import { formatSymbol } from 'utils/token';
+import styles from './styles.module.less';
+import TokenLogo from 'components/TokenLogo';
+import IconFont from 'components/IconFont';
+
+const token: ColumnType<APIPoolItem> = {
+  title: () => <Trans>Token</Trans>,
+  key: 'Token',
+  ellipsis: true,
+  dataIndex: 'token',
+  render: (token, item) => {
+    const chainId = getChainIdByAPI(item.chainId);
+    return (
+      <Row className="flex-row-center">
+        <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={token?.symbol} />
+        <div>{formatSymbol(token?.symbol)}</div>
+      </Row>
+    );
+  },
+};
+
+const network: ColumnType<APIPoolItem> = {
+  title: () => <Trans>Network</Trans>,
+  key: 'Network',
+  ellipsis: true,
+  dataIndex: 'token',
+  render: (token, item) => {
+    const iconProps = getIconByChainId(getChainIdByAPI(item.chainId));
+    return (
+      <Row className="flex-row-center">
+        <IconFont className={styles['network-icon']} type={iconProps?.type || ''} />
+        <div>{formatSymbol(token?.symbol)}</div>
+      </Row>
+    );
+  },
+};
+
+const yourLiquidity: ColumnType<APIPoolItem> = {
+  title: () => <Trans>Your Liquidity</Trans>,
+  key: 'yourLiquidity',
+  ellipsis: true,
+  dataIndex: 'myTvlInUsd',
+  render: (myTvlInUsd) => {
+    return <Row>${myTvlInUsd}</Row>;
+  },
+};
+
+const totalLiquidity: ColumnType<APIPoolItem> = {
+  title: () => <Trans>Total Liquidity</Trans>,
+  key: 'totalLiquidity',
+  ellipsis: true,
+  dataIndex: 'totalTvlInUsd',
+  render: (totalTvlInUsd) => {
+    return <Row>${totalTvlInUsd}</Row>;
+  },
+};
+
+const columns = {
+  token,
+  network,
+  yourLiquidity,
+  totalLiquidity,
+};
+
+export default columns;

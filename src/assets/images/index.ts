@@ -36,6 +36,8 @@ import closeIcon from './close.svg';
 import infoCircleIcon from './info-circle.svg';
 import questionFilledIcon from './question-filled.svg';
 import loadingIcon from './loading.png';
+import poolsIcon from './pools.svg';
+import poolsBlueIcon from './pools-blue.svg';
 
 export {
   metamask,
@@ -76,4 +78,6 @@ export {
   questionFilledIcon,
   loadingIcon,
   tonLogo,
+  poolsIcon,
+  poolsBlueIcon,
 };

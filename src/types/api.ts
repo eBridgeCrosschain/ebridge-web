@@ -50,6 +50,14 @@ export interface APICrossChainItem {
  * AElf.CrossChainServer.Tokens.TokenDto
  */
 export type TokensToken = {
-  chainId?: number;
+  chainId?: string;
   id?: string;
 } & TokenInfo;
+
+export interface APIPoolItem {
+  token?: TokensToken;
+  chainId: string;
+  myTvlInUsd?: string;
+  totalTvlInUsd?: string;
+  tokenPrice?: string;
+}

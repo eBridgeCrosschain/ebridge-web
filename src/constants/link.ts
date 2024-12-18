@@ -7,6 +7,8 @@ import {
   bridgeBlueIcon,
   transactionsIcon,
   transactionsBlueIcon,
+  poolsIcon,
+  poolsBlueIcon,
 } from 'assets/images';
 
 export const ROUTE_PATHS = {
@@ -16,6 +18,15 @@ export const ROUTE_PATHS = {
   PRIVACY_POLICY: '/privacy-policy',
   POOLS: '/pools',
 };
+
+export const HIDE_MAIN_PAGE_LIST = [
+  {
+    icon: poolsIcon,
+    selectedIcon: poolsBlueIcon,
+    title: 'Pools',
+    href: ROUTE_PATHS.POOLS,
+  },
+];
 
 export const NAV_LIST = [
   {
@@ -31,8 +42,8 @@ export const NAV_LIST = [
     href: ROUTE_PATHS.TRANSACTIONS,
   },
   {
-    icon: transactionsIcon,
-    selectedIcon: transactionsBlueIcon,
+    icon: poolsIcon,
+    selectedIcon: poolsBlueIcon,
     title: 'Pools',
     href: ROUTE_PATHS.POOLS,
   },
