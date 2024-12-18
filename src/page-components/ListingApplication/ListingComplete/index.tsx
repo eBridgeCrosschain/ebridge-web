@@ -6,6 +6,7 @@ import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
 import { completeIcon } from 'assets/images';
 import { BRIDGE_NOW } from 'constants/listingApplication';
+import { ROUTE_PATHS } from 'constants/link';
 
 const ListingCompleteTitle = 'Listing is complete';
 const ListingCompleteContent = 'The Bridge will be available in 10 minutes.';
@@ -13,8 +14,8 @@ const ListingCompleteContent = 'The Bridge will be available in 10 minutes.';
 function ListingComplete() {
   const router = useRouter();
 
-  const handleGoMyApplications = useCallback(() => {
-    router.push('/my-applications');
+  const handleGoBridge = useCallback(() => {
+    router.push(ROUTE_PATHS.BRIDGE);
   }, [router]);
 
   return (
@@ -23,7 +24,7 @@ function ListingComplete() {
       <div className={styles['title']}>{ListingCompleteTitle}</div>
       <div className={styles['content']}>{ListingCompleteContent}</div>
 
-      <CommonButton className={clsx('flex-1', styles['transfer-button'])} type="ghost" onClick={handleGoMyApplications}>
+      <CommonButton className={clsx('flex-1', styles['transfer-button'])} type="ghost" onClick={handleGoBridge}>
         {BRIDGE_NOW}
       </CommonButton>
     </div>

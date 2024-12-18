@@ -37,6 +37,8 @@ import infoCircleIcon from './info-circle.svg';
 import questionFilledIcon from './question-filled.svg';
 import loadingIcon from './loading.png';
 import completeIcon from './complete.svg';
+import infoCircleFillIcon from './info-circle-fill.svg';
+import viewProgressIcon from './view-progress.svg';
 
 export {
   metamask,
@@ -74,8 +76,10 @@ export {
   transactionsBlueIcon,
   closeIcon,
   infoCircleIcon,
+  infoCircleFillIcon,
   questionFilledIcon,
   loadingIcon,
   tonLogo,
   completeIcon,
+  viewProgressIcon,
 };

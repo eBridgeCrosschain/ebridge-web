@@ -14,6 +14,8 @@ export const ROUTE_PATHS = {
   TRANSACTIONS: '/transactions',
   TERMS_OF_SERVICE: '/terms-of-service',
   PRIVACY_POLICY: '/privacy-policy',
+  LISTING_APPLICATION: '/listing-application',
+  MY_APPLICATIONS: '/my-applications',
 };
 
 export const NAV_LIST = [
@@ -73,3 +75,5 @@ export const HEADER_COMMUNITY_CONFIG = [
     link: COMMUNITY_LINK_MAP.TWITTER,
   },
 ];
+
+export const CONTACT_US_FORM_URL = 'https://form.ebridge.exchange/contact';
