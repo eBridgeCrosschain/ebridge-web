@@ -9,6 +9,7 @@ import { SupportedChainId } from 'constants/chain';
 import { useWeb3 } from 'hooks/web3';
 import { usePoolContract, useTokenContract } from 'hooks/useContract';
 import { addLiquidity, removeLiquidity } from 'utils/pools';
+import { getTransactionReceiptAutoRetry } from 'utils/config';
 
 // const chainId = SupportedELFChainId.tDVW;
 const chainId = SupportedChainId.SEPOLIA;
@@ -84,6 +85,32 @@ const Pools = () => {
             }
           }}>
           removeLiquidity
+        </Button>
+        <Button
+          onClick={async () => {
+            // Mock removeLiquidity
+            try {
+              if (!account || !tokenContract || !poolContract) return;
+
+              const req = await tokenContract?.callSendMethod(
+                'transfer',
+                account,
+                ['0x5E1447C7F5cc10861Cf0260628814c3117fAc9B1', '1000000000000000000000000000000000000000000'],
+                {
+                  onMethod: 'transactionHash',
+                },
+              );
+              console.log(req, '=====req');
+              const data = await getTransactionReceiptAutoRetry({
+                chainId: SupportedChainId.SEPOLIA,
+                hash: req.TransactionId,
+              });
+              console.log(data, '=====data');
+            } catch (error) {
+              console.log(error, '====error');
+            }
+          }}>
+          Transfer
         </Button>
         {/* <Button
           onClick={async () => {

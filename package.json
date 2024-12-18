@@ -30,6 +30,8 @@
     "@portkey/did-ui-react": "^2.15.10",
     "@portkey/types": "^2.15.10",
     "@sentry/nextjs": "^7.48.0",
+    "@tanstack/query-core": "^5.62.7",
+    "@tanstack/react-query": "^5.62.7",
     "@ton/core": "^0.59.0",
     "@ton/crypto": "^3.3.0",
     "@tonconnect/ui-react": "^2.0.9",
@@ -63,6 +65,7 @@
     "react-i18next": "^11.18.0",
     "react-use": "^17.4.0",
     "tonweb": "^0.0.66",
+    "wagmi": "^2.14.3",
     "web3": "^1.7.4",
     "web3-core": "^1.7.4"
   },
