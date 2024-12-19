@@ -191,12 +191,11 @@ export const SELECT_CHAIN_FORM_CHAIN_NOT_CREATED_STATUS_LIST = [
   ApplicationChainStatusEnum.Issued,
 ];
 
+// TODO CHECK
 export const SELECT_CHAIN_FORM_CHAIN_CREATED_NOT_LISTED_STATUS_LIST = [
-  ApplicationChainStatusEnum.Reviewing,
-  ApplicationChainStatusEnum.Rejected,
-  ApplicationChainStatusEnum.Reviewed,
   ApplicationChainStatusEnum.PoolInitializing,
-  ApplicationChainStatusEnum.Integrating,
+  ApplicationChainStatusEnum.PoolInitialized,
+  ApplicationChainStatusEnum.LiquidityAdding,
   ApplicationChainStatusEnum.Failed,
 ];
 

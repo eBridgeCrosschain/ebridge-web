@@ -26,7 +26,7 @@ export default function StatusBox({ wrapperClassName, className, status, failRea
   }, [status]);
 
   const isFailed = useMemo(() => {
-    return status === ApplicationChainStatusEnum.Failed || status === ApplicationChainStatusEnum.Rejected;
+    return status === ApplicationChainStatusEnum.Failed;
   }, [status]);
 
   const showFailedReason = useCallback(() => {

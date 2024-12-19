@@ -32,21 +32,22 @@ export default function ViewProgress({
   const isMd = useMediaQueries('md');
 
   const currentStep = useMemo(() => {
-    // TODO
     if (status === ApplicationChainStatusEnum.Unissued) {
       return ListingProcessStep.BASIC_INFO;
     }
     if (status === ApplicationChainStatusEnum.Issuing) {
       return ListingProcessStep.SELECT_CHAIN;
     }
-    if (status === ApplicationChainStatusEnum.Issued || status === ApplicationChainStatusEnum.Reviewing) {
+    if (status === ApplicationChainStatusEnum.Issued || status === ApplicationChainStatusEnum.PoolInitializing) {
       return ListingProcessStep.INITIALIZE_TOKEN_POOL;
     }
-    if (status === ApplicationChainStatusEnum.Reviewed || status === ApplicationChainStatusEnum.PoolInitializing) {
+    if (
+      status === ApplicationChainStatusEnum.PoolInitialized ||
+      status === ApplicationChainStatusEnum.LiquidityAdding
+    ) {
       return ListingProcessStep.ADD_TOKEN_POOL;
     }
 
-    // ApplicationChainStatusEnum.Rejected;
     // ApplicationChainStatusEnum.Failed;
     return ListingProcessStep.COMPLETE;
   }, [status]);

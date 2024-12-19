@@ -122,12 +122,9 @@ export enum ApplicationChainStatusEnum {
   Unissued = 'Unissued',
   Issuing = 'Issuing',
   Issued = 'Issued',
-  Reviewing = 'Reviewing',
-  Rejected = 'Rejected',
-  Reviewed = 'Reviewed',
   PoolInitializing = 'PoolInitializing',
   PoolInitialized = 'PoolInitialized',
-  Integrating = 'Integrating',
+  LiquidityAdding = 'LiquidityAdding',
   Complete = 'Complete',
   Failed = 'Failed',
 }
@@ -184,8 +181,6 @@ export type TMyApplicationItem = {
   symbol: string;
   status: ApplicationChainStatusEnum;
   updateTime: number;
-  rejectedTime?: number; // status === ApplicationChainStatusEnum.Rejected
-  rejectedReason?: string; // status === ApplicationChainStatusEnum.Rejected
   failedTime?: number; // status === ApplicationChainStatusEnum.Failed
   failedReason?: string; // status === ApplicationChainStatusEnum.Failed
   chainTokenInfo?: TMyApplicationChainTokenInfo[];

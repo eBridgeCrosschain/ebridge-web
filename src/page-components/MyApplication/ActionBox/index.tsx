@@ -17,7 +17,7 @@ export default function ActionBox({
   chainName,
   id,
   status,
-  rejectedTime,
+  filedTime,
 }: {
   symbol: string;
   tokenIcon?: string;
@@ -25,7 +25,7 @@ export default function ActionBox({
   chainName: string;
   id: string;
   status: ApplicationChainStatusEnum;
-  rejectedTime?: number;
+  filedTime?: number;
 }) {
   const router = useRouter();
   // TODO
@@ -38,11 +38,13 @@ export default function ActionBox({
   }, [status]);
 
   const isFailed = useMemo(() => {
-    return status === ApplicationChainStatusEnum.Failed || status === ApplicationChainStatusEnum.Rejected;
+    return status === ApplicationChainStatusEnum.Failed;
   }, [status]);
 
-  const isNeedInitTokenPool = useMemo(() => {
-    return status === ApplicationChainStatusEnum.PoolInitializing || status === ApplicationChainStatusEnum.Reviewed;
+  const isNeedAddTokenPool = useMemo(() => {
+    return (
+      status === ApplicationChainStatusEnum.PoolInitialized || status === ApplicationChainStatusEnum.LiquidityAdding
+    );
   }, [status]);
 
   const handleViewProgress = useCallback(() => {
@@ -93,7 +95,7 @@ export default function ActionBox({
   }, [chainId, symbol]);
 
   useEffectOnce(() => {
-    if (rejectedTime && rejectedTime + TwoDaysTimestamp >= Date.now()) {
+    if (filedTime && filedTime + TwoDaysTimestamp >= Date.now()) {
       setIsReapplyDisable(true);
     } else {
       setIsReapplyDisable(false);
@@ -118,7 +120,7 @@ export default function ActionBox({
     );
   }
 
-  if (isNeedInitTokenPool) {
+  if (isNeedAddTokenPool) {
     return (
       <div className={styles['action']} onClick={handleAddTokenPool}>
         Add token pool
