@@ -7,10 +7,6 @@ const storages = {
   contractsFileDescriptorBase64: 'contracts-file-descriptor-base64-10',
   crossChainReceived: 'cross-chain-received',
   portkeyCAAddresses: 'portkey-ca-addresses',
-  // loginSuccess: 'aelf-login-success',
-  // logoutSuccess: 'aelf-logout-success',
-  // aelfAuthTokenSuccess: 'aelf-auth-token-success',
-  // googleReCaptcha: 'google-reCaptcha',
 };
 export default storages;
 

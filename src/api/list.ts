@@ -20,10 +20,6 @@ export const BASE_APIS = {
   getCurrentBlockHeight: '',
 };
 
-const UserApiList = {
-  checkEOARegistration: '/api/ebridge/user/check-eoa-registration',
-};
-
 const CrossApiList = {
   getCrossChainTransfers: '/api/app/cross-chain-transfers',
   getCrossChainIndexing: '/api/app/cross-chain-indexing/progress',
@@ -63,7 +59,7 @@ const CMSApiList = {
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, user: UserApiList, application: ApplicationApiList };
+export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, application: ApplicationApiList };
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

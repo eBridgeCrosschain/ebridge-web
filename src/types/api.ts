@@ -242,14 +242,6 @@ export type TGetTokenConfigResult = {
   holders: number;
 };
 
-export type TCheckEOARegistrationRequest = {
-  address: string;
-};
-
-export type TCheckEOARegistrationResult = {
-  result: boolean;
-};
-
 export interface APIPoolItem {
   token?: TokensToken;
   chainId: string;

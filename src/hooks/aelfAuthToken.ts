@@ -1,21 +1,18 @@
 import { WalletTypeEnum as AelfWalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { APP_NAME } from 'constants/index';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import AElf from 'aelf-sdk';
 import { zeroFill } from '@portkey/utils';
 import { useAElf } from './web3';
 import { AuthTokenSource, getAuthPlainText, getLocalJWT, QueryAuthApiExtraRequest } from 'utils/aelfAuthToken';
 import { ExtraInfoForDiscover, WebLoginWalletInfo } from 'types/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
-import { checkEOARegistration, queryAuthApi } from 'utils/api/auth';
+import { queryAuthApi } from 'utils/api/auth';
 import { service } from 'api/utils';
 import { getCaHashAndOriginChainIdByWallet, getManagerAddressByWallet } from './wallet';
 import { recoverPubKey } from 'utils/aelfUtils';
-import { ReCaptchaType } from 'components/GoogleRecaptcha/types';
-import googleReCaptchaModal from 'utils/modal/googleReCaptchaModal';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
-import CommonMessage from 'components/CommonMessage';
 
 export function useAelfAuthToken() {
   const { account, isActive, loginWalletType } = useAElf();
@@ -84,36 +81,6 @@ export function useAelfAuthToken() {
     return { signature: signResult?.signature || '', plainText: plainTextHex };
   }, [account, getSignature, loginWalletType, walletInfo?.extraInfo]);
 
-  const [isReCaptchaLoading, setIsReCaptchaLoading] = useState(true); // TODO
-  useEffect(() => {
-    const { remove } = eBridgeEventBus.GoogleReCaptcha.addListener((res) => {
-      if (res === 'onLoad') {
-        setIsReCaptchaLoading(false);
-      }
-    });
-    return () => {
-      remove();
-    };
-  }, []);
-
-  const handleReCaptcha = useCallback(async (): Promise<string | undefined> => {
-    if (!account) return;
-    if (loginWalletType === AelfWalletTypeEnum.elf) {
-      const isRegistered = await checkEOARegistration({ address: account });
-      if (!isRegistered.result) {
-        // change loading text
-        if (isReCaptchaLoading) {
-          // setLoading(true, { text: 'Captcha Human Verification Loading' });
-        }
-        const result = await googleReCaptchaModal();
-        if (result.type === ReCaptchaType.success) {
-          return result.data;
-        }
-      }
-    }
-    return undefined;
-  }, [account, isReCaptchaLoading, loginWalletType]);
-
   const queryAuth = useCallback(
     async (isThrowError: boolean, isAfterErrorDisconnect: boolean): Promise<string | undefined> => {
       if (!isActive || !loginWalletType) return;
@@ -121,9 +88,6 @@ export function useAelfAuthToken() {
       try {
         // Mark: only one signature process can be performed at the same time
         eBridgeInstance.setObtainingSignature(true);
-        // setLoading(true);
-        const recaptchaResult = await handleReCaptcha();
-        // setLoading(true); // to change loading text = 'Loading...'
         const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
           walletInfo as WebLoginWalletInfo,
           loginWalletType,
@@ -144,7 +108,6 @@ export function useAelfAuthToken() {
           managerAddress: managerAddress,
           ca_hash: caHash || undefined,
           chain_id: originChainId || undefined,
-          recaptchaToken: recaptchaResult || undefined,
         };
 
         const authToken = await queryAuthApi(apiParams);
@@ -154,13 +117,6 @@ export function useAelfAuthToken() {
         return authToken;
       } catch (error: any) {
         console.log('queryAuthApi error', error);
-        if (
-          error?.type === ReCaptchaType.cancel ||
-          error?.type === ReCaptchaType.error ||
-          error?.type === ReCaptchaType.expire
-        ) {
-          CommonMessage.error(error?.data);
-        }
         if (isThrowError) throw error;
         if (isAfterErrorDisconnect) await disConnectWallet();
 
@@ -170,7 +126,7 @@ export function useAelfAuthToken() {
         eBridgeInstance.setObtainingSignature(false);
       }
     },
-    [isActive, handleReCaptcha, walletInfo, loginWalletType, handleSignMessage, loginSuccessActive, disConnectWallet],
+    [isActive, walletInfo, loginWalletType, handleSignMessage, loginSuccessActive, disConnectWallet],
   );
 
   const getAuth = useCallback(

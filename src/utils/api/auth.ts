@@ -5,8 +5,6 @@ import { stringify } from 'query-string';
 import { PortkeyVersion } from 'types/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { JWTData, QueryAuthApiExtraRequest, setLocalJWT } from 'utils/aelfAuthToken';
-import { TCheckEOARegistrationRequest, TCheckEOARegistrationResult } from 'types/api';
-import { request } from 'api';
 
 type QueryAuthApiBaseConfig = {
   grant_type: string;
@@ -39,13 +37,4 @@ export const queryAuthApi = async (config: QueryAuthApiExtraRequest): Promise<st
   }
 
   return `${token_type} ${access_token}`;
-};
-
-export const checkEOARegistration = async (
-  params: TCheckEOARegistrationRequest,
-): Promise<TCheckEOARegistrationResult> => {
-  const res = await request.user.checkEOARegistration({
-    params,
-  });
-  return res.data;
 };
