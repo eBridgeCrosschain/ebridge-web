@@ -1,5 +1,11 @@
 'use client';
-import { getTransactionReceipt, GetTransactionReceiptParameters, getBalance, GetBalanceParameters } from '@wagmi/core';
+import {
+  getTransactionReceipt,
+  GetTransactionReceiptParameters,
+  getBalance,
+  GetBalanceParameters,
+  GetTransactionReceiptReturnType,
+} from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
 import { sleep } from 'utils';
 import { handleErrorMessage } from './error';
@@ -10,7 +16,7 @@ export async function getTransactionReceiptAutoRetry(
   params: GetTransactionReceiptParameters<any>,
   reGetCount = 0,
   notExistedReGetCount = 0,
-) {
+): Promise<GetTransactionReceiptReturnType> {
   try {
     const req = await getTransactionReceipt(EVMProviderConfig, params);
     if (req.status === 'success') return req;
