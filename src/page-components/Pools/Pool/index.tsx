@@ -4,7 +4,7 @@ import IconFont from 'components/IconFont';
 import MainContentHeader from 'components/MainContentHeader';
 import { useLanguage } from 'i18n';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-use';
 import { getChainIdByAPI, getChainName, getChainType, getIconByChainId } from 'utils/chain';
 import styles from './styles.module.less';
@@ -17,16 +17,24 @@ import { Trans } from 'react-i18next';
 import { useBalances } from 'hooks/useBalances';
 import { isELFChain } from 'utils/aelfUtils';
 import { divDecimals } from 'utils/calculate';
+import CommonAmountRow from 'components/CommonAmountRow';
+import { parseInputChange } from 'utils/input';
+import { unitConverter } from 'utils/converter';
+import { formatSymbol } from 'utils/token';
+import TokenLogo from 'components/TokenLogo';
 export default function Pool() {
   const { t } = useLanguage();
 
   const { push } = useRouter();
   const { pathname } = useLocation();
 
+  const [amount, setAmount] = useState<string>();
+
   const [apiChainId, symbol] = useMemo(() => pathname?.replace('/pool/', '').split('/') || [], [pathname]);
   const chainId = useMemo(() => getChainIdByAPI(apiChainId), [apiChainId]);
 
   const tokenInfo = useMemo(() => getTokenInfoByWhitelist(chainId as ChainId, symbol), [chainId, symbol]);
+  const min = useMemo(() => divDecimals(1, tokenInfo?.decimals), [tokenInfo?.decimals]);
 
   const web3Wallet = useWeb3Wallet(chainId);
   const connect = useConnect();
@@ -63,6 +71,21 @@ export default function Pool() {
       <div className={clsx('main-page-component-wrap')}>
         <MainContentHeader wrap={false} title={t('Pool')} rightEle={chainIcon} />
         <div>
+          <CommonAmountRow
+            showBalance={!!web3Wallet.account}
+            // showError={!!(!changing && showError)}
+            value={amount}
+            // onClickMAX={() => dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)))}
+            onAmountInputChange={(e) => setAmount(parseInputChange(e.target.value, min, tokenInfo?.decimals))}
+            leftHeaderTitle={t('Token amount')}
+            rightHeaderTitle={`${unitConverter(showBalance)} ${formatSymbol(tokenInfo?.symbol)}`}
+            rightInputEle={
+              <Row className={clsx('flex-row-center', styles['token-logo-row'], 'font-family-medium')}>
+                <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={tokenInfo?.symbol} />
+                <div>{formatSymbol(tokenInfo?.symbol)}</div>
+              </Row>
+            }
+          />
           <CommonButton
             onClick={async () => {
               // TODO: connect

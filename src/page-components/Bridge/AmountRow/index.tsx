@@ -28,33 +28,31 @@ export default function AmountRow() {
   );
 
   return (
-    <>
-      <CommonAmountRow
-        showBalance={!!account}
-        showError={!!(!changing && showError)}
-        value={fromInput}
-        onClickMAX={() => dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)))}
-        onAmountInputChange={(e) => dispatch(setFrom(parseInputChange(e.target.value, min, token?.decimals)))}
-        leftHeaderEle={t('Amount')}
-        rightHeaderTitle={`${unitConverter(show)} ${formatSymbol(
-          selectToken && selectToken[chainId as TBridgeChainId]?.symbol,
-        )}`}
-        rightInputEle={
-          <TokenSelect
-            title={selectToken && selectToken[chainId as TBridgeChainId]?.symbol}
-            symbol={selectToken?.symbol}
-            chainId={chainId}
-            onClick={() =>
-              dispatch(
-                setSelectModal({
-                  open: true,
-                  type: 'to',
-                }),
-              )
-            }
-          />
-        }
-      />
-    </>
+    <CommonAmountRow
+      showBalance={!!account}
+      showError={!!(!changing && showError)}
+      value={fromInput}
+      onClickMAX={() => dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)))}
+      onAmountInputChange={(e) => dispatch(setFrom(parseInputChange(e.target.value, min, token?.decimals)))}
+      leftHeaderTitle={t('Amount')}
+      rightHeaderTitle={`${unitConverter(show)} ${formatSymbol(
+        selectToken && selectToken[chainId as TBridgeChainId]?.symbol,
+      )}`}
+      rightInputEle={
+        <TokenSelect
+          title={selectToken && selectToken[chainId as TBridgeChainId]?.symbol}
+          symbol={selectToken?.symbol}
+          chainId={chainId}
+          onClick={() =>
+            dispatch(
+              setSelectModal({
+                open: true,
+                type: 'to',
+              }),
+            )
+          }
+        />
+      }
+    />
   );
 }
