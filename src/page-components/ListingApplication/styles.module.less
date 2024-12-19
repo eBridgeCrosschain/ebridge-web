@@ -1,0 +1,136 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+
+@listing-content-padding: 48px;
+
+.listing-container {
+  flex: 1;
+  height: 100%;
+  padding: 40px 0;
+  background-color: @bg-14;
+}
+
+.listing-content {
+  max-width: calc(890px + (@listing-content-padding * 2));
+  margin: 0 auto;
+  padding: 0 @listing-content-padding;
+}
+
+.listing-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.listing-back-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.listing-back-text {
+  .font-family-medium();
+
+  font-size: 14px;
+  line-height: 22px;
+  color: @font-15;
+}
+
+.listing-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listing-card {
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid @border-5;
+  background-color: @bg-2;
+}
+
+.listing-card-steps-title {
+  margin-bottom: 24px;
+  .font-family-semibold();
+
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.listing-card-form-title {
+  margin-bottom: 32px;
+  .font-family-semibold();
+
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.listing-card-form-content {
+  :global {
+    .@{app-prefix}-form-item-label {
+      label {
+        width: 100%;
+        .font-family-medium();
+
+        color: @font-15;
+      }
+    }
+
+    .@{app-prefix}-input,
+    .@{app-prefix}-input-affix-wrapper {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-color: @border-5;
+      font-size: 14px;
+      line-height: 22px;
+
+      &::placeholder {
+        color: @font-18;
+      }
+
+      &:hover {
+        border-color: @bg-17;
+      }
+
+      &:focus,
+      &.@{app-prefix}-input-affix-wrapper-focused {
+        border-color: @bg-17;
+        box-shadow: none;
+        caret-color: @bg-17;
+      }
+    }
+
+    .@{app-prefix}-input-suffix {
+      margin-left: 16px;
+    }
+
+    .@{app-prefix}-form-item-margin-offset {
+      margin-bottom: 0 !important;
+    }
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .listing-container {
+    padding: 16px 12px 48px;
+    background-color: @bg-2;
+  }
+
+  .listing-content {
+    padding: 0;
+  }
+
+  .listing-card {
+    padding: 24px 12px;
+  }
+
+  .listing-card-steps-title {
+    margin-bottom: 24px;
+  }
+
+  .listing-card-form-title {
+    margin-bottom: 24px;
+  }
+}
