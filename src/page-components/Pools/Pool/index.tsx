@@ -17,10 +17,7 @@ import { Trans } from 'react-i18next';
 import { useBalances } from 'hooks/useBalances';
 import { isELFChain } from 'utils/aelfUtils';
 import { divDecimals } from 'utils/calculate';
-import { EVMProviderConfig } from 'constants/evm';
 export default function Pool() {
-  console.log(EVMProviderConfig, '===EVMProviderConfig');
-
   const { t } = useLanguage();
 
   const { push } = useRouter();
@@ -68,6 +65,7 @@ export default function Pool() {
         <div>
           <CommonButton
             onClick={async () => {
+              // TODO: connect
               const req = await connect(getChainType(chainId), chainId);
             }}
             type="primary">

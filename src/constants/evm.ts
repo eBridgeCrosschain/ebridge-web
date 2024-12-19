@@ -1,9 +1,20 @@
 import { http, createConfig } from 'wagmi';
-import { arbitrum, avalanche, base, bsc, bscTestnet, mainnet, optimism, polygon, sepolia } from 'wagmi/chains';
+import {
+  arbitrum,
+  avalanche,
+  base,
+  baseSepolia,
+  bsc,
+  bscTestnet,
+  mainnet,
+  optimism,
+  polygon,
+  sepolia,
+} from 'wagmi/chains';
 import { metaMask } from 'wagmi/connectors';
 
 export const EVMProviderConfig = createConfig({
-  chains: [mainnet, bsc, base, polygon, avalanche, arbitrum, optimism, sepolia, bscTestnet],
+  chains: [mainnet, bsc, base, polygon, avalanche, arbitrum, optimism, sepolia, bscTestnet, baseSepolia],
   connectors: [metaMask()],
   transports: {
     [mainnet.id]: http(),
@@ -15,5 +26,6 @@ export const EVMProviderConfig = createConfig({
     [optimism.id]: http(),
     [sepolia.id]: http(),
     [bscTestnet.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
