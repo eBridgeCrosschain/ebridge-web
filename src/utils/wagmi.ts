@@ -1,5 +1,5 @@
 'use client';
-import { getTransactionReceipt, GetTransactionReceiptParameters } from '@wagmi/core';
+import { getTransactionReceipt, GetTransactionReceiptParameters, getBalance, GetBalanceParameters } from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
 import { sleep } from 'utils';
 import { handleErrorMessage } from './error';
@@ -27,4 +27,8 @@ export async function getTransactionReceiptAutoRetry(
     }
     throw error;
   }
+}
+
+export async function getBalanceByWagmi(params: GetBalanceParameters<any>) {
+  return getBalance(EVMProviderConfig, params);
 }

@@ -21,7 +21,7 @@ export default function PoolOverviewCard({ title, tooltipTitle, data }: TPoolOve
           <CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />
         </Tooltip>
       </div>
-      <div className={styles['page-overview-data']}>{data ? t(data) : ''}</div>
+      <div className={clsx(styles['page-overview-data'], 'font-family-medium')}>{data ? t(data) : ''}</div>
     </div>
   );
 }

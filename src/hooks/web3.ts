@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import { ZERO } from 'constants/misc';
 import { useCallback, useMemo } from 'react';
 import { getProvider } from 'utils/provider';
-import { Web3Type } from 'types';
+import { ChainId, Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
 import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, IS_MAINNET } from 'constants/index';
 import { Accounts } from '@portkey/provider-types';
@@ -15,6 +15,8 @@ import { getPortkeySDKAccount } from 'utils/wallet';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { toUserFriendlyAddress } from '@tonconnect/sdk';
 import { SupportedTONChainId } from 'constants/chain';
+import { isELFChain } from 'utils/aelfUtils';
+import { isTonChain } from 'utils';
 
 export function useAElfConnect() {
   const login = useLogin();
@@ -155,4 +157,16 @@ export function useTon(): Web3Type {
       baseAccount: wallet?.account,
     } as any;
   }, [wallet]);
+}
+
+export function useWeb3Wallet(chainId?: ChainId) {
+  const tonWallet = useTon();
+  const aelfWallet = useAElf();
+  const web3Wallet = useWeb3();
+
+  return useMemo(() => {
+    if (isELFChain(chainId)) return aelfWallet;
+    if (isTonChain(chainId)) return tonWallet;
+    return web3Wallet;
+  }, [aelfWallet, chainId, tonWallet, web3Wallet]);
 }

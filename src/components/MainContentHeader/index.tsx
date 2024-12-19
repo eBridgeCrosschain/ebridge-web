@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import clsx from 'clsx';
 import { Tooltip } from 'antd';
 import CommonImage from 'components/CommonImage';
@@ -10,12 +10,13 @@ interface IMainContentHeaderProps {
   className?: string;
   wrap?: boolean;
   title: string;
+  rightEle?: ReactNode;
   tipConfig?: {
     label: string;
   } & ({ content: React.ReactNode; onClick?: never } | { content?: never; onClick?: () => void });
 }
 
-export default function MainContentHeader({ className, wrap, title, tipConfig }: IMainContentHeaderProps) {
+export default function MainContentHeader({ className, wrap, title, tipConfig, rightEle }: IMainContentHeaderProps) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const isMobile = isMobileDevices();
@@ -48,6 +49,7 @@ export default function MainContentHeader({ className, wrap, title, tipConfig }:
         className,
       )}>
       <div className={styles['header-title']}>{title}</div>
+      {rightEle}
       {tipConfig && (
         <div
           className={clsx(styles['header-tip'], 'flex-row-center', 'cursor-pointer')}
