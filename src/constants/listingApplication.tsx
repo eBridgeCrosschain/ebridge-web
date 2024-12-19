@@ -59,7 +59,7 @@ export const LISTING_STEP_ITEMS: ICommonStepsProps['stepItems'] = [
 export const CONTACT_US_ROW = (
   <>
     {'• If you need any support, please '}
-    <CommonLink href="https://form.etransfer.exchange/contact">contact us</CommonLink>
+    <CommonLink href="https://form.ebridge.exchange/contact">contact us</CommonLink>
     {'.'}
   </>
 );
@@ -207,6 +207,6 @@ export const SELECT_CHAIN_FORM_CHAIN_DISABLED_STATUS_LIST = [
 ];
 
 export const SELECT_CHAIN_FORM_CHAIN_TOOLTIP_MAP = {
-  LISTED: 'The token is already listed on ETransfer.',
+  LISTED: 'The token is already listed on eBridge.',
   CREATED_NOT_LISTED: 'The token has been created on {{chainName}}.',
 };

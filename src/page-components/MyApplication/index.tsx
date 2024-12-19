@@ -1,13 +1,12 @@
 import clsx from 'clsx';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import { getMyApplicationList } from 'utils/api/application';
 import MyApplicationTable from './MyApplicationTable';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useAElf } from 'hooks/web3';
 import { useAelfLogin } from 'hooks/wallet';
-import { eventBus } from 'utils';
-import storages from 'constants/storages';
+import eBridgeEventBus from 'utils/eBridgeEventBus';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
 import { backIcon } from 'assets/images';
@@ -106,21 +105,19 @@ function MyApplications() {
   const initForReLoginRef = useRef(initForReLogin);
   initForReLoginRef.current = initForReLogin;
 
-  const Listeners = useMemo(() => {
-    return [
-      { eventName: storages.loginSuccess, listener: initForReLoginRef.current },
-      { eventName: storages.logoutSuccess, listener: initLogoutRef.current },
-    ];
-  }, []);
-
   useEffectOnce(() => {
-    Listeners.forEach(({ eventName, listener }) => {
-      eventBus.addListener(eventName, listener);
+    // log in
+    const { remove: removeLoginSuccess } = eBridgeEventBus.AelfLoginSuccess.addListener(() =>
+      initForReLoginRef.current(),
+    );
+    // log out \ exit
+    const { remove: removeLogoutSuccess } = eBridgeEventBus.AelfLogoutSuccess.addListener(() => {
+      initLogoutRef.current();
     });
+
     return () => {
-      Listeners.forEach(({ eventName, listener }) => {
-        eventBus.removeListener(eventName, listener);
-      });
+      removeLoginSuccess();
+      removeLogoutSuccess();
     };
   });
 

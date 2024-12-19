@@ -18,7 +18,7 @@ import CommonMessage from 'components/CommonMessage';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
-import { useLogout } from 'hooks/wallet';
+import { useAelfLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useConnect } from 'hooks/useConnect';
@@ -27,7 +27,7 @@ function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
-  const logoutWebLogin = useLogout();
+  const logoutWebLogin = useAelfLogout();
   const connect = useConnect();
   const [tonConnectUI] = useTonConnectUI();
 

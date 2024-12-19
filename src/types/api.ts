@@ -241,3 +241,11 @@ export type TGetTokenConfigResult = {
   liquidityInUsd: string;
   holders: number;
 };
+
+export type TCheckEOARegistrationRequest = {
+  address: string;
+};
+
+export type TCheckEOARegistrationResult = {
+  result: boolean;
+};

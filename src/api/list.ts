@@ -20,6 +20,10 @@ export const BASE_APIS = {
   getCurrentBlockHeight: '',
 };
 
+const UserApiList = {
+  checkEOARegistration: '/api/ebridge/user/check-eoa-registration',
+};
+
 const CrossApiList = {
   getCrossChainTransfers: '/api/app/cross-chain-transfers',
   getCrossChainIndexing: '/api/app/cross-chain-indexing/progress',
@@ -28,28 +32,28 @@ const CrossApiList = {
 };
 
 const ApplicationApiList = {
-  getTokenList: '/api/etransfer/application/tokens',
+  getTokenList: '/api/ebridge/application/tokens',
   commitTokenInfo: {
-    target: '/api/etransfer/application/commit-basic-info',
+    target: '/api/ebridge/application/commit-basic-info',
     baseConfig: { method: 'POST' },
   },
-  getTokenInfo: '/api/etransfer/application/user-token-access-info',
-  getChainStatus: '/api/etransfer/application/check-chain-access-status',
+  getTokenInfo: '/api/ebridge/application/user-token-access-info',
+  getChainStatus: '/api/ebridge/application/check-chain-access-status',
   addChain: {
-    target: '/api/etransfer/application/add-chain',
+    target: '/api/ebridge/application/add-chain',
     baseConfig: { method: 'POST' },
   },
   prepareBindIssue: {
-    target: '/api/etransfer/application/prepare-binding-issue',
+    target: '/api/ebridge/application/prepare-binding-issue',
     baseConfig: { method: 'POST' },
   },
   getIssue: {
-    target: '/api/etransfer/application/issue-binding',
+    target: '/api/ebridge/application/issue-binding',
     baseConfig: { method: 'POST' },
   },
-  getMyApplicationList: '/api/etransfer/application/list',
-  getApplicationDetail: '/api/etransfer/application/detail',
-  getTokenConfig: '/api/etransfer/application/token/config',
+  getMyApplicationList: '/api/ebridge/application/list',
+  getApplicationDetail: '/api/ebridge/application/detail',
+  getTokenConfig: '/api/ebridge/application/token/config',
 };
 
 const CMSApiList = {
@@ -59,7 +63,7 @@ const CMSApiList = {
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, application: ApplicationApiList };
+export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, user: UserApiList, application: ApplicationApiList };
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;
