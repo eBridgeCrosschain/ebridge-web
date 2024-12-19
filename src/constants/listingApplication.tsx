@@ -65,29 +65,25 @@ export const CONTACT_US_ROW = (
 );
 
 export enum ListingProcessStep {
-  SUBMIT_TOKEN_INFO = 0,
-  ISSUE_TOKEN = 1,
-  COBO_CUSTODY_REVIEW = 2,
-  INITIALIZE_LIQUIDITY_POOL = 3,
-  CROSS_CHAIN_INTEGRATION = 4,
-  COMPLETE = 5,
+  BASIC_INFO = 0,
+  SELECT_CHAIN = 1,
+  INITIALIZE_TOKEN_POOL = 2,
+  ADD_TOKEN_POOL = 3,
+  COMPLETE = 4,
 }
 
-export const VIEW_COBO_CUSTODY_PROGRESS: ICommonStepsProps['stepItems'] = [
+export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
   {
-    title: 'Submit token info',
+    title: 'Basic info',
   },
   {
-    title: 'Issue token',
+    title: 'Select chain',
   },
   {
-    title: 'Cobo Custody Review',
+    title: 'Initialize Token Pool',
   },
   {
-    title: 'Initialize Liquidity Pool',
-  },
-  {
-    title: 'Cross-chain integration (1 business day)',
+    title: 'Add token pool',
   },
   {
     title: 'Complete',

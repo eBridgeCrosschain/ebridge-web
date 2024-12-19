@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import styles from './styles.module.scss';
+import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
 import { infoCircleFillIcon } from 'assets/images';
 

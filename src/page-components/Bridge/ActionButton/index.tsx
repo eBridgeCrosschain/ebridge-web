@@ -25,14 +25,14 @@ import { useModalDispatch } from 'contexts/useModal/hooks';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import LoadingModal from './LoadingModal';
 import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
-import { useLogin } from 'hooks/wallet';
+import { useAelfLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
 import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
 import { useConnect } from 'hooks/useConnect';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
-  const login = useLogin();
+  const login = useAelfLogin();
   const connect = useConnect();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [

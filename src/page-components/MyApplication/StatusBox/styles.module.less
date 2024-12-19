@@ -1,0 +1,41 @@
+@import '/src/assets/theme/color.less';
+
+.status-wrapper {
+  min-width: 112px;
+}
+
+.status-box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  color: @font-15;
+  white-space: nowrap;
+}
+
+.badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.badge-success {
+  background-color: @bg-18;
+}
+
+.badge-failed {
+  background-color: @bg-21;
+}
+
+.badge-warning {
+  background-color: @bg-20;
+}
+
+.processing,
+.failed {
+  margin: 0 6px 0 4px;
+}
+
+.question-icon {
+  width: 22px;
+  height: 22px;
+}

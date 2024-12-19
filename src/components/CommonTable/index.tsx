@@ -1,12 +1,11 @@
 import { Table, TableProps } from 'antd';
-import CommonImage from 'components/CommonImage';
 import React from 'react';
 import EmptyWallet from 'assets/images/empty-wallet.svg';
 import Empty from 'assets/images/empty.svg';
-import styles from './styles.module.less';
-import clsx from 'clsx';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { Trans } from 'react-i18next';
+import EmptyDataBox from 'components/EmptyDataBox';
+
 export default function CommonTable(props: TableProps<any>) {
   const { fromWallet, toWallet } = useWallet();
   const isConnect = !(fromWallet?.account || toWallet?.account);
@@ -16,10 +15,10 @@ export default function CommonTable(props: TableProps<any>) {
       locale={{
         emptyText: () => {
           return (
-            <div className={clsx(styles.empty)}>
-              <CommonImage priority src={isConnect ? EmptyWallet : Empty} className={styles.icon} />
-              <div>
-                {!isConnect ? (
+            <EmptyDataBox
+              imageSrc={isConnect ? EmptyWallet : Empty}
+              text={
+                !isConnect ? (
                   <Trans>No cross-chain records found.</Trans>
                 ) : (
                   <>
@@ -27,9 +26,9 @@ export default function CommonTable(props: TableProps<any>) {
                     <Trans>wallet</Trans>
                     <Trans>to view transaction history</Trans>
                   </>
-                )}
-              </div>
-            </div>
+                )
+              }
+            />
           );
         },
       }}

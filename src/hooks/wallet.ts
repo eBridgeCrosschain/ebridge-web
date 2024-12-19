@@ -17,7 +17,7 @@ export function useInitWallet() {
   const { connectWallet, walletType } = useConnectWallet();
   const connectWalletRef = useRef(connectWallet);
   connectWalletRef.current = connectWallet;
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
   const init = useCallback(async () => {
     if (walletType === WalletTypeEnum.elf) {
@@ -47,14 +47,14 @@ export function useInitWallet() {
   }, [init, isLogin, onLogoutClearData, walletType]);
 }
 
-export function useIsLogin() {
+export function useIsAelfLogin() {
   const { isConnected, walletInfo } = useConnectWallet();
   return useMemo(() => isConnected && !!walletInfo, [isConnected, walletInfo]);
 }
 
-export function useLogin() {
+export function useAelfLogin() {
   const { connectWallet } = useConnectWallet();
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
   return useCallback(async () => {
     if (isLogin) return;
@@ -69,7 +69,7 @@ export function useLogin() {
 
 export function useGetAccount() {
   const { walletInfo } = useConnectWallet();
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
   // WalletInfo TAelfAccounts ExtraInfoForDiscover | ExtraInfoForPortkeyAA | ExtraInfoForNightElf;
   return useMemo(() => {
