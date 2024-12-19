@@ -24,7 +24,7 @@ function ListingComplete() {
       <div className={styles['title']}>{ListingCompleteTitle}</div>
       <div className={styles['content']}>{ListingCompleteContent}</div>
 
-      <CommonButton className={clsx('flex-1', styles['transfer-button'])} type="ghost" onClick={handleGoBridge}>
+      <CommonButton className={clsx(styles['transfer-button'])} type="primary" onClick={handleGoBridge}>
         {BRIDGE_NOW}
       </CommonButton>
     </div>
