@@ -40,6 +40,8 @@ import loadingIcon from './loading.png';
 import completeIcon from './complete.svg';
 import infoCircleFillIcon from './info-circle-fill.svg';
 import viewProgressIcon from './view-progress.svg';
+import poolsIcon from './pools.svg';
+import poolsBlueIcon from './pools-blue.svg';
 
 export {
   metamask,
@@ -84,4 +86,6 @@ export {
   tonLogo,
   completeIcon,
   viewProgressIcon,
+  poolsIcon,
+  poolsBlueIcon,
 };

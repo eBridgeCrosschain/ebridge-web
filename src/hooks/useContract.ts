@@ -1,4 +1,4 @@
-import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, CREATE_TOKEN_ABI, LIMIT_ABI } from 'constants/abis';
+import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, CREATE_TOKEN_ABI, LIMIT_ABI, POOLS_ABI } from 'constants/abis';
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
 import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
@@ -21,6 +21,7 @@ import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 
 import { useGetAccount } from './wallet';
 import { SupportedELFChainId } from 'constants/chain';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { getBridgeChainInfo } from 'utils/chain';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
@@ -274,4 +275,12 @@ export function useCreateTokenContract(chainId?: ChainId) {
     return ERCChainConstants.constants.CREATE_TOKEN_CONTRACT || '';
   }, [chainId]);
   return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
+}
+
+export function usePoolContract(chainId?: ChainId, address?: string) {
+  const contractAddress = useMemo(() => {
+    return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
+  }, [chainId]);
+
+  return useContract(address || contractAddress, POOLS_ABI, chainId);
 }

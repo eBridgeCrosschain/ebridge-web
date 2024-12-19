@@ -61,6 +61,11 @@ export enum CrossChainType {
   heterogeneous = 'heterogeneous',
 }
 
+export enum OperatePool {
+  add = 'add',
+  remove = 'remove',
+}
+
 export interface WalletInfo {
   connector: Connector | string;
   name: string;

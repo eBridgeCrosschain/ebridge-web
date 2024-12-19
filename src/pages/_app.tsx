@@ -12,7 +12,7 @@ import Nav from 'components/Nav';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import clsx from 'clsx';
-import { NAV_LIST } from 'constants/link';
+import { HIDE_MAIN_PAGE_LIST, NAV_LIST } from 'constants/link';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useIsTelegramPlatform } from 'hooks/telegram';
 const Provider = dynamic(import('components/Provider'), { ssr: false });
@@ -22,6 +22,10 @@ export default function APP({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isFull = useMemo(() => router.pathname === '/assets', [router.pathname]);
   const isMainPage = useMemo(() => NAV_LIST.map((item) => item.href).includes(router.pathname), [router.pathname]);
+  const hideMainPageStyles = useMemo(
+    () => HIDE_MAIN_PAGE_LIST.map((item) => item.href).includes(router.pathname),
+    [router.pathname],
+  );
   const isMd = useMediaQueries('md');
 
   const isTelegramPlatform = useIsTelegramPlatform();
@@ -34,9 +38,13 @@ export default function APP({ Component, pageProps }: AppProps) {
         <div className={clsx('page-body', isTelegramPlatform && 'tg-page-body')}>
           <div className={clsx('page-content', 'main-page-content-wrap', isTelegramPlatform && 'tg-page-content')}>
             {!isMd && <Nav />}
-            <div className="main-page-component-wrap">
+            {hideMainPageStyles ? (
               <Component {...pageProps} />
-            </div>
+            ) : (
+              <div className="main-page-component-wrap">
+                <Component {...pageProps} />
+              </div>
+            )}
           </div>
           <Footer />
         </div>

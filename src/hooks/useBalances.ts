@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ZERO } from 'constants/misc';
-import { getELFChainBalance, getBalance, getETHBalance } from 'contracts';
+import { getELFChainBalance } from 'contracts';
 import { useCallback, useMemo, useState } from 'react';
 import { Web3Type } from 'types';
 import { isERCAddress, isTonChain } from 'utils';
@@ -9,6 +9,7 @@ import { useTokenContract } from './useContract';
 import useInterval from './useInterval';
 import { getTokenInfoByWhitelist } from 'utils/whitelist';
 import { getTonChainBalance } from 'utils/ton';
+import { getBalanceByWagmi } from 'utils/wagmi';
 
 export const useBalances = (
   wallet?: Web3Type,
@@ -17,7 +18,7 @@ export const useBalances = (
   targetAddress?: string,
 ): [BigNumber[], () => void] => {
   const [balanceMap, setBalanceMap] = useState<{ [key: string]: BigNumber }>();
-  const { library, chainId, account: owner } = wallet || {};
+  const { chainId, account: owner } = wallet || {};
   const account = useMemo(() => targetAddress || owner, [targetAddress, owner]);
   const tokenContract = useTokenContract(chainId, undefined, wallet?.isPortkey);
   const tokensList = useMemo(() => (Array.isArray(tokens) ? tokens : [tokens]), [tokens]);
@@ -42,10 +43,12 @@ export const useBalances = (
         });
       } else {
         // erc20 chain
-        promise = tokensList.map((i) => {
-          if (i && library) {
-            if (isERCAddress(i)) return getBalance(library, i, account);
-            return getETHBalance(account, library);
+        promise = tokensList.map(async (i) => {
+          if (i) {
+            const params = { address: account as any, token: i as any, chainId: chainId };
+            if (!isERCAddress(i)) delete params.token;
+            const req = await getBalanceByWagmi(params);
+            return req.value;
           }
         });
       }
@@ -56,8 +59,8 @@ export const useBalances = (
       if (key) obj[key + account + chainId] = bs[index];
     });
     setBalanceMap((preObj) => ({ ...preObj, ...obj }));
-  }, [account, chainId, tokensList, tokenContract, library]);
-  useInterval(onGetBalance, delay, [onGetBalance, library, tokenContract]);
+  }, [account, chainId, tokensList, tokenContract]);
+  useInterval(onGetBalance, delay, [onGetBalance, chainId, tokenContract]);
   const memoBalances = useMemo(() => {
     if (tokensList) return tokensList.map((key) => (balanceMap && key ? balanceMap[key + account + chainId] : ZERO));
     return [ZERO];

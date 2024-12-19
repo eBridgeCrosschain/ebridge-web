@@ -1,10 +1,10 @@
 import { CHAIN_SHORT_NAME, SupportedELFChainId } from 'constants/chain';
 import { CHAIN_ID_MAP } from 'constants/chain';
-import { ChainId } from 'types';
-import { enumToMap, shortenAddress } from 'utils';
+import { ChainId, ChainType } from 'types';
+import { enumToMap, isTonChain, shortenAddress } from 'utils';
 import { isELFChain } from './aelfUtils';
 import AElf from 'aelf-sdk';
-import { CHAIN_ICON, CHAIN_NAME } from 'constants/index';
+import { CHAIN_ICON, CHAIN_NAME, SupportedELFChain, SupportedERCChain, SupportedTONChain } from 'constants/index';
 const { chainIdConvertor } = AElf.utils;
 export function getIconByChainId(chainId: ChainId) {
   return CHAIN_ICON[chainId];
@@ -79,4 +79,20 @@ export const formatNetworkName = (item: string) => {
     default:
       return item;
   }
+};
+
+export const getBridgeChainInfo = (chainId?: ChainId) => {
+  if (isELFChain(chainId)) return (SupportedELFChain as any)[chainId as any];
+  if (isTonChain(chainId)) return (SupportedTONChain as any)[chainId as any];
+  return (SupportedERCChain as any)[chainId as any];
+};
+
+export const getChainName = (chanId: ChainId) => {
+  return CHAIN_NAME[chanId];
+};
+
+export const getChainType = (chanId: ChainId): ChainType => {
+  if (isELFChain(chanId)) return 'ELF';
+  if (isTonChain(chanId)) return 'TON';
+  return 'ERC';
 };
