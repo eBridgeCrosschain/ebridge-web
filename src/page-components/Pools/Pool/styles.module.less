@@ -1,3 +1,51 @@
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.pool-page {
+  gap: 24px;
+  :global {
+    .@{app-prefix}-tabs{
+      margin-top: 24px;
+    }
+    .@{app-prefix}-table-container .@{app-prefix}-table-content {
+      &::-webkit-scrollbar {
+        height: 8px;
+        width: 0;
+        overflow-y: scroll;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: @border-3;
+      }
+    }
+    .@{app-prefix}-tabs-top > .@{app-prefix}-tabs-nav {
+      margin-bottom: 0;
+    }
+    .@{app-prefix}-tabs-top > .@{app-prefix}-tabs-nav .@{app-prefix}-tabs-ink-bar,
+    .@{app-prefix}-tabs-top > div > .@{app-prefix}-tabs-nav .@{app-prefix}-tabs-ink-bar {
+      background: @border-2;
+      height: 4px;
+      border-radius: 1px;
+    }
+    .@{app-prefix}-tabs-tab {
+      padding-top: 0;
+      padding-bottom: 18px;
+      &:hover {
+        color: @font-1;
+      }
+      .@{app-prefix}-tabs-tab-active .@{app-prefix}-tabs-tab-btn {
+        text-shadow: none;
+      }
+      .@{app-prefix}-tabs-tab-btn {
+        font-size: 16px;
+      }
+    }
+    .@{app-prefix}-table-ping-right:not(.@{app-prefix}-table-has-fix-right) > .@{app-prefix}-table-container::after {
+      box-shadow: inset -10px 0 8px -8px rgb(0 0 0 / 3%);
+    }
+  }
+}
 .chain-icon-row {
   display: flex;
   font-size: 14px;
@@ -17,4 +65,56 @@
     height: 24px;
     margin-right: 8px;
   }
+}
+
+.action-btn {
+  margin: auto;
+  width: 240px;
+  height: 48px;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+
+.action-btn-loading {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  &[disabled] {
+    cursor: not-allowed;
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .action-btn {
+    width: 100%;
+  }
+}
+.share-col {
+  margin: 24px 0;
+  padding: 6px 24px 24px;
+  background: @bg-15;
+  border-radius: 12px;
+  .share-row {
+    margin-top: 16px;
+    div {
+      .font-family-medium();
+
+      line-height: 22px;
+      &:first-child {
+        color: @font-13;
+      }
+      &:last-child {
+        color: @font-15;
+      }
+    }
+  }
+}
+
+.operate-pool {
+  margin-top: 40px;
 }

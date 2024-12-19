@@ -1,4 +1,4 @@
-import { Row } from 'antd';
+import { Row, Tabs } from 'antd';
 import clsx from 'clsx';
 import IconFont from 'components/IconFont';
 import MainContentHeader from 'components/MainContentHeader';
@@ -6,49 +6,24 @@ import { useLanguage } from 'i18n';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-use';
-import { getChainIdByAPI, getChainName, getChainType, getIconByChainId } from 'utils/chain';
+import { getChainIdByAPI, getChainName, getIconByChainId } from 'utils/chain';
 import styles from './styles.module.less';
 import { getTokenInfoByWhitelist } from 'utils/whitelist';
-import { ChainId } from 'types';
-import { useWeb3Wallet } from 'hooks/web3';
-import { useConnect } from 'hooks/useConnect';
-import CommonButton from 'components/CommonButton';
-import { Trans } from 'react-i18next';
-import { useBalances } from 'hooks/useBalances';
-import { isELFChain } from 'utils/aelfUtils';
-import { divDecimals } from 'utils/calculate';
-import CommonAmountRow from 'components/CommonAmountRow';
-import { parseInputChange } from 'utils/input';
-import { unitConverter } from 'utils/converter';
-import { formatSymbol } from 'utils/token';
-import TokenLogo from 'components/TokenLogo';
+import { ChainId, OperatePool } from 'types';
+import AddPool from './AddPool';
+import RemovePool from './RemovePool';
 export default function Pool() {
   const { t } = useLanguage();
 
+  const [activeKey, setActiveKey] = useState(OperatePool.add);
+
   const { push } = useRouter();
   const { pathname } = useLocation();
-
-  const [amount, setAmount] = useState<string>();
 
   const [apiChainId, symbol] = useMemo(() => pathname?.replace('/pool/', '').split('/') || [], [pathname]);
   const chainId = useMemo(() => getChainIdByAPI(apiChainId), [apiChainId]);
 
   const tokenInfo = useMemo(() => getTokenInfoByWhitelist(chainId as ChainId, symbol), [chainId, symbol]);
-  const min = useMemo(() => divDecimals(1, tokenInfo?.decimals), [tokenInfo?.decimals]);
-
-  const web3Wallet = useWeb3Wallet(chainId);
-  const connect = useConnect();
-  const [[balance]] = useBalances(
-    { ...web3Wallet, chainId },
-    useMemo(() => {
-      if (isELFChain(chainId) || tokenInfo?.isNativeToken) return [tokenInfo?.symbol];
-      return [tokenInfo?.address];
-    }, [chainId, tokenInfo?.address, tokenInfo?.isNativeToken, tokenInfo?.symbol]),
-  );
-
-  const showBalance = useMemo(() => divDecimals(balance, tokenInfo?.decimals), [balance, tokenInfo?.decimals]);
-
-  console.log(showBalance.toFixed(), '===balances');
 
   const chainIcon = useMemo(() => {
     const iconProps = getIconByChainId(chainId);
@@ -68,33 +43,21 @@ export default function Pool() {
   }, [chainIcon, push, tokenInfo]);
   return (
     <div className={clsx('page-content', 'main-page-content-wrap')}>
-      <div className={clsx('main-page-component-wrap')}>
+      <div className={clsx('main-page-component-wrap', styles['pool-page'])}>
         <MainContentHeader wrap={false} title={t('Pool')} rightEle={chainIcon} />
-        <div>
-          <CommonAmountRow
-            showBalance={!!web3Wallet.account}
-            // showError={!!(!changing && showError)}
-            value={amount}
-            // onClickMAX={() => dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)))}
-            onAmountInputChange={(e) => setAmount(parseInputChange(e.target.value, min, tokenInfo?.decimals))}
-            leftHeaderTitle={t('Token amount')}
-            rightHeaderTitle={`${unitConverter(showBalance)} ${formatSymbol(tokenInfo?.symbol)}`}
-            rightInputEle={
-              <Row className={clsx('flex-row-center', styles['token-logo-row'], 'font-family-medium')}>
-                <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={tokenInfo?.symbol} />
-                <div>{formatSymbol(tokenInfo?.symbol)}</div>
-              </Row>
-            }
-          />
-          <CommonButton
-            onClick={async () => {
-              // TODO: connect
-              const req = await connect(getChainType(chainId), chainId);
-            }}
-            type="primary">
-            <Trans>Enter Amount</Trans>
-          </CommonButton>
-        </div>
+        <Tabs
+          tabBarGutter={16}
+          defaultActiveKey={OperatePool.add}
+          activeKey={activeKey}
+          onChange={(v) => setActiveKey(v as OperatePool)}>
+          <Tabs.TabPane tab={t('Add')} key={OperatePool.add} />
+          <Tabs.TabPane tab={t('Remove')} key={OperatePool.remove} />
+        </Tabs>
+        {activeKey === OperatePool.add ? (
+          <AddPool chainId={chainId} tokenInfo={tokenInfo} />
+        ) : (
+          <RemovePool chainId={chainId} tokenInfo={tokenInfo} />
+        )}
       </div>
     </div>
   );
