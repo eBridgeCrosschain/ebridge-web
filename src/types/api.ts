@@ -1,3 +1,4 @@
+import { TBridgeChainId } from 'constants/chain';
 import { ChainId, TokenInfo } from 'types';
 
 /**
@@ -260,11 +261,11 @@ export type TGetTokenPriceResult = {
 
 export type TChangeAddLiquidityStatusRequest = {
   orderId: string;
-  chainId: string;
+  chainId: TBridgeChainId;
 };
 
 export type TChangeAddLiquidityStatusResult = {
   orderId: string;
-  chainId: string;
+  chainId: TBridgeChainId;
   success: boolean;
 };
