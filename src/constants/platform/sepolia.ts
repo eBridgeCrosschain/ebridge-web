@@ -1,7 +1,8 @@
 export const CHAIN_INFO = {
   chainId: 11155111,
   exploreUrl: 'https://sepolia.etherscan.io/',
-  rpcUrl: 'https://sepolia.infura.io/v3/fce90b852ec6426eb706bc1a6dcd35a6',
+  // rpcUrl: 'https://sepolia.infura.io/v3/fce90b852ec6426eb706bc1a6dcd35a6',
+  rpcUrl: 'https://sepolia.drpc.org',
 };
 
 export const BRIDGE_CONTRACT = '0xf9Ab39c7A0A925BAf94f9C1c1d1CE8bFc9F9b2b3';

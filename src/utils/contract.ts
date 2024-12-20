@@ -2,11 +2,11 @@
 import { provider } from 'web3-core';
 import type { Contract } from 'web3-eth-contract';
 import Web3 from 'web3';
-import { ACTIVE_CHAIN, SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
-import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
+import { SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
+import { ELFChainConstants } from 'constants/ChainConstants';
 import { getContractMethods, transformArrayToMap, getTxResult, isELFChain, encodedTransfer } from './aelfUtils';
 import { ChainId, ChainType } from 'types';
-import { getDefaultProvider } from './provider';
+import { getDefaultProviderByChainId } from './provider';
 import { isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
@@ -89,9 +89,11 @@ export class ContractBasic {
   public address?: string;
   public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic | TONContractBasic;
   public contractType: ChainType;
+  public chainId?: ChainId;
   // public isPortkey?: boolean;
   constructor(options: ContractProps) {
     this.address = options.contractAddress;
+    this.chainId = options.chainId;
     const isELF = isELFChain(options.chainId);
     const isTON = isTonChain(options.chainId);
     this.callContract = options.portkeyChain
@@ -139,31 +141,28 @@ export class WB3ContractBasic {
   public provider?: provider;
   public chainId?: number;
   public web3?: Web3;
+  contractABI: AbiItem[] | undefined;
   constructor(options: ContractProps) {
     console.log(options, '====options');
 
     const { contractABI, provider, contractAddress, chainId } = options;
+    this.contractABI = contractABI;
     const contactABITemp = contractABI;
-
+    this.chainId = chainId as number;
     this.contract =
       contractAddress && provider ? this.initContract(provider, contractAddress, contactABITemp as AbiItem) : null;
 
     this.contractForView = this.initViewOnlyContract(contractAddress, contactABITemp as AbiItem);
     this.address = contractAddress;
     this.provider = provider;
-    this.chainId = chainId as number;
   }
 
   public initContract: InitContract = (provider, address, ABI) => {
     this.web3 = new Web3(provider);
-    console.log(ABI, '=====ABI', address);
-
     return new this.web3.eth.Contract(ABI as any, address);
   };
   public initViewOnlyContract: InitViewOnlyContract = (address, ABI) => {
-    console.log(address, ABI, '======ABI');
-
-    const defaultProvider = getDefaultProvider();
+    const defaultProvider = getDefaultProviderByChainId(this.chainId as ChainId);
     const defaultWeb3 = new Web3(defaultProvider);
     return new defaultWeb3.eth.Contract(ABI as any, address);
   };
@@ -174,15 +173,25 @@ export class WB3ContractBasic {
     callOptions = { defaultBlock: 'latest' },
   ) => {
     try {
-      const chainId = this.chainId || ERCChainConstants.chainId;
       const { defaultBlock, options } = callOptions;
-      let contract = this.contractForView;
-      // active chain
-      if (ACTIVE_CHAIN[chainId]) contract = this.contract || this.contractForView;
+      const contract = this.contractForView;
       // BlockTag
       contract.defaultBlock = defaultBlock;
 
       return await contract.methods[functionName](...(paramsOption || [])).call(options);
+
+      // const chainId = this.chainId || ERCChainConstants.chainId;
+      // const { defaultBlock } = callOptions;
+
+      // const params = {
+      //   abi: this.contractABI,
+      //   functionName,
+      //   address: this.address as string,
+      //   chainId,
+      //   args: paramsOption,
+      // } as TreadContractByWagmiParams;
+      // if (defaultBlock === 'latest') delete params.blockNumber;
+      // return await readContractByWagmi(params);
     } catch (e) {
       return { error: e };
     }

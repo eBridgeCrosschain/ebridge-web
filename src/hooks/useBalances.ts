@@ -48,7 +48,7 @@ export const useBalances = (
             const params = { address: account as any, token: i as any, chainId: chainId };
             if (!isERCAddress(i)) delete params.token;
             const req = await getBalanceByWagmi(params);
-            return req.value;
+            return req.value.toString();
           }
         });
       }

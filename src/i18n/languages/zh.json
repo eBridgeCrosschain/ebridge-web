@@ -218,6 +218,7 @@
     "Estimated value": "預估價值",
     "Share of Pool": "流動池份額",
     "Liquidity": "總流動性",
-    "Enter Amount": "輸入數量"
+    "Enter Amount": "輸入數量",
+    "Insufficient amount": "金额不足"
   }
 }

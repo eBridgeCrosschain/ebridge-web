@@ -1,13 +1,11 @@
 import { Col, Row } from 'antd';
 import clsx from 'clsx';
-import IconFont from 'components/IconFont';
 import { useLanguage } from 'i18n';
-import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
-import { getChainName, getChainType, getIconByChainId } from 'utils/chain';
+import { useMemo, useState } from 'react';
+import { getChainType } from 'utils/chain';
 import styles from '../styles.module.less';
 import { ChainId, TokenInfo } from 'types';
-import { useWeb3Wallet } from 'hooks/web3';
+import { useEVMSwitchChain, useWeb3Wallet } from 'hooks/web3';
 import { useConnect } from 'hooks/useConnect';
 import CommonButton from 'components/CommonButton';
 import { Trans } from 'react-i18next';
@@ -16,7 +14,7 @@ import { isELFChain } from 'utils/aelfUtils';
 import { divDecimals } from 'utils/calculate';
 import CommonAmountRow from 'components/CommonAmountRow';
 import { getMaxAmount, parseInputChange } from 'utils/input';
-import { unitConverter } from 'utils/converter';
+import { getShareOfPool, unitConverter } from 'utils/converter';
 import { formatSymbol } from 'utils/token';
 import TokenLogo from 'components/TokenLogo';
 import { usePoolContract, useTokenContract } from 'hooks/useContract';
@@ -25,6 +23,7 @@ import { useThrottleCallback } from 'hooks';
 import { ZERO } from 'constants/misc';
 import useLoadingModal from 'hooks/useLoadingModal';
 import { ResultType } from 'components/Loading/ResultModal';
+import { usePoolTotalLiquidity } from 'hooks/pools';
 
 export type TAddPoolProps = {
   chainId: ChainId;
@@ -34,13 +33,12 @@ export type TAddPoolProps = {
 export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
   const { t } = useLanguage();
 
-  const { push } = useRouter();
-
   const [amount, setAmount] = useState<string>();
 
   const poolContract = usePoolContract(chainId);
   const tokenContract = useTokenContract(chainId, tokenInfo?.address);
-
+  const totalLiquidity = usePoolTotalLiquidity({ poolContract, tokenContract, tokenInfo });
+  const evmSwitchChain = useEVMSwitchChain();
   const web3Wallet = useWeb3Wallet(chainId);
   const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
   const { account, library } = web3Wallet || {};
@@ -63,27 +61,11 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
 
   const showError = useMemo(() => amount && account && max.lt(amount), [account, amount, max]);
 
-  const chainIcon = useMemo(() => {
-    const iconProps = getIconByChainId(chainId);
-    if (!iconProps) return null;
-    return (
-      <Row className={clsx('flex-row-center', styles['chain-icon-row'], 'font-family-medium')}>
-        <IconFont className={styles['chain-icon']} type={iconProps?.type || ''} />
-        {getChainName(chainId)}
-      </Row>
-    );
-  }, [chainId]);
-
-  useEffect(() => {
-    if (!chainIcon || !tokenInfo) {
-      push('/pools');
-    }
-  }, [chainIcon, push, tokenInfo]);
-
   const onAddLiquidity = useThrottleCallback(async () => {
     try {
       if (!tokenInfo || !account || !tokenContract || !poolContract || !amount) return;
       setLoadingModal({ open: true });
+      if (poolContract.contractType === 'ERC') await evmSwitchChain(chainId);
       const req = await addLiquidity({
         symbol: tokenInfo?.symbol,
         amount: amount,
@@ -93,18 +75,31 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
         chainId,
         tokenContract,
       });
-      if (req.error) {
+      if (req?.error) {
         setResultModal({ open: true, type: ResultType.REJECTED });
       } else {
+        setAmount('');
         setResultModal({ open: true, type: ResultType.APPROVED });
       }
-      console.log(req, '=====req');
     } catch (error) {
       setResultModal({ open: true, type: ResultType.REJECTED });
     } finally {
+      totalLiquidity.onGetTotalLiquidity();
       setLoadingModal({ open: false });
     }
-  }, [account, amount, chainId, library, poolContract, tokenContract, tokenInfo]);
+  }, [
+    tokenInfo,
+    account,
+    tokenContract,
+    poolContract,
+    amount,
+    setLoadingModal,
+    evmSwitchChain,
+    chainId,
+    library,
+    setResultModal,
+    totalLiquidity,
+  ]);
   const btnProps = useMemo(() => {
     let children = 'Enter Amount';
     let disabled = true;
@@ -150,10 +145,11 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
       />
       <Col className={styles['share-col']}>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
-          <div>{t('Share of Pool')}</div> <div>{t('Share of Pool')}</div>
+          <div>{t('Share of Pool')}</div> <div>{getShareOfPool(amount, totalLiquidity.showTotalLiquidity)}%</div>
         </div>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
-          <div>{t('Liquidity')}</div> <div>{t('Liquidity')}</div>
+          {/* // TODO:$ Converter */}
+          <div>{t('Liquidity')}</div> <div>${unitConverter(totalLiquidity.showTotalLiquidity)}</div>
         </div>
       </Col>
       {modal}
