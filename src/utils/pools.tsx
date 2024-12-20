@@ -39,11 +39,7 @@ export const addLiquidity = async ({
   );
 
   if (req !== REQ_CODE.Success) throw req;
-  console.log(chainId, '====chainId', 'addLiquidity');
-
   if (isELFChain(chainId)) {
-    console.log(chainId, '====chainId', 'addLiquidity');
-
     return poolContract?.callSendMethod('addLiquidity', account, {
       tokenSymbol: symbol,
       amount: bigAmount,

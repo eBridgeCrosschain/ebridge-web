@@ -5,6 +5,7 @@ import CommonModal from 'components/CommonModal';
 import CommonImage from 'components/CommonImage';
 import { checkFilledIcon, errorFilledIcon } from 'assets/images';
 import styles from './styles.module.less';
+import { useCallback, useMemo } from 'react';
 
 export enum ResultType {
   APPROVED = 'approved',
@@ -12,42 +13,46 @@ export enum ResultType {
 }
 
 export interface IResultModalProps {
-  open: boolean;
-  type: ResultType;
-  onClose: () => void;
+  open?: boolean;
+  type?: ResultType;
+  onClose?: () => void;
   onRetry?: () => void;
+  approvedDescription?: string;
 }
 
-export default function ResultModal({ open, type, onClose, onRetry }: IResultModalProps) {
+export default function ResultModal({ open, type, onClose, onRetry, approvedDescription }: IResultModalProps) {
   const { t } = useLanguage();
 
-  const handleRetry = () => {
-    onClose();
+  const handleRetry = useCallback(() => {
+    onClose?.();
     onRetry?.();
-  };
+  }, [onClose, onRetry]);
 
-  const resultModalConfig = {
-    [ResultType.APPROVED]: {
-      title: 'Transaction approved',
-      icon: checkFilledIcon,
-      description: "The transaction has been approved. You can check it's status in the “Transactions” page.",
-      buttonProps: {
-        children: t('Close'),
-        onClick: onClose,
+  const resultModalConfig = useMemo(
+    () => ({
+      [ResultType.APPROVED]: {
+        title: 'Transaction approved',
+        icon: checkFilledIcon,
+        description: approvedDescription || 'The transaction has been approved.',
+        buttonProps: {
+          children: t('Close'),
+          onClick: onClose,
+        },
       },
-    },
-    [ResultType.REJECTED]: {
-      title: 'Transaction rejected',
-      icon: errorFilledIcon,
-      description: 'The transaction was not signed. It was rejected.',
-      buttonProps: {
-        children: t('Retry'),
-        onClick: handleRetry,
+      [ResultType.REJECTED]: {
+        title: 'Transaction rejected',
+        icon: errorFilledIcon,
+        description: 'The transaction was not signed. It was rejected.',
+        buttonProps: {
+          children: t('Retry'),
+          onClick: handleRetry,
+        },
       },
-    },
-  };
+    }),
+    [approvedDescription, handleRetry, onClose, t],
+  );
 
-  const config = resultModalConfig[type];
+  const config = useMemo(() => resultModalConfig[type || ResultType.APPROVED], [resultModalConfig, type]);
 
   return (
     <CommonModal className={styles['result-modal']} width={377} title={t(config.title)} open={open} onCancel={onClose}>
