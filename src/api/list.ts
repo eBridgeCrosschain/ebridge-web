@@ -50,6 +50,14 @@ const ApplicationApiList = {
   getMyApplicationList: '/api/ebridge/application/list',
   getApplicationDetail: '/api/ebridge/application/detail',
   getTokenConfig: '/api/ebridge/application/token/config',
+  changeAddLiquidityStatus: {
+    target: '/api/ebridge/application/add-liquidity',
+    baseConfig: { method: 'POST' },
+  },
+};
+
+const CommonApiList = {
+  getTokenPrice: '/api/ebridge/application/token/price',
 };
 
 const CMSApiList = {
@@ -59,7 +67,12 @@ const CMSApiList = {
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList, application: ApplicationApiList };
+export const EXPAND_APIS = {
+  cross: CrossApiList,
+  cms: CMSApiList,
+  application: ApplicationApiList,
+  common: CommonApiList,
+};
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

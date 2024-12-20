@@ -19,6 +19,8 @@ import {
   TGetApplicationIssueRequest,
   TGetTokenConfigRequest,
   TGetTokenConfigResult,
+  TChangeAddLiquidityStatusRequest,
+  TChangeAddLiquidityStatusResult,
 } from 'types/api';
 
 export const getApplicationTokenList = async (): Promise<TGetApplicationTokenListResult> => {
@@ -86,5 +88,13 @@ export const getApplicationDetail = async (
 
 export const getApplicationTokenConfig = async (params: TGetTokenConfigRequest): Promise<TGetTokenConfigResult> => {
   const res = await request.application.getTokenConfig({ params });
+  return res.data;
+};
+
+export const changeAddLiquidityStatus = async (
+  params: TChangeAddLiquidityStatusRequest,
+): Promise<TChangeAddLiquidityStatusResult> => {
+  const res = await request.application.changeAddLiquidityStatus({ data: params });
+
   return res.data;
 };

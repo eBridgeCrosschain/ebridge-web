@@ -41,6 +41,8 @@ export const IS_ONLY_SIDE_CHAIN_LIST: string[] = [];
 
 export const EBRIDGE_PORTKEY_PROJECT_CODE = '13003';
 
+export const CONNECT_AELF_WALLET = 'Connect aelf Wallet';
+
 export const GOT_IT = 'Got it';
 
 export const LOADING_TEXT = 'Loading...';
@@ -48,5 +50,7 @@ export const LOADING_TEXT = 'Loading...';
 export const DEFAULT_NULL_VALUE = '--';
 
 export const BUTTON_TEXT_NEXT = 'Next';
+
+export const BUTTON_TEXT_SUBMIT = 'Submit';
 
 export const BUTTON_TEXT_BACK = 'Back';

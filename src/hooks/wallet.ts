@@ -114,15 +114,32 @@ export function useAelfLogin() {
   const { connectWallet } = useConnectWallet();
   const isLogin = useIsAelfLogin();
 
-  return useCallback(async () => {
-    if (isLogin) return;
+  const { getAuth } = useAelfAuthToken();
+  const getAuthRef = useRef(getAuth);
+  getAuthRef.current = getAuth;
 
-    try {
-      await connectWallet();
-    } catch (error) {
-      CommonMessage.error(handleWebLoginErrorMessage(error));
-    }
-  }, [connectWallet, isLogin]);
+  return useCallback(
+    async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void) => {
+      if (isLogin) {
+        if (isNeedGetJWT) {
+          await getAuthRef.current(true, false);
+        }
+        await handleConnectedCallback?.();
+        return;
+      }
+
+      try {
+        await connectWallet();
+        if (isNeedGetJWT) {
+          await getAuthRef.current(true, false);
+        }
+        await handleConnectedCallback?.();
+      } catch (error) {
+        CommonMessage.error(handleWebLoginErrorMessage(error));
+      }
+    },
+    [connectWallet, isLogin],
+  );
 }
 
 export function useGetAccount() {

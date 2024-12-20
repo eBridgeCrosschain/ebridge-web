@@ -124,6 +124,7 @@ export enum ApplicationChainStatusEnum {
   Issued = 'Issued',
   PoolInitializing = 'PoolInitializing',
   PoolInitialized = 'PoolInitialized',
+  LiquidityAdded = 'LiquidityAdded',
   Complete = 'Complete',
   Failed = 'Failed',
 }
@@ -196,7 +197,6 @@ export type TMyApplicationChainTokenInfo = {
 };
 
 export type TGetApplicationDetailRequest = {
-  symbol: string;
   id?: string;
   network?: string;
 };
@@ -226,10 +226,9 @@ export type TApplicationDetailItemChainTokenInfo = {
   contractAddress: string;
   tokenContractAddress: string;
   status: ApplicationChainStatusEnum;
-  balanceAmount: string;
-  minAmount: string;
-  limit24HInUsd: string;
-  rejectedTime: number;
+  minAmount: string; // min amount usd
+  dailyLimit: string;
+  rateLimit: string;
 };
 
 export type TGetTokenConfigRequest = {
@@ -248,3 +247,24 @@ export interface APIPoolItem {
   totalTvlInUsd?: string;
   tokenPrice?: string;
 }
+
+export type TGetTokenPriceRequest = {
+  symbol: string;
+  amount: string;
+};
+
+export type TGetTokenPriceResult = {
+  symbol: string;
+  tokenAmountInUsd: number;
+};
+
+export type TChangeAddLiquidityStatusRequest = {
+  orderId: string;
+  chainId: string;
+};
+
+export type TChangeAddLiquidityStatusResult = {
+  orderId: string;
+  chainId: string;
+  success: boolean;
+};

@@ -1,0 +1,55 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.component-title-wrapper {
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.component-title {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  line-height: 28px;
+  .font-family-medium();
+}
+
+.token-pool-steps-wrapper {
+  height: 440px;
+  padding-top: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+
+  .token-pool-steps {
+    :global {
+      .ant-steps-item {
+        &:last-child {
+          .ant-steps-item-content {
+            min-height: auto;
+          }
+        }
+        &:not(:last-child) {
+          .ant-steps-item-content {
+            min-height: 80px !important;
+          }
+        }
+        .ant-steps-item-content {
+          .ant-steps-item-title {
+            margin-top: 2px;
+          }
+        }
+        .ant-steps-item-icon {
+          width: 24px;
+          height: 24px;
+          .ant-steps-icon {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { WalletTypeEnum as AelfWalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { APP_NAME } from 'constants/index';
-import { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import AElf from 'aelf-sdk';
 import { zeroFill } from '@portkey/utils';
 import { useAElf } from './web3';
@@ -13,6 +13,7 @@ import { getCaHashAndOriginChainIdByWallet, getManagerAddressByWallet } from './
 import { recoverPubKey } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
+import { useEffectOnce } from 'react-use';
 
 export function useAelfAuthToken() {
   const { account, isActive, loginWalletType } = useAElf();
@@ -185,4 +186,34 @@ export function useSetAelfAuthFromStorage() {
 
     return false;
   }, [loginWalletType, walletInfo]);
+}
+
+export function useShowLoginButtonLoading() {
+  const { isConnected, walletInfo } = useConnectWallet();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const stopLoading = useCallback(() => {
+    timerRef.current = setTimeout(() => {
+      setLoading(false);
+      timerRef.current = null;
+    }, 3000);
+  }, []);
+
+  useEffectOnce(() => {
+    if (isConnected && !walletInfo) {
+      stopLoading();
+    } else {
+      setLoading(false);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  });
+
+  return loading;
 }
