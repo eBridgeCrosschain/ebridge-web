@@ -42,9 +42,7 @@ export default function ActionBox({
   }, [status]);
 
   const isNeedAddTokenPool = useMemo(() => {
-    return (
-      status === ApplicationChainStatusEnum.PoolInitialized || status === ApplicationChainStatusEnum.LiquidityAdding
-    );
+    return status === ApplicationChainStatusEnum.PoolInitialized;
   }, [status]);
 
   const handleViewProgress = useCallback(() => {

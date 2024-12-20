@@ -124,7 +124,6 @@ export enum ApplicationChainStatusEnum {
   Issued = 'Issued',
   PoolInitializing = 'PoolInitializing',
   PoolInitialized = 'PoolInitialized',
-  LiquidityAdding = 'LiquidityAdding',
   Complete = 'Complete',
   Failed = 'Failed',
 }

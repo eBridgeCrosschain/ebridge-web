@@ -195,7 +195,6 @@ export const SELECT_CHAIN_FORM_CHAIN_NOT_CREATED_STATUS_LIST = [
 export const SELECT_CHAIN_FORM_CHAIN_CREATED_NOT_LISTED_STATUS_LIST = [
   ApplicationChainStatusEnum.PoolInitializing,
   ApplicationChainStatusEnum.PoolInitialized,
-  ApplicationChainStatusEnum.LiquidityAdding,
   ApplicationChainStatusEnum.Failed,
 ];
 

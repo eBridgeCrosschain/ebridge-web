@@ -41,10 +41,7 @@ export default function ViewProgress({
     if (status === ApplicationChainStatusEnum.Issued || status === ApplicationChainStatusEnum.PoolInitializing) {
       return ListingProcessStep.INITIALIZE_TOKEN_POOL;
     }
-    if (
-      status === ApplicationChainStatusEnum.PoolInitialized ||
-      status === ApplicationChainStatusEnum.LiquidityAdding
-    ) {
+    if (status === ApplicationChainStatusEnum.PoolInitialized) {
       return ListingProcessStep.ADD_TOKEN_POOL;
     }
 
