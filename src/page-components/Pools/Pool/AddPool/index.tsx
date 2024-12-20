@@ -23,6 +23,8 @@ import { usePoolContract, useTokenContract } from 'hooks/useContract';
 import { addLiquidity } from 'utils/pools';
 import { useThrottleCallback } from 'hooks';
 import { ZERO } from 'constants/misc';
+import useLoadingModal from 'hooks/useLoadingModal';
+import { ResultType } from 'components/Loading/ResultModal';
 
 export type TAddPoolProps = {
   chainId: ChainId;
@@ -36,13 +38,11 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
 
   const [amount, setAmount] = useState<string>();
 
-  const [loading, setLoading] = useState(false);
-
   const poolContract = usePoolContract(chainId);
   const tokenContract = useTokenContract(chainId, tokenInfo?.address);
 
   const web3Wallet = useWeb3Wallet(chainId);
-
+  const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
   const { account, library } = web3Wallet || {};
   const connect = useConnect();
   const [[balance]] = useBalances(
@@ -83,7 +83,7 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
   const onAddLiquidity = useThrottleCallback(async () => {
     try {
       if (!tokenInfo || !account || !tokenContract || !poolContract || !amount) return;
-      setLoading(true);
+      setLoadingModal({ open: true });
       const req = await addLiquidity({
         symbol: tokenInfo?.symbol,
         amount: amount,
@@ -93,11 +93,16 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
         chainId,
         tokenContract,
       });
+      if (req.error) {
+        setResultModal({ open: true, type: ResultType.REJECTED });
+      } else {
+        setResultModal({ open: true, type: ResultType.APPROVED });
+      }
       console.log(req, '=====req');
     } catch (error) {
-      console.log(error, '====error');
+      setResultModal({ open: true, type: ResultType.REJECTED });
     } finally {
-      setLoading(false);
+      setLoadingModal({ open: false });
     }
   }, [account, amount, chainId, library, poolContract, tokenContract, tokenInfo]);
   const btnProps = useMemo(() => {
@@ -108,6 +113,7 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
     if (!account) {
       onClick = () => connect(getChainType(chainId), chainId);
       children = 'Connect';
+      disabled = false;
       return { children, disabled, onClick };
     }
 
@@ -150,10 +156,12 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
           <div>{t('Liquidity')}</div> <div>{t('Liquidity')}</div>
         </div>
       </Col>
+      {modal}
       <CommonButton
         {...btnProps}
+        loading={loadingOpen}
         type="primary"
-        className={clsx(styles['action-btn'], loading && styles['action-btn-loading'])}>
+        className={clsx(styles['action-btn'], loadingOpen && styles['action-btn-loading'])}>
         <Trans>{btnProps.children}</Trans>
       </CommonButton>
     </div>

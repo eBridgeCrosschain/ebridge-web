@@ -5,25 +5,28 @@ import CommonImage from 'components/CommonImage';
 import { loadingIcon } from 'assets/images';
 import styles from './styles.module.less';
 
-interface ILoadingModalProps {
+export interface ILoadingModalProps {
   open?: boolean;
+  title?: string;
+  description?: string;
 }
 
-export default function LoadingModal({ open }: ILoadingModalProps) {
+export default function LoadingModal({ open, title, description }: ILoadingModalProps) {
   const { t } = useLanguage();
   return (
     <CommonModal
       className={styles['loading-modal']}
       width={377}
-      title={t('Wait for wallet confirmation...')}
+      title={title || t('Wait for wallet confirmation...')}
       closable={false}
       open={open || false}>
       <div className={clsx(styles['loading-modal-body'], 'flex-column-center')}>
         <CommonImage className={styles['loading-icon']} src={loadingIcon} />
         <div className={styles['loading-text']}>
-          {t(
-            "The Transaction fee also needs to be approved. Don't refresh or close the page until the operation is complete.",
-          )}
+          {description ||
+            t(
+              "The Transaction fee also needs to be approved. Don't refresh or close the page until the operation is complete.",
+            )}
         </div>
       </div>
     </CommonModal>

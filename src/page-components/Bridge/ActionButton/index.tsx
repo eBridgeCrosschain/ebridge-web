@@ -3,7 +3,7 @@ import lodash from 'lodash';
 import CommonButton from 'components/CommonButton';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { useBridgeContract, useTokenContract } from 'hooks/useContract';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './styles.module.less';
 import { CrossChainTransfer, CreateReceipt, LockToken } from 'utils/crossChain';
 import { useHomeContext } from '../HomeContext';
@@ -23,12 +23,12 @@ import { arrowRightWhiteIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { setWalletsModal } from 'contexts/useModal/actions';
-import LoadingModal from './LoadingModal';
-import ResultModal, { IResultModalProps, ResultType } from './ResultModal';
 import { useAelfLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
 import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
 import { useConnect } from 'hooks/useConnect';
+import useLoadingModal from 'hooks/useLoadingModal';
+import { ResultType } from 'components/Loading/ResultModal';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
@@ -49,12 +49,24 @@ export default function ActionButton() {
   }, [fromChainId, selectToken]);
   const { t } = useLanguage();
   const modalDispatch = useModalDispatch();
-  const INIT_RESULT_MODAL_PROPS = {
-    open: false,
-    type: ResultType.APPROVED,
-    onRetry: undefined,
-  };
-  const [resultModalProps, setResultModalProps] = useState<Omit<IResultModalProps, 'onClose'>>(INIT_RESULT_MODAL_PROPS);
+
+  const { modal, setLoadingModal, setResultModal } = useLoadingModal(
+    useMemo(
+      () => ({
+        resultModalProps: {
+          onClose: () => setIsBridgeButtonLoading(false),
+          approvedDescription:
+            "The transaction has been approved. You can check it's status in the “Transactions” page.",
+        },
+      }),
+      [],
+    ),
+  );
+
+  useEffect(() => {
+    setLoadingModal({ open: actionLoading });
+  }, [actionLoading, setLoadingModal]);
+
   const [isBridgeButtonLoading, setIsBridgeButtonLoading] = useState(false);
 
   const tokenContract = useTokenContract(fromChainId, fromTokenInfo?.address, fromWallet?.isPortkey);
@@ -88,12 +100,12 @@ export default function ActionButton() {
       });
       if (!req.error) {
         dispatch(setFrom(''));
-        setResultModalProps({ open: true, type: ResultType.APPROVED });
+        setResultModal({ open: true, type: ResultType.APPROVED });
       } else {
-        setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
+        setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
       }
     } catch (error: any) {
-      setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
+      setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
     }
     dispatch(setActionLoading(false));
   }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
@@ -153,12 +165,15 @@ export default function ActionButton() {
       const req = await (fromTokenInfo.isNativeToken ? LockToken : CreateReceipt)(params);
       if (!req?.error) {
         dispatch(setFrom(''));
-        setResultModalProps({ open: true, type: ResultType.APPROVED });
+        setResultModal({
+          open: true,
+          type: ResultType.APPROVED,
+        });
       } else {
-        setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
+        setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
       }
     } catch (error: any) {
-      setResultModalProps({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
+      setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onCreateReceipt });
     }
     dispatch(setActionLoading(false));
   }, [
@@ -177,6 +192,7 @@ export default function ActionButton() {
     checkPortkeyConnect,
     checkLimitAndRate,
     tokenContract,
+    setResultModal,
   ]);
 
   const needConfirm = useMemo(
@@ -371,14 +387,7 @@ export default function ActionButton() {
         }}
       />
       {limitAmountModal}
-      <LoadingModal open={actionLoading} />
-      <ResultModal
-        {...resultModalProps}
-        onClose={() => {
-          setIsBridgeButtonLoading(false);
-          setResultModalProps(INIT_RESULT_MODAL_PROPS);
-        }}
-      />
+      {modal}
     </>
   );
 }
