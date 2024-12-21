@@ -144,3 +144,5 @@ export const CrossChainTimeList = [
 export const TELEGRAM_BOT_ID = '';
 
 export const SHOW_V_CONSOLE = true;
+
+export const AwakenHost = 'https://test-app.awaken.finance/';

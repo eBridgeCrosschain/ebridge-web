@@ -1,0 +1,77 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+
+.select-modal {
+  :global {
+    .@{app-prefix}-modal-header {
+      .@{app-prefix}-modal-title .@{app-prefix}-col {
+        text-align: left !important;
+      }
+    }
+    .@{app-prefix}-modal-body {
+      min-width: 448px;
+      max-width: 448px;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+  }
+  .input-search {
+    height: 40px;
+    border-radius: 6px;
+    width: calc(100% - 48px);
+    align-self: center;
+    :global {
+      .@{app-prefix}-input-suffix {
+        font-size: 16px;
+      }
+    }
+  }
+  .token-list {
+    margin-top: 8px;
+    height: 270px;
+    overflow: auto;
+    .token-item {
+      padding: 13px 24px;
+      line-height: 24px;
+      .font-family-medium();
+      .token-logo {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+        border-radius: 50%;
+      }
+      &:hover {
+        background: @bg-15;
+      }
+    }
+    .token-item-selected {
+      background: @bg-15;
+    }
+  }
+  .token-list-add-token {
+    margin-bottom: 56px;
+  }
+  .bottom-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 8px 0 24px;
+    .row-body {
+      height: 48px;
+      a {
+        color: @font-1;
+      }
+    }
+  }
+}
+@media screen and (max-width: @md-width) {
+  .select-modal {
+    :global {
+      .@{app-prefix}-modal-header {
+        border-width: 0;
+      }
+    }
+  }
+}

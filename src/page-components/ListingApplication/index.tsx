@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState, memo } from 'react';
+import { useEffect, useMemo, useRef, useState, memo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import CommonSteps from 'components/CommonSteps';
 import CommonImage from 'components/CommonImage';
 import UnsavedChangesWarningModal from './UnsavedChangesWarningModal';
-// import TokenInformation from './TokenInformation';
+import TokenInformation from './TokenInformation';
 // import SelectChain from './SelectChain';
 // import CoboCustodyReview from './CoboCustodyReview';
 // import InitializeLiquidityPool from './InitializeLiquidityPool';
@@ -23,8 +23,8 @@ function ListingApplication() {
   const isMobile = useMobile();
   const router = useRouter();
   const { query } = router;
-  const symbol = useMemo(() => query.symbol || undefined, [query]);
-  const id = useMemo(() => query.id || undefined, [query]);
+  const symbol = useMemo(() => (query.symbol as string) || undefined, [query]);
+  const id = useMemo(() => (query.id as string) || undefined, [query]);
   const networks = useMemo(() => {
     const str = query.networks || '';
     try {
@@ -74,25 +74,31 @@ function ListingApplication() {
     };
   }, [currentStep]);
 
-  const handleNextStep = (params?: TSearchParams) => {
-    if (typeof currentStep !== 'number') return;
-    const nextStep = currentStep + 1;
-    if (nextStep <= ListingStep.COMPLETE) {
-      globalCanAccessStep = true;
-      const replaceUrl = getListingUrl(nextStep, params);
-      router.replace(replaceUrl);
-    }
-  };
+  const handleNextStep = useCallback(
+    (params?: TSearchParams) => {
+      if (typeof currentStep !== 'number') return;
+      const nextStep = currentStep + 1;
+      if (nextStep <= ListingStep.COMPLETE) {
+        globalCanAccessStep = true;
+        const replaceUrl = getListingUrl(nextStep, params);
+        router.replace(replaceUrl);
+      }
+    },
+    [currentStep, router],
+  );
 
-  const handlePrevStep = (params?: TSearchParams) => {
-    if (typeof currentStep !== 'number') return;
-    const prevStep = currentStep - 1;
-    if (prevStep >= ListingStep.TOKEN_INFORMATION) {
-      globalCanAccessStep = true;
-      const replaceUrl = getListingUrl(prevStep, params);
-      router.replace(replaceUrl);
-    }
-  };
+  const handlePrevStep = useCallback(
+    (params?: TSearchParams) => {
+      if (typeof currentStep !== 'number') return;
+      const prevStep = currentStep - 1;
+      if (prevStep >= ListingStep.TOKEN_INFORMATION) {
+        globalCanAccessStep = true;
+        const replaceUrl = getListingUrl(prevStep, params);
+        router.replace(replaceUrl);
+      }
+    },
+    [currentStep, router],
+  );
 
   const handleWarningModalConfirm = () => {
     setIsWarningModalOpen(false);
@@ -112,8 +118,8 @@ function ListingApplication() {
 
   const renderForm = () => {
     switch (currentStep) {
-      // case ListingStep.TOKEN_INFORMATION:
-      //   return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
+      case ListingStep.TOKEN_INFORMATION:
+        return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
       // case ListingStep.SELECT_CHAIN:
       //   return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
       // case ListingStep.COBO_CUSTODY_REVIEW:
@@ -156,7 +162,6 @@ function ListingApplication() {
               <CommonSteps stepItems={LISTING_STEP_ITEMS} current={currentStep} />
             </div>
             <div className={styles['listing-card']}>
-              <div className={styles['listing-card-form-title']}>{LISTING_STEP_ITEMS[currentStep]?.title}</div>
               <div className={styles['listing-card-form-content']}>{renderForm()}</div>
             </div>
           </div>

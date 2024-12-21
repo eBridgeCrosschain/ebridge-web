@@ -56,14 +56,6 @@ export const LISTING_STEP_ITEMS: ICommonStepsProps['stepItems'] = [
   },
 ];
 
-export const CONTACT_US_ROW = (
-  <>
-    {'• If you need any support, please '}
-    <CommonLink href="https://form.ebridge.exchange/contact">contact us</CommonLink>
-    {'.'}
-  </>
-);
-
 export enum ListingProcessStep {
   BASIC_INFO = 0,
   SELECT_CHAIN = 1,
@@ -93,7 +85,7 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
 // ================ Token information ================
 
 export const TOKEN_INFORMATION_FORM_LABEL_MAP: Record<TokenInformationFormKeys, string> = {
-  [TokenInformationFormKeys.TOKEN]: 'Select aelf chain token',
+  [TokenInformationFormKeys.TOKEN]: 'Select token',
   [TokenInformationFormKeys.OFFICIAL_WEBSITE]: 'Official website',
   [TokenInformationFormKeys.OFFICIAL_TWITTER]: 'Official Twitter',
   [TokenInformationFormKeys.TITLE]: 'What is your title on the project/team/company?',
