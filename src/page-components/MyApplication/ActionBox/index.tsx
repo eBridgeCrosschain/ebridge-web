@@ -19,6 +19,7 @@ export default function ActionBox({
   id,
   status,
   filedTime,
+  resetList,
 }: {
   symbol: string;
   tokenIcon?: string;
@@ -28,6 +29,7 @@ export default function ActionBox({
   id: string;
   status: ApplicationChainStatusEnum;
   filedTime?: number;
+  resetList?: () => Promise<void>;
 }) {
   const router = useRouter();
   // TODO
@@ -76,24 +78,18 @@ export default function ActionBox({
   const handleReapply = useCallback(async () => {
     try {
       // setLoading(true);
-      const res = await addApplicationChain({
+      await addApplicationChain({
         symbol,
         chainIds: aelfChainIds,
         otherChainIds: [otherChainId],
       });
-      const _chainList = res.chainList || [];
-      const _otherChainList = res.otherChainList || [];
-      const _concatChainList = _chainList.concat(_otherChainList);
-      const _targetChainIds = aelfChainIds?.concat([otherChainId]);
-      if (_concatChainList.length === _targetChainIds.length) {
-        setIsReapplyDisable(true);
-      }
+      await resetList?.();
     } catch (error) {
       console.log('>>>>>> handleReapply error ', error);
     } finally {
       // setLoading(false);
     }
-  }, [aelfChainIds, otherChainId, symbol]);
+  }, [aelfChainIds, otherChainId, resetList, symbol]);
 
   useEffectOnce(() => {
     if (filedTime && filedTime + TwoDaysTimestamp >= Date.now()) {

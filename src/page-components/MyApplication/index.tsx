@@ -14,6 +14,10 @@ import { BUTTON_TEXT_BACK } from 'constants/misc';
 import { MY_APPLICATIONS } from 'constants/listingApplication';
 import LinkForBlank from 'components/LinkForBlank';
 
+const DefaultSkipCount = 0;
+const DefaultMaxResultCount = 10;
+const DefaultTotalCount = 0;
+
 function MyApplications() {
   const isMd = useMediaQueries('md');
   // const { setLoading } = useLoading(); // TODO
@@ -23,9 +27,9 @@ function MyApplications() {
   const [currentApplicationList, setCurrentApplicationList] = useState<any[]>([]);
 
   // pagination
-  const [skipPageCount, setSkipPageCount] = useState(0);
-  const [maxResultCount, setMaxResultCount] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
+  const [skipPageCount, setSkipPageCount] = useState(DefaultSkipCount);
+  const [maxResultCount, setMaxResultCount] = useState(DefaultMaxResultCount);
+  const [totalCount, setTotalCount] = useState(DefaultTotalCount);
 
   const getApplicationData = useCallback(
     async ({ skip, max }: { skip?: number; max?: number }) => {
@@ -64,9 +68,9 @@ function MyApplications() {
       }
       if (maxResultCount !== pageSize) {
         // pageSize change and skipCount need init
-        skip = 0;
+        skip = DefaultSkipCount;
         max = pageSize;
-        setSkipPageCount(0);
+        setSkipPageCount(DefaultSkipCount);
         setMaxResultCount(pageSize);
       }
 
@@ -82,6 +86,10 @@ function MyApplications() {
     getApplicationData({});
   }, [getApplicationData]);
 
+  const handleResetList = useCallback(async () => {
+    await getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
+  }, [getApplicationData]);
+
   useEffectOnce(() => {
     if (!isActive) {
       aelfLogin(); // TODO
@@ -92,15 +100,15 @@ function MyApplications() {
 
   const initForLogout = useCallback(async () => {
     setCurrentApplicationList([]);
-    setSkipPageCount(0);
-    setMaxResultCount(10);
-    setTotalCount(0);
+    setSkipPageCount(DefaultSkipCount);
+    setMaxResultCount(DefaultMaxResultCount);
+    setTotalCount(DefaultSkipCount);
   }, []);
   const initLogoutRef = useRef(initForLogout);
   initLogoutRef.current = initForLogout;
 
   const initForReLogin = useCallback(async () => {
-    getApplicationData({ skip: 0, max: 10 });
+    getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
   }, [getApplicationData]);
   const initForReLoginRef = useRef(initForReLogin);
   initForReLoginRef.current = initForReLogin;
@@ -144,6 +152,7 @@ function MyApplications() {
           tableOnChange={tableOnChange}
           maxResultCount={maxResultCount}
           skipPageCount={skipPageCount}
+          onResetList={handleResetList}
         />
       </div>
     </div>

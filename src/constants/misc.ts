@@ -43,6 +43,8 @@ export const EBRIDGE_PORTKEY_PROJECT_CODE = '13003';
 
 export const CONNECT_AELF_WALLET = 'Connect aelf Wallet';
 
+export const SERVICE_BUSY_TIP = 'The service is busy. Please try again later.';
+
 export const GOT_IT = 'Got it';
 
 export const LOADING_TEXT = 'Loading...';
