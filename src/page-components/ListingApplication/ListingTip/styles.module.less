@@ -1,0 +1,22 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.tip-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.tip-title-icon {
+  path {
+    fill: @font-13;
+  }
+}
+
+.tip-title-text {
+  font-size: 14px;
+  line-height: 22px;
+  color: @font-13;
+  .font-family-medium();
+}

@@ -23,7 +23,7 @@ import { arrowRightWhiteIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { setWalletsModal } from 'contexts/useModal/actions';
-import { useLogin } from 'hooks/wallet';
+import { useAelfLogin } from 'hooks/wallet';
 import { getMaxAmount } from 'utils/input';
 import { useCheckTxnFeeEnough } from 'hooks/checkTxnFee';
 import { useConnect } from 'hooks/useConnect';
@@ -32,7 +32,7 @@ import { ResultType } from 'components/Loading/ResultModal';
 
 export default function ActionButton() {
   const { fromWallet, toWallet, fromOptions, toOptions, isHomogeneous } = useWallet();
-  const login = useLogin();
+  const login = useAelfLogin();
   const connect = useConnect();
   const [toConfirmModal, setToConfirmModal] = useState<boolean>(false);
   const [

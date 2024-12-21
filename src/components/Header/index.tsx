@@ -28,7 +28,7 @@ import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { ChainType } from 'types';
-import { useLogin } from 'hooks/wallet';
+import { useAelfLogin } from 'hooks/wallet';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
@@ -88,7 +88,7 @@ function Logo({ clickable = false }: { clickable?: boolean }) {
 function ConnectWalletsButton() {
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const login = useLogin();
+  const login = useAelfLogin();
   const { isHomogeneous } = useWallet();
 
   return (

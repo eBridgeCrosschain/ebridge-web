@@ -1,7 +1,7 @@
 import { Connector } from '@web3-react/types';
 import { ALL_SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chain';
 import storages from 'constants/storages';
-import { eventBus } from 'utils';
+import { eventBus } from 'utils/eBridgeEventBus';
 import {
   coinbaseWalletConnection,
   injectedConnection,

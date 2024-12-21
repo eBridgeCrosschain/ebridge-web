@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { ChainId, ChainType } from 'types';
-import { useLogin } from './wallet';
+import { useAelfLogin } from './wallet';
 import { useTonConnectModal } from '@tonconnect/ui-react';
 import { setWalletModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 
 export function useConnect() {
-  const login = useLogin();
+  const login = useAelfLogin();
   const { open } = useTonConnectModal();
   const dispatch = useModalDispatch();
   return useCallback(

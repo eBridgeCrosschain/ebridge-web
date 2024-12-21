@@ -63,6 +63,7 @@
     "react-dom": "18.2.0",
     "react-ga": "^3.3.1",
     "react-i18next": "^11.18.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-use": "^17.4.0",
     "tonweb": "^0.0.66",
     "wagmi": "^2.14.3",

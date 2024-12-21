@@ -8,16 +8,16 @@ import CommonImage from 'components/CommonImage';
 import { closeIcon } from 'assets/images';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 
-export default function CommonModal(
-  props: ModalProps & {
-    children?: any;
-    className?: string;
-    leftCallBack?: () => void;
-    leftElement?: ReactNode;
-    transitionName?: string;
-    type?: 'pop-bottom' | 'default';
-  },
-) {
+export interface ICommonModalProps extends ModalProps {
+  children?: any;
+  className?: string;
+  leftCallBack?: () => void;
+  leftElement?: ReactNode;
+  transitionName?: string;
+  type?: 'pop-bottom' | 'default';
+}
+
+export default function CommonModal(props: ICommonModalProps) {
   const { leftCallBack, width, title, leftElement, transitionName, type } = props;
   const isMobile = useMobile();
   return (

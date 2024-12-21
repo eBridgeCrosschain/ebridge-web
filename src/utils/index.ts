@@ -1,9 +1,7 @@
 import { SupportedChainId, SupportedELFChainId, SupportedTONChainId } from 'constants/chain';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
-import EventEmitter from 'events';
 import { AelfInstancesKey, ChainId, TokenInfo } from 'types';
 import { isELFChain } from './aelfUtils';
-export const eventBus = new EventEmitter();
 import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
 import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedExternalChain } from 'constants/index';

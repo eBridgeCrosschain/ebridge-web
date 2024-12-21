@@ -9,3 +9,8 @@ const storages = {
   portkeyCAAddresses: 'portkey-ca-addresses',
 };
 export default storages;
+
+export enum LocalStorageKey {
+  TOKEN_TYPE = 'token_type',
+  ACCESS_TOKEN = 'ebridge_access_token',
+}

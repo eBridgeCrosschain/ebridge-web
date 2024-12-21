@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
-import { useIsLogin, useLogin } from 'hooks/wallet';
+import { useAelfLogin, useIsAelfLogin } from 'hooks/wallet';
 import { useModal } from 'contexts/useModal';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import { useWalletContext } from 'contexts/useWallet';
@@ -40,8 +40,8 @@ const STEP_ITEM_CONFIG = {
 
 export default function WalletsModal() {
   const { t } = useLanguage();
-  const login = useLogin();
-  const isLogin = useIsLogin();
+  const login = useAelfLogin();
+  const isLogin = useIsAelfLogin();
   const [{ walletsModal }, { dispatch }] = useModal();
   const [{ fromOptions, toOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);

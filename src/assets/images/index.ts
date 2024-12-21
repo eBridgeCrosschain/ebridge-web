@@ -24,6 +24,7 @@ import arrowGrayIcon from './arrow-gray.svg';
 import arrowBlueIcon from './arrow-blue.svg';
 import arrowRightWhiteIcon from './arrow_right_white.svg';
 import arrowRightGrayIcon from './arrow_right_gray.svg';
+import backIcon from './back.svg';
 import checkBlueIcon from './check-blue.svg';
 import checkFilledIcon from './check-filled.svg';
 import errorFilledIcon from './error-filled.svg';
@@ -36,6 +37,9 @@ import closeIcon from './close.svg';
 import infoCircleIcon from './info-circle.svg';
 import questionFilledIcon from './question-filled.svg';
 import loadingIcon from './loading.png';
+import completeIcon from './complete.svg';
+import infoCircleFillIcon from './info-circle-fill.svg';
+import viewProgressIcon from './view-progress.svg';
 import poolsIcon from './pools.svg';
 import poolsBlueIcon from './pools-blue.svg';
 
@@ -65,6 +69,7 @@ export {
   arrowBlueIcon,
   arrowRightWhiteIcon,
   arrowRightGrayIcon,
+  backIcon,
   checkBlueIcon,
   checkFilledIcon,
   errorFilledIcon,
@@ -75,9 +80,12 @@ export {
   transactionsBlueIcon,
   closeIcon,
   infoCircleIcon,
+  infoCircleFillIcon,
   questionFilledIcon,
   loadingIcon,
   tonLogo,
+  completeIcon,
+  viewProgressIcon,
   poolsIcon,
   poolsBlueIcon,
 };

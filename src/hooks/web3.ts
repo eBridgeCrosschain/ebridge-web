@@ -9,7 +9,7 @@ import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
-import { useLogin } from './wallet';
+import { useAelfLogin } from './wallet';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
 import { useTonWallet } from '@tonconnect/ui-react';
@@ -20,7 +20,7 @@ import { isTonChain } from 'utils';
 import { getNetworkInfo, switchChain } from 'utils/network';
 
 export function useAElfConnect() {
-  const login = useLogin();
+  const login = useAelfLogin();
   const chainDispatch = useChainDispatch();
 
   return useCallback(async () => {
@@ -30,7 +30,7 @@ export function useAElfConnect() {
 }
 
 export function usePortkeyConnect() {
-  const login = useLogin();
+  const login = useAelfLogin();
   const chainDispatch = useChainDispatch();
   return useCallback(async () => {
     await login();

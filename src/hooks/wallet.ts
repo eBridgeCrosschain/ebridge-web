@@ -1,30 +1,36 @@
-import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { WalletTypeEnum as AelfWalletTypeEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
 import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
+import { GetCAHolderByManagerParams } from '@portkey/services';
 import CommonMessage from 'components/CommonMessage';
 import { MAIN_SIDE_CHAIN_ID } from 'constants/index';
 import { useChainDispatch } from 'contexts/useChain';
 import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/actions';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, TAelfAccounts } from 'types/wallet';
+import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, TAelfAccounts, WebLoginWalletInfo } from 'types/wallet';
 import { sleep } from 'utils';
 import { handleWebLoginErrorMessage } from 'utils/error';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
+import { useAelfAuthToken } from './aelfAuthToken';
+import { AuthTokenSource, removeOneLocalJWT } from 'utils/aelfAuthToken';
+import eBridgeEventBus from 'utils/eBridgeEventBus';
+import { pubKeyToAddress } from 'utils/aelfUtils';
+import { eBridgeInstance } from 'utils/eBridgeInstance';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
   const { connectWallet, walletType } = useConnectWallet();
   const connectWalletRef = useRef(connectWallet);
   connectWalletRef.current = connectWallet;
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
   const init = useCallback(async () => {
-    if (walletType === WalletTypeEnum.elf) {
+    if (walletType === AelfWalletTypeEnum.elf) {
       chainDispatch(setSelectELFWallet('NIGHTELF'));
-    } else if (walletType === WalletTypeEnum.aa || walletType === WalletTypeEnum.discover) {
+    } else if (walletType === AelfWalletTypeEnum.aa || walletType === AelfWalletTypeEnum.discover) {
       chainDispatch(setSelectELFWallet('PORTKEY'));
-    } else if (walletType === WalletTypeEnum.unknown) {
+    } else if (walletType === AelfWalletTypeEnum.unknown) {
       chainDispatch(setSelectELFWallet(undefined));
     }
   }, [chainDispatch, walletType]);
@@ -38,7 +44,7 @@ export function useInitWallet() {
 
   useEffect(() => {
     if (!isLogin) {
-      if (localStorage.getItem('connectedWallet') !== WalletTypeEnum.aa) {
+      if (localStorage.getItem('connectedWallet') !== AelfWalletTypeEnum.aa) {
         onLogoutClearData();
       }
     } else {
@@ -47,31 +53,100 @@ export function useInitWallet() {
   }, [init, isLogin, onLogoutClearData, walletType]);
 }
 
-export function useIsLogin() {
+export function useAelfAuthListener() {
+  // const { setLoading } = useLoading(); // TODO
+  const { isConnected, walletInfo, walletType } = useConnectWallet();
+
+  const { queryAuth } = useAelfAuthToken();
+  // const getAuthRef = useRef(getAuth);
+  // getAuthRef.current = getAuth;
+
+  // useEffect(() => {
+  //   console.warn('>>>>>> isConnected', isConnected);
+  //   console.warn('>>>>>> walletInfo', walletInfo);
+  //   if (isConnected && walletInfo) {
+  //     getAuthRef.current(false, true);
+  //   }
+  // }, [isConnected, walletInfo]);
+
+  const onAuthorizationExpired = useCallback(async () => {
+    if (!isConnected) {
+      console.warn('AuthorizationExpired: Not Logined');
+      eBridgeInstance.setUnauthorized(false);
+      return;
+    } else if (isConnected && walletInfo) {
+      const { caHash } = await getCaHashAndOriginChainIdByWallet(walletInfo as WebLoginWalletInfo, walletType);
+      const managerAddress = await getManagerAddressByWallet(walletInfo as WebLoginWalletInfo, walletType);
+      const source = walletType === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey;
+      const key = (caHash || source) + managerAddress;
+      removeOneLocalJWT(key);
+
+      console.log('AuthorizationExpired');
+      eBridgeInstance.setUnauthorized(true);
+      await queryAuth(false, true);
+    } else {
+      eBridgeInstance.setUnauthorized(false);
+    }
+    // setLoading(false);
+  }, [isConnected, queryAuth, walletInfo, walletType]);
+  const onAuthorizationExpiredRef = useRef(onAuthorizationExpired);
+  onAuthorizationExpiredRef.current = onAuthorizationExpired;
+
+  useEffect(() => {
+    const { remove } = eBridgeEventBus.Unauthorized.addListener(() => {
+      console.log('Unauthorized listener', eBridgeInstance.unauthorized);
+      if (eBridgeInstance.unauthorized) return;
+      eBridgeInstance.setUnauthorized(true);
+      onAuthorizationExpiredRef.current?.();
+    });
+    return () => {
+      remove();
+    };
+  }, []);
+}
+
+export function useIsAelfLogin() {
   const { isConnected, walletInfo } = useConnectWallet();
   return useMemo(() => isConnected && !!walletInfo, [isConnected, walletInfo]);
 }
 
-export function useLogin() {
+export function useAelfLogin() {
   const { connectWallet } = useConnectWallet();
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
-  return useCallback(async () => {
-    if (isLogin) return;
+  const { getAuth } = useAelfAuthToken();
+  const getAuthRef = useRef(getAuth);
+  getAuthRef.current = getAuth;
 
-    try {
-      await connectWallet();
-    } catch (error) {
-      CommonMessage.error(handleWebLoginErrorMessage(error));
-    }
-  }, [connectWallet, isLogin]);
+  return useCallback(
+    async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void) => {
+      if (isLogin) {
+        if (isNeedGetJWT) {
+          await getAuthRef.current(true, false);
+        }
+        await handleConnectedCallback?.();
+        return;
+      }
+
+      try {
+        await connectWallet();
+        if (isNeedGetJWT) {
+          await getAuthRef.current(true, false);
+        }
+        await handleConnectedCallback?.();
+      } catch (error) {
+        CommonMessage.error(handleWebLoginErrorMessage(error));
+      }
+    },
+    [connectWallet, isLogin],
+  );
 }
 
 export function useGetAccount() {
   const { walletInfo } = useConnectWallet();
-  const isLogin = useIsLogin();
+  const isLogin = useIsAelfLogin();
 
-  // WalletInfo TAelfAccounts ExtraInfoForDiscover | ExtraInfoForPortkeyAA | ExtraInfoForNightElf;
+  // WebLoginWalletInfo TAelfAccounts ExtraInfoForDiscover | ExtraInfoForPortkeyAA | ExtraInfoForNightElf;
   return useMemo(() => {
     if (!isLogin) return undefined;
 
@@ -84,7 +159,7 @@ export function useGetAccount() {
   }, [isLogin, walletInfo]);
 }
 
-export function useLogout() {
+export function useAelfLogout() {
   const chainDispatch = useChainDispatch();
   const { disConnectWallet, connectWallet } = useConnectWallet();
 
@@ -105,8 +180,8 @@ export function useGetWalletManagerStatus() {
 
   return useCallback(
     async (chainId: ChainId) => {
-      if (walletType === WalletTypeEnum.elf) return true;
-      if (walletType === WalletTypeEnum.discover) {
+      if (walletType === AelfWalletTypeEnum.elf) return true;
+      if (walletType === AelfWalletTypeEnum.discover) {
         const discoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
         const provider = discoverInfo.provider;
         if (!provider) {
@@ -128,3 +203,61 @@ export function useGetWalletManagerStatus() {
     [walletInfo?.extraInfo, walletType],
   );
 }
+
+export const getManagerAddressByWallet = async (
+  walletInfo: WebLoginWalletInfo,
+  walletType: AelfWalletTypeEnum,
+  pubkey?: string,
+): Promise<string> => {
+  if (walletType === AelfWalletTypeEnum.unknown) return '';
+
+  let managerAddress;
+  if (walletType === AelfWalletTypeEnum.discover) {
+    const discoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
+    managerAddress = await discoverInfo?.provider?.request({
+      method: 'wallet_getCurrentManagerAddress',
+    });
+  } else if (walletType === AelfWalletTypeEnum.aa) {
+    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
+    managerAddress = portkeyAAInfo.portkeyInfo.walletInfo.address;
+  } else {
+    // AelfWalletTypeEnum.elf
+    managerAddress = walletInfo.address;
+  }
+
+  if (!managerAddress && pubkey) {
+    managerAddress = pubKeyToAddress(pubkey);
+  }
+
+  return managerAddress || '';
+};
+
+export const getCaHashAndOriginChainIdByWallet = async (
+  walletInfo: WebLoginWalletInfo,
+  walletType: AelfWalletTypeEnum,
+): Promise<{ caHash: string; originChainId: TChainId }> => {
+  if (walletType === AelfWalletTypeEnum.unknown)
+    return {
+      caHash: '',
+      originChainId: MAIN_SIDE_CHAIN_ID.sideChain,
+    };
+
+  let caHash, originChainId;
+  if (walletType === AelfWalletTypeEnum.discover) {
+    const res = await PortkeyDid.did.services.getHolderInfoByManager({
+      caAddresses: [walletInfo?.address],
+    } as unknown as GetCAHolderByManagerParams);
+    const caInfo = res[0];
+    caHash = caInfo?.caHash;
+    originChainId = caInfo?.chainId as TChainId;
+  } else if (walletType === AelfWalletTypeEnum.aa) {
+    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
+    caHash = portkeyAAInfo.portkeyInfo.caInfo.caHash;
+    originChainId = portkeyAAInfo.portkeyInfo.chainId;
+  }
+
+  return {
+    caHash: caHash || '',
+    originChainId: originChainId || MAIN_SIDE_CHAIN_ID.sideChain,
+  };
+};

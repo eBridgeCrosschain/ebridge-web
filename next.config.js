@@ -40,7 +40,11 @@ const nextConfig = {
     return getRewrites();
   },
   images: {
-    domains: ['raw.githubusercontent.com'],
+    domains: [
+      'raw.githubusercontent.com',
+      'forest-mainnet.s3.ap-northeast-1.amazonaws.com',
+      'forest-testnet.s3.ap-northeast-1.amazonaws.com',
+    ],
   },
 };
 
@@ -68,7 +72,7 @@ const withTM = require('next-transpile-modules')([
   '@aelf-web-login/wallet-adapter-base',
   '@aelf-web-login/wallet-adapter-react',
   '@aelf-web-login/wallet-adapter-bridge',
-  '@portkey/did-ui-react'
+  '@portkey/did-ui-react',
 ]);
 
 module.exports = withPlugins(

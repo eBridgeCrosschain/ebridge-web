@@ -128,6 +128,22 @@ export const checkAllowanceAndApprove = async ({
   return true;
 };
 
+export const createToken = async ({
+  createTokenContract,
+  account,
+  name,
+  symbol,
+  initialSupply,
+}: {
+  createTokenContract: ContractBasic;
+  account: string;
+  name: string;
+  symbol: string;
+  initialSupply: number;
+}): Promise<any> => {
+  return await createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply]);
+};
+
 export const getETHBalance = async (address: string, library?: provider) => {
   const web3 = new Web3(library || getDefaultProvider());
   return web3.eth.getBalance(address);

@@ -1,0 +1,37 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.my-applications-page-container-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: @border-5;
+}
+
+.my-applications-page-back {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  .my-applications-page-back-text {
+    font-size: 14px;
+    color: @font-15;
+    .font-family-medium();
+  }
+}
+
+.my-applications-page-body {
+  height: 100%;
+  background-color: @bg-2;
+}
+
+.my-applications-page-title {
+  font-size: 24px;
+  .font-family-medium();
+
+  text-align: left;
+  margin-bottom: 16px;
+}

@@ -1,0 +1,122 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.view-progress-modal {
+  :global {
+    .ant-modal-content {
+      height: 100%;
+      .ant-modal-close {
+        .ant-modal-close-x {
+          height: 68px;
+          padding-top: 8px;
+          svg path {
+            fill: @font-15;
+          }
+        }
+      }
+      .ant-modal-header {
+        height: 68px;
+        padding-top: 24px;
+        padding-bottom: 16px;
+
+        .ant-modal-title {
+          font-size: 20px;
+          line-height: 28px;
+          .font-family-medium();
+        }
+      }
+    }
+  }
+}
+
+.token-info {
+  background-color: @bg-16;
+  padding: 9px 12px;
+  border-radius: 6px;
+
+  .token-symbol {
+    font-size: 14px;
+    line-height: 22px;
+    .font-family-medium();
+  }
+
+  .token-network {
+    color: @font-13;
+    font-size: 14px;
+    line-height: 22px;
+  }
+}
+
+.view-progress-steps-wrapper {
+  height: 440px;
+  padding-top: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+
+  .view-progress-steps {
+    :global {
+      .ant-steps-item {
+        &:last-child {
+          .ant-steps-item-content {
+            min-height: auto;
+          }
+        }
+        &:not(:last-child) {
+          .ant-steps-item-content {
+            min-height: 80px !important;
+          }
+        }
+        .ant-steps-item-content {
+          .ant-steps-item-title {
+            margin-top: 2px;
+          }
+        }
+        .ant-steps-item-icon {
+          width: 24px;
+          height: 24px;
+          .ant-steps-icon {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.view-progress-drawer.view-progress-drawer-weight {
+  :global {
+    .ant-drawer-header {
+      height: auto;
+      // TODO
+      // @include media-pad {
+      //   padding: 24px 24px 16px;
+      // }
+      // @include media-mobile {
+      //   padding: 16px;
+      // }
+      .ant-drawer-header-title {
+        .ant-drawer-title {
+          text-align: left;
+          font-size: 20px;
+          line-height: 28px;
+        }
+      }
+    }
+
+    .ant-drawer-body {
+      padding: 24px;
+      // TODO
+      // @include media-pad {
+      //   padding: 24px;
+      // }
+      // @include media-mobile {
+      //   padding: 16px 16px 48px;
+      // }
+    }
+  }
+}
+
+.confirm-button {
+  width: 100%;
+  margin-top: 24px;
+}

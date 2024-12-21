@@ -15,6 +15,8 @@ import {
 import { NetworkType } from 'types';
 import { NetworkEnum } from '@aelf-web-login/wallet-adapter-base';
 
+export const NETWORK_TYPE: NetworkEnum = NetworkEnum.MAINNET;
+
 export const MAIN_SIDE_CHAIN_ID = {
   mainChain: SupportedELFChainId.AELF,
   sideChain: SupportedELFChainId.tDVV,
