@@ -1,37 +1,52 @@
 @import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/font.less';
 
 .my-application-table {
   .token-symbol {
+    margin-left: 4px;
     max-width: 152px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   :global {
-    .ant-table-thead {
-      height: 48px;
-      .ant-table-cell {
-        color: @font-13;
-        background-color: @bg-2;
-      }
+    .@{app-prefix}-table-cell-ellipsis {
+      white-space: normal;
+      word-break: normal;
     }
-    .ant-table-thead > tr > th {
-      padding: 12px 0 12px 12px;
+    .@{app-prefix}-table-thead > tr > th {
+      padding: 13px 8px;
+      background: @bg-19;
+      border-bottom-width: 0;
+      color: @font-15;
+      line-height: 22px;
+      .font-family-medium();
+      .text-overflow(1);
+
+      white-space: nowrap;
     }
-    .ant-table-tbody > tr > td {
-      box-sizing: border-box;
-      height: 72px;
-      padding: 12px 0 12px 12px;
+    .@{app-prefix}-table-container table > thead > tr:first-child th:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
     }
-    .ant-table-thead > tr > th::before {
-      display: none;
+    .@{app-prefix}-table-container table > thead > tr:first-child th:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
     }
-    .ant-pagination-item-active {
-      border-color: @primary-color;
-      a {
-        color: @primary-color;
+    .@{app-prefix}-table-tbody > tr > td {
+      padding: 16px 8px;
+      color: @font-15;
+      .font-family-medium();
+    }
+    .@{app-prefix}-table-thead > tr > th,
+    .@{app-prefix}-table-tbody > tr > td,
+    .@{app-prefix}-table tfoot > tr > th,
+    .@{app-prefix}-table tfoot > tr > td {
+      font-size: 14px;
+      line-height: 20px;
+      &::before {
+        display: none;
       }
     }
   }

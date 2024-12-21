@@ -8,6 +8,7 @@ import assetsBackImg from './images/assetsBack.svg';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
 import { LoginStatusEnum } from '@portkey/types';
+import { ROUTE_PATHS } from 'constants/link';
 
 export default function Assets() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function Assets() {
 
   useEffect(() => {
     if (walletType !== WalletTypeEnum.aa) {
-      router.replace('/');
+      router.replace(ROUTE_PATHS.HOME);
     }
   }, [walletType, router]);
 

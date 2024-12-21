@@ -8,6 +8,7 @@ import styles from './styles.module.less';
 import { closeIcon } from 'assets/images';
 import CommonImage from 'components/CommonImage';
 import useMediaQueries from 'hooks/useMediaQueries';
+import CommonButton from 'components/CommonButton';
 
 export interface ICommonTooltipSwitchModalRef {
   open: () => void;
@@ -19,15 +20,29 @@ interface ICommonTooltipSwitchModalProps {
   modalWidth?: number;
   tip: React.ReactNode;
   children: React.ReactNode;
-  modalFooterClassName?: string; // TODO
+  isShowConfirmButton?: boolean;
+  confirmButtonText?: string;
+  confirmButtonClassName?: string;
+  onConfirm?: () => void;
 }
 
 const CommonTooltipSwitchModal = forwardRef<ICommonTooltipSwitchModalRef, ICommonTooltipSwitchModalProps>(
-  ({ tooltipProps, modalProps, modalWidth = 335, tip, children }, ref) => {
+  (
+    {
+      tooltipProps,
+      modalProps,
+      modalWidth = 335,
+      tip,
+      children,
+      isShowConfirmButton = true,
+      confirmButtonText = GOT_IT,
+      confirmButtonClassName,
+      onConfirm,
+    },
+    ref,
+  ) => {
     const isMd = useMediaQueries('md');
-
     const isTooltip = useMemo(() => !isMd, [isMd]);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleModalOpen = useCallback(() => {
@@ -58,15 +73,21 @@ const CommonTooltipSwitchModal = forwardRef<ICommonTooltipSwitchModalRef, ICommo
         <CommonModal
           {...modalProps}
           className={clsx(styles['common-tooltip-switch-modal'], modalProps?.className)}
-          // footerClassName={clsx(styles['common-tooltip-switch-modal-footer'], modalFooterClassName)}
           width={modalWidth}
           closeIcon={<CommonImage src={closeIcon} />}
-          // hideCancelButton
-          okText={GOT_IT}
+          okText={confirmButtonText}
           open={isModalOpen}
           onOk={handleModalClose}
           onCancel={handleModalClose}>
           <div>{tip}</div>
+          {isShowConfirmButton && (
+            <CommonButton
+              type="primary"
+              className={clsx(styles['confirm-button'], confirmButtonClassName)}
+              onClick={onConfirm || handleModalClose}>
+              {confirmButtonText}
+            </CommonButton>
+          )}
         </CommonModal>
       </>
     );
