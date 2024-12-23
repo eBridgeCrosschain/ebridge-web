@@ -386,28 +386,39 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
           {renderMainContent}
           {renderInputAmountContent}
           {addTokenPoolCount === tokenInfoList.length ? (
-            <CommonButton className={styles['action-btn']} onClick={onSubmit} disabled={submitDisabled}>
-              {BUTTON_TEXT_SUBMIT}
-            </CommonButton>
+            <div className={styles['action-btn-wrapper']}>
+              <CommonButton
+                className={styles['action-btn']}
+                type="primary"
+                onClick={onSubmit}
+                disabled={submitDisabled}>
+                {BUTTON_TEXT_SUBMIT}
+              </CommonButton>
+            </div>
           ) : (
-            <CommonButton
-              {...btnProps}
-              loading={loadingOpen}
-              type="primary"
-              className={clsx(styles['action-btn'], loadingOpen && styles['action-btn-loading'])}>
-              {btnProps.children}
-            </CommonButton>
+            <div className={styles['action-btn-wrapper']}>
+              <CommonButton
+                {...btnProps}
+                loading={loadingOpen}
+                type="primary"
+                className={clsx(styles['action-btn'], loadingOpen && styles['action-btn-loading'])}>
+                {btnProps.children}
+              </CommonButton>
+            </div>
           )}
         </>
       ) : (
         <>
           <EmptyDataBox text={WALLET_CONNECTION_REQUIRED} />
-          <CommonButton
-            className={styles['action-btn']}
-            onClick={() => handleAelfLogin(true)}
-            loading={isLoginButtonLoading}>
-            {CONNECT_AELF_WALLET}
-          </CommonButton>
+          <div className={styles['action-btn-wrapper']}>
+            <CommonButton
+              className={styles['action-btn']}
+              type="primary"
+              onClick={() => handleAelfLogin(true)}
+              loading={isLoginButtonLoading}>
+              {CONNECT_AELF_WALLET}
+            </CommonButton>
+          </div>
         </>
       )}
     </div>
