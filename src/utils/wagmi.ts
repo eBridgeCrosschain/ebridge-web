@@ -5,6 +5,8 @@ import {
   getBalance,
   GetBalanceParameters,
   GetTransactionReceiptReturnType,
+  readContract,
+  ReadContractReturnType,
 } from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
 import { sleep } from 'utils';
@@ -37,4 +39,17 @@ export async function getTransactionReceiptAutoRetry(
 
 export async function getBalanceByWagmi(params: GetBalanceParameters<any>) {
   return getBalance(EVMProviderConfig, params);
+}
+
+export type TreadContractByWagmiParams = {
+  address: string;
+  abi?: any;
+  functionName: string;
+  args?: any[];
+  chainId?: GetBalanceParameters<any>['chainId'];
+  blockNumber?: number;
+};
+
+export async function readContractByWagmi(params: TreadContractByWagmiParams): Promise<ReadContractReturnType> {
+  return readContract(EVMProviderConfig, params as any);
 }

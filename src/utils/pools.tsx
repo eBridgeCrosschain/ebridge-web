@@ -1,4 +1,4 @@
-import { ChainId } from 'types';
+import { ChainId, TokenInfo } from 'types';
 import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
 import { isELFChain } from './aelfUtils';
@@ -6,6 +6,8 @@ import { ContractBasic } from './contract';
 import { checkApprove } from 'contracts';
 import { provider } from 'web3-core';
 import { REQ_CODE } from 'constants/misc';
+import { getBalanceByWagmi, readContractByWagmi } from './wagmi';
+import { POOLS_ABI } from 'constants/abis';
 
 export const addLiquidity = async ({
   symbol,
@@ -77,4 +79,54 @@ export const removeLiquidity = async ({
   }
 
   return poolContract?.callSendMethod('removeLiquidity', account, [tokenInfo?.address, bigAmount]);
+};
+
+export type TGetTotalLiquidityParams = {
+  poolContract?: ContractBasic;
+  tokenContract?: ContractBasic;
+  symbol?: string;
+};
+
+export const getTotalLiquidity = async ({ poolContract, tokenContract, symbol }: TGetTotalLiquidityParams) => {
+  if (poolContract?.contractType === 'ELF') {
+    const req = await poolContract.callViewMethod('GetTokenPoolInfo', {
+      tokenSymbol: symbol,
+    });
+    if (req.error) throw req.error;
+    return req.liquidity;
+  }
+
+  const req = await getBalanceByWagmi({
+    address: poolContract?.address as any,
+    token: tokenContract?.address as any,
+    chainId: tokenContract?.chainId,
+  });
+  return req.value.toString();
+};
+
+export type TGetMyLiquidityParams = {
+  poolContract?: ContractBasic;
+  account?: string;
+  tokenInfo?: TokenInfo;
+};
+
+export const getMyLiquidity = async ({ poolContract, account, tokenInfo }: TGetMyLiquidityParams) => {
+  if (poolContract?.contractType === 'ELF') {
+    const req = await poolContract.callViewMethod('GetLiquidity', {
+      tokenSymbol: tokenInfo?.symbol,
+      provider: account,
+    });
+    if (req.error) throw req.error;
+    return req.value;
+  }
+
+  const req = await readContractByWagmi({
+    abi: POOLS_ABI,
+    functionName: 'getUserLiquidity',
+    address: poolContract?.address as string,
+    chainId: poolContract?.chainId,
+    args: [account, tokenInfo?.address],
+  });
+
+  return req?.toString();
 };

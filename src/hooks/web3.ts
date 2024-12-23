@@ -17,6 +17,7 @@ import { toUserFriendlyAddress } from '@tonconnect/sdk';
 import { SupportedTONChainId } from 'constants/chain';
 import { isELFChain } from 'utils/aelfUtils';
 import { isTonChain } from 'utils';
+import { getNetworkInfo, switchChain } from 'utils/network';
 
 export function useAElfConnect() {
   const login = useAelfLogin();
@@ -169,4 +170,18 @@ export function useWeb3Wallet(chainId?: ChainId) {
     if (isTonChain(chainId)) return tonWallet;
     return web3Wallet;
   }, [aelfWallet, chainId, tonWallet, web3Wallet]);
+}
+
+export function useEVMSwitchChain() {
+  const { connector, chainId: evmChainId } = useWeb3React();
+  return useCallback(
+    (chainId: ChainId) => {
+      if (evmChainId === chainId) return;
+      // Whether the switch is successful or not does not affect the link status
+      const info = getNetworkInfo(chainId);
+      if (!info) throw new Error('Invalid chainId');
+      return switchChain(info.info, connector, true);
+    },
+    [connector, evmChainId],
+  );
 }
