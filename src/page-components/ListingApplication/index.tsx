@@ -5,9 +5,9 @@ import CommonImage from 'components/CommonImage';
 import UnsavedChangesWarningModal from './UnsavedChangesWarningModal';
 import TokenInformation from './TokenInformation';
 import SelectChain from './SelectChain';
-// import CoboCustodyReview from './CoboCustodyReview';
-// import InitializeLiquidityPool from './InitializeLiquidityPool';
-// import ListingComplete from './ListingComplete';
+import InitializeTokenPool from './InitializeTokenPool';
+import AddTokenPool from './AddTokenPool';
+import ListingComplete from './ListingComplete';
 import { backIcon } from 'assets/images';
 import { LISTING_STEP_ITEMS, ListingStep, LISTING_STEP_PATHNAME_MAP } from 'constants/listingApplication';
 import { ROUTE_PATHS } from 'constants/link';
@@ -125,12 +125,12 @@ function ListingApplication() {
         return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
       case ListingStep.SELECT_CHAIN:
         return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
-      // case ListingStep.COBO_CUSTODY_REVIEW:
-      //   return <CoboCustodyReview networks={networks} />;
-      // case ListingStep.INITIALIZE_LIQUIDITY_POOL:
-      //   return <InitializeLiquidityPool symbol={symbol} id={id} onNext={handleNextStep} />;
-      // case ListingStep.COMPLETE:
-      //   return <ListingComplete />;
+      case ListingStep.INITIALIZE_TOKEN_POOL:
+        return <InitializeTokenPool networks={networks} />;
+      case ListingStep.ADD_TOKEN_POOL:
+        return <AddTokenPool id={id} onNext={handleNextStep} />;
+      case ListingStep.COMPLETE:
+        return <ListingComplete />;
       default:
         return null;
     }

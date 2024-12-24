@@ -20,7 +20,7 @@
     "react-hooks/exhaustive-deps": [
       "warn",
       {
-        "additionalHooks": "^use(ReturnLastCallback)$"
+        "additionalHooks": "^use(LockCallback|Interval|ThrottleCallback|DebounceCallback)$"
       }
     ]
   },

@@ -25,11 +25,12 @@ import { getBridgeChainInfo } from 'utils/chain';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
-export function getContract(address: string, ABI: any, library?: provider) {
+export function getContract(address: string, ABI: any, library?: provider, chainId?: ChainId) {
   return new ContractBasic({
     contractAddress: address,
     contractABI: ABI,
     provider: library,
+    chainId,
   });
 }
 
@@ -96,7 +97,7 @@ export function useERCContract(address: string | undefined, ABI: any, chainId?: 
   return useMemo(() => {
     if (!address || isELFChain(chainId) || isTonChain(chainId)) return undefined;
     try {
-      return getContract(address, ABI, library);
+      return getContract(address, ABI, library, chainId);
     } catch (error) {
       console.log(error, '====useERCContract');
       return undefined;

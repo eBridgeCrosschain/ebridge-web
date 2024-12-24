@@ -78,3 +78,19 @@ export const unitConverter = (
     minDecimals,
   });
 };
+
+export const getShareOfPool = (num?: BigNumber.Value, total?: BigNumber.Value) => {
+  const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
+  if (!total) return '0.00';
+  const newtotal = bigNum.plus(total);
+  return percentConverter(bigNum.div(newtotal));
+};
+
+export const percentConverter = (num: BigNumber.Value) => {
+  let bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
+  bigNum = bigNum.times(100);
+
+  if (bigNum.isNaN() || bigNum.lt(0)) return '0.00';
+
+  return bigNum.toFixed(2);
+};
