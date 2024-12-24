@@ -2,8 +2,21 @@
 @import '/src/assets/theme/color.less';
 @import '/src/assets/theme/font.less';
 
+.back-row{
+  background: transparent;
+  border-width: 0;
+  padding: 1px;
+  border-color: transparent;
+  overflow: hidden;
+  .back-icon{
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+  }
+}
 .pool-page {
   gap: 24px;
+  margin: 12px auto 0;
   :global {
     .@{app-prefix}-tabs{
       margin-top: 24px;

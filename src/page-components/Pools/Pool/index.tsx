@@ -12,12 +12,15 @@ import { getTokenInfoByWhitelist } from 'utils/whitelist';
 import { ChainId, OperatePool } from 'types';
 import AddPool from './AddPool';
 import RemovePool from './RemovePool';
+import CommonImage from 'components/CommonImage';
+import { backIcon } from 'assets/images';
+import Col from 'antd/es/grid/col';
 export default function Pool() {
   const { t } = useLanguage();
 
   const [activeKey, setActiveKey] = useState(OperatePool.add);
 
-  const { push } = useRouter();
+  const { push, back } = useRouter();
   const { pathname } = useLocation();
 
   const [apiChainId, symbol] = useMemo(() => pathname?.replace('/pool/', '').split('/') || [], [pathname]);
@@ -43,22 +46,30 @@ export default function Pool() {
   }, [chainIcon, push, tokenInfo]);
   return (
     <div className={clsx('page-content', 'main-page-content-wrap')}>
-      <div className={clsx('main-page-component-wrap', styles['pool-page'])}>
-        <MainContentHeader wrap={false} title={t('Pool')} rightEle={chainIcon} />
-        <Tabs
-          tabBarGutter={16}
-          defaultActiveKey={OperatePool.add}
-          activeKey={activeKey}
-          onChange={(v) => setActiveKey(v as OperatePool)}>
-          <Tabs.TabPane tab={t('Add')} key={OperatePool.add} />
-          <Tabs.TabPane tab={t('Remove')} key={OperatePool.remove} />
-        </Tabs>
-        {activeKey === OperatePool.add ? (
-          <AddPool chainId={chainId} tokenInfo={tokenInfo} />
-        ) : (
-          <RemovePool chainId={chainId} tokenInfo={tokenInfo} />
-        )}
-      </div>
+      <Col span={24}>
+        <Row
+          className={clsx('main-page-component-wrap', styles['back-row'], 'flex-row-center', 'cursor-pointer')}
+          onClick={back}>
+          <CommonImage className={styles['back-icon']} src={backIcon} />
+          <div className={clsx('font-family-medium', 'font-15')}>{t('Back')}</div>
+        </Row>
+        <div className={clsx('main-page-component-wrap', styles['pool-page'])}>
+          <MainContentHeader wrap={false} title={t('Pool')} rightEle={chainIcon} />
+          <Tabs
+            tabBarGutter={16}
+            defaultActiveKey={OperatePool.add}
+            activeKey={activeKey}
+            onChange={(v) => setActiveKey(v as OperatePool)}>
+            <Tabs.TabPane tab={t('Add')} key={OperatePool.add} />
+            <Tabs.TabPane tab={t('Remove')} key={OperatePool.remove} />
+          </Tabs>
+          {activeKey === OperatePool.add ? (
+            <AddPool chainId={chainId} tokenInfo={tokenInfo} />
+          ) : (
+            <RemovePool chainId={chainId} tokenInfo={tokenInfo} />
+          )}
+        </div>
+      </Col>
     </div>
   );
 }
