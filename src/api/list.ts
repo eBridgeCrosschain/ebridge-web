@@ -57,6 +57,7 @@ const ApplicationApiList = {
 };
 
 const CommonApiList = {
+  getTokenWhiteList: '/api/ebridge/application/token-white-list',
   getTokenPrice: '/api/ebridge/application/token/price',
 };
 

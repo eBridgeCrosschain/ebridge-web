@@ -14,7 +14,7 @@ import { ROUTE_PATHS } from 'constants/link';
 import { useMobile } from 'contexts/useStore/hooks';
 import { isMobileDevices } from 'utils/isMobile';
 import { getListingUrl } from 'utils/listingApplication';
-// import { useInitAelfWallet } from 'hooks/wallet/useAelf';
+import { useAelfAuthListener } from 'hooks/wallet';
 import { TSearchParams } from 'types/listingApplication';
 import styles from './styles.module.less';
 
@@ -41,7 +41,7 @@ function ListingApplication() {
   const isNavigatingRef = useRef(false);
   const nextUrlRef = useRef('');
 
-  // useInitAelfWallet();
+  useAelfAuthListener();
 
   useEffect(() => {
     const { stepText } = router.query;

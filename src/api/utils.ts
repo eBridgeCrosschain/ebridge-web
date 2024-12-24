@@ -1,6 +1,17 @@
 import axios from 'axios';
 import { BaseConfig, RequestConfig } from './types';
 import { BASE_URL } from 'constants/index';
+import eBridgeEventBus from 'utils/eBridgeEventBus';
+
+const isDeniedRequest = (error: { message: string }) => {
+  try {
+    const message: string = error.message;
+    if (message?.includes('401')) return true;
+  } catch (error) {
+    console.log(error);
+  }
+  return false;
+};
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -22,6 +33,10 @@ axiosInstance.interceptors.response.use(
     return res;
   },
   (error) => {
+    console.log('api error', error, isDeniedRequest(error));
+    if (isDeniedRequest(error)) {
+      eBridgeEventBus.Unauthorized.emit();
+    }
     return Promise.reject(error);
   },
 );
