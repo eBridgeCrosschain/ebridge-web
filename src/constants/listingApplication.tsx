@@ -1,5 +1,4 @@
 import { ICommonStepsProps } from 'components/CommonSteps';
-import CommonLink from 'components/CommonLink';
 import { ApplicationChainStatusEnum } from 'types/api';
 import {
   TokenInformationFormKeys,
@@ -73,6 +72,7 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
   },
   {
     title: 'Initialize Token Pool',
+    description: 'It is expected to be completed in 1 business day.',
   },
   {
     title: 'Add token pool',

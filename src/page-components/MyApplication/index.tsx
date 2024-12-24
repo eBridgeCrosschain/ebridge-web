@@ -15,6 +15,8 @@ import { MY_APPLICATIONS } from 'constants/listingApplication';
 import { useRouter } from 'next/router';
 import { CONTACT_US_FORM_URL, ROUTE_PATHS } from 'constants/link';
 import { openWithBlank } from 'utils/link';
+import { sleep } from 'utils';
+import { useInitAelfWallet, useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
 
 const DefaultSkipCount = 0;
 const DefaultMaxResultCount = 10;
@@ -25,8 +27,9 @@ function MyApplications() {
   const isMd = useMediaQueries('md');
   // const { setLoading } = useLoading(); // TODO
   const { isActive } = useAElf();
-  const aelfLogin = useAelfLogin();
-
+  const handleAelfLogin = useAelfLogin();
+  const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
+  useInitAelfWallet();
   const [currentApplicationList, setCurrentApplicationList] = useState<any[]>([]);
 
   // pagination
@@ -39,6 +42,8 @@ function MyApplications() {
       console.log(skip, max);
       try {
         // setLoading(true);
+        await setAelfAuthFromStorage();
+        await sleep(500);
 
         const currentSkipPageCount = typeof skip !== 'number' ? skipPageCount : skip;
         const currentMaxCount = typeof max !== 'number' ? maxResultCount : max;
@@ -56,7 +61,7 @@ function MyApplications() {
         // setLoading(false);
       }
     },
-    [maxResultCount, skipPageCount],
+    [maxResultCount, setAelfAuthFromStorage, skipPageCount],
   );
 
   // web get page date
@@ -88,17 +93,30 @@ function MyApplications() {
   const init = useCallback(async () => {
     getApplicationData({});
   }, [getApplicationData]);
+  const initRef = useRef(init);
+  initRef.current = init;
 
   const handleResetList = useCallback(async () => {
     await getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
   }, [getApplicationData]);
 
-  useEffectOnce(() => {
+  const connectAndInit = useCallback(() => {
     if (!isActive) {
-      aelfLogin(); // TODO
+      handleAelfLogin(true, initRef.current);
     } else {
-      init();
+      initRef.current();
     }
+  }, [handleAelfLogin, isActive]);
+  const connectAndInitRef = useRef(connectAndInit);
+  connectAndInitRef.current = connectAndInit;
+  const connectAndInitSleep = useCallback(async () => {
+    // setLoading(true); // TODO
+    // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
+    await sleep(3000);
+    connectAndInitRef.current();
+  }, []);
+  useEffectOnce(() => {
+    connectAndInitSleep();
   });
 
   const initForLogout = useCallback(async () => {

@@ -294,7 +294,19 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     } finally {
       setLoadingModal({ open: false });
     }
-  }, []);
+  }, [
+    addTokenPoolCount,
+    aelfLibrary,
+    amount,
+    currentAccount,
+    currentChainId,
+    currentTokenInfo,
+    poolContract,
+    setLoadingModal,
+    setResultModal,
+    tokenContract,
+    web3Library,
+  ]);
 
   const onSubmit = useCallback(async () => {
     try {
