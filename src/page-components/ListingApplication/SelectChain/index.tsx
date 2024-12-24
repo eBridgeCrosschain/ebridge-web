@@ -68,11 +68,10 @@ interface ISelectChainProps {
 export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: ISelectChainProps) {
   const router = useRouter();
   const isMobile = useMobile();
-  // TODO: page loading
   const { modal, setLoadingModal } = useLoadingModal({
     loadingModalProps: {
-      title: ' ',
-      description: ' ',
+      hideTitle: true,
+      hideDescription: true,
     },
   });
   const connect = useConnect();

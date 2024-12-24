@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import clsx from 'clsx';
+import CommonLink from 'components/CommonLink';
 import DynamicArrow from 'components/DynamicArrow';
-import LinkForBlank from 'components/LinkForBlank';
 import CommonImage from 'components/CommonImage';
 import CommonSelectTokenModal from 'components/CommonSelectTokenModal';
 import TokenRow from '../../TokenRow';
@@ -9,7 +9,6 @@ import { checkFilled16Icon, closeFilled16Icon } from 'assets/images';
 import { TTokenConfig, TTokenItem } from 'types/listingApplication';
 import { AwakenHost } from 'constants/index';
 import styles from './styles.module.less';
-import CommonLink from 'components/CommonLink';
 
 interface ITokenSelectProps {
   className?: string;

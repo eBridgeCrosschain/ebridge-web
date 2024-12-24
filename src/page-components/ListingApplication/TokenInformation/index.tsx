@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import { Form, Input, InputProps } from 'antd';
 import { useRouter } from 'next/router';
@@ -7,6 +7,7 @@ import CommonButton from 'components/CommonButton';
 import CommonMessage from 'components/CommonMessage';
 import ListingTip from '../ListingTip';
 import TokenSelect from './TokenSelect';
+import { sleep } from 'utils';
 import {
   commitTokenInfo,
   getApplicationTokenInfo,
@@ -15,8 +16,11 @@ import {
 } from 'utils/api/application';
 import { getListingUrl } from 'utils/listingApplication';
 import { getChainType } from 'utils/chain';
+import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { useAElf } from 'hooks/web3';
-// import { useConnect } from 'hooks/useConnect';
+import { useAelfLogin } from 'hooks/wallet';
+import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
+import useLoadingModal from 'hooks/useLoadingModal';
 import { useMobile } from 'contexts/useStore/hooks';
 import { TCommitTokenInfoRequest } from 'types/api';
 import {
@@ -51,12 +55,18 @@ const AELF_CHAIN_ID = MAIN_SIDE_CHAIN_ID.mainChain;
 export default function TokenInformation({ symbol, handleNextStep }: ITokenInformationProps) {
   const isMobile = useMobile();
   const router = useRouter();
-  // const { setLoading } = useLoading(); // TODO: page loading
+  const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
+  const handleAelfLogin = useAelfLogin();
+  const { modal, setLoadingModal } = useLoadingModal({
+    loadingModalProps: {
+      hideTitle: true,
+      hideDescription: true,
+    },
+  });
   const [form] = Form.useForm<TTokenInformationFormValues>();
-  // const connect = useConnect();
   const chainType = getChainType(AELF_CHAIN_ID);
-  const { account } = useAElf();
-  const isConnected = useMemo(() => !!account, [account]);
+  const aelfWallet = useAElf();
+  const { isActive: isAelfActive, account: aelfAccount } = aelfWallet || {};
 
   const [formValues, setFormValues] = useState(TOKEN_INFORMATION_FORM_INITIAL_VALUES);
   const [formValidateData, setFormValidateData] = useState(TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA);
@@ -88,17 +98,17 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     [],
   );
 
-  // const reset = useCallback(() => {
-  //   setFormValues(TOKEN_INFORMATION_FORM_INITIAL_VALUES);
-  //   setFormValidateData(TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA);
-  //   setIsButtonDisabled(true);
-  //   setTokenList([]);
-  // }, []);
+  const reset = useCallback(() => {
+    setFormValues(TOKEN_INFORMATION_FORM_INITIAL_VALUES);
+    setFormValidateData(TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA);
+    setIsButtonDisabled(true);
+    setTokenList([]);
+  }, []);
 
   const getTokenList = useCallback(async () => {
     try {
-      // await setAelfAuthFromStorage();
-      // await sleep(500);
+      await setAelfAuthFromStorage();
+      await sleep(500);
       const res = await getApplicationTokenList();
       const list = (res.tokenList || []).map((item) => ({
         name: item.tokenName,
@@ -113,7 +123,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       console.error(error);
       return [];
     }
-  }, []);
+  }, [setAelfAuthFromStorage]);
 
   const getTokenConfig = useCallback(async (_symbol: string) => {
     try {
@@ -160,7 +170,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   );
 
   const init = useCallback(async () => {
-    // setLoading(true);
+    setLoadingModal({ open: true });
     const list = await getTokenList();
     if (symbol) {
       const config = await getTokenConfig(symbol);
@@ -168,29 +178,56 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         await getTokenInfo(symbol, list, config);
       }
     }
-    // setLoading(false);
-  }, [getTokenConfig, getTokenInfo, getTokenList, symbol]);
+    setLoadingModal({ open: false });
+  }, [getTokenConfig, getTokenInfo, getTokenList, setLoadingModal, symbol]);
   const initRef = useRef(init);
   initRef.current = init;
 
   const connectAndInit = useCallback(() => {
-    if (!isConnected) {
-      // TODO: connect aelf wallet
-      // handleAelfLogin(true, initRef.current);
+    if (!isAelfActive) {
+      handleAelfLogin(true, initRef.current);
     } else {
       initRef.current();
     }
-  }, [isConnected]);
+  }, [handleAelfLogin, isAelfActive]);
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    // setLoading(true);
+    setLoadingModal({ open: true });
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
-    // await sleep(3000);
+    await sleep(3000);
     connectAndInitRef.current();
-  }, []);
+  }, [setLoadingModal]);
   useEffectOnce(() => {
     connectAndInitSleep();
+  });
+
+  const initForLogout = useCallback(async () => {
+    reset();
+  }, [reset]);
+  const initLogoutRef = useRef(initForLogout);
+  initLogoutRef.current = initForLogout;
+
+  const initForReLogin = useCallback(async () => {
+    initRef.current();
+  }, []);
+  const initForReLoginRef = useRef(initForReLogin);
+  initForReLoginRef.current = initForReLogin;
+
+  useEffectOnce(() => {
+    // log in
+    const { remove: removeLoginSuccess } = eBridgeEventBus.AelfLoginSuccess.addListener(() => {
+      initForReLoginRef.current();
+    });
+    // log out \ exit
+    const { remove: removeLogoutSuccess } = eBridgeEventBus.AelfLogoutSuccess.addListener(() => {
+      initLogoutRef.current();
+    });
+
+    return () => {
+      removeLoginSuccess();
+      removeLogoutSuccess();
+    };
   });
 
   const handleFormDataChange = useCallback(
@@ -217,7 +254,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const handleSelectToken = useCallback(
     async (item: TTokenItem) => {
-      // setLoading(true);
+      setLoadingModal({ open: true });
       const list = await getTokenList();
       const newItem = list.find((v) => v.symbol === item.symbol);
       if (newItem) {
@@ -244,9 +281,9 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           },
         });
       }
-      // setLoading(false);
+      setLoadingModal({ open: false });
     },
-    [handleFormDataChange, router, getTokenConfig, getTokenInfo, getTokenList],
+    [setLoadingModal, getTokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
   );
 
   const handleCommonInputChange = useCallback(
@@ -420,7 +457,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
               <ConnectWallet
                 chainType={chainType}
                 chainId={AELF_CHAIN_ID}
-                account={account}
+                account={aelfAccount}
                 buttonText={CONNECT_AELF_WALLET}
               />
             </div>
@@ -483,7 +520,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         </Form.Item>
       </Form>
       <div className={styles['token-information-footer-button-wrapper']}>
-        {isConnected ? (
+        {isAelfActive ? (
           <CommonButton
             className={styles['token-information-footer-button']}
             type="primary"
@@ -496,13 +533,12 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           <CommonButton
             className={styles['token-information-footer-button']}
             type="primary"
-            // TODO: connect aelf wallet
-            // onClick={() => connect(chainType, MAIN_SIDE_CHAIN_ID.mainChain)}
-          >
+            onClick={() => handleAelfLogin(true, initRef.current)}>
             {CONNECT_AELF_WALLET}
           </CommonButton>
         )}
       </div>
+      {modal}
     </div>
   );
 }

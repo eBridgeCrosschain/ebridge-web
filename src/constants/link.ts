@@ -10,6 +10,8 @@ import {
   poolsIcon,
   poolsBlueIcon,
 } from 'assets/images';
+import { ListingStep } from './listingApplication';
+import { getListingUrl } from 'utils/listingApplication';
 
 export const ROUTE_PATHS = {
   HOME: '/',
@@ -30,6 +32,8 @@ export const HIDE_MAIN_PAGE_LIST = [
     href: ROUTE_PATHS.POOLS,
   },
 ];
+
+export const HIDE_BACKGROUND_IMAGE_PATH_LIST = [ROUTE_PATHS.LISTING_APPLICATION, ROUTE_PATHS.MY_APPLICATIONS];
 
 export const NAV_LIST = [
   {
@@ -52,6 +56,17 @@ export const NAV_LIST = [
   },
 ];
 
+export const LISTING_MENU_CONFIG = [
+  {
+    label: 'Listing Application',
+    link: getListingUrl(ListingStep.TOKEN_INFORMATION),
+  },
+  {
+    label: 'My Applications',
+    link: ROUTE_PATHS.MY_APPLICATIONS,
+  },
+];
+
 export const LEGAL_MENU_CONFIG = [
   {
     label: 'Terms of Service',
@@ -60,6 +75,17 @@ export const LEGAL_MENU_CONFIG = [
   {
     label: 'Privacy Policy',
     link: ROUTE_PATHS.PRIVACY_POLICY,
+  },
+];
+
+export const FOOTER_MENU_LIST_CONFIG = [
+  {
+    title: 'Listing',
+    menu: LISTING_MENU_CONFIG,
+  },
+  {
+    title: 'Legal',
+    menu: LEGAL_MENU_CONFIG,
   },
 ];
 

@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from 'i18n';
-import { Trans } from 'react-i18next';
 import clsx from 'clsx';
 import { Input, Row } from 'antd';
+import LinkForBlank from 'components/LinkForBlank';
 import CommonModal from 'components/CommonModal';
 import IconFont from 'components/IconFont';
 import TokenLogo from 'components/TokenLogo';
 import { formatSymbol } from 'utils/token';
+import { getListingUrl } from 'utils/listingApplication';
 import { TBridgeChainId } from 'constants/chain';
+import { ListingStep } from 'constants/listingApplication';
 import styles from './styles.module.less';
 
 type TToken<T> = T & {
@@ -79,9 +81,7 @@ function SelectToken<T>({ selectSymbol, tokenList, chainId, hideAddToken, onSele
       {!hideAddToken && (
         <div className={styles['bottom-row']}>
           <div className={clsx('flex-center', styles['row-body'])}>
-            <a onClick={() => void 0}>
-              <Trans>Add Token</Trans>
-            </a>
+            <LinkForBlank href={getListingUrl(ListingStep.TOKEN_INFORMATION)} element="Add Token" />
           </div>
         </div>
       )}

@@ -14,7 +14,7 @@ import { ROUTE_PATHS } from 'constants/link';
 import { useMobile } from 'contexts/useStore/hooks';
 import { isMobileDevices } from 'utils/isMobile';
 import { getListingUrl } from 'utils/listingApplication';
-// import { useInitAelfWallet } from 'hooks/wallet/useAelf';
+import { useInitAelfWallet } from 'hooks/aelfAuthToken';
 import { TSearchParams } from 'types/listingApplication';
 import styles from './styles.module.less';
 
@@ -41,7 +41,7 @@ function ListingApplication() {
   const isNavigatingRef = useRef(false);
   const nextUrlRef = useRef('');
 
-  // useInitAelfWallet();
+  useInitAelfWallet();
 
   useEffect(() => {
     const { stepText } = router.query;
@@ -136,39 +136,39 @@ function ListingApplication() {
     }
   };
 
-  if (typeof currentStep !== 'number') return null;
-
   return (
     <>
       <div className={styles['listing-container']}>
-        <div className={styles['listing-content']}>
-          {!isMobile && (
-            <div
-              className={styles['listing-back']}
-              onClick={() => {
-                if (currentStep === ListingStep.TOKEN_INFORMATION || currentStep === ListingStep.SELECT_CHAIN) {
-                  setIsWarningModalOpen(true);
-                  nextUrlRef.current = window.history.length > 1 ? 'back' : ROUTE_PATHS.BRIDGE;
-                } else if (window.history.length > 1) {
-                  router.back();
-                } else {
-                  router.push(ROUTE_PATHS.BRIDGE);
-                }
-              }}>
-              <CommonImage className={styles['listing-back-icon']} src={backIcon} priority />
-              <span className={styles['listing-back-text']}>Back</span>
-            </div>
-          )}
-          <div className={styles['listing-card-list']}>
-            <div className={styles['listing-card']}>
-              <div className={styles['listing-card-steps-title']}>Listing Application</div>
-              <CommonSteps stepItems={LISTING_STEP_ITEMS} current={currentStep} />
-            </div>
-            <div className={styles['listing-card']}>
-              <div className={styles['listing-card-form-content']}>{renderForm()}</div>
+        {typeof currentStep === 'number' && (
+          <div className={styles['listing-content']}>
+            {!isMobile && (
+              <div
+                className={styles['listing-back']}
+                onClick={() => {
+                  if (currentStep === ListingStep.TOKEN_INFORMATION || currentStep === ListingStep.SELECT_CHAIN) {
+                    setIsWarningModalOpen(true);
+                    nextUrlRef.current = window.history.length > 1 ? 'back' : ROUTE_PATHS.BRIDGE;
+                  } else if (window.history.length > 1) {
+                    router.back();
+                  } else {
+                    router.push(ROUTE_PATHS.BRIDGE);
+                  }
+                }}>
+                <CommonImage className={styles['listing-back-icon']} src={backIcon} priority />
+                <span className={styles['listing-back-text']}>Back</span>
+              </div>
+            )}
+            <div className={styles['listing-card-list']}>
+              <div className={styles['listing-card']}>
+                <div className={styles['listing-card-steps-title']}>Listing Application</div>
+                <CommonSteps stepItems={LISTING_STEP_ITEMS} current={currentStep} />
+              </div>
+              <div className={styles['listing-card']}>
+                <div className={styles['listing-card-form-content']}>{renderForm()}</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <UnsavedChangesWarningModal
         open={isWarningModalOpen}

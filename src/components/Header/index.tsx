@@ -12,6 +12,7 @@ import {
   communityIcon,
   legalIcon,
   aelfLogo,
+  listingIcon,
 } from 'assets/images';
 import clsx from 'clsx';
 import { Button, Drawer, Dropdown, Menu } from 'antd';
@@ -23,7 +24,7 @@ import CommonImage from 'components/CommonImage';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { IS_MAINNET } from 'constants/index';
-import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS } from 'constants/link';
+import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS, LISTING_MENU_CONFIG } from 'constants/link';
 import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
@@ -211,6 +212,11 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
           checked: item.language === language,
           onClick: () => changeLanguage(item.language),
         })),
+      },
+      {
+        icon: listingIcon,
+        label: 'Listing',
+        children: LISTING_MENU_CONFIG,
       },
       {
         icon: communityIcon,

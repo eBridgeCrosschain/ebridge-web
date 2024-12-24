@@ -31,4 +31,14 @@
     text-align: left;
     line-height: 20px;
   }
+  &-hide-title {
+    :global {
+      .@{app-prefix}-modal-header {
+        display: none;
+      }
+      .@{app-prefix}-modal-body {
+        padding-top: 24px;
+      }
+    }
+  }
 }
