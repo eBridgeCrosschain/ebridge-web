@@ -1,4 +1,5 @@
 import { SupportedELFChainList } from 'constants/index';
+import { BlockchainNetworkType } from 'constants/network';
 
 export type TAccounts = Record<string, string[]>;
 
@@ -11,4 +12,28 @@ export const getPortkeySDKAccount = (accounts?: Record<string, string>): TAccoun
     _accounts[_chainId] = [`ELF_${address}_${_chainId}`];
   });
   return _accounts;
+};
+
+export const isEVMChain = (network: string) => {
+  if (
+    network === BlockchainNetworkType.Arbitrum ||
+    network === BlockchainNetworkType.Avax ||
+    network === BlockchainNetworkType.BASE ||
+    network === BlockchainNetworkType.Binance ||
+    network === BlockchainNetworkType.Ethereum ||
+    network === BlockchainNetworkType.Optimism ||
+    network === BlockchainNetworkType.Polygon ||
+    network === BlockchainNetworkType.SETH ||
+    network === BlockchainNetworkType.TBinance
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const isTONChain = (network: string) => {
+  if (network === BlockchainNetworkType.TON) {
+    return true;
+  }
+  return false;
 };

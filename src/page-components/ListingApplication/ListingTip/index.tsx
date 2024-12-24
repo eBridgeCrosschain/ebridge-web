@@ -7,10 +7,12 @@ import CommonImage from 'components/CommonImage';
 export default function ListingTip({
   tip,
   title,
+  modalTitle,
   customChildren,
 }: {
   tip: React.ReactNode;
   title?: string;
+  modalTitle?: string;
   customChildren?: React.ReactNode;
 }) {
   const tooltipSwitchModalsRef = useRef<ICommonTooltipSwitchModalRef | null>(null);
@@ -20,7 +22,7 @@ export default function ListingTip({
       ref={(ref) => {
         tooltipSwitchModalsRef.current = ref;
       }}
-      modalProps={{ title }}
+      modalProps={{ title: modalTitle || title, zIndex: 1001 }}
       tip={tip}>
       {customChildren ? (
         <div onClick={() => tooltipSwitchModalsRef.current?.open()}>{customChildren}</div>

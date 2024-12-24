@@ -4,7 +4,7 @@ import CommonSteps from 'components/CommonSteps';
 import CommonImage from 'components/CommonImage';
 import UnsavedChangesWarningModal from './UnsavedChangesWarningModal';
 import TokenInformation from './TokenInformation';
-// import SelectChain from './SelectChain';
+import SelectChain from './SelectChain';
 // import CoboCustodyReview from './CoboCustodyReview';
 // import InitializeLiquidityPool from './InitializeLiquidityPool';
 // import ListingComplete from './ListingComplete';
@@ -12,6 +12,7 @@ import { backIcon } from 'assets/images';
 import { LISTING_STEP_ITEMS, ListingStep, LISTING_STEP_PATHNAME_MAP } from 'constants/listingApplication';
 import { ROUTE_PATHS } from 'constants/link';
 import { useMobile } from 'contexts/useStore/hooks';
+import { isMobileDevices } from 'utils/isMobile';
 import { getListingUrl } from 'utils/listingApplication';
 // import { useInitAelfWallet } from 'hooks/wallet/useAelf';
 import { TSearchParams } from 'types/listingApplication';
@@ -61,6 +62,8 @@ function ListingApplication() {
   }, [router]);
 
   useEffect(() => {
+    if (isMobileDevices()) return;
+
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (currentStep === ListingStep.TOKEN_INFORMATION || currentStep === ListingStep.SELECT_CHAIN) {
         e.preventDefault();
@@ -120,8 +123,8 @@ function ListingApplication() {
     switch (currentStep) {
       case ListingStep.TOKEN_INFORMATION:
         return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
-      // case ListingStep.SELECT_CHAIN:
-      //   return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
+      case ListingStep.SELECT_CHAIN:
+        return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
       // case ListingStep.COBO_CUSTODY_REVIEW:
       //   return <CoboCustodyReview networks={networks} />;
       // case ListingStep.INITIALIZE_LIQUIDITY_POOL:

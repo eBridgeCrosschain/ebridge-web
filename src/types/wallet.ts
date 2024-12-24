@@ -51,3 +51,11 @@ export declare type TAelfNode = {
   rpcUrl: string;
   chainId: string;
 };
+
+export enum WalletTypeEnum {
+  EVM = 'EVM',
+  SOL = 'Solana',
+  TON = 'TON',
+  TRON = 'TRON',
+  AELF = 'Aelf',
+}

@@ -1,13 +1,21 @@
 import clsx from 'clsx';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
-import { infoCircleFillIcon } from 'assets/images';
+import { errorFilledIcon, infoCircleFillIcon } from 'assets/images';
 
 export enum RemindType {
   BRAND = 'brand',
   INFO = 'info',
   WARNING = 'warning',
+  ERROR = 'error',
 }
+
+const ICON_SRC = {
+  [RemindType.BRAND]: infoCircleFillIcon,
+  [RemindType.INFO]: infoCircleFillIcon,
+  [RemindType.WARNING]: infoCircleFillIcon,
+  [RemindType.ERROR]: errorFilledIcon,
+};
 
 export default function Remind({
   className,
@@ -35,7 +43,7 @@ export default function Remind({
         className,
       )}>
       {isShowIcon && (
-        <CommonImage className={clsx('flex-shrink-0', styles['icon'], iconClassName)} src={infoCircleFillIcon} />
+        <CommonImage className={clsx('flex-shrink-0', styles['icon'], iconClassName)} src={ICON_SRC[type]} />
       )}
       <div className={styles['text']}>{children}</div>
     </div>
