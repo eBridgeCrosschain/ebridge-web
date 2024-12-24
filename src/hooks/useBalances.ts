@@ -7,9 +7,9 @@ import { isERCAddress, isTonChain } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { useTokenContract } from './useContract';
 import useInterval from './useInterval';
-import { getTokenInfoByWhitelist } from 'utils/whitelist';
 import { getTonChainBalance } from 'utils/ton';
 import { getBalanceByWagmi } from 'utils/wagmi';
+import { useGetTokenInfoByWhitelist } from './token';
 
 export const useBalances = (
   wallet?: Web3Type,
@@ -22,7 +22,7 @@ export const useBalances = (
   const account = useMemo(() => targetAddress || owner, [targetAddress, owner]);
   const tokenContract = useTokenContract(chainId, undefined, wallet?.isPortkey);
   const tokensList = useMemo(() => (Array.isArray(tokens) ? tokens : [tokens]), [tokens]);
-
+  const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
   const onGetBalance = useCallback(async () => {
     if (!account) return setBalanceMap(undefined);
     let promise;
@@ -59,7 +59,7 @@ export const useBalances = (
       if (key) obj[key + account + chainId] = bs[index];
     });
     setBalanceMap((preObj) => ({ ...preObj, ...obj }));
-  }, [account, chainId, tokensList, tokenContract]);
+  }, [account, chainId, tokensList, tokenContract, getTokenInfoByWhitelist]);
   useInterval(onGetBalance, delay, [onGetBalance, chainId, tokenContract]);
   const memoBalances = useMemo(() => {
     if (tokensList) return tokensList.map((key) => (balanceMap && key ? balanceMap[key + account + chainId] : ZERO));

@@ -17,7 +17,7 @@ import { divDecimals } from 'utils/calculate';
 import styles from './styles.module.less';
 import { CrossChainItem } from 'types/api';
 import { ChainId } from 'types';
-import { getTokenInfoByWhitelist } from 'utils/whitelist';
+import { useGetTokenInfoByWhitelist } from 'hooks/token';
 
 const calculateMinValue = (
   input1: LimitDataProps | undefined,
@@ -97,6 +97,8 @@ export default function useLimitAmountModal() {
 
   const limitContract = useLimitContract(fromChainId, toChainId);
   const bridgeOutContract = useBridgeOutContract(toChainId, toWallet?.isPortkey);
+
+  const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
 
   const getTokenInfo = useCallback(
     (chainId?: ChainId) => {
@@ -280,7 +282,16 @@ export default function useLimitAmountModal() {
 
       return false;
     },
-    [checkCapacity, checkDailyLimit, fromChainId, getElfLimitDataFn, getEvmLimitDataFn, getTokenInfo, toChainId],
+    [
+      checkCapacity,
+      checkDailyLimit,
+      fromChainId,
+      getElfLimitDataFn,
+      getEvmLimitDataFn,
+      getTokenInfo,
+      getTokenInfoByWhitelist,
+      toChainId,
+    ],
   );
 
   const closeModal = () => setVisible(false);

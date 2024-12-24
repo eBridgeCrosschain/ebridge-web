@@ -8,10 +8,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-use';
 import { getChainIdByAPI, getChainName, getIconByChainId } from 'utils/chain';
 import styles from './styles.module.less';
-import { getTokenInfoByWhitelist } from 'utils/whitelist';
 import { ChainId, OperatePool } from 'types';
 import AddPool from './AddPool';
 import RemovePool from './RemovePool';
+import { useGetTokenInfoByWhitelist } from 'hooks/token';
 export default function Pool() {
   const { t } = useLanguage();
 
@@ -23,7 +23,12 @@ export default function Pool() {
   const [apiChainId, symbol] = useMemo(() => pathname?.replace('/pool/', '').split('/') || [], [pathname]);
   const chainId = useMemo(() => getChainIdByAPI(apiChainId), [apiChainId]);
 
-  const tokenInfo = useMemo(() => getTokenInfoByWhitelist(chainId as ChainId, symbol), [chainId, symbol]);
+  const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
+
+  const tokenInfo = useMemo(
+    () => getTokenInfoByWhitelist(chainId as ChainId, symbol),
+    [chainId, getTokenInfoByWhitelist, symbol],
+  );
 
   const chainIcon = useMemo(() => {
     const iconProps = getIconByChainId(chainId);

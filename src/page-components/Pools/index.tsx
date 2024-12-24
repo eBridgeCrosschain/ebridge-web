@@ -4,7 +4,6 @@ import { Col, Row } from 'antd';
 import clsx from 'clsx';
 import PoolOverviewCard, { TPoolOverviewCardProps } from './PoolOverviewCard';
 import PoolList from './PoolList';
-import { useQueries } from '@tanstack/react-query';
 import useMediaQueries from 'hooks/useMediaQueries';
 
 const OverviewCardList: TPoolOverviewCardProps[] = [
