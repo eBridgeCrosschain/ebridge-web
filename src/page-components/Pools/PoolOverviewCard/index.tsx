@@ -16,7 +16,7 @@ export default function PoolOverviewCard({ title, tooltipTitle, data }: TPoolOve
   return (
     <div className={styles['page-overview-card']}>
       <div className={clsx('flex-row-center', styles['page-overview-title-row'])}>
-        {t(title)}&nbsp;
+        {t(title)}
         <Tooltip trigger="hover" placement="topLeft" arrowPointAtCenter title={t(tooltipTitle)}>
           <CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />
         </Tooltip>
