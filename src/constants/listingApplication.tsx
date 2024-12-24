@@ -1,5 +1,4 @@
 import { ICommonStepsProps } from 'components/CommonSteps';
-import CommonLink from 'components/CommonLink';
 import { ApplicationChainStatusEnum } from 'types/api';
 import {
   TokenInformationFormKeys,
@@ -56,14 +55,6 @@ export const LISTING_STEP_ITEMS: ICommonStepsProps['stepItems'] = [
   },
 ];
 
-export const CONTACT_US_ROW = (
-  <>
-    {'• If you need any support, please '}
-    <CommonLink href="https://form.ebridge.exchange/contact">contact us</CommonLink>
-    {'.'}
-  </>
-);
-
 export enum ListingProcessStep {
   BASIC_INFO = 0,
   SELECT_CHAIN = 1,
@@ -81,6 +72,7 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
   },
   {
     title: 'Initialize Token Pool',
+    description: 'It is expected to be completed in 1 business day.',
   },
   {
     title: 'Add token pool',
@@ -93,7 +85,7 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
 // ================ Token information ================
 
 export const TOKEN_INFORMATION_FORM_LABEL_MAP: Record<TokenInformationFormKeys, string> = {
-  [TokenInformationFormKeys.TOKEN]: 'Select aelf chain token',
+  [TokenInformationFormKeys.TOKEN]: 'Select token',
   [TokenInformationFormKeys.OFFICIAL_WEBSITE]: 'Official website',
   [TokenInformationFormKeys.OFFICIAL_TWITTER]: 'Official Twitter',
   [TokenInformationFormKeys.TITLE]: 'What is your title on the project/team/company?',
@@ -191,10 +183,10 @@ export const SELECT_CHAIN_FORM_CHAIN_NOT_CREATED_STATUS_LIST = [
   ApplicationChainStatusEnum.Issued,
 ];
 
-// TODO CHECK
 export const SELECT_CHAIN_FORM_CHAIN_CREATED_NOT_LISTED_STATUS_LIST = [
   ApplicationChainStatusEnum.PoolInitializing,
   ApplicationChainStatusEnum.PoolInitialized,
+  ApplicationChainStatusEnum.LiquidityAdded,
   ApplicationChainStatusEnum.Failed,
 ];
 

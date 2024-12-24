@@ -168,3 +168,5 @@ export const BASE_URL = 'https://ebridge.exchange';
 export const TELEGRAM_BOT_ID = '6932375590';
 
 export const SHOW_V_CONSOLE = false;
+
+export const AwakenHost = 'https://app.awaken.finance/';

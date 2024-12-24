@@ -4,7 +4,7 @@
 .flex-1 {
   flex: 1;
 }
-.flex-shrink-0{
+.flex-shrink-0 {
   flex-shrink: 0;
 }
 .flex-row {
@@ -33,6 +33,10 @@
 .flex-row-center {
   align-items: center;
   .flex-row();
+}
+.flex-row-center-between {
+  justify-content: space-between;
+  .flex-row-center();
 }
 .flex-row-content-center {
   justify-content: center;
@@ -73,6 +77,13 @@
 .text-right {
   text-align: right;
 }
+.gap-8 {
+  gap: 8px;
+}
+.gap-4 {
+  gap: 4px;
+}
+
 
 /* set list-style */
 ul,
@@ -98,4 +109,9 @@ body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, /* structural elements */
 }
 .pointer-events-none {
   pointer-events: none !important;
+}
+
+.list-style-decimal {
+  list-style: decimal;
+  padding-left: 16px;
 }

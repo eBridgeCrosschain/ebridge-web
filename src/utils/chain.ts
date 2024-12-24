@@ -33,6 +33,10 @@ export function getChainIdByAPI(chainId: string) {
   if (elfChainId) return isNaN(elfChainId) ? elfChainId : (Number(elfChainId) as ChainId);
   return chainId as ChainId;
 }
+export function getIconByAPIChainId(apiChainId: string) {
+  const chainId = getChainIdByAPI(apiChainId);
+  return getIconByChainId(chainId);
+}
 export function getChainIdToMap(chainId?: ChainId) {
   const id = (CHAIN_ID_MAP as any)[chainId as any];
   if (id) return id;

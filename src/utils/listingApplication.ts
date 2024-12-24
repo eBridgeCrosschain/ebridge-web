@@ -16,5 +16,5 @@ export const getListingUrl = (step: ListingStep, params?: TSearchParams) => {
       });
       break;
   }
-  return `/listing${LISTING_STEP_PATHNAME_MAP[step]}${search ? '?' + search : ''}`;
+  return `/listing-application${LISTING_STEP_PATHNAME_MAP[step]}${search ? '?' + search : ''}`;
 };

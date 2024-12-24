@@ -1,10 +1,16 @@
 import { WalletTypeEnum as AelfWalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { APP_NAME } from 'constants/index';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AElf from 'aelf-sdk';
 import { zeroFill } from '@portkey/utils';
 import { useAElf } from './web3';
-import { AuthTokenSource, getAuthPlainText, getLocalJWT, QueryAuthApiExtraRequest } from 'utils/aelfAuthToken';
+import {
+  AuthTokenSource,
+  getAuthPlainText,
+  getLocalJWT,
+  QueryAuthApiExtraRequest,
+  removeOneLocalJWT,
+} from 'utils/aelfAuthToken';
 import { ExtraInfoForDiscover, WebLoginWalletInfo } from 'types/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { queryAuthApi } from 'utils/api/auth';
@@ -216,4 +222,44 @@ export function useShowLoginButtonLoading() {
   });
 
   return loading;
+}
+
+export function useInitAelfWallet() {
+  const { isConnected, walletInfo, walletType } = useConnectWallet();
+
+  const { queryAuth } = useAelfAuthToken();
+  const onAuthorizationExpired = useCallback(async () => {
+    if (!isConnected) {
+      console.warn('AuthorizationExpired: Not Logined');
+      eBridgeInstance.setUnauthorized(false);
+      return;
+    } else if (isConnected && walletInfo) {
+      const { caHash } = await getCaHashAndOriginChainIdByWallet(walletInfo as WebLoginWalletInfo, walletType);
+      const managerAddress = await getManagerAddressByWallet(walletInfo as WebLoginWalletInfo, walletType);
+      const source = walletType === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey;
+      const key = (caHash || source) + managerAddress;
+      removeOneLocalJWT(key);
+
+      console.log('AuthorizationExpired');
+      eBridgeInstance.setUnauthorized(true);
+      await queryAuth(false, true);
+    } else {
+      eBridgeInstance.setUnauthorized(false);
+    }
+    // setLoading(false); // TODO
+  }, [isConnected, queryAuth, walletInfo, walletType]);
+  const onAuthorizationExpiredRef = useRef(onAuthorizationExpired);
+  onAuthorizationExpiredRef.current = onAuthorizationExpired;
+
+  useEffect(() => {
+    const { remove } = eBridgeEventBus.Unauthorized.addListener(() => {
+      console.log('Unauthorized listener', eBridgeInstance.unauthorized);
+      if (eBridgeInstance.unauthorized) return;
+      eBridgeInstance.setUnauthorized(true);
+      onAuthorizationExpiredRef.current?.();
+    });
+    return () => {
+      remove();
+    };
+  }, []);
 }

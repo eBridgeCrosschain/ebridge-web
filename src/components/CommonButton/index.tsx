@@ -5,7 +5,7 @@ import React from 'react';
 import styles from './styles.module.less';
 declare const ButtonTypes: ['default', 'primary', 'ghost', 'dashed', 'link', 'text', 'select'];
 
-interface CommonButtonProps {
+export interface CommonButtonProps {
   type?: (typeof ButtonTypes)[number];
   children?: React.ReactNode;
   icon?: React.ReactNode;

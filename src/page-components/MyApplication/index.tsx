@@ -12,18 +12,24 @@ import CommonImage from 'components/CommonImage';
 import { backIcon } from 'assets/images';
 import { BUTTON_TEXT_BACK } from 'constants/misc';
 import { MY_APPLICATIONS } from 'constants/listingApplication';
-import LinkForBlank from 'components/LinkForBlank';
+import { useRouter } from 'next/router';
+import { CONTACT_US_FORM_URL, ROUTE_PATHS } from 'constants/link';
+import { openWithBlank } from 'utils/link';
+import { sleep } from 'utils';
+import { useInitAelfWallet, useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
 
 const DefaultSkipCount = 0;
 const DefaultMaxResultCount = 10;
 const DefaultTotalCount = 0;
 
 function MyApplications() {
+  const router = useRouter();
   const isMd = useMediaQueries('md');
   // const { setLoading } = useLoading(); // TODO
   const { isActive } = useAElf();
-  const aelfLogin = useAelfLogin();
-
+  const handleAelfLogin = useAelfLogin();
+  const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
+  useInitAelfWallet();
   const [currentApplicationList, setCurrentApplicationList] = useState<any[]>([]);
 
   // pagination
@@ -36,6 +42,8 @@ function MyApplications() {
       console.log(skip, max);
       try {
         // setLoading(true);
+        await setAelfAuthFromStorage();
+        await sleep(500);
 
         const currentSkipPageCount = typeof skip !== 'number' ? skipPageCount : skip;
         const currentMaxCount = typeof max !== 'number' ? maxResultCount : max;
@@ -53,7 +61,7 @@ function MyApplications() {
         // setLoading(false);
       }
     },
-    [maxResultCount, skipPageCount],
+    [maxResultCount, setAelfAuthFromStorage, skipPageCount],
   );
 
   // web get page date
@@ -85,17 +93,30 @@ function MyApplications() {
   const init = useCallback(async () => {
     getApplicationData({});
   }, [getApplicationData]);
+  const initRef = useRef(init);
+  initRef.current = init;
 
   const handleResetList = useCallback(async () => {
     await getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
   }, [getApplicationData]);
 
-  useEffectOnce(() => {
+  const connectAndInit = useCallback(() => {
     if (!isActive) {
-      aelfLogin(); // TODO
+      handleAelfLogin(true, initRef.current);
     } else {
-      init();
+      initRef.current();
     }
+  }, [handleAelfLogin, isActive]);
+  const connectAndInitRef = useRef(connectAndInit);
+  connectAndInitRef.current = connectAndInit;
+  const connectAndInitSleep = useCallback(async () => {
+    // setLoading(true); // TODO
+    // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
+    await sleep(3000);
+    connectAndInitRef.current();
+  }, []);
+  useEffectOnce(() => {
+    connectAndInitSleep();
   });
 
   const initForLogout = useCallback(async () => {
@@ -130,22 +151,24 @@ function MyApplications() {
   });
 
   return (
-    <div className={styles['my-applications-page-container-wrapper']}>
+    <div className={clsx('page-content', 'main-page-content-wrap', styles['my-applications-page-container-wrapper'])}>
       {!isMd && (
-        <LinkForBlank
-          className={styles['my-applications-page-back']}
-          href="/"
-          element={
-            <>
-              <CommonImage src={backIcon} />
-              <div className={styles['my-applications-page-back-text']}>{BUTTON_TEXT_BACK}</div>
-            </>
-          }
-        />
+        <div className={styles['my-applications-page-back']} onClick={() => router.push(ROUTE_PATHS.HOME)}>
+          <CommonImage className={styles['my-applications-page-back-icon']} src={backIcon} />
+          <div className={styles['my-applications-page-back-text']}>{BUTTON_TEXT_BACK}</div>
+        </div>
       )}
 
       <div className={clsx(styles['my-applications-page-body'])}>
-        <div className={styles['my-applications-page-title']}>{MY_APPLICATIONS}</div>
+        <div className={clsx(isMd ? 'flex-column' : 'flex-row-center-between', styles['my-applications-page-title'])}>
+          <div className={styles['my-applications-page-title-text']}>{MY_APPLICATIONS}</div>
+
+          <div className={styles['right-tip']}>
+            <span>{`If you need any support, please`}&nbsp;</span>
+            <span className={styles['action']} onClick={() => openWithBlank(CONTACT_US_FORM_URL)}>{`contact us`}</span>
+            <span>{`.`}</span>
+          </div>
+        </div>
         <MyApplicationTable
           totalCount={totalCount}
           applicationList={currentApplicationList}

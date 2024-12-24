@@ -4,10 +4,11 @@
 .common-tooltip-overlay {
   font-size: 12px;
   line-height: 20px;
+
   :global {
-    .ant-tooltip-inner {
-      padding: 6px 12px;
-      border-radius: 4px;
+    .@{app-prefix}-tooltip-inner {
+      padding: 8px;
+      border-radius: 8px;
     }
   }
 }
@@ -15,7 +16,7 @@
 @media screen and (max-width: @md-width) {
   .common-tooltip-overlay {
     :global {
-      .ant-tooltip-inner {
+      .@{app-prefix}-tooltip-inner {
         padding: 6px 8px;
       }
     }

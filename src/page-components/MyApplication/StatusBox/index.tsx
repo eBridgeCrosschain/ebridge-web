@@ -1,14 +1,11 @@
 import styles from './styles.module.less';
-import { useCallback, useMemo, useState } from 'react';
-import { Tooltip } from 'antd';
+import { useMemo } from 'react';
 import { TMyApplicationStatus } from 'types/listingApplication';
 import clsx from 'clsx';
-import CommonModal from 'components/CommonModal';
-import { GOT_IT } from 'constants/misc';
 import { ApplicationChainStatusEnum } from 'types/api';
-import useMediaQueries from 'hooks/useMediaQueries';
 import CommonImage from 'components/CommonImage';
 import { questionFilledIcon } from 'assets/images';
+import ListingTip from 'page-components/ListingApplication/ListingTip';
 
 type TStatusBoxProps = {
   wrapperClassName?: string;
@@ -18,9 +15,6 @@ type TStatusBoxProps = {
 };
 
 export default function StatusBox({ wrapperClassName, className, status, failReason }: TStatusBoxProps) {
-  const isMd = useMediaQueries('md');
-  const [isMobileOpenModal, setIsMobileOpenModal] = useState(false);
-
   const isSucceed = useMemo(() => {
     return status === ApplicationChainStatusEnum.Complete;
   }, [status]);
@@ -28,12 +22,6 @@ export default function StatusBox({ wrapperClassName, className, status, failRea
   const isFailed = useMemo(() => {
     return status === ApplicationChainStatusEnum.Failed;
   }, [status]);
-
-  const showFailedReason = useCallback(() => {
-    if (isMd) {
-      setIsMobileOpenModal(true);
-    }
-  }, [isMd]);
 
   const content = useMemo(() => {
     if (isSucceed) {
@@ -47,12 +35,14 @@ export default function StatusBox({ wrapperClassName, className, status, failRea
 
     if (isFailed) {
       return (
-        <div className={clsx(styles['status-box'], className)} onClick={showFailedReason}>
-          <div className={clsx(styles['badge'], styles['badge-filed'])} />
+        <div className={clsx(styles['status-box'], className)}>
+          <div className={clsx(styles['badge'], styles['badge-failed'])} />
           <span className={styles.failed}>{TMyApplicationStatus.Failed}</span>
-          <Tooltip title={!isMd && failReason} placement="top">
-            <CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />
-          </Tooltip>
+          <ListingTip
+            title={TMyApplicationStatus.Failed}
+            tip={failReason}
+            customChildren={<CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />}
+          />
         </div>
       );
     }
@@ -63,22 +53,7 @@ export default function StatusBox({ wrapperClassName, className, status, failRea
         <span className={styles.processing}>{TMyApplicationStatus.Processing}</span>
       </div>
     );
-  }, [isSucceed, isFailed, className, showFailedReason, isMd, failReason]);
+  }, [isSucceed, isFailed, className, failReason]);
 
-  return (
-    <div className={clsx(styles['status-wrapper'], wrapperClassName)}>
-      {content}
-      {/* TODO */}
-      <CommonModal
-        width={'300px'}
-        // hideCancelButton={true}
-        okText={GOT_IT}
-        onOk={() => setIsMobileOpenModal(false)}
-        title={TMyApplicationStatus.Failed}
-        open={isMobileOpenModal}
-        onCancel={() => setIsMobileOpenModal(false)}>
-        <div>{failReason}</div>
-      </CommonModal>
-    </div>
-  );
+  return <div className={clsx(styles['status-wrapper'], wrapperClassName)}>{content}</div>;
 }

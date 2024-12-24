@@ -9,6 +9,7 @@ import useMediaQueries from 'hooks/useMediaQueries';
 import { ListingProcessStep, VIEW_PROGRESS, VIEW_PROGRESS_STEPS } from 'constants/listingApplication';
 import DisplayImage from 'components/DisplayImage';
 import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
+import CommonButton from 'components/CommonButton';
 
 export default function ViewProgress({
   className,
@@ -81,30 +82,19 @@ export default function ViewProgress({
     );
   }, [chainName, currentStep, formatSteps, tokenIcon, tokenSymbol]);
 
-  if (isMd) {
-    return <div>{/* TODO */}</div>;
-    // <CommonDrawer
-    //   className={clsx(styles['view-progress-drawer'], styles['view-progress-drawer-weight'], className)}
-    //   height="auto"
-    //   title={ViewProgressTitle}
-    //   open={open}
-    //   onClose={onClose}>
-    //   {content}
-    //   <CommonButton className={styles['confirm-button']} onClick={onConfirm}>
-    //     {GOT_IT}
-    //   </CommonButton>
-    // </CommonDrawer>
-  }
-
   return (
     <CommonModal
       className={clsx(styles['view-progress-modal'], className)}
-      title={VIEW_PROGRESS}
+      width={438}
       open={open}
-      // hideCancelButton // TODO
-      okText={GOT_IT}
+      type={isMd ? 'pop-bottom' : 'default'}
+      title={VIEW_PROGRESS}
       onCancel={onClose}
-      onOk={onConfirm}>
+      footer={
+        <CommonButton className={styles['confirm-button']} type="primary" onClick={onConfirm}>
+          {GOT_IT}
+        </CommonButton>
+      }>
       {content}
     </CommonModal>
   );

@@ -59,35 +59,29 @@
   line-height: 32px;
 }
 
-.listing-card-form-title {
-  margin-bottom: 32px;
-  .font-family-semibold();
-
-  font-size: 20px;
-  line-height: 28px;
-}
-
 .listing-card-form-content {
   :global {
     .@{app-prefix}-form-item-label {
       label {
         width: 100%;
-        .font-family-medium();
-
-        color: @font-15;
+        color: @font-13;
+        font-size: 16px;
+        line-height: 22px;
       }
     }
 
     .@{app-prefix}-input,
     .@{app-prefix}-input-affix-wrapper {
-      padding: 8px 12px;
+      padding: 12px;
       border-radius: 6px;
       border-color: @border-5;
       font-size: 14px;
       line-height: 22px;
+      .font-family-medium();
 
       &::placeholder {
         color: @font-18;
+        .font-family-medium();
       }
 
       &:hover {
@@ -103,7 +97,7 @@
     }
 
     .@{app-prefix}-input-suffix {
-      margin-left: 16px;
+      margin-left: 8px;
     }
 
     .@{app-prefix}-form-item-margin-offset {
@@ -127,10 +121,6 @@
   }
 
   .listing-card-steps-title {
-    margin-bottom: 24px;
-  }
-
-  .listing-card-form-title {
     margin-bottom: 24px;
   }
 }

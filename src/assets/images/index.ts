@@ -21,12 +21,17 @@ import communityIcon from './community.svg';
 import legalIcon from './legal.svg';
 import arrowIcon from './arrow.svg';
 import arrowGrayIcon from './arrow-gray.svg';
+import downIcon from './down.svg';
+import downBigIcon from './downBig.svg';
+import downSmallIcon from './downSmall.svg';
 import arrowBlueIcon from './arrow-blue.svg';
 import arrowRightWhiteIcon from './arrow_right_white.svg';
 import arrowRightGrayIcon from './arrow_right_gray.svg';
 import backIcon from './back.svg';
 import checkBlueIcon from './check-blue.svg';
 import checkFilledIcon from './check-filled.svg';
+import checkFilled16Icon from './checkFilled16.svg';
+import closeFilled16Icon from './closeFilled16.svg';
 import errorFilledIcon from './error-filled.svg';
 import menuIcon from './menu.svg';
 import bridgeIcon from './bridge.svg';
@@ -66,12 +71,17 @@ export {
   legalIcon,
   arrowIcon,
   arrowGrayIcon,
+  downIcon,
+  downBigIcon,
+  downSmallIcon,
   arrowBlueIcon,
   arrowRightWhiteIcon,
   arrowRightGrayIcon,
   backIcon,
   checkBlueIcon,
   checkFilledIcon,
+  checkFilled16Icon,
+  closeFilled16Icon,
   errorFilledIcon,
   menuIcon,
   bridgeIcon,

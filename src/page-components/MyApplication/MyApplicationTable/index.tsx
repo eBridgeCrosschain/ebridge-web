@@ -1,6 +1,5 @@
-import { Table } from 'antd';
+import CommonTable from 'components/CommonTable';
 import clsx from 'clsx';
-import EmptyDataBox from 'components/EmptyDataBox';
 import { formatSymbol } from 'utils/token';
 import styles from './styles.module.less';
 import StatusBox from '../StatusBox';
@@ -11,6 +10,9 @@ import { NO_APPLICATION } from 'constants/listingApplication';
 import { DEFAULT_NULL_VALUE } from 'constants/misc';
 import DisplayImage from 'components/DisplayImage';
 import { useMemo } from 'react';
+import { TablePagination } from 'page-components/Transactions/components';
+import IconFont from 'components/IconFont';
+import { getChainIdByAPI, getIconByChainId } from 'utils/chain';
 
 export default function MyApplicationTable({
   applicationList,
@@ -49,10 +51,13 @@ export default function MyApplicationTable({
         key: 'networkName',
         render: (_: any, item: TMyApplicationItem) => {
           const { chainTokenInfo } = getApplicationDisplayInfo(item);
+          // TODO
+          const iconProps = getIconByChainId(getChainIdByAPI(chainTokenInfo?.chainId || ''));
           return chainTokenInfo?.chainId ? (
             <div className="flex-row-center gap-8">
+              <IconFont className={styles['network-icon']} type={iconProps?.type || ''} />
               {/* TODO */}
-              {/* <NetworkLogo network={chainTokenInfo?.chainId} /> */}
+              {/* <div>{getChainName(getChainIdByAPI(chainTokenInfo?.chainId))}</div> */}
               <span>{chainTokenInfo?.chainName}</span>
             </div>
           ) : (
@@ -104,26 +109,25 @@ export default function MyApplicationTable({
   }, [onResetList]);
 
   return (
-    <Table
-      className={styles['my-application-table']}
-      size={'large'}
-      rowKey={(row) => row.symbol}
-      dataSource={applicationList}
-      columns={MyApplicationTableColumns}
-      scroll={{ x: 670 }}
-      locale={{
-        emptyText: <EmptyDataBox text={NO_APPLICATION} />,
-      }}
-      pagination={
-        totalCount > maxResultCount
-          ? {
-              current: skipPageCount + 1,
-              pageSize: maxResultCount,
-              total: totalCount,
-              onChange: tableOnChange,
-            }
-          : false
-      }
-    />
+    <>
+      <CommonTable
+        className={styles['my-application-table']}
+        rowKey={'id'}
+        dataSource={applicationList}
+        columns={MyApplicationTableColumns}
+        scroll={{ x: 670 }}
+        emptyText={NO_APPLICATION}
+        pagination={{ hideOnSinglePage: true, pageSize: maxResultCount }}
+      />
+      {totalCount > maxResultCount && (
+        <TablePagination
+          current={skipPageCount + 1}
+          onChange={tableOnChange}
+          pageSize={maxResultCount}
+          total={totalCount}
+          showSizeChanger={false}
+        />
+      )}
+    </>
   );
 }

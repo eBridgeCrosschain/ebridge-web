@@ -1,4 +1,5 @@
 @import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/font.less';
 
 .component-title-wrapper {
@@ -19,37 +20,62 @@
 }
 
 .token-pool-steps-wrapper {
-  height: 440px;
-  padding-top: 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 32px;
+  margin-bottom: 32px;
 
   .token-pool-steps {
     :global {
-      .ant-steps-item {
+      .@{app-prefix}-steps-item {
         &:last-child {
-          .ant-steps-item-content {
+          .@{app-prefix}-steps-item-content {
             min-height: auto;
           }
         }
         &:not(:last-child) {
-          .ant-steps-item-content {
-            min-height: 80px !important;
+          .@{app-prefix}-steps-item-content {
+            min-height: 52px !important;
           }
         }
-        .ant-steps-item-content {
-          .ant-steps-item-title {
+        .@{app-prefix}-steps-item-content {
+          .@{app-prefix}-steps-item-title {
             margin-top: 2px;
           }
         }
-        .ant-steps-item-icon {
+        .@{app-prefix}-steps-item-icon {
           width: 24px;
           height: 24px;
-          .ant-steps-icon {
+          .@{app-prefix}-steps-icon {
             font-size: 12px;
           }
         }
       }
+    }
+  }
+}
+
+.action-btn-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .action-btn {
+    width: 240px;
+    height: 48px;
+    font-size: 16px;
+    margin-top: 32px;
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .token-pool-steps-wrapper {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .action-btn-wrapper {
+    .action-btn {
+      width: 100%;
+      margin-top: 24px;
     }
   }
 }

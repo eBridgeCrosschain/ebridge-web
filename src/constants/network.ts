@@ -1,0 +1,17 @@
+export enum BlockchainNetworkType {
+  AELF = 'AELF',
+  tDVV = 'tDVV',
+  tDVW = 'tDVW',
+  SETH = 'SETH',
+  Ethereum = 'ETH',
+  Polygon = 'MATIC',
+  Arbitrum = 'ARBITRUM',
+  Optimism = 'OPTIMISM',
+  Solana = 'Solana',
+  Tron = 'TRX',
+  Binance = 'BSC',
+  TBinance = 'TBSC',
+  Avax = 'AVAXC',
+  TON = 'TON',
+  BASE = 'BASE',
+}

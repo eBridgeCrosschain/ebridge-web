@@ -1,17 +1,18 @@
-import { useEffect, useMemo, useRef, useState, memo } from 'react';
+import { useEffect, useMemo, useRef, useState, memo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import CommonSteps from 'components/CommonSteps';
 import CommonImage from 'components/CommonImage';
 import UnsavedChangesWarningModal from './UnsavedChangesWarningModal';
-// import TokenInformation from './TokenInformation';
-// import SelectChain from './SelectChain';
-// import CoboCustodyReview from './CoboCustodyReview';
-// import InitializeLiquidityPool from './InitializeLiquidityPool';
-// import ListingComplete from './ListingComplete';
+import TokenInformation from './TokenInformation';
+import SelectChain from './SelectChain';
+import InitializeTokenPool from './InitializeTokenPool';
+import AddTokenPool from './AddTokenPool';
+import ListingComplete from './ListingComplete';
 import { backIcon } from 'assets/images';
 import { LISTING_STEP_ITEMS, ListingStep, LISTING_STEP_PATHNAME_MAP } from 'constants/listingApplication';
 import { ROUTE_PATHS } from 'constants/link';
 import { useMobile } from 'contexts/useStore/hooks';
+import { isMobileDevices } from 'utils/isMobile';
 import { getListingUrl } from 'utils/listingApplication';
 // import { useInitAelfWallet } from 'hooks/wallet/useAelf';
 import { TSearchParams } from 'types/listingApplication';
@@ -23,8 +24,8 @@ function ListingApplication() {
   const isMobile = useMobile();
   const router = useRouter();
   const { query } = router;
-  const symbol = useMemo(() => query.symbol || undefined, [query]);
-  const id = useMemo(() => query.id || undefined, [query]);
+  const symbol = useMemo(() => (query.symbol as string) || undefined, [query]);
+  const id = useMemo(() => (query.id as string) || undefined, [query]);
   const networks = useMemo(() => {
     const str = query.networks || '';
     try {
@@ -61,6 +62,8 @@ function ListingApplication() {
   }, [router]);
 
   useEffect(() => {
+    if (isMobileDevices()) return;
+
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (currentStep === ListingStep.TOKEN_INFORMATION || currentStep === ListingStep.SELECT_CHAIN) {
         e.preventDefault();
@@ -74,25 +77,31 @@ function ListingApplication() {
     };
   }, [currentStep]);
 
-  const handleNextStep = (params?: TSearchParams) => {
-    if (typeof currentStep !== 'number') return;
-    const nextStep = currentStep + 1;
-    if (nextStep <= ListingStep.COMPLETE) {
-      globalCanAccessStep = true;
-      const replaceUrl = getListingUrl(nextStep, params);
-      router.replace(replaceUrl);
-    }
-  };
+  const handleNextStep = useCallback(
+    (params?: TSearchParams) => {
+      if (typeof currentStep !== 'number') return;
+      const nextStep = currentStep + 1;
+      if (nextStep <= ListingStep.COMPLETE) {
+        globalCanAccessStep = true;
+        const replaceUrl = getListingUrl(nextStep, params);
+        router.replace(replaceUrl);
+      }
+    },
+    [currentStep, router],
+  );
 
-  const handlePrevStep = (params?: TSearchParams) => {
-    if (typeof currentStep !== 'number') return;
-    const prevStep = currentStep - 1;
-    if (prevStep >= ListingStep.TOKEN_INFORMATION) {
-      globalCanAccessStep = true;
-      const replaceUrl = getListingUrl(prevStep, params);
-      router.replace(replaceUrl);
-    }
-  };
+  const handlePrevStep = useCallback(
+    (params?: TSearchParams) => {
+      if (typeof currentStep !== 'number') return;
+      const prevStep = currentStep - 1;
+      if (prevStep >= ListingStep.TOKEN_INFORMATION) {
+        globalCanAccessStep = true;
+        const replaceUrl = getListingUrl(prevStep, params);
+        router.replace(replaceUrl);
+      }
+    },
+    [currentStep, router],
+  );
 
   const handleWarningModalConfirm = () => {
     setIsWarningModalOpen(false);
@@ -112,16 +121,16 @@ function ListingApplication() {
 
   const renderForm = () => {
     switch (currentStep) {
-      // case ListingStep.TOKEN_INFORMATION:
-      //   return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
-      // case ListingStep.SELECT_CHAIN:
-      //   return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
-      // case ListingStep.COBO_CUSTODY_REVIEW:
-      //   return <CoboCustodyReview networks={networks} />;
-      // case ListingStep.INITIALIZE_LIQUIDITY_POOL:
-      //   return <InitializeLiquidityPool symbol={symbol} id={id} onNext={handleNextStep} />;
-      // case ListingStep.COMPLETE:
-      //   return <ListingComplete />;
+      case ListingStep.TOKEN_INFORMATION:
+        return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
+      case ListingStep.SELECT_CHAIN:
+        return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
+      case ListingStep.INITIALIZE_TOKEN_POOL:
+        return <InitializeTokenPool networks={networks} />;
+      case ListingStep.ADD_TOKEN_POOL:
+        return <AddTokenPool id={id} onNext={handleNextStep} />;
+      case ListingStep.COMPLETE:
+        return <ListingComplete />;
       default:
         return null;
     }
@@ -156,7 +165,6 @@ function ListingApplication() {
               <CommonSteps stepItems={LISTING_STEP_ITEMS} current={currentStep} />
             </div>
             <div className={styles['listing-card']}>
-              <div className={styles['listing-card-form-title']}>{LISTING_STEP_ITEMS[currentStep]?.title}</div>
               <div className={styles['listing-card-form-content']}>{renderForm()}</div>
             </div>
           </div>

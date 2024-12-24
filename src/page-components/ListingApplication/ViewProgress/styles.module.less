@@ -1,12 +1,14 @@
 @import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/font.less';
 
 .view-progress-modal {
   :global {
-    .ant-modal-content {
+    .@{app-prefix}-modal-content {
       height: 100%;
-      .ant-modal-close {
-        .ant-modal-close-x {
+      .@{app-prefix}-modal-close {
+        .@{app-prefix}-modal-close-x {
+          width: 68px;
           height: 68px;
           padding-top: 8px;
           svg path {
@@ -14,15 +16,33 @@
           }
         }
       }
-      .ant-modal-header {
-        height: 68px;
+      .@{app-prefix}-modal-header {
+        height: 60px;
         padding-top: 24px;
-        padding-bottom: 16px;
+        padding-bottom: 8px;
 
-        .ant-modal-title {
+        .@{app-prefix}-modal-title {
           font-size: 20px;
           line-height: 28px;
           .font-family-medium();
+        }       
+      }
+      .@{app-prefix}-modal-body {
+        width: 100%;
+        min-width: 360px;
+        padding-top: 0;
+
+        .@{app-prefix}-steps-item-description {
+          .font-family-regular() !important;
+        }
+      }
+      .@{app-prefix}-modal-footer{
+        border-top: none;
+        padding-top: 0;
+        padding-bottom: 24px;
+        @media screen and (max-width: @md-width) {
+          padding: 24px;
+          padding-bottom: 34px;
         }
       }
     }
@@ -48,33 +68,32 @@
 }
 
 .view-progress-steps-wrapper {
-  height: 440px;
   padding-top: 16px;
   margin-top: 8px;
   margin-bottom: 8px;
 
   .view-progress-steps {
     :global {
-      .ant-steps-item {
+      .@{app-prefix}-steps-item {
         &:last-child {
-          .ant-steps-item-content {
+          .@{app-prefix}-steps-item-content {
             min-height: auto;
           }
         }
         &:not(:last-child) {
-          .ant-steps-item-content {
+          .@{app-prefix}-steps-item-content {
             min-height: 80px !important;
           }
         }
-        .ant-steps-item-content {
-          .ant-steps-item-title {
+        .@{app-prefix}-steps-item-content {
+          .@{app-prefix}-steps-item-title {
             margin-top: 2px;
           }
         }
-        .ant-steps-item-icon {
+        .@{app-prefix}-steps-item-icon {
           width: 24px;
           height: 24px;
-          .ant-steps-icon {
+          .@{app-prefix}-steps-icon {
             font-size: 12px;
           }
         }
@@ -83,40 +102,7 @@
   }
 }
 
-.view-progress-drawer.view-progress-drawer-weight {
-  :global {
-    .ant-drawer-header {
-      height: auto;
-      // TODO
-      // @include media-pad {
-      //   padding: 24px 24px 16px;
-      // }
-      // @include media-mobile {
-      //   padding: 16px;
-      // }
-      .ant-drawer-header-title {
-        .ant-drawer-title {
-          text-align: left;
-          font-size: 20px;
-          line-height: 28px;
-        }
-      }
-    }
-
-    .ant-drawer-body {
-      padding: 24px;
-      // TODO
-      // @include media-pad {
-      //   padding: 24px;
-      // }
-      // @include media-mobile {
-      //   padding: 16px 16px 48px;
-      // }
-    }
-  }
-}
-
 .confirm-button {
   width: 100%;
-  margin-top: 24px;
+  height: 48px;
 }

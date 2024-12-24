@@ -12,6 +12,7 @@ import {
 } from 'assets/images';
 
 export const ROUTE_PATHS = {
+  HOME: '/',
   BRIDGE: '/bridge',
   TRANSACTIONS: '/transactions',
   TERMS_OF_SERVICE: '/terms-of-service',
