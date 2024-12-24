@@ -1,6 +1,6 @@
 import { service } from 'api/utils';
 import axios from 'axios';
-import { BASE_URL } from 'constants/index';
+import { BASE_AUTH_URL } from 'constants/index';
 import { stringify } from 'query-string';
 import { PortkeyVersion } from 'types/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
@@ -15,14 +15,14 @@ type QueryAuthApiBaseConfig = {
 
 const queryAuthApiBaseConfig: QueryAuthApiBaseConfig = {
   grant_type: 'signature',
-  scope: 'EBridgeServer',
-  client_id: 'EBridgeServer_App',
+  scope: 'CrossChainServer',
+  client_id: 'CrossChainServer_App',
   version: PortkeyVersion.v2,
 };
 
 export const queryAuthApi = async (config: QueryAuthApiExtraRequest): Promise<string> => {
   const data = { ...queryAuthApiBaseConfig, ...config };
-  const res = await axios.post<JWTData>(`${BASE_URL}/connect/token`, stringify(data), {
+  const res = await axios.post<JWTData>(`${BASE_AUTH_URL}/connect/token`, stringify(data), {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
   const token_type = res.data.token_type;

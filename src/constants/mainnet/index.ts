@@ -165,6 +165,8 @@ export const INDEXER_URL = 'https://indexer-api.aefinder.io/api/app/graphql/ebri
 
 export const BASE_URL = 'https://ebridge.exchange';
 
+export const BASE_AUTH_URL = 'https://app.ebridge.exchange';
+
 export const TELEGRAM_BOT_ID = '6932375590';
 
 export const SHOW_V_CONSOLE = false;

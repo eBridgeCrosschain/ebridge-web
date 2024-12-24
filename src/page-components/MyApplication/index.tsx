@@ -5,7 +5,7 @@ import { getMyApplicationList } from 'utils/api/application';
 import MyApplicationTable from './MyApplicationTable';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useAElf } from 'hooks/web3';
-import { useAelfLogin } from 'hooks/wallet';
+import { useAelfAuthListener, useAelfLogin } from 'hooks/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
@@ -16,7 +16,7 @@ import { useRouter } from 'next/router';
 import { CONTACT_US_FORM_URL, ROUTE_PATHS } from 'constants/link';
 import { openWithBlank } from 'utils/link';
 import { sleep } from 'utils';
-import { useInitAelfWallet, useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
+import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
 
 const DefaultSkipCount = 0;
 const DefaultMaxResultCount = 10;
@@ -29,7 +29,7 @@ function MyApplications() {
   const { isActive } = useAElf();
   const handleAelfLogin = useAelfLogin();
   const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
-  useInitAelfWallet();
+  useAelfAuthListener();
   const [currentApplicationList, setCurrentApplicationList] = useState<any[]>([]);
 
   // pagination

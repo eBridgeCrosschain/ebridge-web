@@ -1,4 +1,5 @@
 import { TBridgeChainId } from 'constants/chain';
+import { WhitelistMap } from 'contexts/useWhitelist/actions';
 import { ChainId, TokenInfo } from 'types';
 
 /**
@@ -269,3 +270,5 @@ export type TChangeAddLiquidityStatusResult = {
   chainId: TBridgeChainId;
   success: boolean;
 };
+
+export type TGetTokenWhiteListResult = WhitelistMap;

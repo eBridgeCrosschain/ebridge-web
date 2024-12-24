@@ -58,16 +58,6 @@ export function useAelfAuthListener() {
   const { isConnected, walletInfo, walletType } = useConnectWallet();
 
   const { queryAuth } = useAelfAuthToken();
-  // const getAuthRef = useRef(getAuth);
-  // getAuthRef.current = getAuth;
-
-  // useEffect(() => {
-  //   console.warn('>>>>>> isConnected', isConnected);
-  //   console.warn('>>>>>> walletInfo', walletInfo);
-  //   if (isConnected && walletInfo) {
-  //     getAuthRef.current(false, true);
-  //   }
-  // }, [isConnected, walletInfo]);
 
   const onAuthorizationExpired = useCallback(async () => {
     if (!isConnected) {
