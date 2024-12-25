@@ -186,10 +186,10 @@ export function useEVMSwitchChain() {
 }
 
 export function useActiveAddresses() {
-  const { account: tonAccount } = useTon();
+  // const { account: tonAccount } = useTon();
   const { account: aelfAccount } = useAElf();
   const { account: evmAccount } = useWeb3();
   return useMemo(() => {
-    return [evmAccount, tonAccount, aelfAccount].filter(Boolean).join(',');
-  }, [aelfAccount, evmAccount, tonAccount]);
+    return [evmAccount, aelfAccount].filter(Boolean).join(',');
+  }, [aelfAccount, evmAccount]);
 }

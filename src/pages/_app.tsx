@@ -65,7 +65,9 @@ export default function APP({ Component, pageProps }: AppProps) {
     } else {
       return (
         <div className={pageBodyClassName}>
-          <Component {...pageProps} />
+          <div className="flex-1">
+            <Component {...pageProps} />
+          </div>
           <Footer />
         </div>
       );
