@@ -15,7 +15,7 @@ const options = {
       { value: 1e12, symbol: 'T' },
       { value: 1e9, symbol: 'B' },
       { value: 1e6, symbol: 'M' },
-      { value: 1e3, symbol: 'K' },
+      // { value: 1e3, symbol: 'K' },
     ],
     lastValue: 1e3,
   },
@@ -36,8 +36,66 @@ export const fixedDecimal = ({
   return bigCount.dp(minDecimals, BigNumber.ROUND_DOWN).toFixed();
 };
 
+export const fixedDecimalToFormat = ({
+  num,
+  decimals = 4,
+  minDecimals = 8,
+}: {
+  num?: number | BigNumber | string;
+  decimals?: number;
+  minDecimals?: number;
+}) => {
+  const bigCount = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
+  if (bigCount.isNaN()) return '0';
+  const dpCount = bigCount.dp(decimals, BigNumber.ROUND_DOWN);
+  if (dpCount.gt(0)) return dpCount.toFormat();
+  return bigCount.dp(minDecimals, BigNumber.ROUND_DOWN).toFormat();
+};
+
 type Num = number | BigNumber | string;
 export const unitConverter = (
+  ags:
+    | {
+        num?: Num;
+        decimals?: number;
+        defaultVal?: string;
+        minDecimals?: number;
+        skipConverterIndex?: number;
+      }
+    | Num
+    | undefined,
+) => {
+  let obj: any = {};
+  if (!BigNumber.isBigNumber(ags) && typeof ags === 'object') {
+    obj = ags;
+  } else {
+    obj.num = ags;
+  }
+  const { num, decimals = 4, defaultVal = '0', minDecimals = 8, skipConverterIndex = 0 } = obj;
+  const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
+  if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
+  const abs = bigNum.abs();
+  const { list, lastValue } = !i18n.language.includes('zh') ? options.en : options.zh;
+  if (abs.gt(lastValue)) {
+    for (let i = 0; i < list.length - skipConverterIndex; i++) {
+      const { value, symbol } = list[i];
+      if (abs.gt(value))
+        return (
+          fixedDecimal({
+            num: bigNum.div(value),
+            decimals,
+            minDecimals,
+          }) + symbol
+        );
+    }
+  }
+  return fixedDecimal({
+    num: bigNum,
+    decimals,
+    minDecimals,
+  });
+};
+export const unitConverterToFormat = (
   ags:
     | {
         num?: Num;
@@ -54,7 +112,7 @@ export const unitConverter = (
   } else {
     obj.num = ags;
   }
-  const { num, decimals = 5, defaultVal = '0', minDecimals = 8 } = obj;
+  const { num, decimals = 4, defaultVal = '0', minDecimals = 8 } = obj;
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
@@ -64,7 +122,7 @@ export const unitConverter = (
       const { value, symbol } = list[i];
       if (abs.gt(value))
         return (
-          fixedDecimal({
+          fixedDecimalToFormat({
             num: bigNum.div(value),
             decimals,
             minDecimals,
@@ -72,7 +130,7 @@ export const unitConverter = (
         );
     }
   }
-  return fixedDecimal({
+  return fixedDecimalToFormat({
     num: bigNum,
     decimals,
     minDecimals,
