@@ -28,9 +28,10 @@ import { usePoolTotalLiquidity } from 'hooks/pools';
 export type TAddPoolProps = {
   chainId: ChainId;
   tokenInfo?: TokenInfo;
+  price: string | number;
 };
 
-export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
+export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
   const { t } = useLanguage();
 
   const [amount, setAmount] = useState<string>();
@@ -143,13 +144,16 @@ export default function AddPool({ chainId, tokenInfo }: TAddPoolProps) {
           </Row>
         }
       />
+      <div className={styles['estimated-value']}>
+        {t('Estimated value')}: ${unitConverter(ZERO.plus(amount ?? 0).times(price))}
+      </div>
       <Col className={styles['share-col']}>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
           <div>{t('Share of Pool')}</div> <div>{getShareOfPool(amount, totalLiquidity.showTotalLiquidity)}%</div>
         </div>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
-          {/* // TODO:$ Converter */}
-          <div>{t('Liquidity')}</div> <div>${unitConverter(totalLiquidity.showTotalLiquidity)}</div>
+          <div>{t('Liquidity')}</div>
+          <div>${unitConverter(ZERO.plus(totalLiquidity.showTotalLiquidity).times(price))}</div>
         </div>
       </Col>
       {modal}

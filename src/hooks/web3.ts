@@ -164,7 +164,6 @@ export function useWeb3Wallet(chainId?: ChainId) {
   const tonWallet = useTon();
   const aelfWallet = useAElf();
   const web3Wallet = useWeb3();
-
   return useMemo(() => {
     if (isELFChain(chainId)) return aelfWallet;
     if (isTonChain(chainId)) return tonWallet;
@@ -184,4 +183,13 @@ export function useEVMSwitchChain() {
     },
     [connector, evmChainId],
   );
+}
+
+export function useActiveAddresses() {
+  const { account: tonAccount } = useTon();
+  const { account: aelfAccount } = useAElf();
+  const { account: evmAccount } = useWeb3();
+  return useMemo(() => {
+    return [evmAccount, tonAccount, aelfAccount].filter(Boolean).join(',');
+  }, [aelfAccount, evmAccount, tonAccount]);
 }

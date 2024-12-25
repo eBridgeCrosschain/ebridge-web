@@ -250,6 +250,13 @@ export interface APIPoolItem {
   tokenPrice?: string;
 }
 
+export type TPoolOverview = {
+  totalTvlInUsd: string | number;
+  myTotalTvlInUsd: string | number;
+  poolCount: number;
+  tokenCount: number;
+};
+
 export type TGetTokenPriceRequest = {
   symbol: string;
   amount: string;

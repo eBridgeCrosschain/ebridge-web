@@ -11,7 +11,7 @@ import styles from './styles.module.less';
 import { ChainId, OperatePool } from 'types';
 import AddPool from './AddPool';
 import RemovePool from './RemovePool';
-import { useGetTokenInfoByWhitelist } from 'hooks/token';
+import { useGetTokenInfoByWhitelist, useTokenPrice } from 'hooks/token';
 import CommonImage from 'components/CommonImage';
 import { backIcon } from 'assets/images';
 import Col from 'antd/es/grid/col';
@@ -27,6 +27,7 @@ export default function Pool() {
   const chainId = useMemo(() => getChainIdByAPI(apiChainId), [apiChainId]);
 
   const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
+  const { price } = useTokenPrice(symbol);
 
   const tokenInfo = useMemo(
     () => getTokenInfoByWhitelist(chainId as ChainId, symbol),
@@ -69,9 +70,9 @@ export default function Pool() {
             <Tabs.TabPane tab={t('Remove')} key={OperatePool.remove} />
           </Tabs>
           {activeKey === OperatePool.add ? (
-            <AddPool chainId={chainId} tokenInfo={tokenInfo} />
+            <AddPool price={price} chainId={chainId} tokenInfo={tokenInfo} />
           ) : (
-            <RemovePool chainId={chainId} tokenInfo={tokenInfo} />
+            <RemovePool price={price} chainId={chainId} tokenInfo={tokenInfo} />
           )}
         </div>
       </Col>
