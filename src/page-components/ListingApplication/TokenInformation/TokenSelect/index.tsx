@@ -60,7 +60,7 @@ export default function TokenSelect({
 
         {token && (
           <div className={styles['token-selected-info-card']}>
-            {!!tokenConfig?.liquidityInUsd && (
+            {!!tokenConfig?.liquidityInUsd && tokenConfig.liquidityInUsd !== '0' && (
               <div className={styles['token-selected-info-card-row']}>
                 <div className={styles['token-selected-info-card-row-content']}>
                   {getInfoValidateIcon(
@@ -70,11 +70,11 @@ export default function TokenSelect({
                   <span>{`Liquidity > $${tokenConfig.liquidityInUsd}`}</span>
                 </div>
                 <CommonLink className={styles['token-selected-info-card-row-link']} showIcon={false} href={AwakenHost}>
-                  Add Token Pool
+                  Add Liquidity
                 </CommonLink>
               </div>
             )}
-            {tokenConfig?.holders !== undefined && (
+            {!!tokenConfig?.holders && (
               <div className={styles['token-selected-info-card-row']}>
                 <div className={styles['token-selected-info-card-row-content']}>
                   {getInfoValidateIcon(!!token?.holders && token.holders > tokenConfig.holders)}
