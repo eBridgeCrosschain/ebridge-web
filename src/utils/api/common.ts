@@ -10,5 +10,5 @@ export const getTokenPrice = async (params: TGetTokenPriceRequest): Promise<TGet
 export const getTokenWhiteList = async (): Promise<TGetTokenWhiteListResult> => {
   const res = await request.common.getTokenWhiteList();
 
-  return res.data.data;
+  return res.data;
 };
