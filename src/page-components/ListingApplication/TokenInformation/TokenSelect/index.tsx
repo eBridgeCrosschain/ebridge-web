@@ -8,6 +8,7 @@ import TokenRow from '../../TokenRow';
 import { checkFilled16Icon, closeFilled16Icon } from 'assets/images';
 import { TTokenConfig, TTokenItem } from 'types/listingApplication';
 import { AwakenHost } from 'constants/index';
+import { LISTING_TOKEN_TIP } from 'constants/listingApplication';
 import styles from './styles.module.less';
 
 interface ITokenSelectProps {
@@ -88,6 +89,7 @@ export default function TokenSelect({
 
       <CommonSelectTokenModal
         hideAddToken
+        remindContent={LISTING_TOKEN_TIP}
         open={isShowTokenSelectModal}
         selectSymbol={token?.symbol}
         tokenList={tokenList}

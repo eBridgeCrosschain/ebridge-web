@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import styles from './styles.module.less';
 import CommonImage from 'components/CommonImage';
-import { errorFilledIcon, infoCircleFillIcon } from 'assets/images';
+import { errorFilledIcon, infoCircleFillGrayIcon, infoCircleFillIcon } from 'assets/images';
 
 export enum RemindType {
   BRAND = 'brand',
@@ -12,7 +12,7 @@ export enum RemindType {
 
 const ICON_SRC = {
   [RemindType.BRAND]: infoCircleFillIcon,
-  [RemindType.INFO]: infoCircleFillIcon,
+  [RemindType.INFO]: infoCircleFillGrayIcon,
   [RemindType.WARNING]: infoCircleFillIcon,
   [RemindType.ERROR]: errorFilledIcon,
 };

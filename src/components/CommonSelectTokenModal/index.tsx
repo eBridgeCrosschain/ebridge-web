@@ -6,6 +6,7 @@ import LinkForBlank from 'components/LinkForBlank';
 import CommonModal from 'components/CommonModal';
 import IconFont from 'components/IconFont';
 import TokenLogo from 'components/TokenLogo';
+import Remind, { RemindType } from 'components/Remind';
 import { formatSymbol } from 'utils/token';
 import { getListingUrl } from 'utils/listingApplication';
 import { TBridgeChainId } from 'constants/chain';
@@ -23,6 +24,7 @@ interface ISelectTokenProps<T> {
   tokenList: TToken<T>[];
   chainId?: TBridgeChainId;
   hideAddToken?: boolean;
+  remindContent?: string;
   onSelect: (token: TToken<T>) => void;
 }
 
@@ -31,7 +33,14 @@ interface ISelectTokenModalProps<T> extends ISelectTokenProps<T> {
   onClose: () => void;
 }
 
-function SelectToken<T>({ selectSymbol, tokenList, chainId, hideAddToken, onSelect }: ISelectTokenProps<T>) {
+function SelectToken<T>({
+  selectSymbol,
+  tokenList,
+  chainId,
+  hideAddToken,
+  remindContent,
+  onSelect,
+}: ISelectTokenProps<T>) {
   const [searchList, setSearchList] = useState<TToken<T>[]>();
   const [value, setValue] = useState<string>();
   const { t } = useLanguage();
@@ -62,6 +71,11 @@ function SelectToken<T>({ selectSymbol, tokenList, chainId, hideAddToken, onSele
         placeholder={t('Search token')}
         suffix={<IconFont onClick={onSearch} className="cursor-pointer" type="Icon-search" />}
       />
+      {remindContent && (
+        <Remind className={styles['token-tip']} type={RemindType.INFO} isBorder={false}>
+          {remindContent}
+        </Remind>
+      )}
       <div className={clsx({ [styles['token-list']]: true, [styles['token-list-add-token']]: !hideAddToken })}>
         {(searchList || tokenList).map((item, k) => {
           return (

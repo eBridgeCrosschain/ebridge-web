@@ -44,6 +44,7 @@ import questionFilledIcon from './question-filled.svg';
 import loadingIcon from './loading.png';
 import completeIcon from './complete.svg';
 import infoCircleFillIcon from './info-circle-fill.svg';
+import infoCircleFillGrayIcon from './info-circle-fill-gray.svg';
 import viewProgressIcon from './view-progress.svg';
 import poolsIcon from './pools.svg';
 import poolsBlueIcon from './pools-blue.svg';
@@ -92,6 +93,7 @@ export {
   closeIcon,
   infoCircleIcon,
   infoCircleFillIcon,
+  infoCircleFillGrayIcon,
   questionFilledIcon,
   loadingIcon,
   tonLogo,
