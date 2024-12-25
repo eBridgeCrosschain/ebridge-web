@@ -13,7 +13,7 @@ import { sleep } from 'utils';
 import { handleWebLoginErrorMessage } from 'utils/error';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { useAelfAuthToken } from './aelfAuthToken';
-import { AuthTokenSource, removeOneLocalJWT } from 'utils/aelfAuthToken';
+import { AuthTokenSource, removeOneLocalJWT, resetLocalJWT } from 'utils/aelfAuthToken';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { pubKeyToAddress } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
@@ -159,6 +159,7 @@ export function useAelfLogout() {
 
       chainDispatch(setSelectERCWallet(undefined));
       clearWCStorageByDisconnect();
+      resetLocalJWT();
       await sleep(500);
       connectWallet();
     });
