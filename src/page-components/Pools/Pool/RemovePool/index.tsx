@@ -26,9 +26,10 @@ import { usePoolMyLiquidity, usePoolTotalLiquidity } from 'hooks/pools';
 export type TRemovePoolProps = {
   chainId: ChainId;
   tokenInfo?: TokenInfo;
+  price: string | number;
 };
 
-export default function RemovePool({ chainId, tokenInfo }: TRemovePoolProps) {
+export default function RemovePool({ chainId, tokenInfo, price }: TRemovePoolProps) {
   const { t } = useLanguage();
 
   const [amount, setAmount] = useState<string>();
@@ -42,7 +43,7 @@ export default function RemovePool({ chainId, tokenInfo }: TRemovePoolProps) {
   const myLiquidity = usePoolMyLiquidity({ poolContract, account: web3Wallet?.account, tokenInfo });
 
   const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
-  const { account, library } = web3Wallet || {};
+  const { account } = web3Wallet || {};
   const connect = useConnect();
 
   const min = useMemo(() => divDecimals(1, tokenInfo?.decimals), [tokenInfo?.decimals]);
@@ -130,14 +131,17 @@ export default function RemovePool({ chainId, tokenInfo }: TRemovePoolProps) {
           </Row>
         }
       />
+      <div className={styles['estimated-value']}>
+        {t('Estimated value')}: ${unitConverter(ZERO.plus(amount ?? 0).times(price))}
+      </div>
       <Col className={styles['share-col']}>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
           <div>{t('Share of Pool')}</div>{' '}
           <div>{percentConverter(ZERO.plus(amount ?? 0).div(totalLiquidity.showTotalLiquidity))}%</div>
         </div>
         <div className={clsx('flex-row-center flex-row-between', styles['share-row'])}>
-          {/* // TODO:$ Converter */}
-          <div>{t('Liquidity')}</div> <div>${unitConverter(totalLiquidity.showTotalLiquidity)}</div>
+          <div>{t('Liquidity')}</div>
+          <div>${unitConverter(ZERO.plus(totalLiquidity.showTotalLiquidity).times(price))}</div>
         </div>
       </Col>
       {modal}

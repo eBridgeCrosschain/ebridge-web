@@ -1,9 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TokenInfo } from 'types';
 import { ContractBasic } from 'utils/contract';
 import useInterval from './useInterval';
 import { getMyLiquidity, getTotalLiquidity } from 'utils/pools';
 import { divDecimals } from 'utils/calculate';
+import { request } from 'api';
+import { useActiveAddresses } from './web3';
+import { usePoolsDispatch } from 'contexts/usePools/hooks';
+import { setPoolList, setPoolOverview } from 'contexts/usePools/actions';
+import { usePools } from 'contexts/usePools';
 
 export function usePoolTotalLiquidity(
   {
@@ -18,7 +23,6 @@ export function usePoolTotalLiquidity(
   delay: null | number = 10000,
 ) {
   const [totalLiquidity, setTotalLiquidity] = useState<string>();
-  console.log(tokenContract, '=====tokenContract');
 
   const onGetTotalLiquidity = useCallback(async () => {
     if (!poolContract || !tokenContract || !tokenInfo) return;
@@ -78,4 +82,44 @@ export function usePoolMyLiquidity(
     showMyLiquidity: divDecimals(myLiquidity, tokenInfo?.decimals),
     onGetMyLiquidity,
   };
+}
+
+export function usePoolOverview() {
+  const addresses = useActiveAddresses();
+  const [{ poolOverview }] = usePools();
+  const dispatch = usePoolsDispatch();
+  const getPoolOverview = useCallback(async () => {
+    try {
+      const req = await request.pool.overview({ params: { addresses } });
+      dispatch(setPoolOverview(req.data));
+    } catch (error) {
+      console.debug(error, 'getPoolOverview');
+    }
+  }, [addresses, dispatch]);
+
+  useEffect(() => {
+    getPoolOverview();
+  }, [getPoolOverview]);
+
+  return { poolOverview, getPoolOverview };
+}
+
+export function usePoolList() {
+  const addresses = useActiveAddresses();
+  const [{ poolList }] = usePools();
+  const dispatch = usePoolsDispatch();
+  const getPoolList = useCallback(async () => {
+    try {
+      const req = await request.pool.list({ params: { addresses, skipCount: 0, maxResultCount: 200 } });
+      dispatch(setPoolList(req.data));
+    } catch (error) {
+      console.debug(error, 'getPoolList');
+    }
+  }, [addresses, dispatch]);
+
+  useEffect(() => {
+    getPoolList();
+  }, [getPoolList]);
+
+  return { poolList, getPoolList };
 }

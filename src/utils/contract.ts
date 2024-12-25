@@ -143,8 +143,6 @@ export class WB3ContractBasic {
   public web3?: Web3;
   contractABI: AbiItem[] | undefined;
   constructor(options: ContractProps) {
-    console.log(options, '====options');
-
     const { contractABI, provider, contractAddress, chainId } = options;
     this.contractABI = contractABI;
     const contactABITemp = contractABI;
@@ -172,12 +170,12 @@ export class WB3ContractBasic {
     paramsOption,
     callOptions = { defaultBlock: 'latest' },
   ) => {
+    const contract = this.chainId ? this.contractForView : this.contract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
       const { defaultBlock, options } = callOptions;
-      const contract = this.contractForView;
       // BlockTag
       contract.defaultBlock = defaultBlock;
-
       return await contract.methods[functionName](...(paramsOption || [])).call(options);
 
       // const chainId = this.chainId || ERCChainConstants.chainId;
@@ -193,6 +191,8 @@ export class WB3ContractBasic {
       // if (defaultBlock === 'latest') delete params.blockNumber;
       // return await readContractByWagmi(params);
     } catch (e) {
+      console.log(e, '=====e');
+
       return { error: e };
     }
   };
@@ -211,8 +211,6 @@ export class WB3ContractBasic {
       } catch (error) {
         console.log(error);
       }
-
-      console.log({ from: account, ...options }, '====options');
 
       const result: any = await new Promise((resolve, reject) =>
         contract.methods[functionName](...(paramsOption || []))

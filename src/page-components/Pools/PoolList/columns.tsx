@@ -7,9 +7,11 @@ import { formatSymbol } from 'utils/token';
 import styles from './styles.module.less';
 import TokenLogo from 'components/TokenLogo';
 import IconFont from 'components/IconFont';
+import { unitConverter } from 'utils/converter';
 
 const token: ColumnType<APIPoolItem> = {
   title: () => <Trans>Token</Trans>,
+  width: 150,
   key: 'Token',
   ellipsis: true,
   dataIndex: 'token',
@@ -25,6 +27,7 @@ const token: ColumnType<APIPoolItem> = {
 };
 
 const network: ColumnType<APIPoolItem> = {
+  width: 300,
   title: () => <Trans>Network</Trans>,
   key: 'Network',
   ellipsis: true,
@@ -57,7 +60,7 @@ const totalLiquidity: ColumnType<APIPoolItem> = {
   ellipsis: true,
   dataIndex: 'totalTvlInUsd',
   render: (totalTvlInUsd) => {
-    return `$${totalTvlInUsd}`;
+    return `$${unitConverter(totalTvlInUsd)}`;
   },
 };
 

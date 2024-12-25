@@ -64,6 +64,12 @@ const CommonApiList = {
 const CMSApiList = {
   getToggleResultOfMask: '/cms/items/home',
 };
+
+const PoolApiList = {
+  overview: '/api/ebridge/application/pool-overview',
+  detail: '/api/ebridge/application/pool-detail',
+  list: '/api/ebridge/application/pool-list',
+};
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
@@ -73,6 +79,7 @@ export const EXPAND_APIS = {
   cms: CMSApiList,
   application: ApplicationApiList,
   common: CommonApiList,
+  pool: PoolApiList,
 };
 
 export type BASE_REQ_TYPES = {

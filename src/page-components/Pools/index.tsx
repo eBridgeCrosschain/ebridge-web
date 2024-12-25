@@ -5,33 +5,39 @@ import clsx from 'clsx';
 import PoolOverviewCard, { TPoolOverviewCardProps } from './PoolOverviewCard';
 import PoolList from './PoolList';
 import useMediaQueries from 'hooks/useMediaQueries';
+import { usePoolOverview } from 'hooks/pools';
+import { TPoolOverview } from 'types/api';
+import { unitConverter } from 'utils/converter';
 
-const OverviewCardList: TPoolOverviewCardProps[] = [
-  { title: 'Total TVL', tooltipTitle: 'The total value of all assets locked in liquidity pools across eBridge.' },
+const OverviewCardList: (TPoolOverviewCardProps & {
+  key: keyof TPoolOverview;
+})[] = [
+  {
+    title: 'Total TVL',
+    tooltipTitle: 'The total value of all assets locked in liquidity pools across eBridge.',
+    key: 'totalTvlInUsd',
+  },
   {
     title: 'Your Total Liquidity',
     tooltipTitle: 'The total value of the liquidity you have added to all pools on eBridge.',
+    key: 'myTotalTvlInUsd',
   },
-  { title: 'Pools', tooltipTitle: 'The number of liquidity pools currently active on eBridge.' },
+  { title: 'Pools', tooltipTitle: 'The number of liquidity pools currently active on eBridge.', key: 'poolCount' },
   {
     title: 'Tokens',
     tooltipTitle: 'The number of different tokens available across all liquidity pools on eBridge.',
+    key: 'tokenCount',
   },
 ];
 
 const Pools = () => {
   const isMd = useMediaQueries('md');
-  // MOCK Token Address
-  //   const tokenContract = useTokenContract(chainId, '0x60eeCc4d19f65B9EaDe628F2711C543eD1cE6679');
-  //   const poolContract = usePoolContract(chainId);
-  //   const { account, library } = useWeb3();
-
+  const { poolOverview } = usePoolOverview();
   const overviewCardListMemo = useMemo(() => {
     return OverviewCardList.map((i) => {
-      //FIXME: Mock Data
-      return { ...i, data: '$2,612.12' };
+      return { ...i, data: unitConverter(poolOverview?.[i.key]) };
     });
-  }, []);
+  }, [poolOverview]);
 
   return (
     <div className={styles['pools-page']}>
