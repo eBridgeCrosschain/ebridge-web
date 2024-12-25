@@ -20,7 +20,7 @@ import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { useAElf } from 'hooks/web3';
 import { useAelfLogin } from 'hooks/wallet';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
-import useLoadingModal from 'hooks/useLoadingModal';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useMobile } from 'contexts/useStore/hooks';
 import { TCommitTokenInfoRequest } from 'types/api';
 import {
@@ -57,12 +57,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const router = useRouter();
   const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
   const handleAelfLogin = useAelfLogin();
-  const { modal, setLoadingModal } = useLoadingModal({
-    loadingModalProps: {
-      hideTitle: true,
-      hideDescription: true,
-    },
-  });
+  const { setGlobalLoading } = useGlobalLoading();
   const [form] = Form.useForm<TTokenInformationFormValues>();
   const chainType = getChainType(AELF_CHAIN_ID);
   const aelfWallet = useAElf();
@@ -170,7 +165,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   );
 
   const init = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     const list = await getTokenList();
     if (symbol) {
       const config = await getTokenConfig(symbol);
@@ -178,14 +173,14 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         await getTokenInfo(symbol, list, config);
       }
     }
-    setLoadingModal({ open: false });
-  }, [getTokenConfig, getTokenInfo, getTokenList, setLoadingModal, symbol]);
+    setGlobalLoading(false);
+  }, [getTokenConfig, getTokenInfo, getTokenList, setGlobalLoading, symbol]);
   const initRef = useRef(init);
   initRef.current = init;
 
   const connectAndInit = useCallback(() => {
     if (!isAelfActive) {
-      handleAelfLogin(true, initRef.current);
+      handleAelfLogin(true, initRef.current, true);
     } else {
       initRef.current();
     }
@@ -193,11 +188,11 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
     await sleep(3000);
     connectAndInitRef.current();
-  }, [setLoadingModal]);
+  }, [setGlobalLoading]);
   useEffectOnce(() => {
     connectAndInitSleep();
   });
@@ -254,7 +249,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const handleSelectToken = useCallback(
     async (item: TTokenItem) => {
-      setLoadingModal({ open: true });
+      setGlobalLoading(true);
       const list = await getTokenList();
       const newItem = list.find((v) => v.symbol === item.symbol);
       if (newItem) {
@@ -281,9 +276,9 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           },
         });
       }
-      setLoadingModal({ open: false });
+      setGlobalLoading(false);
     },
-    [setLoadingModal, getTokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
+    [setGlobalLoading, getTokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
   );
 
   const handleCommonInputChange = useCallback(
@@ -538,7 +533,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           </CommonButton>
         )}
       </div>
-      {modal}
     </div>
   );
 }

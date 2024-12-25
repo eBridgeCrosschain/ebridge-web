@@ -17,6 +17,7 @@ import { AuthTokenSource, removeOneLocalJWT, resetLocalJWT } from 'utils/aelfAut
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { pubKeyToAddress } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
@@ -101,6 +102,7 @@ export function useIsAelfLogin() {
 }
 
 export function useAelfLogin() {
+  const { setGlobalLoading } = useGlobalLoading();
   const { connectWallet } = useConnectWallet();
   const isLogin = useIsAelfLogin();
 
@@ -109,13 +111,17 @@ export function useAelfLogin() {
   getAuthRef.current = getAuth;
 
   return useCallback(
-    async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void) => {
+    async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void, isStopLoading = false) => {
       if (isLogin) {
         if (isNeedGetJWT) {
           await getAuthRef.current(true, false);
         }
         await handleConnectedCallback?.();
         return;
+      }
+
+      if (isStopLoading) {
+        setGlobalLoading(false);
       }
 
       try {
@@ -128,7 +134,7 @@ export function useAelfLogin() {
         CommonMessage.error(handleWebLoginErrorMessage(error));
       }
     },
-    [connectWallet, isLogin],
+    [connectWallet, isLogin, setGlobalLoading],
   );
 }
 

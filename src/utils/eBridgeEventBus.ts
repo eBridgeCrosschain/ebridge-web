@@ -2,7 +2,13 @@ import EventEmitter from 'events';
 
 export const eventBus = new EventEmitter();
 
-const EventList = ['Unauthorized', 'AelfLoginSuccess', 'AelfLogoutSuccess', 'AelfAuthTokenSuccess'] as const;
+const EventList = [
+  'Unauthorized',
+  'AelfLoginSuccess',
+  'AelfLogoutSuccess',
+  'AelfAuthTokenSuccess',
+  'GlobalLoading',
+] as const;
 
 // eslint-disable-next-line no-new-func
 const eventsServer = new Function();
