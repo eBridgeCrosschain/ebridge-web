@@ -51,7 +51,7 @@ export default function CreationProgressModal({
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
   const createTokenContract = useCreateTokenContract();
-  const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | null>>({});
+  const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | undefined>>({});
 
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
