@@ -159,11 +159,11 @@ export default function CreationProgressModal({
           contractAddress: ERCChainConstants.constants.CREATE_TOKEN_CONTRACT,
           supply,
         };
-        const id = await prepareBindIssue(params);
-        if (!id) {
+        const res = await prepareBindIssue(params);
+        if (!res || !res.bindingId || !res.thirdTokenId) {
           throw new Error('Failed to prepare bind issue');
         }
-        return id;
+        return res;
       } catch (error: any) {
         error.shouldShowMessage = true;
         console.error(error);
