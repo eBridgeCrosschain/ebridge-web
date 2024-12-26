@@ -220,6 +220,7 @@
     "Liquidity": "總流動性",
     "Enter Amount": "輸入數量",
     "Search token": "搜尋代幣",
-    "Insufficient amount": "金额不足"
+    "Insufficient amount": "金额不足",
+    "You currently don’t have any positions in pools.": "您目前在池中沒有任何持倉。"
   }
 }

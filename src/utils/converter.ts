@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import i18n from 'i18n';
 
 const options = {
   zh: {
@@ -75,7 +74,7 @@ export const unitConverter = (
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
-  const { list, lastValue } = !i18n.language.includes('zh') ? options.en : options.zh;
+  const { list, lastValue } = options.en;
   if (abs.gt(lastValue)) {
     for (let i = 0; i < list.length - skipConverterIndex; i++) {
       const { value, symbol } = list[i];
@@ -116,7 +115,7 @@ export const unitConverterToFormat = (
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
-  const { list, lastValue } = !i18n.language.includes('zh') ? options.en : options.zh;
+  const { list, lastValue } = options.en;
   if (abs.gt(lastValue)) {
     for (let i = 0; i < list.length; i++) {
       const { value, symbol } = list[i];
@@ -151,4 +150,29 @@ export const percentConverter = (num: BigNumber.Value) => {
   if (bigNum.isNaN() || bigNum.lt(0) || bigNum.toFixed() === 'Infinity') return '0.00';
 
   return bigNum.gt(100) ? '100.00' : bigNum.toFixed(2);
+};
+
+export const showUSDConverter = (
+  ags:
+    | {
+        num?: Num;
+        decimals?: number;
+        defaultVal?: string;
+        minDecimals?: number;
+        skipConverterIndex?: number;
+      }
+    | Num
+    | undefined,
+) => {
+  let obj: any = {};
+  if (!BigNumber.isBigNumber(ags) && typeof ags === 'object') {
+    obj = ags;
+  } else {
+    obj.num = ags;
+  }
+  const { num } = obj;
+  const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
+
+  if (bigNum.isNaN() || bigNum.lte(0)) return '--';
+  return `$${unitConverter(obj)}`;
 };

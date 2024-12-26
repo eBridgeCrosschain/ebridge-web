@@ -219,6 +219,7 @@
     "Liquidity": "Liquidity",
     "Enter Amount": "Enter Amount",
     "Search token": "Search token",
-    "Insufficient amount": "Insufficient amount"
+    "Insufficient amount": "Insufficient amount",
+    "You currently don’t have any positions in pools.": "You currently don’t have any positions in pools."
   }
 }

@@ -7,7 +7,7 @@ import { formatSymbolAndNativeToken } from 'utils/token';
 import styles from './styles.module.less';
 import TokenLogo from 'components/TokenLogo';
 import IconFont from 'components/IconFont';
-import { unitConverter } from 'utils/converter';
+import { showUSDConverter } from 'utils/converter';
 
 const token: ColumnType<APIPoolItem> = {
   title: () => <Trans>Token</Trans>,
@@ -49,7 +49,7 @@ const yourLiquidity: ColumnType<APIPoolItem> = {
   ellipsis: true,
   dataIndex: 'myTvlInUsd',
   render: (myTvlInUsd) => {
-    return `$${unitConverter(myTvlInUsd)}`;
+    return showUSDConverter(myTvlInUsd);
   },
 };
 
@@ -60,7 +60,7 @@ const totalLiquidity: ColumnType<APIPoolItem> = {
   ellipsis: true,
   dataIndex: 'totalTvlInUsd',
   render: (totalTvlInUsd) => {
-    return `$${unitConverter(totalTvlInUsd)}`;
+    return showUSDConverter(totalTvlInUsd);
   },
 };
 

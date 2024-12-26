@@ -11,8 +11,6 @@ export function useConnect() {
   const dispatch = useModalDispatch();
   return useCallback(
     (chainType?: ChainType, chainId?: ChainId) => {
-      console.log(chainType, '===chainType');
-
       switch (chainType) {
         case 'ELF': {
           login();

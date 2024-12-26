@@ -24,16 +24,10 @@ export default function PoolList() {
   const activeAddresses = useActiveAddresses();
   const sortList = useMemo(
     () =>
-      poolList?.items
-        .filter((i) => {
-          if (checked) return ZERO.lt(i.myTvlInUsd ?? 0);
-          return true;
-        })
-        .sort((a, b) =>
-          ZERO.plus(b.totalTvlInUsd ?? 0)
-            .minus(a.totalTvlInUsd ?? 0)
-            .toNumber(),
-        ),
+      poolList?.items.filter((i) => {
+        if (checked) return ZERO.lt(i.myTvlInUsd ?? 0);
+        return true;
+      }),
     [checked, poolList?.items],
   );
   return (
@@ -56,6 +50,7 @@ export default function PoolList() {
         columns={columns}
         dataSource={sortList}
         scroll={{ x: 700 }}
+        emptyText={t('You currently don’t have any positions in pools.')}
         onRow={(record: APIPoolItem) => {
           return {
             onClick: () => push(`pool/${record.chainId}/${formatSymbolAndNativeToken(record.token?.symbol)}`),

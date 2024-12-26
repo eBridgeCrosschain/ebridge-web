@@ -7,7 +7,7 @@ import PoolList from './PoolList';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { usePoolOverview } from 'hooks/pools';
 import { TPoolOverview } from 'types/api';
-import { unitConverter } from 'utils/converter';
+import { showUSDConverter, unitConverter } from 'utils/converter';
 
 const OverviewCardList: (TPoolOverviewCardProps & {
   key: keyof TPoolOverview;
@@ -36,7 +36,10 @@ const Pools = () => {
   const overviewCardListMemo = useMemo(() => {
     return OverviewCardList.map((i) => {
       const isUSD = i.key.toUpperCase().includes('USD');
-      return { ...i, data: `${isUSD ? '$' : ''}${unitConverter(poolOverview?.[i.key])}` };
+      return {
+        ...i,
+        data: `${isUSD ? showUSDConverter(poolOverview?.[i.key]) : unitConverter(poolOverview?.[i.key])}`,
+      };
     });
   }, [poolOverview]);
 

@@ -29,18 +29,19 @@ export const addLiquidity = async ({
   const tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
 
   const bigAmount = timesDecimals(amount, tokenInfo?.decimals).toFixed(0);
+  if (!tokenInfo?.isNativeToken) {
+    const req = await checkApprove(
+      library,
+      (isELFChain(chainId) ? tokenInfo?.symbol : tokenInfo?.address) as string,
+      account,
+      poolContract.address || '',
+      bigAmount,
+      undefined,
+      isELFChain(chainId) ? tokenContract : undefined,
+    );
 
-  const req = await checkApprove(
-    library,
-    (isELFChain(chainId) ? tokenInfo?.symbol : tokenInfo?.address) as string,
-    account,
-    poolContract.address || '',
-    bigAmount,
-    undefined,
-    isELFChain(chainId) ? tokenContract : undefined,
-  );
-
-  if (req !== REQ_CODE.Success) throw req;
+    if (req !== REQ_CODE.Success) throw req;
+  }
   if (isELFChain(chainId)) {
     return poolContract?.callSendMethod('addLiquidity', account, {
       tokenSymbol: symbol,
