@@ -77,13 +77,13 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
         tokenContract,
       });
       if (req?.error) {
-        setResultModal({ open: true, type: ResultType.REJECTED });
+        setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onAddLiquidity });
       } else {
         setAmount('');
         setResultModal({ open: true, type: ResultType.APPROVED });
       }
     } catch (error) {
-      setResultModal({ open: true, type: ResultType.REJECTED });
+      setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onAddLiquidity });
     } finally {
       totalLiquidity.onGetTotalLiquidity();
       setLoadingModal({ open: false });

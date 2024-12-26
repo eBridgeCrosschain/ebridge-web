@@ -64,13 +64,13 @@ export default function RemovePool({ chainId, tokenInfo, price }: TRemovePoolPro
         chainId,
       });
       if (req?.error) {
-        setResultModal({ open: true, type: ResultType.REJECTED });
+        setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onRemoveLiquidity });
       } else {
         setAmount('');
         setResultModal({ open: true, type: ResultType.APPROVED });
       }
     } catch (error) {
-      setResultModal({ open: true, type: ResultType.REJECTED });
+      setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onRemoveLiquidity });
     } finally {
       totalLiquidity.onGetTotalLiquidity();
       myLiquidity.onGetMyLiquidity();

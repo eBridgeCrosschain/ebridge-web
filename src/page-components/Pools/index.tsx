@@ -41,7 +41,7 @@ const Pools = () => {
         data: `${
           isUSD
             ? showUSDConverter({ num: poolOverview?.[i.key], defaultVal: '$0.00' })
-            : unitConverter({ num: poolOverview?.[i.key], defaultVal: '0.00' })
+            : unitConverter(poolOverview?.[i.key])
         }`,
       };
     });
