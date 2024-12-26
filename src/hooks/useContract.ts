@@ -278,10 +278,10 @@ export function useCreateTokenContract(chainId?: ChainId) {
   return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
 }
 
-export function usePoolContract(chainId?: ChainId, address?: string) {
+export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {
   const contractAddress = useMemo(() => {
     return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
   }, [chainId]);
 
-  return useContract(address || contractAddress, POOLS_ABI, chainId);
+  return useContract(address || contractAddress, POOLS_ABI, chainId, isPortkey);
 }

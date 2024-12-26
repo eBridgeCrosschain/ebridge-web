@@ -35,12 +35,12 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
   const { t } = useLanguage();
 
   const [amount, setAmount] = useState<string>();
+  const web3Wallet = useWeb3Wallet(chainId);
 
-  const poolContract = usePoolContract(chainId);
-  const tokenContract = useTokenContract(chainId, tokenInfo?.address);
+  const poolContract = usePoolContract(chainId, undefined, web3Wallet?.isPortkey);
+  const tokenContract = useTokenContract(chainId, tokenInfo?.address, web3Wallet?.isPortkey);
   const totalLiquidity = usePoolTotalLiquidity({ poolContract, tokenContract, tokenInfo });
   const evmSwitchChain = useEVMSwitchChain();
-  const web3Wallet = useWeb3Wallet(chainId);
   const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
   const { account, library } = web3Wallet || {};
   const connect = useConnect();

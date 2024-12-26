@@ -3,7 +3,7 @@ import type { ColumnType } from 'antd/lib/table';
 import { Trans } from 'react-i18next';
 import { APIPoolItem } from 'types/api';
 import { getChainIdByAPI, getChainName, getIconByChainId } from 'utils/chain';
-import { formatSymbol } from 'utils/token';
+import { formatSymbolAndNativeToken } from 'utils/token';
 import styles from './styles.module.less';
 import TokenLogo from 'components/TokenLogo';
 import IconFont from 'components/IconFont';
@@ -20,7 +20,7 @@ const token: ColumnType<APIPoolItem> = {
     return (
       <Row className="flex-row-center">
         <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={token?.symbol} />
-        <div>{formatSymbol(token?.symbol)}</div>
+        <div>{formatSymbolAndNativeToken(token?.symbol)}</div>
       </Row>
     );
   },
@@ -49,7 +49,7 @@ const yourLiquidity: ColumnType<APIPoolItem> = {
   ellipsis: true,
   dataIndex: 'myTvlInUsd',
   render: (myTvlInUsd) => {
-    return `$${myTvlInUsd}`;
+    return `$${unitConverter(myTvlInUsd)}`;
   },
 };
 

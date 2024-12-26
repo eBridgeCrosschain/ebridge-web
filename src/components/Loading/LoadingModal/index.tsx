@@ -1,9 +1,8 @@
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import CommonModal from 'components/CommonModal';
-import CommonImage from 'components/CommonImage';
-import { loadingIcon } from 'assets/images';
 import styles from './styles.module.less';
+import { LoadingIcon } from '../LoadingIcon';
 
 export interface ILoadingModalProps {
   open?: boolean;
@@ -23,7 +22,7 @@ export default function LoadingModal({ open, title, description, hideTitle, hide
       closable={false}
       open={open || false}>
       <div className={clsx(styles['loading-modal-body'], 'flex-column-center')}>
-        <CommonImage className={styles['loading-icon']} src={loadingIcon} />
+        <LoadingIcon />
         {!hideDescription && (
           <div className={styles['loading-text']}>
             {description ||

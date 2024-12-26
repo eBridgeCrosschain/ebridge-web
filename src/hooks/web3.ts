@@ -85,6 +85,8 @@ export function useAElf(): Web3Type {
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
+    const isPortkey = walletType === 'PortkeyDiscover' ? true : false;
+    const _walletType = isPortkey ? 'PORTKEY' : 'NIGHTELF';
     return {
       ...contextNetwork,
       account: walletInfo?.address,
@@ -93,8 +95,9 @@ export function useAElf(): Web3Type {
       library: undefined,
       provider: undefined,
       loginWalletType: walletType,
-      walletType: 'NIGHTELF',
-      connector: walletInfo?.address ? 'NIGHT ELF' : undefined,
+      walletType: _walletType,
+      connector: walletInfo?.address ? _walletType : undefined,
+      isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
   return tmpContext;
@@ -186,10 +189,10 @@ export function useEVMSwitchChain() {
 }
 
 export function useActiveAddresses() {
-  const { account: tonAccount } = useTon();
+  // const { account: tonAccount } = useTon();
   const { account: aelfAccount } = useAElf();
   const { account: evmAccount } = useWeb3();
   return useMemo(() => {
-    return [evmAccount, tonAccount, aelfAccount].filter(Boolean).join(',');
-  }, [aelfAccount, evmAccount, tonAccount]);
+    return [evmAccount, aelfAccount].filter(Boolean).join(',');
+  }, [aelfAccount, evmAccount]);
 }
