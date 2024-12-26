@@ -128,7 +128,7 @@ function ListingApplication() {
       case ListingStep.INITIALIZE_TOKEN_POOL:
         return <InitializeTokenPool networks={networks} />;
       case ListingStep.ADD_TOKEN_POOL:
-        return <AddTokenPool id={id} onNext={handleNextStep} />;
+        return <AddTokenPool id={id} symbol={symbol} onNext={handleNextStep} />;
       case ListingStep.COMPLETE:
         return <ListingComplete />;
       default:
