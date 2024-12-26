@@ -148,7 +148,7 @@ export const percentConverter = (num: BigNumber.Value) => {
   let bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   bigNum = bigNum.times(100);
 
-  if (bigNum.isNaN() || bigNum.lt(0)) return '0.00';
+  if (bigNum.isNaN() || bigNum.lt(0) || bigNum.toFixed() === 'Infinity') return '0.00';
 
-  return bigNum.toFixed(2);
+  return bigNum.gt(100) ? '100.00' : bigNum.toFixed(2);
 };
