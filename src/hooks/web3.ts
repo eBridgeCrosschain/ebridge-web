@@ -85,6 +85,8 @@ export function useAElf(): Web3Type {
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
+    const isPortkey = walletType === 'PortkeyDiscover' ? true : false;
+    const _walletType = isPortkey ? 'PORTKEY' : 'NIGHTELF';
     return {
       ...contextNetwork,
       account: walletInfo?.address,
@@ -93,8 +95,9 @@ export function useAElf(): Web3Type {
       library: undefined,
       provider: undefined,
       loginWalletType: walletType,
-      walletType: 'NIGHTELF',
-      connector: walletInfo?.address ? 'NIGHT ELF' : undefined,
+      walletType: _walletType,
+      connector: walletInfo?.address ? _walletType : undefined,
+      isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
   return tmpContext;
