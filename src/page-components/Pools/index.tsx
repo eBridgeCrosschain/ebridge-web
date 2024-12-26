@@ -35,7 +35,8 @@ const Pools = () => {
   const { poolOverview } = usePoolOverview();
   const overviewCardListMemo = useMemo(() => {
     return OverviewCardList.map((i) => {
-      return { ...i, data: unitConverter(poolOverview?.[i.key]) };
+      const isUSD = i.key.toUpperCase().includes('USD');
+      return { ...i, data: `${isUSD ? '$' : ''}${unitConverter(poolOverview?.[i.key])}` };
     });
   }, [poolOverview]);
 

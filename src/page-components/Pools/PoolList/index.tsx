@@ -5,38 +5,63 @@ import { ColumnsType } from 'antd/lib/table';
 import { APIPoolItem } from 'types/api';
 import { useRouter } from 'next/router';
 import { usePoolList } from 'hooks/pools';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ZERO } from 'constants/misc';
+import { formatSymbolAndNativeToken } from 'utils/token';
+import { Checkbox, Row } from 'antd';
+import { useLanguage } from 'i18n';
+import clsx from 'clsx';
+import { useActiveAddresses } from 'hooks/web3';
 const columns: ColumnsType<any> = [Columns.token, Columns.network, Columns.yourLiquidity, Columns.totalLiquidity];
 
 const Pagination = { hideOnSinglePage: true, pageSize: 100 };
 
 export default function PoolList() {
+  const { t } = useLanguage();
   const { push } = useRouter();
-
+  const [checked, setChecked] = useState(false);
   const { poolList } = usePoolList();
+  const activeAddresses = useActiveAddresses();
   const sortList = useMemo(
     () =>
-      poolList?.items.sort((a, b) =>
-        ZERO.plus(b.totalTvlInUsd ?? 0)
-          .minus(a.totalTvlInUsd ?? 0)
-          .toNumber(),
-      ),
-    [poolList?.items],
+      poolList?.items
+        .filter((i) => {
+          if (checked) return ZERO.lt(i.myTvlInUsd ?? 0);
+          return true;
+        })
+        .sort((a, b) =>
+          ZERO.plus(b.totalTvlInUsd ?? 0)
+            .minus(a.totalTvlInUsd ?? 0)
+            .toNumber(),
+        ),
+    [checked, poolList?.items],
   );
   return (
-    <CommonTable
-      pagination={Pagination}
-      rowKey={(item: APIPoolItem) => item?.chainId + item?.token?.symbol}
-      className={styles.table}
-      columns={columns}
-      dataSource={sortList}
-      scroll={{ x: 700 }}
-      onRow={(record: APIPoolItem) => {
-        return {
-          onClick: () => push(`pool/${record.chainId}/${record.token?.symbol}`),
-        };
-      }}
-    />
+    <>
+      <Row className={clsx(styles['check-box-row'], 'flex-row-center')}>
+        <Checkbox
+          disabled={!activeAddresses}
+          className={styles['check-box']}
+          checked={checked}
+          onChange={(e) => {
+            setChecked(e.target.checked);
+          }}
+        />
+        <div>{t('Only show my positions')}</div>
+      </Row>
+      <CommonTable
+        pagination={Pagination}
+        rowKey={(item: APIPoolItem) => item?.chainId + item?.token?.symbol}
+        className={styles.table}
+        columns={columns}
+        dataSource={sortList}
+        scroll={{ x: 700 }}
+        onRow={(record: APIPoolItem) => {
+          return {
+            onClick: () => push(`pool/${record.chainId}/${formatSymbolAndNativeToken(record.token?.symbol)}`),
+          };
+        }}
+      />
+    </>
   );
 }

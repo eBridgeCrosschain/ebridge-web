@@ -37,8 +37,8 @@ export default function RemovePool({ chainId, tokenInfo, price }: TRemovePoolPro
   const web3Wallet = useWeb3Wallet(chainId);
   const evmSwitchChain = useEVMSwitchChain();
 
-  const poolContract = usePoolContract(chainId);
-  const tokenContract = useTokenContract(chainId, tokenInfo?.address);
+  const poolContract = usePoolContract(chainId, undefined, web3Wallet?.isPortkey);
+  const tokenContract = useTokenContract(chainId, tokenInfo?.address, web3Wallet?.isPortkey);
   const totalLiquidity = usePoolTotalLiquidity({ poolContract, tokenContract, tokenInfo });
   const myLiquidity = usePoolMyLiquidity({ poolContract, account: web3Wallet?.account, tokenInfo });
 
