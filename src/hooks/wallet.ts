@@ -18,6 +18,8 @@ import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { pubKeyToAddress } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import useGlobalLoading from 'hooks/useGlobalLoading';
+import { ROUTE_PATHS } from 'constants/link';
+import { useRouter } from 'next/router';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
@@ -103,8 +105,11 @@ export function useIsAelfLogin() {
 
 export function useAelfLogin() {
   const { setGlobalLoading } = useGlobalLoading();
+  const router = useRouter();
   const { connectWallet } = useConnectWallet();
   const isLogin = useIsAelfLogin();
+  const isLoginRef = useRef(isLogin);
+  isLoginRef.current = isLogin;
 
   const { getAuth } = useAelfAuthToken();
   const getAuthRef = useRef(getAuth);
@@ -112,8 +117,13 @@ export function useAelfLogin() {
 
   return useCallback(
     async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void, isStopLoading = false) => {
-      if (isLogin) {
-        if (isNeedGetJWT) {
+      const _isNeedGetJWT =
+        router.asPath?.includes(ROUTE_PATHS.LISTING_APPLICATION) ||
+        router.asPath?.includes(ROUTE_PATHS.MY_APPLICATIONS) ||
+        isNeedGetJWT;
+
+      if (isLoginRef.current) {
+        if (_isNeedGetJWT) {
           await getAuthRef.current(true, false);
         }
         await handleConnectedCallback?.();
@@ -126,7 +136,7 @@ export function useAelfLogin() {
 
       try {
         await connectWallet();
-        if (isNeedGetJWT) {
+        if (_isNeedGetJWT) {
           await getAuthRef.current(true, false);
         }
         await handleConnectedCallback?.();
@@ -134,7 +144,7 @@ export function useAelfLogin() {
         CommonMessage.error(handleWebLoginErrorMessage(error));
       }
     },
-    [connectWallet, isLogin, setGlobalLoading],
+    [connectWallet, router.asPath, setGlobalLoading],
   );
 }
 
@@ -156,20 +166,31 @@ export function useGetAccount() {
 }
 
 export function useAelfLogout() {
+  const router = useRouter();
   const chainDispatch = useChainDispatch();
-  const { disConnectWallet, connectWallet } = useConnectWallet();
+  const { disConnectWallet } = useConnectWallet();
+  const handleAelfLogin = useAelfLogin();
+  const handleAelfLoginRef = useRef(handleAelfLogin);
+  handleAelfLoginRef.current = handleAelfLogin;
 
   return useCallback(async () => {
     Promise.resolve(disConnectWallet()).then(async () => {
       console.log('onLogout');
-
+      eBridgeEventBus.AelfLogoutSuccess.emit();
       chainDispatch(setSelectERCWallet(undefined));
       clearWCStorageByDisconnect();
-      resetLocalJWT();
-      await sleep(500);
-      connectWallet();
+      resetLocalJWT(); // only remove aelf token
+
+      const _isNotNeedReLogin =
+        router.asPath?.includes(ROUTE_PATHS.LISTING_APPLICATION) ||
+        router.asPath?.includes(ROUTE_PATHS.MY_APPLICATIONS);
+
+      if (!_isNotNeedReLogin) {
+        await sleep(500);
+        handleAelfLoginRef.current();
+      }
     });
-  }, [chainDispatch, connectWallet, disConnectWallet]);
+  }, [chainDispatch, disConnectWallet, router.asPath]);
 }
 
 export function useGetWalletManagerStatus() {

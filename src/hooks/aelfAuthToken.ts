@@ -9,15 +9,25 @@ import { ExtraInfoForDiscover, WebLoginWalletInfo } from 'types/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { queryAuthApi } from 'utils/api/auth';
 import { service } from 'api/utils';
-import { getCaHashAndOriginChainIdByWallet, getManagerAddressByWallet } from './wallet';
+import { getCaHashAndOriginChainIdByWallet, getManagerAddressByWallet, useIsAelfLogin } from './wallet';
 import { recoverPubKey } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { useEffectOnce } from 'react-use';
 
 export function useAelfAuthToken() {
-  const { account, isActive, loginWalletType } = useAElf();
-  const { walletInfo, disConnectWallet, getSignature } = useConnectWallet();
+  const { account } = useAElf();
+  const { walletInfo, walletType, disConnectWallet, getSignature } = useConnectWallet();
+
+  const isAelfLogin = useIsAelfLogin();
+  const isAelfLoginRef = useRef(isAelfLogin);
+  isAelfLoginRef.current = isAelfLogin;
+
+  const loginWalletTypeRef = useRef(walletType);
+  loginWalletTypeRef.current = walletType;
+
+  const walletInfoRef = useRef(walletInfo);
+  walletInfoRef.current = walletInfo;
   // const { setLoading } = useLoading(); // TODO
 
   const loginSuccessActive = useCallback(() => {
@@ -36,9 +46,9 @@ export function useAelfAuthToken() {
       from: string;
     } | null;
 
-    if (loginWalletType === AelfWalletTypeEnum.discover) {
+    if (loginWalletTypeRef.current === AelfWalletTypeEnum.discover) {
       // discover
-      const discoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
+      const discoverInfo = walletInfoRef.current?.extraInfo as ExtraInfoForDiscover;
       if ((discoverInfo?.provider as any).methodCheck('wallet_getManagerSignature')) {
         const sin = await discoverInfo?.provider?.request({
           method: 'wallet_getManagerSignature',
@@ -59,7 +69,7 @@ export function useAelfAuthToken() {
           signInfo,
         });
       }
-    } else if (loginWalletType === AelfWalletTypeEnum.elf) {
+    } else if (loginWalletTypeRef.current === AelfWalletTypeEnum.elf) {
       // nightElf
       const signInfo = AElf.utils.sha256(plainTextHex);
       signResult = await getSignature({
@@ -80,32 +90,33 @@ export function useAelfAuthToken() {
     if (signResult?.error) throw signResult.errorMessage;
 
     return { signature: signResult?.signature || '', plainText: plainTextHex };
-  }, [account, getSignature, loginWalletType, walletInfo?.extraInfo]);
+  }, [account, getSignature]);
 
   const queryAuth = useCallback(
     async (isThrowError: boolean, isAfterErrorDisconnect: boolean): Promise<string | undefined> => {
-      if (!isActive || !loginWalletType) return;
+      if (!isAelfLoginRef.current || !loginWalletTypeRef.current) return;
       if (eBridgeInstance.obtainingSignature) return;
       try {
         // Mark: only one signature process can be performed at the same time
         eBridgeInstance.setObtainingSignature(true);
         const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
-          walletInfo as WebLoginWalletInfo,
-          loginWalletType,
+          walletInfoRef.current as WebLoginWalletInfo,
+          loginWalletTypeRef.current,
         );
         const signatureResult = await handleSignMessage();
         if (!signatureResult) throw Error('Signature error');
         const pubkey = recoverPubKey(signatureResult.plainText, signatureResult.signature) + '';
         const managerAddress = await getManagerAddressByWallet(
-          walletInfo as WebLoginWalletInfo,
-          loginWalletType,
+          walletInfoRef.current as WebLoginWalletInfo,
+          loginWalletTypeRef.current,
           pubkey,
         );
         const apiParams: QueryAuthApiExtraRequest = {
           pubkey,
           signature: signatureResult.signature,
           plain_text: signatureResult.plainText,
-          source: loginWalletType === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey,
+          source:
+            loginWalletTypeRef.current === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey,
           managerAddress: managerAddress,
           ca_hash: caHash || undefined,
           chain_id: originChainId || undefined,
@@ -113,7 +124,7 @@ export function useAelfAuthToken() {
 
         const authToken = await queryAuthApi(apiParams);
         eBridgeInstance.setUnauthorized(false);
-        console.log('login status isActive', isActive);
+        console.log('login status isAelfLoginRef.current', isAelfLoginRef.current);
         loginSuccessActive();
         return authToken;
       } catch (error: any) {
@@ -127,17 +138,24 @@ export function useAelfAuthToken() {
         eBridgeInstance.setObtainingSignature(false);
       }
     },
-    [isActive, walletInfo, loginWalletType, handleSignMessage, loginSuccessActive, disConnectWallet],
+    [handleSignMessage, loginSuccessActive, disConnectWallet],
   );
 
   const getAuth = useCallback(
     async (isThrowError: boolean, isAfterErrorDisconnect: boolean): Promise<string | undefined> => {
-      if (!isActive || !loginWalletType) return;
+      if (!isAelfLoginRef.current || !loginWalletTypeRef.current) return;
       if (eBridgeInstance.obtainingSignature) return;
       try {
-        const { caHash } = await getCaHashAndOriginChainIdByWallet(walletInfo as WebLoginWalletInfo, loginWalletType);
-        const managerAddress = await getManagerAddressByWallet(walletInfo as WebLoginWalletInfo, loginWalletType);
-        const source = loginWalletType === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey;
+        const { caHash } = await getCaHashAndOriginChainIdByWallet(
+          walletInfoRef.current as WebLoginWalletInfo,
+          loginWalletTypeRef.current,
+        );
+        const managerAddress = await getManagerAddressByWallet(
+          walletInfoRef.current as WebLoginWalletInfo,
+          loginWalletTypeRef.current,
+        );
+        const source =
+          loginWalletTypeRef.current === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey;
         const key = (caHash || source) + managerAddress;
         const data = getLocalJWT(key);
         // 1: local storage has JWT token
@@ -158,7 +176,7 @@ export function useAelfAuthToken() {
         return;
       }
     },
-    [isActive, loginSuccessActive, loginWalletType, queryAuth, walletInfo],
+    [loginSuccessActive, queryAuth],
   );
 
   return { getAuth, queryAuth, loginSuccessActive };
@@ -167,12 +185,20 @@ export function useAelfAuthToken() {
 export function useSetAelfAuthFromStorage() {
   const { loginWalletType } = useAElf();
   const { walletInfo } = useConnectWallet();
+  const walletInfoRef = useRef(walletInfo);
+  walletInfoRef.current = walletInfo;
 
   return useCallback(async () => {
-    if (!walletInfo || loginWalletType === AelfWalletTypeEnum.unknown || !loginWalletType) return false;
+    if (!walletInfoRef.current || loginWalletType === AelfWalletTypeEnum.unknown || !loginWalletType) return false;
 
-    const { caHash } = await getCaHashAndOriginChainIdByWallet(walletInfo as WebLoginWalletInfo, loginWalletType);
-    const managerAddress = await getManagerAddressByWallet(walletInfo as WebLoginWalletInfo, loginWalletType);
+    const { caHash } = await getCaHashAndOriginChainIdByWallet(
+      walletInfoRef.current as WebLoginWalletInfo,
+      loginWalletType,
+    );
+    const managerAddress = await getManagerAddressByWallet(
+      walletInfoRef.current as WebLoginWalletInfo,
+      loginWalletType,
+    );
     const source = loginWalletType === AelfWalletTypeEnum.elf ? AuthTokenSource.NightElf : AuthTokenSource.Portkey;
     const key = (caHash || source) + managerAddress;
     const data = getLocalJWT(key);
@@ -185,12 +211,14 @@ export function useSetAelfAuthFromStorage() {
     }
 
     return false;
-  }, [loginWalletType, walletInfo]);
+  }, [loginWalletType]);
 }
 
 export function useShowLoginButtonLoading() {
   const { isConnected, walletInfo } = useConnectWallet();
   const [loading, setLoading] = useState<boolean>(true);
+  const walletInfoRef = useRef(walletInfo);
+  walletInfoRef.current = walletInfo;
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const stopLoading = useCallback(() => {
@@ -201,7 +229,7 @@ export function useShowLoginButtonLoading() {
   }, []);
 
   useEffectOnce(() => {
-    if (isConnected && !walletInfo) {
+    if (isConnected && !walletInfoRef.current) {
       stopLoading();
     } else {
       setLoading(false);
