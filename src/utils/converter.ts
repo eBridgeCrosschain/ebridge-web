@@ -170,9 +170,9 @@ export const showUSDConverter = (
   } else {
     obj.num = ags;
   }
-  const { num } = obj;
+  const { num, defaultVal } = obj;
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
 
-  if (bigNum.isNaN() || bigNum.lte(0)) return '--';
+  if (bigNum.isNaN() || bigNum.lte(0)) return defaultVal || '--';
   return `$${unitConverter(obj)}`;
 };

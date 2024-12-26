@@ -43,16 +43,16 @@ export const NAV_LIST = [
     href: ROUTE_PATHS.BRIDGE,
   },
   {
-    icon: transactionsIcon,
-    selectedIcon: transactionsBlueIcon,
-    title: 'Transactions',
-    href: ROUTE_PATHS.TRANSACTIONS,
-  },
-  {
     icon: poolsIcon,
     selectedIcon: poolsBlueIcon,
     title: 'Pools',
     href: ROUTE_PATHS.POOLS,
+  },
+  {
+    icon: transactionsIcon,
+    selectedIcon: transactionsBlueIcon,
+    title: 'Transactions',
+    href: ROUTE_PATHS.TRANSACTIONS,
   },
 ];
 

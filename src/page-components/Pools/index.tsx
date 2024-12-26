@@ -38,7 +38,11 @@ const Pools = () => {
       const isUSD = i.key.toUpperCase().includes('USD');
       return {
         ...i,
-        data: `${isUSD ? showUSDConverter(poolOverview?.[i.key]) : unitConverter(poolOverview?.[i.key])}`,
+        data: `${
+          isUSD
+            ? showUSDConverter({ num: poolOverview?.[i.key], defaultVal: '$0.00' })
+            : unitConverter({ num: poolOverview?.[i.key], defaultVal: '0.00' })
+        }`,
       };
     });
   }, [poolOverview]);
