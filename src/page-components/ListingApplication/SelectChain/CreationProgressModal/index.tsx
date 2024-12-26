@@ -182,17 +182,17 @@ export default function CreationProgressModal({
         if (!createTokenContract) {
           throw new Error('No create token contract found');
         }
-        const txHash = await createToken({
+        const res = await createToken({
           createTokenContract,
           account: evmAccount,
           name: chain.tokenName,
           symbol: chain.symbol,
           initialSupply: Number(supply),
         });
-        if (!txHash) {
+        if (!res || !res.transactionHash) {
           throw new Error('Failed to create token');
         }
-        return txHash;
+        return res.transactionHash;
       } catch (error) {
         console.error(error);
         throw error;
