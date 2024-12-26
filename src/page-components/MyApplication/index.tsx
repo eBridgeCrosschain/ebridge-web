@@ -13,7 +13,7 @@ import { backIcon } from 'assets/images';
 import { BUTTON_TEXT_BACK } from 'constants/misc';
 import { MY_APPLICATIONS } from 'constants/listingApplication';
 import { useRouter } from 'next/router';
-import { CONTACT_US_FORM_URL, ROUTE_PATHS } from 'constants/link';
+import { CONTACT_US_FORM_URL } from 'constants/link';
 import { openWithBlank } from 'utils/link';
 import { sleep } from 'utils';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
@@ -96,10 +96,6 @@ function MyApplications() {
   const initRef = useRef(init);
   initRef.current = init;
 
-  const handleResetList = useCallback(async () => {
-    await getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
-  }, [getApplicationData]);
-
   const connectAndInit = useCallback(() => {
     if (!isActive) {
       handleAelfLogin(true, initRef.current);
@@ -153,7 +149,7 @@ function MyApplications() {
   return (
     <div className={clsx('page-content', 'main-page-content-wrap', styles['my-applications-page-container-wrapper'])}>
       {!isMd && (
-        <div className={styles['my-applications-page-back']} onClick={() => router.push(ROUTE_PATHS.HOME)}>
+        <div className={styles['my-applications-page-back']} onClick={() => router.back()}>
           <CommonImage className={styles['my-applications-page-back-icon']} src={backIcon} />
           <div className={styles['my-applications-page-back-text']}>{BUTTON_TEXT_BACK}</div>
         </div>
@@ -175,7 +171,6 @@ function MyApplications() {
           tableOnChange={tableOnChange}
           maxResultCount={maxResultCount}
           skipPageCount={skipPageCount}
-          onResetList={handleResetList}
         />
       </div>
     </div>

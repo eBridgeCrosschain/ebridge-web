@@ -33,10 +33,13 @@ import { useThrottleCallback } from 'hooks';
 import { usePoolContract, useTokenContract } from 'hooks/useContract';
 import { addLiquidity } from 'utils/pools';
 import { ResultType } from 'components/Loading/ResultModal';
-import { getChainType } from 'utils/chain';
+import { getChainIdByAPI, getChainType } from 'utils/chain';
+import { useTokenPrice } from 'hooks/token';
+import { ROUTE_PATHS } from 'constants/link';
 
 export interface AddTokenPoolProps {
   id?: string;
+  symbol?: string;
   onNext?: () => void;
 }
 
@@ -46,9 +49,7 @@ const AlreadyPoolAddedStatus = [
   ApplicationChainStatusEnum.LiquidityAdded,
 ];
 
-// const DefaultTokenInfo = { symbol: '', icon: '', dailyLimit: '0.00', rateLimit: '0.00', decimals: 0 };
-
-function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
+function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
   const router = useRouter();
   const currentId = useMemo(() => {
     if (router.query?.id && typeof router.query?.id === 'string') {
@@ -56,6 +57,13 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     }
     return id || '';
   }, [router.query?.id, id]);
+  const currentSymbol = useMemo(() => {
+    if (router.query?.symbol && typeof router.query?.symbol === 'string') {
+      return router.query?.symbol;
+    }
+    return symbol || '';
+  }, [router.query?.symbol, symbol]);
+
   const isMd = useMediaQueries('md');
   const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
 
@@ -72,24 +80,33 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
 
   // page data
   const [currentChainId, setCurrentChainId] = useState<TBridgeChainId>();
-  const [currentAccount, setCurrentAccount] = useState<string>();
+  const currentChainIdFormat = useMemo(() => getChainIdByAPI((currentChainId as string) || ''), [currentChainId]);
+  const currentAccount = useMemo(() => {
+    if (isELFChain(currentChainIdFormat)) {
+      return aelfAccount;
+    } else {
+      return web3Account;
+    }
+  }, [aelfAccount, currentChainIdFormat, web3Account]);
   const [tokenInfoList, setTokenInfoList] = useState<TApplicationDetailItemChainTokenInfo[]>([]);
   const [currentTokenInfo, setCurrentTokenInfo] = useState<TApplicationDetailItemChainTokenInfo | undefined>();
   const [tokenPoolSteps, setTokenPoolSteps] = useState<ICommonStepsProps['stepItems']>([]);
   const [currentStep, setCurrentStep] = useState(0); // TODO
+  const alreadySetCurrentStepRef = useRef(false);
   const [addTokenPoolCount, setAddTokenPoolCount] = useState(0);
   const [submitDisabled, setSubmitDisable] = useState(true);
   const [amount, setAmount] = useState<string>();
+  const { price } = useTokenPrice(currentSymbol);
   const [[balance]] = useBalances(
     useMemo(() => {
-      return isELFChain(currentChainId)
-        ? { ...aelfWallet, chainId: currentChainId }
-        : { ...web3Wallet, chainId: currentChainId };
-    }, [aelfWallet, currentChainId, web3Wallet]),
+      return isELFChain(currentChainIdFormat)
+        ? { ...aelfWallet, chainId: currentChainIdFormat }
+        : { ...web3Wallet, chainId: currentChainIdFormat };
+    }, [aelfWallet, currentChainIdFormat, web3Wallet]),
     useMemo(() => {
-      if (isELFChain(currentChainId)) return [currentTokenInfo?.symbol];
+      if (isELFChain(currentChainIdFormat)) return [currentTokenInfo?.symbol];
       return [currentTokenInfo?.tokenContractAddress];
-    }, [currentChainId, currentTokenInfo?.symbol, currentTokenInfo?.tokenContractAddress]),
+    }, [currentChainIdFormat, currentTokenInfo?.symbol, currentTokenInfo?.tokenContractAddress]),
   );
   const showBalance = useMemo(
     () => divDecimals(balance, currentTokenInfo?.decimals),
@@ -97,25 +114,25 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
   );
   const min = useMemo(() => divDecimals(1, currentTokenInfo?.decimals), [currentTokenInfo?.decimals]);
   const max = useMemo(
-    () => getMaxAmount({ chainId: currentChainId, symbol: currentTokenInfo?.symbol, balance: showBalance }),
-    [currentChainId, currentTokenInfo?.symbol, showBalance],
+    () => getMaxAmount({ chainId: currentChainIdFormat, symbol: currentTokenInfo?.symbol, balance: showBalance }),
+    [currentChainIdFormat, currentTokenInfo?.symbol, showBalance],
   );
   const showError = useMemo(() => amount && currentAccount && max.lt(amount), [amount, currentAccount, max]);
   const poolContract = usePoolContract(
     useMemo(() => {
-      return currentChainId;
-    }, [currentChainId]),
+      return currentChainIdFormat;
+    }, [currentChainIdFormat]),
     undefined,
-    web3Wallet?.isPortkey,
+    aelfWallet?.isPortkey,
   );
   const tokenContract = useTokenContract(
     useMemo(() => {
-      return currentChainId;
-    }, [currentChainId]),
+      return currentChainIdFormat;
+    }, [currentChainIdFormat]),
     useMemo(() => {
       return currentTokenInfo?.tokenContractAddress;
     }, [currentTokenInfo?.tokenContractAddress]),
-    web3Wallet?.isPortkey,
+    aelfWallet?.isPortkey,
   );
 
   const tipNode = useMemo(() => {
@@ -141,68 +158,71 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     ) : null;
   }, [currentTokenInfo?.dailyLimit, currentTokenInfo?.rateLimit, currentTokenInfo?.symbol, isMd]);
 
-  const getData = useCallback(
-    async (id: string) => {
-      if (!isAelfActive) return;
-      try {
-        // isLoading && setLoading(true); // TODO
+  const getData = useCallback(async () => {
+    if (!isAelfActive) return;
+    try {
+      // isLoading && setLoading(true); // TODO
 
-        await setAelfAuthFromStorage();
-        await sleep(500);
-        const res = await getApplicationDetail({ id });
+      await setAelfAuthFromStorage();
+      await sleep(500);
+      const res = await getApplicationDetail({ id: currentId, symbol: currentSymbol });
 
-        const chainTokenInfos = res[0]?.chainTokenInfo || [];
-        const otherChainTokenInfos = res[0]?.otherChainTokenInfo;
-        let concatList = [];
-        if (otherChainTokenInfos) {
-          concatList = chainTokenInfos?.concat([otherChainTokenInfos]);
-        } else {
-          concatList = chainTokenInfos;
-        }
-
-        if (concatList.length === 0) {
-          router.push('/my-applications');
-          return;
-        }
-        setTokenInfoList(concatList);
-        const _list: ICommonStepsProps['stepItems'] = [];
-        concatList.forEach((item, index) => {
-          _list.push({
-            title: 'Add pool on ' + item.chainName,
-          });
-
-          if (!AlreadyPoolAddedStatus.includes(item.status)) {
-            setCurrentStep(index);
-            setCurrentTokenInfo(item);
-            setCurrentChainId(item.chainId as TBridgeChainId);
-            if (isELFChain(item.chainId as TBridgeChainId)) {
-              setCurrentAccount(aelfAccount);
-            } else {
-              setCurrentAccount(web3Account);
-            }
-          }
-        });
-        setTokenPoolSteps(_list);
-
-        // submit but disable
-        const unfinishedAelfTokenPool = concatList?.find((item) => !AlreadyPoolAddedStatus.includes(item.status));
-        if (unfinishedAelfTokenPool?.chainId) {
-          setSubmitDisable(true);
-        } else {
-          setSubmitDisable(false);
-        }
-      } catch (error) {
-        console.log('InitializeLiquidityPool getData error', error);
-      } finally {
-        // setLoading(false);
+      const chainTokenInfos = res[0]?.chainTokenInfo || [];
+      const otherChainTokenInfos = res[0]?.otherChainTokenInfo;
+      let concatList = [];
+      if (otherChainTokenInfos) {
+        concatList = chainTokenInfos?.concat([otherChainTokenInfos]);
+      } else {
+        concatList = chainTokenInfos;
       }
-    },
-    [aelfAccount, isAelfActive, router, setAelfAuthFromStorage, web3Account],
-  );
+
+      if (concatList.length === 0) {
+        router.push(ROUTE_PATHS.MY_APPLICATIONS);
+        return;
+      }
+
+      // if all chain-pool is not initialized, go my-applications page
+      const _poolInitializingList = concatList.filter(
+        (item) => item.status === ApplicationChainStatusEnum.PoolInitializing,
+      );
+      if (_poolInitializingList.length === concatList.length) {
+        router.push(ROUTE_PATHS.MY_APPLICATIONS);
+        return;
+      }
+
+      setTokenInfoList(concatList);
+      const _list: ICommonStepsProps['stepItems'] = [];
+      concatList.forEach((item, index) => {
+        _list.push({
+          title: 'Add pool on ' + item.chainName,
+        });
+
+        if (!alreadySetCurrentStepRef.current && !AlreadyPoolAddedStatus.includes(item.status)) {
+          setCurrentStep(index);
+          alreadySetCurrentStepRef.current = true;
+          setCurrentTokenInfo(item);
+          setCurrentChainId(item.chainId as TBridgeChainId);
+        }
+      });
+      setTokenPoolSteps(_list);
+
+      // submit but disable
+      const unfinishedAelfTokenPool = concatList?.find((item) => !AlreadyPoolAddedStatus.includes(item.status));
+      if (unfinishedAelfTokenPool?.chainId) {
+        setSubmitDisable(true);
+      } else {
+        setSubmitDisable(false);
+      }
+    } catch (error) {
+      console.log('InitializeLiquidityPool getData error', error);
+    } finally {
+      // setLoading(false);
+    }
+  }, [currentId, currentSymbol, isAelfActive, router, setAelfAuthFromStorage]);
 
   const init = useCallback(async () => {
     if (currentId) {
-      await getData(currentId);
+      await getData();
     } else {
       router.replace(`/listing/${LISTING_STEP_PATHNAME_MAP[ListingStep.TOKEN_INFORMATION]}`);
     }
@@ -262,27 +282,32 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
   const renderMainContent = useMemo(() => {
     return (
       <div className={styles['token-pool-steps-wrapper']}>
-        <CommonSteps
-          className={styles['token-pool-steps']}
-          stepItems={tokenPoolSteps}
-          current={currentStep}
-          direction={'vertical'}
-        />
+        {tokenInfoList.length === 0 ? null : tokenInfoList.length > 1 ? (
+          <CommonSteps
+            className={styles['token-pool-steps']}
+            stepItems={tokenPoolSteps}
+            current={currentStep}
+            direction={isMd ? 'vertical' : 'horizontal'}
+          />
+        ) : (
+          <div className={styles['token-pool-step-title']}>{tokenPoolSteps?.[0].title}</div>
+        )}
       </div>
     );
-  }, [currentStep, tokenPoolSteps]);
+  }, [currentStep, isMd, tokenInfoList.length, tokenPoolSteps]);
 
   const onAddLiquidity = useThrottleCallback(async () => {
     try {
-      if (!currentChainId || !currentTokenInfo || !currentAccount || !tokenContract || !poolContract || !amount) return;
+      if (!currentChainIdFormat || !currentTokenInfo || !currentAccount || !tokenContract || !poolContract || !amount)
+        return;
       setLoadingModal({ open: true });
       const req = await addLiquidity({
         symbol: currentTokenInfo?.symbol,
         amount: amount,
         account: currentAccount,
-        library: isELFChain(currentChainId) ? aelfLibrary : web3Library,
+        library: isELFChain(currentChainIdFormat) ? aelfLibrary : web3Library,
         poolContract,
-        chainId: currentChainId,
+        chainId: currentChainIdFormat,
         tokenContract,
       });
       if (req.error) {
@@ -302,7 +327,7 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     aelfLibrary,
     amount,
     currentAccount,
-    currentChainId,
+    currentChainIdFormat,
     currentTokenInfo,
     poolContract,
     setLoadingModal,
@@ -313,8 +338,8 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
 
   const onSubmit = useCallback(async () => {
     try {
-      if (!currentChainId) return;
-      const res = await changeAddLiquidityStatus({ orderId: currentId, chainId: currentChainId });
+      if (!currentChainId || !amount) return;
+      const res = await changeAddLiquidityStatus({ orderId: currentId, chainId: currentChainId, amount });
       if (res) {
         onNext?.();
       } else {
@@ -323,23 +348,23 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     } catch (error) {
       setResultModal({ open: true, type: ResultType.REJECTED, approvedDescription: SERVICE_BUSY_TIP });
     }
-  }, [currentChainId, currentId, onNext, setResultModal]);
+  }, [amount, currentChainId, currentId, onNext, setResultModal]);
 
   const btnProps = useMemo(() => {
     let children = 'Enter Amount';
     let disabled = submitDisabled;
     let onClick = onAddLiquidity;
 
-    if (!currentAccount && currentChainId) {
-      onClick = () => connect(getChainType(currentChainId), currentChainId);
+    if (!currentAccount && currentChainIdFormat) {
+      onClick = () => connect(getChainType(currentChainIdFormat), currentChainIdFormat);
       children = 'Connect';
       disabled = false;
       return { children, disabled, onClick };
     }
 
-    if (max.lt(amount ?? '0') && currentChainId) {
+    if (max.lt(amount ?? '0') && currentChainIdFormat) {
       disabled = true;
-      onClick = () => connect(getChainType(currentChainId), currentChainId);
+      onClick = () => connect(getChainType(currentChainIdFormat), currentChainIdFormat);
       children = 'Insufficient balance';
       return { children, disabled, onClick };
     }
@@ -350,12 +375,20 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     }
 
     return { children, disabled, onClick };
-  }, [amount, connect, currentAccount, currentChainId, max, onAddLiquidity, submitDisabled]);
+  }, [amount, connect, currentAccount, currentChainIdFormat, max, onAddLiquidity, submitDisabled]);
+
+  const inputAmountPlaceholder = useMemo(() => {
+    if (!currentTokenInfo?.minAmount) return 'Min 0';
+
+    return 'Min ' + ZERO.plus(currentTokenInfo?.minAmount).times(price);
+  }, [currentTokenInfo?.minAmount, price]);
 
   const renderInputAmountContent = useMemo(() => {
     return (
       <div className={styles['token-pool-input-container']}>
         <CommonAmountRow
+          inputWrapClassName={styles['token-pool-input-wrap']}
+          placeholder={inputAmountPlaceholder}
           showBalance={!!currentAccount}
           showError={!!showError}
           value={amount}
@@ -365,21 +398,32 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
           rightHeaderTitle={`${unitConverter(showBalance)} ${formatSymbol(currentTokenInfo?.symbol)}`}
           rightInputEle={
             <Row className={clsx('flex-row-center', styles['token-logo-row'], 'font-family-medium')}>
-              <TokenLogo className={styles['token-logo']} chainId={currentChainId} symbol={currentTokenInfo?.symbol} />
+              <TokenLogo
+                className={styles['token-logo']}
+                chainId={currentChainIdFormat}
+                symbol={currentTokenInfo?.symbol}
+                src={currentTokenInfo?.icon}
+              />
               <div>{formatSymbol(currentTokenInfo?.symbol)}</div>
             </Row>
           }
         />
+        <div className={styles['estimated-value']}>
+          {`Estimated value: $ ${unitConverter(ZERO.plus(amount ?? 0).times(price))}`}
+        </div>
       </div>
     );
   }, [
     amount,
     currentAccount,
-    currentChainId,
+    currentChainIdFormat,
     currentTokenInfo?.decimals,
+    currentTokenInfo?.icon,
     currentTokenInfo?.symbol,
+    inputAmountPlaceholder,
     max,
     min,
+    price,
     showBalance,
     showError,
   ]);

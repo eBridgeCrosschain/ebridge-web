@@ -199,7 +199,8 @@ export type TMyApplicationChainTokenInfo = {
 };
 
 export type TGetApplicationDetailRequest = {
-  id?: string;
+  id: string;
+  symbol: string;
   network?: string;
 };
 
@@ -270,6 +271,7 @@ export type TGetTokenPriceResult = {
 export type TChangeAddLiquidityStatusRequest = {
   orderId: string;
   chainId: TBridgeChainId;
+  amount: string;
 };
 
 export type TChangeAddLiquidityStatusResult = {

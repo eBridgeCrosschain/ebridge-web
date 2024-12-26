@@ -23,6 +23,14 @@
   margin-top: 32px;
   margin-bottom: 32px;
 
+  .token-pool-step-title {
+    font-size: 14px;
+    line-height: 22px;
+    text-align: left;
+    color: @font-15;
+    .font-family-medium();
+  }
+
   .token-pool-steps {
     :global {
       .@{app-prefix}-steps-item {
@@ -51,6 +59,39 @@
       }
     }
   }
+}
+
+.token-pool-input-wrap {
+  height: 56px;
+
+  :global {
+    .@{app-prefix}-input,
+    .@{app-prefix}-input-affix-wrapper {
+      padding: 0 !important;
+      border: 0 !important;
+      color: @font-17 !important;
+      font-size: 20px !important;
+      line-height: 24px !important;
+    }
+  }
+}
+
+.token-logo-row {
+  font-size: 20px;
+  line-height: 24px;
+  .token-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+}
+
+.estimated-value {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: @font-15;
 }
 
 .action-btn-wrapper {
