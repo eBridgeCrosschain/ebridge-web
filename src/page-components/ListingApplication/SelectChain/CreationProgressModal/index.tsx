@@ -14,6 +14,7 @@ import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
 import { useCreateTokenContract } from 'hooks/useContract';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
 import { ERCChainConstants } from 'constants/ChainConstants';
+import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
 
 export interface ICreationProgressModalProps {
@@ -153,7 +154,7 @@ export default function CreationProgressModal({
         const params: TPrepareBindIssueRequest = {
           address: evmAccount,
           symbol: chain.symbol,
-          chainId: 'AELF',
+          chainId: CHAIN_ID_MAP[SupportedELFChainId.AELF],
           otherChainId: chain.chainId,
           contractAddress: ERCChainConstants.constants.CREATE_TOKEN_CONTRACT,
           supply,
