@@ -147,12 +147,15 @@ export default function CreationProgressModal({
         if (!evmAccount) {
           throw new Error('No address found');
         }
+        if (!ERCChainConstants.constants.CREATE_TOKEN_CONTRACT) {
+          throw new Error('No create token contract found');
+        }
         const params: TPrepareBindIssueRequest = {
           address: evmAccount,
           symbol: chain.symbol,
           chainId: 'AELF',
           otherChainId: chain.chainId,
-          contractAddress: ERCChainConstants.constants.BRIDGE_CONTRACT,
+          contractAddress: ERCChainConstants.constants.CREATE_TOKEN_CONTRACT,
           supply,
         };
         const id = await prepareBindIssue(params);
