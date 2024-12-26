@@ -24,6 +24,7 @@ export const getListingUrl = (step: ListingStep, params?: TSearchParams) => {
         break;
       case ListingStep.ADD_TOKEN_POOL:
         search = queryString.stringify({
+          symbol: params.symbol,
           id: params.id,
         });
         break;

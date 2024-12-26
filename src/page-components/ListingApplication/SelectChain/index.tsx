@@ -390,7 +390,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   }, [issuingOtherChains, unissuedOtherChains]);
 
   const handleJump = useCallback(
-    ({ networksString, id }: { networksString: string; id?: string }) => {
+    ({ networksString, id, _symbol }: { networksString: string; id?: string; _symbol: string }) => {
       if (
         id &&
         hasDisabledAELFChain &&
@@ -398,6 +398,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         formData[SelectChainFormKeys.OTHER_CHAINS].length === 0
       ) {
         const replaceUrl = getListingUrl(ListingStep.ADD_TOKEN_POOL, {
+          symbol: _symbol,
           id,
         });
         router.replace(replaceUrl);
@@ -436,7 +437,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         const networks = [...aelfNetworks, ...otherNetworks];
         const networksString = JSON.stringify(networks);
         const id = data?.chainList?.[0]?.id;
-        handleJump({ networksString, id });
+        handleJump({ networksString, id, _symbol: token.symbol });
       } catch (error: any) {
         CommonMessage.error(error.message);
       } finally {
