@@ -105,8 +105,8 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
     }, [aelfWallet, currentChainIdFormat, web3Wallet]),
     useMemo(() => {
       if (isELFChain(currentChainIdFormat)) return [currentTokenInfo?.symbol];
-      return [currentTokenInfo?.tokenContractAddress];
-    }, [currentChainIdFormat, currentTokenInfo?.symbol, currentTokenInfo?.tokenContractAddress]),
+      return [currentTokenInfo?.contractAddress];
+    }, [currentChainIdFormat, currentTokenInfo?.symbol, currentTokenInfo?.contractAddress]),
   );
   const showBalance = useMemo(
     () => divDecimals(balance, currentTokenInfo?.decimals),
@@ -130,8 +130,8 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
       return currentChainIdFormat;
     }, [currentChainIdFormat]),
     useMemo(() => {
-      return currentTokenInfo?.tokenContractAddress;
-    }, [currentTokenInfo?.tokenContractAddress]),
+      return currentTokenInfo?.contractAddress;
+    }, [currentTokenInfo?.contractAddress]),
     aelfWallet?.isPortkey,
   );
 
