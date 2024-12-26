@@ -389,26 +389,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     });
   }, [issuingOtherChains, unissuedOtherChains]);
 
-  const handleJump = useCallback(
-    ({ networksString, id, _symbol }: { networksString: string; id?: string; _symbol: string }) => {
-      if (
-        id &&
-        hasDisabledAELFChain &&
-        formData[SelectChainFormKeys.AELF_CHAINS].length !== 0 &&
-        formData[SelectChainFormKeys.OTHER_CHAINS].length === 0
-      ) {
-        const replaceUrl = getListingUrl(ListingStep.INITIALIZE_TOKEN_POOL, {
-          symbol: _symbol,
-          id,
-        });
-        router.replace(replaceUrl);
-      } else {
-        handleNextStep({ networks: networksString });
-      }
-    },
-    [formData, hasDisabledAELFChain, router, handleNextStep],
-  );
-
   const handleAddChain = useCallback(
     async ({ errorOtherChainIds }: { errorOtherChainIds?: string[] } = {}) => {
       if (!token?.symbol) return;
@@ -436,15 +416,14 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
           }));
         const networks = [...aelfNetworks, ...otherNetworks];
         const networksString = JSON.stringify(networks);
-        const id = data?.chainList?.[0]?.id;
-        handleJump({ networksString, id, _symbol: token.symbol });
+        handleNextStep({ networks: networksString });
       } catch (error: any) {
         CommonMessage.error(error.message);
       } finally {
         setGlobalLoading(false);
       }
     },
-    [formData, handleJump, setGlobalLoading, token?.symbol],
+    [formData, handleNextStep, setGlobalLoading, token?.symbol],
   );
 
   const handleCreationProgressModalClose = useCallback(() => {
