@@ -105,6 +105,8 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     useMemo(() => {
       return currentChainId;
     }, [currentChainId]),
+    undefined,
+    web3Wallet?.isPortkey,
   );
   const tokenContract = useTokenContract(
     useMemo(() => {
@@ -113,6 +115,7 @@ function AddTokenPool({ id, onNext }: AddTokenPoolProps) {
     useMemo(() => {
       return currentTokenInfo?.tokenContractAddress;
     }, [currentTokenInfo?.tokenContractAddress]),
+    web3Wallet?.isPortkey,
   );
 
   const tipNode = useMemo(() => {
