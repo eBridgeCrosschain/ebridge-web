@@ -46,14 +46,22 @@
   .token-list {
     overflow: auto;
     .token-item {
+      flex-wrap: nowrap;
       padding: 13px @margin-left-right-web;
       line-height: 24px;
       .font-family-medium();
       .token-logo {
+        flex: none;
         width: 24px;
         height: 24px;
         margin-right: 8px;
         border-radius: 50%;
+      }
+      .token-name {
+        overflow: hidden;
+        flex-shrink: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       &:hover {
         background: @bg-15;

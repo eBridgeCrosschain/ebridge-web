@@ -87,7 +87,7 @@ function SelectToken<T>({
                 [styles['token-item-selected']]: item.symbol === selectSymbol,
               })}>
               <TokenLogo className={styles['token-logo']} chainId={chainId} src={item.icon} symbol={item.symbol} />
-              {formatSymbol(item.displaySymbol || item.symbol)}
+              <span className={styles['token-name']}>{formatSymbol(item.displaySymbol || item.symbol)}</span>
             </Row>
           );
         })}
