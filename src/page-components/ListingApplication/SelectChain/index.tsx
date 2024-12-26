@@ -424,7 +424,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
           throw new Error('Failed to add chain');
         }
         const aelfNetworks = formData[SelectChainFormKeys.AELF_CHAINS]
-          .filter((item) => data?.chainList?.some((v) => v.chainId === item.chainId))
+          .filter((item) => !data?.chainList || data.chainList.some((v) => v.chainId === item.chainId))
           .map((v) => ({
             name: v.chainName,
           }));
