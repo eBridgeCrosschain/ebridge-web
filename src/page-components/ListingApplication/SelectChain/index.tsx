@@ -53,7 +53,8 @@ import { formatWithCommas } from 'utils/calculate';
 import { formatListWithAnd, parseWithCommas, parseWithStringCommas } from 'utils/format';
 import { getListingUrl } from 'utils/listingApplication';
 import { handleInputFocus } from 'utils/input';
-import { getIconByAPIChainId } from 'utils/chain';
+import { handleListingErrorMessage } from 'utils/error';
+import { getChainIdByAPI, getChainName, getIconByAPIChainId } from 'utils/chain';
 import { isEVMChain, isTONChain } from 'utils/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { sleep } from 'utils';
@@ -128,9 +129,17 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const getChainList = useCallback(async () => {
     if (!symbol) return;
     const res = await getApplicationChainStatusList({ symbol });
+    const aelfChains = (res.chainList || []).map((item) => ({
+      ...item,
+      chainName: getChainName(getChainIdByAPI(item.chainId)),
+    }));
+    const otherChains = (res.otherChainList || []).map((item) => ({
+      ...item,
+      chainName: getChainName(getChainIdByAPI(item.chainId)),
+    }));
     const listData = {
-      [SelectChainFormKeys.AELF_CHAINS]: res.chainList || [],
-      [SelectChainFormKeys.OTHER_CHAINS]: res.otherChainList || [],
+      [SelectChainFormKeys.AELF_CHAINS]: aelfChains,
+      [SelectChainFormKeys.OTHER_CHAINS]: otherChains,
     };
     setChainListData(listData);
   }, [symbol]);
@@ -439,7 +448,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         const id = data?.chainList?.[0]?.id;
         handleJump({ networksString, id, _symbol: token.symbol });
       } catch (error: any) {
-        CommonMessage.error(error.message);
+        CommonMessage.error(handleListingErrorMessage(error));
       } finally {
         setGlobalLoading(false);
       }

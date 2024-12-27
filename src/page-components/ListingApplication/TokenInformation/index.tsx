@@ -19,6 +19,7 @@ import { getListingUrl } from 'utils/listingApplication';
 import { getChainType } from 'utils/chain';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { handleInputFocus } from 'utils/input';
+import { handleListingErrorMessage } from 'utils/error';
 import { useAElf } from 'hooks/web3';
 import { useAelfLogin } from 'hooks/wallet';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
@@ -392,7 +393,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         handleNextStep({ symbol: params.symbol });
       }
     } catch (error: any) {
-      CommonMessage.error(error.message);
+      CommonMessage.error(handleListingErrorMessage(error));
     } finally {
       setIsActionButtonLoading(false);
     }

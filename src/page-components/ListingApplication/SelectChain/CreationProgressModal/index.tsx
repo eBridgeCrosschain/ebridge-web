@@ -10,9 +10,9 @@ import { useMobile } from 'contexts/useStore/hooks';
 import { useWeb3 } from 'hooks/web3';
 import { getApplicationIssue, prepareBindIssue } from 'utils/api/application';
 import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
-import { getChainIdByAPI } from 'utils/chain';
+import { getBridgeChainInfo, getChainIdByAPI } from 'utils/chain';
+import { handleListingErrorMessage } from 'utils/error';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
-import { ERCChainConstants } from 'constants/ChainConstants';
 import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
 import { useCallEVMCreateToken } from 'hooks/token';
@@ -51,11 +51,12 @@ export default function CreationProgressModal({
 }: ICreationProgressModalProps) {
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
+  const callEVMCreateToken = useCallEVMCreateToken();
   const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | number>>({});
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
   const [stepItems, setStepItems] = useState<TStepItem[]>([]);
-  const callEVMCreateToken = useCallEVMCreateToken();
+
   const isWarning = useMemo(() => {
     return (
       stepItems.length > 0 &&
@@ -146,7 +147,9 @@ export default function CreationProgressModal({
         if (!evmAccount) {
           throw new Error('No address found');
         }
-        if (!ERCChainConstants.constants.CREATE_TOKEN_CONTRACT) {
+        const chainId = getChainIdByAPI(chain.chainId || '');
+        const contractAddress = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
+        if (!contractAddress) {
           throw new Error('No create token contract found');
         }
         const params: TPrepareBindIssueRequest = {
@@ -154,7 +157,7 @@ export default function CreationProgressModal({
           symbol: chain.symbol,
           chainId: CHAIN_ID_MAP[SupportedELFChainId.AELF],
           otherChainId: chain.chainId,
-          contractAddress: ERCChainConstants.constants.CREATE_TOKEN_CONTRACT,
+          contractAddress,
           supply,
         };
         const res = await prepareBindIssue(params);
@@ -245,7 +248,7 @@ export default function CreationProgressModal({
           handleStepItemChange({ step: index, status: 'finish' });
         } catch (error: any) {
           if (error.shouldShowMessage) {
-            CommonMessage.error(error.message);
+            CommonMessage.error(handleListingErrorMessage(error));
           }
           handleStepItemChange({ step: index, status: 'error' });
         }
@@ -267,7 +270,7 @@ export default function CreationProgressModal({
         }
       } catch (error: any) {
         if (error.shouldShowMessage) {
-          CommonMessage.error(error.message);
+          CommonMessage.error(handleListingErrorMessage(error));
         }
         handleStepItemChange({ step, status: 'error' });
       }
