@@ -64,7 +64,7 @@ export function useCallEVMCreateToken() {
       account: string;
       name: string;
       symbol: string;
-      initialSupply: number;
+      initialSupply: string;
     }) => {
       await evmSwitchChain(chainId);
       const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;

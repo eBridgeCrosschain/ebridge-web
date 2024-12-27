@@ -183,7 +183,7 @@ export default function CreationProgressModal({
           account: evmAccount,
           name: chain.tokenName,
           symbol: chain.symbol,
-          initialSupply: Number(supply),
+          initialSupply: supply,
         });
         if (!res || !res.transactionHash) {
           throw new Error('Failed to create token');

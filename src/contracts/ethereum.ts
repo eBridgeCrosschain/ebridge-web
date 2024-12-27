@@ -139,7 +139,7 @@ export const createToken = async ({
   account: string;
   name: string;
   symbol: string;
-  initialSupply: number;
+  initialSupply: string;
 }) => {
   return createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply], {
     onMethod: 'transactionHash',
