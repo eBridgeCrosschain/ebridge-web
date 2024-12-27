@@ -185,10 +185,10 @@ export default function CreationProgressModal({
           symbol: chain.symbol,
           initialSupply: supply,
         });
-        if (!res || !res.transactionHash) {
+        if (!res || !res.TransactionId) {
           throw new Error('Failed to create token');
         }
-        return res.transactionHash;
+        return res.TransactionId;
       } catch (error) {
         console.error(error);
         throw error;
