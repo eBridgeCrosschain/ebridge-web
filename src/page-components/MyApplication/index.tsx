@@ -13,10 +13,11 @@ import { backIcon } from 'assets/images';
 import { BUTTON_TEXT_BACK } from 'constants/misc';
 import { MY_APPLICATIONS } from 'constants/listingApplication';
 import { useRouter } from 'next/router';
-import { CONTACT_US_FORM_URL, ROUTE_PATHS } from 'constants/link';
+import { CONTACT_US_FORM_URL } from 'constants/link';
 import { openWithBlank } from 'utils/link';
 import { sleep } from 'utils';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 
 const DefaultSkipCount = 0;
 const DefaultMaxResultCount = 10;
@@ -25,7 +26,7 @@ const DefaultTotalCount = 0;
 function MyApplications() {
   const router = useRouter();
   const isMd = useMediaQueries('md');
-  // const { setLoading } = useLoading(); // TODO
+  const { setGlobalLoading } = useGlobalLoading();
   const { isActive } = useAElf();
   const handleAelfLogin = useAelfLogin();
   const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
@@ -41,7 +42,7 @@ function MyApplications() {
     async ({ skip, max }: { skip?: number; max?: number }) => {
       console.log(skip, max);
       try {
-        // setLoading(true);
+        setGlobalLoading(true);
         await setAelfAuthFromStorage();
         await sleep(500);
 
@@ -58,10 +59,10 @@ function MyApplications() {
       } catch (error) {
         console.log('>>>>>> getApplicationData error', error);
       } finally {
-        // setLoading(false);
+        setGlobalLoading(false);
       }
     },
-    [maxResultCount, setAelfAuthFromStorage, skipPageCount],
+    [maxResultCount, setAelfAuthFromStorage, setGlobalLoading, skipPageCount],
   );
 
   // web get page date
@@ -96,10 +97,6 @@ function MyApplications() {
   const initRef = useRef(init);
   initRef.current = init;
 
-  const handleResetList = useCallback(async () => {
-    await getApplicationData({ skip: DefaultSkipCount, max: DefaultMaxResultCount });
-  }, [getApplicationData]);
-
   const connectAndInit = useCallback(() => {
     if (!isActive) {
       handleAelfLogin(true, initRef.current);
@@ -110,11 +107,11 @@ function MyApplications() {
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    // setLoading(true); // TODO
+    setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
     await sleep(3000);
     connectAndInitRef.current();
-  }, []);
+  }, [setGlobalLoading]);
   useEffectOnce(() => {
     connectAndInitSleep();
   });
@@ -153,7 +150,7 @@ function MyApplications() {
   return (
     <div className={clsx('page-content', 'main-page-content-wrap', styles['my-applications-page-container-wrapper'])}>
       {!isMd && (
-        <div className={styles['my-applications-page-back']} onClick={() => router.push(ROUTE_PATHS.HOME)}>
+        <div className={styles['my-applications-page-back']} onClick={() => router.back()}>
           <CommonImage className={styles['my-applications-page-back-icon']} src={backIcon} />
           <div className={styles['my-applications-page-back-text']}>{BUTTON_TEXT_BACK}</div>
         </div>
@@ -175,7 +172,6 @@ function MyApplications() {
           tableOnChange={tableOnChange}
           maxResultCount={maxResultCount}
           skipPageCount={skipPageCount}
-          onResetList={handleResetList}
         />
       </div>
     </div>

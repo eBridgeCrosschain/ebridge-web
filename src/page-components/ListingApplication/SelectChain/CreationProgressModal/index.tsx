@@ -6,15 +6,16 @@ import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
 import Remind, { RemindType } from 'components/Remind';
 import CommonButton from 'components/CommonButton';
 import ListingTip from '../../ListingTip';
-import { createToken } from 'contracts/ethereum';
 import { useMobile } from 'contexts/useStore/hooks';
 import { useWeb3 } from 'hooks/web3';
 import { getApplicationIssue, prepareBindIssue } from 'utils/api/application';
 import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
-import { useCreateTokenContract } from 'hooks/useContract';
+import { getBridgeChainInfo, getChainIdByAPI } from 'utils/chain';
+import { handleListingErrorMessage } from 'utils/error';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
-import { ERCChainConstants } from 'constants/ChainConstants';
+import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
+import { useCallEVMCreateToken } from 'hooks/token';
 
 export interface ICreationProgressModalProps {
   open: boolean;
@@ -50,9 +51,8 @@ export default function CreationProgressModal({
 }: ICreationProgressModalProps) {
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
-  const createTokenContract = useCreateTokenContract();
-  const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | undefined>>({});
-
+  const callEVMCreateToken = useCallEVMCreateToken();
+  const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | number>>({});
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
   const [stepItems, setStepItems] = useState<TStepItem[]>([]);
@@ -147,19 +147,24 @@ export default function CreationProgressModal({
         if (!evmAccount) {
           throw new Error('No address found');
         }
+        const chainId = getChainIdByAPI(chain.chainId || '');
+        const contractAddress = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
+        if (!contractAddress) {
+          throw new Error('No create token contract found');
+        }
         const params: TPrepareBindIssueRequest = {
           address: evmAccount,
           symbol: chain.symbol,
-          chainId: 'AELF',
+          chainId: CHAIN_ID_MAP[SupportedELFChainId.AELF],
           otherChainId: chain.chainId,
-          contractAddress: ERCChainConstants.constants.BRIDGE_CONTRACT,
+          contractAddress,
           supply,
         };
-        const id = await prepareBindIssue(params);
-        if (!id) {
+        const res = await prepareBindIssue(params);
+        if (!res || !res.bindingId || !res.thirdTokenId) {
           throw new Error('Failed to prepare bind issue');
         }
-        return id;
+        return res;
       } catch (error: any) {
         error.shouldShowMessage = true;
         console.error(error);
@@ -175,26 +180,24 @@ export default function CreationProgressModal({
         if (!evmAccount) {
           throw new Error('No address found');
         }
-        if (!createTokenContract) {
-          throw new Error('No create token contract found');
-        }
-        const txHash = await createToken({
-          createTokenContract,
+        const chainId = getChainIdByAPI(chain.chainId || '');
+        const res = await callEVMCreateToken({
+          chainId,
           account: evmAccount,
           name: chain.tokenName,
           symbol: chain.symbol,
-          initialSupply: Number(supply),
+          initialSupply: supply,
         });
-        if (!txHash) {
+        if (!res || !res.TransactionId) {
           throw new Error('Failed to create token');
         }
-        return txHash;
+        return res.TransactionId;
       } catch (error) {
         console.error(error);
         throw error;
       }
     },
-    [createTokenContract, evmAccount, supply],
+    [callEVMCreateToken, evmAccount, supply],
   );
 
   const handlePollingForIssueResult = useCallback(
@@ -231,10 +234,11 @@ export default function CreationProgressModal({
           return;
         }
         try {
-          if (item.chain.txHash && item.chain.chainId) {
+          const chainId = getChainIdByAPI(item.chain.chainId || '');
+          if (item.chain.txHash && chainId) {
             await getTransactionReceiptAutoRetry({
               hash: item.chain.txHash,
-              chainId: item.chain.chainId,
+              chainId,
             });
           }
           await handlePollingForIssueResult({
@@ -244,7 +248,7 @@ export default function CreationProgressModal({
           handleStepItemChange({ step: index, status: 'finish' });
         } catch (error: any) {
           if (error.shouldShowMessage) {
-            CommonMessage.error(error.message);
+            CommonMessage.error(handleListingErrorMessage(error));
           }
           handleStepItemChange({ step: index, status: 'error' });
         }
@@ -266,7 +270,7 @@ export default function CreationProgressModal({
         }
       } catch (error: any) {
         if (error.shouldShowMessage) {
-          CommonMessage.error(error.message);
+          CommonMessage.error(handleListingErrorMessage(error));
         }
         handleStepItemChange({ step, status: 'error' });
       }

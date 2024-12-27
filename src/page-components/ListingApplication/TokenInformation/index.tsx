@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
-import { Form, Input, InputProps } from 'antd';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
+import { Form, Input, InputProps } from 'antd';
 import ConnectWallet from 'components/ConnectWallet';
 import CommonButton from 'components/CommonButton';
 import CommonMessage from 'components/CommonMessage';
@@ -17,10 +18,12 @@ import {
 import { getListingUrl } from 'utils/listingApplication';
 import { getChainType } from 'utils/chain';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
+import { handleInputFocus } from 'utils/input';
+import { handleListingErrorMessage } from 'utils/error';
 import { useAElf } from 'hooks/web3';
 import { useAelfLogin } from 'hooks/wallet';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
-import useLoadingModal from 'hooks/useLoadingModal';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useMobile } from 'contexts/useStore/hooks';
 import { TCommitTokenInfoRequest } from 'types/api';
 import {
@@ -57,12 +60,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const router = useRouter();
   const setAelfAuthFromStorage = useSetAelfAuthFromStorage();
   const handleAelfLogin = useAelfLogin();
-  const { modal, setLoadingModal } = useLoadingModal({
-    loadingModalProps: {
-      hideTitle: true,
-      hideDescription: true,
-    },
-  });
+  const { setGlobalLoading } = useGlobalLoading();
   const [form] = Form.useForm<TTokenInformationFormValues>();
   const chainType = getChainType(AELF_CHAIN_ID);
   const aelfWallet = useAElf();
@@ -138,39 +136,36 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const getTokenInfo = useCallback(
     async (_symbol: string, _tokenList: TTokenItem[], _tokenConfig: TTokenConfig) => {
+      const token = _tokenList.find((item) => item.symbol === _symbol);
+      const newFormValues = {
+        ...TOKEN_INFORMATION_FORM_INITIAL_VALUES,
+        [TokenInformationFormKeys.TOKEN]: token,
+      };
+      const newFormValidateData = TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA;
+
       try {
         const res = await getApplicationTokenInfo({ symbol: _symbol });
-        const token = _tokenList.find((item) => item.symbol === _symbol);
-        if (token) {
-          const newFormValues = {
-            ...TOKEN_INFORMATION_FORM_INITIAL_VALUES,
-            [TokenInformationFormKeys.TOKEN]: token,
-          };
-          if (res) {
-            newFormValues[TokenInformationFormKeys.OFFICIAL_WEBSITE] = res.officialWebsite;
-            newFormValues[TokenInformationFormKeys.OFFICIAL_TWITTER] = res.officialTwitter;
-            newFormValues[TokenInformationFormKeys.TITLE] = res.title;
-            newFormValues[TokenInformationFormKeys.PERSON_NAME] = res.personName;
-            newFormValues[TokenInformationFormKeys.TELEGRAM_HANDLER] = res.telegramHandler;
-            newFormValues[TokenInformationFormKeys.EMAIL] = res.email;
-          }
-          const newFormValidateData = {
-            ...TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA,
-            [TokenInformationFormKeys.TOKEN]: formValidateData[TokenInformationFormKeys.TOKEN],
-          };
-          setFormValues(newFormValues);
-          setFormValidateData(newFormValidateData);
-          judgeIsButtonDisabled(newFormValues, newFormValidateData, _tokenConfig);
+        if (token && res && res.symbol) {
+          newFormValues[TokenInformationFormKeys.OFFICIAL_WEBSITE] = res.officialWebsite;
+          newFormValues[TokenInformationFormKeys.OFFICIAL_TWITTER] = res.officialTwitter;
+          newFormValues[TokenInformationFormKeys.TITLE] = res.title;
+          newFormValues[TokenInformationFormKeys.PERSON_NAME] = res.personName;
+          newFormValues[TokenInformationFormKeys.TELEGRAM_HANDLER] = res.telegramHandler;
+          newFormValues[TokenInformationFormKeys.EMAIL] = res.email;
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setFormValues(newFormValues);
+        setFormValidateData(newFormValidateData);
+        judgeIsButtonDisabled(newFormValues, newFormValidateData, _tokenConfig);
       }
     },
-    [formValidateData, judgeIsButtonDisabled],
+    [judgeIsButtonDisabled],
   );
 
   const init = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     const list = await getTokenList();
     if (symbol) {
       const config = await getTokenConfig(symbol);
@@ -178,14 +173,14 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         await getTokenInfo(symbol, list, config);
       }
     }
-    setLoadingModal({ open: false });
-  }, [getTokenConfig, getTokenInfo, getTokenList, setLoadingModal, symbol]);
+    setGlobalLoading(false);
+  }, [getTokenConfig, getTokenInfo, getTokenList, setGlobalLoading, symbol]);
   const initRef = useRef(init);
   initRef.current = init;
 
   const connectAndInit = useCallback(() => {
     if (!isAelfActive) {
-      handleAelfLogin(true, initRef.current);
+      handleAelfLogin(true, initRef.current, true);
     } else {
       initRef.current();
     }
@@ -193,11 +188,11 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
     await sleep(3000);
     connectAndInitRef.current();
-  }, [setLoadingModal]);
+  }, [setGlobalLoading]);
   useEffectOnce(() => {
     connectAndInitSleep();
   });
@@ -254,9 +249,10 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const handleSelectToken = useCallback(
     async (item: TTokenItem) => {
-      setLoadingModal({ open: true });
+      setGlobalLoading(true);
       const list = await getTokenList();
-      const newItem = list.find((v) => v.symbol === item.symbol);
+      const currentList = list.length > 0 ? list : tokenList;
+      const newItem = currentList.find((v) => v.symbol === item.symbol);
       if (newItem) {
         handleFormDataChange({
           formKey: TokenInformationFormKeys.TOKEN,
@@ -266,10 +262,10 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
             errorMessage: '',
           },
         });
-        router.replace(getListingUrl(ListingStep.TOKEN_INFORMATION, { symbol: item.symbol }));
-        const config = await getTokenConfig(item.symbol);
+        router.replace(getListingUrl(ListingStep.TOKEN_INFORMATION, { symbol: newItem.symbol }));
+        const config = await getTokenConfig(newItem.symbol);
         if (config) {
-          await getTokenInfo(item.symbol, list, config);
+          await getTokenInfo(newItem.symbol, currentList, config);
         }
       } else {
         handleFormDataChange({
@@ -281,9 +277,10 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           },
         });
       }
-      setLoadingModal({ open: false });
+      setTokenList(currentList);
+      setGlobalLoading(false);
     },
-    [setLoadingModal, getTokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
+    [setGlobalLoading, getTokenList, tokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
   );
 
   const handleCommonInputChange = useCallback(
@@ -396,7 +393,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         handleNextStep({ symbol: params.symbol });
       }
     } catch (error: any) {
-      CommonMessage.error(error.message);
+      CommonMessage.error(handleListingErrorMessage(error));
     } finally {
       setIsActionButtonLoading(false);
     }
@@ -407,13 +404,18 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     help: formValidateData[key].errorMessage,
   });
 
-  const getCommonInputProps = (key: TokenInformationFormKeys): Partial<InputProps> => ({
-    size: 'large',
-    allowClear: true,
-    autoComplete: 'off',
-    placeholder: TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[key],
-    value: formValues[key] as string,
-  });
+  const getCommonInputProps = (key: TokenInformationFormKeys): Partial<InputProps> => {
+    const id = `tokenInformationInput_${key}`;
+    return {
+      size: 'large',
+      allowClear: true,
+      autoComplete: 'off',
+      placeholder: TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[key],
+      value: formValues[key] as string,
+      id,
+      onFocus: () => handleInputFocus(id),
+    };
+  };
 
   const renderTokenRequirements = () => {
     const requirements = [];
@@ -439,7 +441,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
             title="Token Requirements"
             tip={
               <>
-                <p>The token must meet the requirements of:</p>
+                <p className={clsx(!isMobile && 'font-15')}>The token must meet the requirements of:</p>
                 {renderTokenRequirements()}
               </>
             }
@@ -538,7 +540,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           </CommonButton>
         )}
       </div>
-      {modal}
     </div>
   );
 }

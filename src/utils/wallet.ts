@@ -1,5 +1,5 @@
+import { CHAIN_ID_MAP, SupportedChainId, SupportedTONChainId } from 'constants/chain';
 import { SupportedELFChainList } from 'constants/index';
-import { BlockchainNetworkType } from 'constants/network';
 
 export type TAccounts = Record<string, string[]>;
 
@@ -15,25 +15,22 @@ export const getPortkeySDKAccount = (accounts?: Record<string, string>): TAccoun
 };
 
 export const isEVMChain = (network: string) => {
-  if (
-    network === BlockchainNetworkType.Arbitrum ||
-    network === BlockchainNetworkType.Avax ||
-    network === BlockchainNetworkType.BASE ||
-    network === BlockchainNetworkType.Binance ||
-    network === BlockchainNetworkType.Ethereum ||
-    network === BlockchainNetworkType.Optimism ||
-    network === BlockchainNetworkType.Polygon ||
-    network === BlockchainNetworkType.SETH ||
-    network === BlockchainNetworkType.TBinance
-  ) {
-    return true;
-  }
-  return false;
+  const evmChainIds = [
+    SupportedChainId.MAINNET,
+    SupportedChainId.BSC_MAINNET,
+    SupportedChainId.KOVAN,
+    SupportedChainId.GORELI,
+    SupportedChainId.BSC_TESTNET,
+    SupportedChainId.SEPOLIA,
+    SupportedChainId.BASE_SEPOLIA,
+    SupportedChainId.BASE,
+  ] as const;
+
+  return evmChainIds.some((chainId) => CHAIN_ID_MAP[chainId] === network);
 };
 
 export const isTONChain = (network: string) => {
-  if (network === BlockchainNetworkType.TON) {
-    return true;
-  }
-  return false;
+  const tonChainIds = [SupportedTONChainId.TESTNET] as const;
+
+  return tonChainIds.some((chainId) => CHAIN_ID_MAP[chainId] === network);
 };

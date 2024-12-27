@@ -9,6 +9,7 @@ import { DefaultHead } from 'components/PageHead';
 import Footer from 'components/Footer';
 import ScrollToTop from 'components/ScrollToTop';
 import Nav from 'components/Nav';
+import Loading from 'components/Loading';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import clsx from 'clsx';
@@ -60,6 +61,7 @@ export default function APP({ Component, pageProps }: AppProps) {
             )}
           </div>
           <Footer />
+          <Loading />
         </div>
       );
     } else {
@@ -69,6 +71,7 @@ export default function APP({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </div>
           <Footer />
+          <Loading />
         </div>
       );
     }

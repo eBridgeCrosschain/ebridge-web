@@ -22,7 +22,9 @@ export default function ListingTip({
       ref={(ref) => {
         tooltipSwitchModalsRef.current = ref;
       }}
+      tooltipProps={{ overlayClassName: styles['tip-tooltip'] }}
       modalProps={{ title: modalTitle || title, zIndex: 1001 }}
+      modalWidth={377}
       tip={tip}>
       {customChildren ? (
         <div onClick={() => tooltipSwitchModalsRef.current?.open()}>{customChildren}</div>

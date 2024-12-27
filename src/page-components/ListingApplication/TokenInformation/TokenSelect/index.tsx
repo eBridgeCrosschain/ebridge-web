@@ -8,6 +8,7 @@ import TokenRow from '../../TokenRow';
 import { checkFilled16Icon, closeFilled16Icon } from 'assets/images';
 import { TTokenConfig, TTokenItem } from 'types/listingApplication';
 import { AwakenHost } from 'constants/index';
+import { LISTING_TOKEN_TIP } from 'constants/listingApplication';
 import styles from './styles.module.less';
 
 interface ITokenSelectProps {
@@ -60,7 +61,7 @@ export default function TokenSelect({
 
         {token && (
           <div className={styles['token-selected-info-card']}>
-            {!!tokenConfig?.liquidityInUsd && (
+            {!!tokenConfig?.liquidityInUsd && tokenConfig.liquidityInUsd !== '0' && (
               <div className={styles['token-selected-info-card-row']}>
                 <div className={styles['token-selected-info-card-row-content']}>
                   {getInfoValidateIcon(
@@ -70,11 +71,11 @@ export default function TokenSelect({
                   <span>{`Liquidity > $${tokenConfig.liquidityInUsd}`}</span>
                 </div>
                 <CommonLink className={styles['token-selected-info-card-row-link']} showIcon={false} href={AwakenHost}>
-                  Add Token Pool
+                  Add Liquidity
                 </CommonLink>
               </div>
             )}
-            {tokenConfig?.holders !== undefined && (
+            {!!tokenConfig?.holders && (
               <div className={styles['token-selected-info-card-row']}>
                 <div className={styles['token-selected-info-card-row-content']}>
                   {getInfoValidateIcon(!!token?.holders && token.holders > tokenConfig.holders)}
@@ -88,6 +89,7 @@ export default function TokenSelect({
 
       <CommonSelectTokenModal
         hideAddToken
+        remindContent={LISTING_TOKEN_TIP}
         open={isShowTokenSelectModal}
         selectSymbol={token?.symbol}
         tokenList={tokenList}

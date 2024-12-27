@@ -282,6 +282,5 @@ export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?:
   const contractAddress = useMemo(() => {
     return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
   }, [chainId]);
-
   return useContract(address || contractAddress, POOLS_ABI, chainId, isPortkey);
 }

@@ -21,12 +21,14 @@ export async function getTransactionReceiptAutoRetry(
 ): Promise<GetTransactionReceiptReturnType> {
   try {
     const req = await getTransactionReceipt(EVMProviderConfig, params);
+    console.log('!! getTransactionReceiptAutoRetry req', req);
     if (req.status === 'success') return req;
     if (req.status === 'reverted') throw { message: 'Transaction is reverted', req };
     reGetCount++;
     await sleep(3000);
     return getTransactionReceiptAutoRetry(params, reGetCount, notExistedReGetCount);
   } catch (error: any) {
+    console.log('!! getTransactionReceiptAutoRetry error', error);
     if (handleErrorMessage(error)?.includes(PENDING_MESSAGE)) {
       if (notExistedReGetCount > 200) throw error;
       notExistedReGetCount++;

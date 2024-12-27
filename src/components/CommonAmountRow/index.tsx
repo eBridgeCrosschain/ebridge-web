@@ -17,6 +17,9 @@ export type TCommonAmountRowProps = {
   onAmountInputChange?: InputProps['onChange'];
   showError?: boolean;
   maxLength?: number;
+  className?: string;
+  inputWrapClassName?: string;
+  placeholder?: InputProps['placeholder'];
 };
 
 export default function CommonAmountRow({
@@ -31,11 +34,14 @@ export default function CommonAmountRow({
   showError,
   maxLength = 25,
   onAmountInputChange,
+  className,
+  inputWrapClassName,
+  placeholder,
 }: TCommonAmountRowProps) {
   const { t } = useLanguage();
 
   return (
-    <div className={clsx(styles['amount-row'], 'flex-column')}>
+    <div className={clsx(styles['amount-row'], 'flex-column', className)}>
       <div className={clsx(styles['amount-label-wrap'], 'flex-row-between', 'flex-row-center')}>
         {leftHeaderEle ? leftHeaderEle : <span className={styles['amount-label']}>{leftHeaderTitle}</span>}
         {showBalance && (
@@ -47,11 +53,12 @@ export default function CommonAmountRow({
           </div>
         )}
       </div>
-      <div className={clsx(styles['amount-input-wrap'], 'flex-row-center')}>
+      <div className={clsx(styles['amount-input-wrap'], 'flex-row-center', inputWrapClassName)}>
         <AmountInput
           maxLength={maxLength}
           className={clsx({ [styles['amount-input-red']]: showError })}
           value={value}
+          placeholder={placeholder}
           onChange={onAmountInputChange}
         />
         {rightInputEle ? (

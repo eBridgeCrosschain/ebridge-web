@@ -42,7 +42,6 @@ export default function DisplayImage({
           src={src}
           alt={alt || `image-${name}`}
           style={{ width, height, zIndex: 2 }}
-          // fill={true} // TODO
           onError={() => {
             setShowIcon(false);
           }}

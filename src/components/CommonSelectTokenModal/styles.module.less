@@ -2,14 +2,24 @@
 @import '/src/assets/theme/font.less';
 @import '/src/assets/theme/constants.less';
 
+@margin-left-right-web: 24px;
+@margin-left-right-mobile: 16px;
+
 .select-modal {
+  height: 430px;
   :global {
+    .@{app-prefix}-modal-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
     .@{app-prefix}-modal-header {
       .@{app-prefix}-modal-title .@{app-prefix}-col {
         text-align: left !important;
       }
     }
     .@{app-prefix}-modal-body {
+      overflow: hidden;
       min-width: 448px;
       max-width: 448px;
       padding-left: 0 !important;
@@ -19,7 +29,8 @@
   .input-search {
     height: 40px;
     border-radius: 6px;
-    width: calc(100% - 48px);
+    width: calc(100% - @margin-left-right-web * 2);
+    margin-bottom: 8px;
     align-self: center;
     :global {
       .@{app-prefix}-input-suffix {
@@ -27,19 +38,30 @@
       }
     }
   }
+  .token-tip {
+    margin-left: @margin-left-right-web;
+    margin-right: @margin-left-right-web;
+    margin-bottom: 8px;
+  }
   .token-list {
-    margin-top: 8px;
-    height: 270px;
     overflow: auto;
     .token-item {
-      padding: 13px 24px;
+      flex-wrap: nowrap;
+      padding: 13px @margin-left-right-web;
       line-height: 24px;
       .font-family-medium();
       .token-logo {
+        flex: none;
         width: 24px;
         height: 24px;
         margin-right: 8px;
         border-radius: 50%;
+      }
+      .token-name {
+        overflow: hidden;
+        flex-shrink: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       &:hover {
         background: @bg-15;
@@ -68,9 +90,27 @@
 }
 @media screen and (max-width: @md-width) {
   .select-modal {
+    height: auto;
     :global {
       .@{app-prefix}-modal-header {
         border-width: 0;
+      }
+      .@{app-prefix}-modal-content {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+    }
+    .input-search {
+      width: calc(100% - @margin-left-right-mobile * 2);
+    }
+    .token-tip {
+      margin-left: @margin-left-right-mobile;
+      margin-right: @margin-left-right-mobile;
+    }
+    .token-list {
+      .token-item {
+        padding-left: @margin-left-right-mobile;
+        padding-right: @margin-left-right-mobile;
       }
     }
   }

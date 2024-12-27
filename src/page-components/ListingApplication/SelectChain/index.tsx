@@ -38,7 +38,7 @@ import {
   LISTING_STEP_ITEMS,
 } from 'constants/listingApplication';
 import { BUTTON_TEXT_BACK, SELECT_CHAIN, ZERO, LANG_MAX } from 'constants/misc';
-import useLoadingModal from 'hooks/useLoadingModal';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useAElf, useTon, useWeb3 } from 'hooks/web3';
 import { useConnect } from 'hooks/useConnect';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
@@ -53,7 +53,8 @@ import { formatWithCommas } from 'utils/calculate';
 import { formatListWithAnd, parseWithCommas, parseWithStringCommas } from 'utils/format';
 import { getListingUrl } from 'utils/listingApplication';
 import { handleInputFocus } from 'utils/input';
-import { getIconByAPIChainId } from 'utils/chain';
+import { handleListingErrorMessage } from 'utils/error';
+import { getChainIdByAPI, getChainName, getIconByAPIChainId } from 'utils/chain';
 import { isEVMChain, isTONChain } from 'utils/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { sleep } from 'utils';
@@ -68,12 +69,7 @@ interface ISelectChainProps {
 export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: ISelectChainProps) {
   const router = useRouter();
   const isMobile = useMobile();
-  const { modal, setLoadingModal } = useLoadingModal({
-    loadingModalProps: {
-      hideTitle: true,
-      hideDescription: true,
-    },
-  });
+  const { setGlobalLoading } = useGlobalLoading();
   const connect = useConnect();
   const { account: aelfAccount } = useAElf();
   const { account: evmAccount } = useWeb3();
@@ -133,9 +129,17 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const getChainList = useCallback(async () => {
     if (!symbol) return;
     const res = await getApplicationChainStatusList({ symbol });
+    const aelfChains = (res.chainList || []).map((item) => ({
+      ...item,
+      chainName: getChainName(getChainIdByAPI(item.chainId)),
+    }));
+    const otherChains = (res.otherChainList || []).map((item) => ({
+      ...item,
+      chainName: getChainName(getChainIdByAPI(item.chainId)),
+    }));
     const listData = {
-      [SelectChainFormKeys.AELF_CHAINS]: res.chainList || [],
-      [SelectChainFormKeys.OTHER_CHAINS]: res.otherChainList || [],
+      [SelectChainFormKeys.AELF_CHAINS]: aelfChains,
+      [SelectChainFormKeys.OTHER_CHAINS]: otherChains,
     };
     setChainListData(listData);
   }, [symbol]);
@@ -402,7 +406,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         formData[SelectChainFormKeys.AELF_CHAINS].length !== 0 &&
         formData[SelectChainFormKeys.OTHER_CHAINS].length === 0
       ) {
-        const replaceUrl = getListingUrl(ListingStep.INITIALIZE_TOKEN_POOL, {
+        const replaceUrl = getListingUrl(ListingStep.ADD_TOKEN_POOL, {
           symbol: _symbol,
           id,
         });
@@ -417,7 +421,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const handleAddChain = useCallback(
     async ({ errorOtherChainIds }: { errorOtherChainIds?: string[] } = {}) => {
       if (!token?.symbol) return;
-      setLoadingModal({ open: true });
+      setGlobalLoading(true);
       try {
         const data = await addApplicationChain({
           chainIds: formData[SelectChainFormKeys.AELF_CHAINS].map((v) => v.chainId),
@@ -430,7 +434,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
           throw new Error('Failed to add chain');
         }
         const aelfNetworks = formData[SelectChainFormKeys.AELF_CHAINS]
-          .filter((item) => data?.chainList?.some((v) => v.chainId === item.chainId))
+          .filter((item) => !data?.chainList || data.chainList.some((v) => v.chainId === item.chainId))
           .map((v) => ({
             name: v.chainName,
           }));
@@ -444,12 +448,12 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         const id = data?.chainList?.[0]?.id;
         handleJump({ networksString, id, _symbol: token.symbol });
       } catch (error: any) {
-        CommonMessage.error(error.message);
+        CommonMessage.error(handleListingErrorMessage(error));
       } finally {
-        setLoadingModal({ open: false });
+        setGlobalLoading(false);
       }
     },
-    [formData, handleJump, setLoadingModal, token?.symbol],
+    [formData, handleJump, setGlobalLoading, token?.symbol],
   );
 
   const handleCreationProgressModalClose = useCallback(() => {
@@ -508,7 +512,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
   const init = useCallback(async () => {
     try {
-      setLoadingModal({ open: true });
+      setGlobalLoading(true);
       await setAelfAuthFromStorage();
       await sleep(500);
 
@@ -518,9 +522,9 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       console.log('SelectChain init', error);
       handleBackStep();
     } finally {
-      setLoadingModal({ open: false });
+      setGlobalLoading(false);
     }
-  }, [getChainList, getToken, handleBackStep, setAelfAuthFromStorage, setLoadingModal]);
+  }, [getChainList, getToken, handleBackStep, setAelfAuthFromStorage, setGlobalLoading]);
 
   const connectAndInit = useCallback(() => {
     if (!isAelfConnected || !symbol) {
@@ -532,19 +536,19 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
     await sleep(3000);
     connectAndInitRef.current();
-  }, [setLoadingModal]);
+  }, [setGlobalLoading]);
   useEffectOnce(() => {
     connectAndInitSleep();
   });
 
   const initForLogout = useCallback(async () => {
-    setLoadingModal({ open: true });
+    setGlobalLoading(true);
     handleBackStep();
-  }, [handleBackStep, setLoadingModal]);
+  }, [handleBackStep, setGlobalLoading]);
   const initLogoutRef = useRef(initForLogout);
   initLogoutRef.current = initForLogout;
 
@@ -631,7 +635,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
             title="Chain Guide"
             tip={
               <>
-                <p>Tips:</p>
+                <p className={clsx(!isMobile && 'font-15')}>Tips:</p>
                 <ul className="list-style-decimal">
                   <li>Please select at least one aelf chain and one other chain.</li>
                   <li>
@@ -711,7 +715,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         handleCreateFinish={handleCreateFinish}
         handleClose={handleCreationProgressModalClose}
       />
-      {modal}
     </>
   );
 }

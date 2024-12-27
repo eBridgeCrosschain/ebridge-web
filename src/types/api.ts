@@ -199,7 +199,8 @@ export type TMyApplicationChainTokenInfo = {
 };
 
 export type TGetApplicationDetailRequest = {
-  id?: string;
+  id: string;
+  symbol: string;
   network?: string;
 };
 
@@ -226,7 +227,6 @@ export type TApplicationDetailItemChainTokenInfo = {
   icon: string;
   poolAddress: string;
   contractAddress: string;
-  tokenContractAddress: string;
   status: ApplicationChainStatusEnum;
   minAmount: string; // min amount usd
   dailyLimit: string;
@@ -270,6 +270,7 @@ export type TGetTokenPriceResult = {
 export type TChangeAddLiquidityStatusRequest = {
   orderId: string;
   chainId: TBridgeChainId;
+  amount: string;
 };
 
 export type TChangeAddLiquidityStatusResult = {

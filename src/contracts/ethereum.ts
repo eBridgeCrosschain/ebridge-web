@@ -139,9 +139,11 @@ export const createToken = async ({
   account: string;
   name: string;
   symbol: string;
-  initialSupply: number;
-}): Promise<any> => {
-  return await createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply]);
+  initialSupply: string;
+}) => {
+  return createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply], {
+    onMethod: 'transactionHash',
+  });
 };
 
 export const getETHBalance = async (address: string, library?: provider) => {

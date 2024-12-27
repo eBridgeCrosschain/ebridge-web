@@ -2,7 +2,18 @@
 @import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/font.less';
 
-.listing-complete-container {
+.component-title {
+  font-size: 20px;
+  line-height: 28px;
+  .font-family-medium();
+
+  margin-bottom: 32px;
+  @media screen and (max-width: @md-width) {
+    margin-bottom: 24px;
+  }
+}
+
+.listing-complete-body {
   padding: 32px 24px;
   @media screen and (max-width: @md-width) {
     padding: 32px 0;

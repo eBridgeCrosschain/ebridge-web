@@ -147,6 +147,8 @@ export const TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA: TTokenInformationForm
 
 export const REQUIRED_ERROR_MESSAGE = 'This field is required';
 
+export const LISTING_TOKEN_TIP = 'Only tokens owned by your connected aelf wallet are displayed here.';
+
 // ================ Select chain ================
 
 export const SELECT_CHAIN_FORM_LABEL_MAP: Record<SelectChainFormKeys, string> = {
