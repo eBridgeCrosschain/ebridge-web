@@ -11,6 +11,7 @@ import { useMobile } from 'contexts/useStore/hooks';
 import { useWeb3 } from 'hooks/web3';
 import { getApplicationIssue, prepareBindIssue } from 'utils/api/application';
 import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
+import { getChainIdByAPI } from 'utils/chain';
 import { useCreateTokenContract } from 'hooks/useContract';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
 import { ERCChainConstants } from 'constants/ChainConstants';
@@ -235,10 +236,11 @@ export default function CreationProgressModal({
           return;
         }
         try {
-          if (item.chain.txHash && item.chain.chainId) {
+          const chainId = getChainIdByAPI(item.chain.chainId || '');
+          if (item.chain.txHash && chainId) {
             await getTransactionReceiptAutoRetry({
               hash: item.chain.txHash,
-              chainId: item.chain.chainId,
+              chainId,
             });
           }
           await handlePollingForIssueResult({
