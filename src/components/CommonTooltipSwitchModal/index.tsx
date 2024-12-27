@@ -15,7 +15,7 @@ export interface ICommonTooltipSwitchModalRef {
 }
 
 interface ICommonTooltipSwitchModalProps {
-  tooltipProps?: Pick<TooltipProps, 'className'>;
+  tooltipProps?: Pick<TooltipProps, 'className' | 'overlayClassName'>;
   modalProps?: Pick<ICommonModalProps, 'className' | 'title' | 'zIndex'>;
   modalWidth?: number;
   tip: React.ReactNode;

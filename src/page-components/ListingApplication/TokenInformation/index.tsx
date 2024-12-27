@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
-import { Form, Input, InputProps } from 'antd';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
+import { Form, Input, InputProps } from 'antd';
 import ConnectWallet from 'components/ConnectWallet';
 import CommonButton from 'components/CommonButton';
 import CommonMessage from 'components/CommonMessage';
@@ -439,7 +440,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
             title="Token Requirements"
             tip={
               <>
-                <p>The token must meet the requirements of:</p>
+                <p className={clsx(!isMobile && 'font-15')}>The token must meet the requirements of:</p>
                 {renderTokenRequirements()}
               </>
             }

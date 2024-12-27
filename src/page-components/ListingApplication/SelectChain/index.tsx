@@ -626,7 +626,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
             title="Chain Guide"
             tip={
               <>
-                <p>Tips:</p>
+                <p className={clsx(!isMobile && 'font-15')}>Tips:</p>
                 <ul className="list-style-decimal">
                   <li>Please select at least one aelf chain and one other chain.</li>
                   <li>
