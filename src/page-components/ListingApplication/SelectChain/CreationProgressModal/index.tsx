@@ -6,17 +6,16 @@ import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
 import Remind, { RemindType } from 'components/Remind';
 import CommonButton from 'components/CommonButton';
 import ListingTip from '../../ListingTip';
-import { createToken } from 'contracts/ethereum';
 import { useMobile } from 'contexts/useStore/hooks';
 import { useWeb3 } from 'hooks/web3';
 import { getApplicationIssue, prepareBindIssue } from 'utils/api/application';
 import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
 import { getChainIdByAPI } from 'utils/chain';
-import { useCreateTokenContract } from 'hooks/useContract';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
 import { ERCChainConstants } from 'constants/ChainConstants';
 import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
+import { useCallEVMCreateToken } from 'hooks/token';
 
 export interface ICreationProgressModalProps {
   open: boolean;
@@ -52,13 +51,11 @@ export default function CreationProgressModal({
 }: ICreationProgressModalProps) {
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
-  const createTokenContract = useCreateTokenContract();
   const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | number>>({});
-
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
   const [stepItems, setStepItems] = useState<TStepItem[]>([]);
-
+  const callEVMCreateToken = useCallEVMCreateToken();
   const isWarning = useMemo(() => {
     return (
       stepItems.length > 0 &&
@@ -180,11 +177,9 @@ export default function CreationProgressModal({
         if (!evmAccount) {
           throw new Error('No address found');
         }
-        if (!createTokenContract) {
-          throw new Error('No create token contract found');
-        }
-        const res = await createToken({
-          createTokenContract,
+        const chainId = getChainIdByAPI(chain.chainId || '');
+        const res = await callEVMCreateToken({
+          chainId,
           account: evmAccount,
           name: chain.tokenName,
           symbol: chain.symbol,
@@ -199,7 +194,7 @@ export default function CreationProgressModal({
         throw error;
       }
     },
-    [createTokenContract, evmAccount, supply],
+    [callEVMCreateToken, evmAccount, supply],
   );
 
   const handlePollingForIssueResult = useCallback(
