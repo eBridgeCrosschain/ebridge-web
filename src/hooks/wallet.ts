@@ -57,7 +57,7 @@ export function useInitWallet() {
 }
 
 export function useAelfAuthListener() {
-  // const { setLoading } = useLoading(); // TODO
+  const { setGlobalLoading } = useGlobalLoading();
   const { isConnected, walletInfo, walletType } = useConnectWallet();
 
   const { queryAuth } = useAelfAuthToken();
@@ -80,8 +80,8 @@ export function useAelfAuthListener() {
     } else {
       eBridgeInstance.setUnauthorized(false);
     }
-    // setLoading(false);
-  }, [isConnected, queryAuth, walletInfo, walletType]);
+    setGlobalLoading(false);
+  }, [isConnected, queryAuth, setGlobalLoading, walletInfo, walletType]);
   const onAuthorizationExpiredRef = useRef(onAuthorizationExpired);
   onAuthorizationExpiredRef.current = onAuthorizationExpired;
 
@@ -117,31 +117,33 @@ export function useAelfLogin() {
 
   return useCallback(
     async (isNeedGetJWT = false, handleConnectedCallback?: () => Promise<void> | void, isStopLoading = false) => {
-      const _isNeedGetJWT =
-        router.asPath?.includes(ROUTE_PATHS.LISTING_APPLICATION) ||
-        router.asPath?.includes(ROUTE_PATHS.MY_APPLICATIONS) ||
-        isNeedGetJWT;
-
-      if (isLoginRef.current) {
-        if (_isNeedGetJWT) {
-          await getAuthRef.current(true, false);
-        }
-        await handleConnectedCallback?.();
-        return;
-      }
-
-      if (isStopLoading) {
-        setGlobalLoading(false);
-      }
-
       try {
+        const _isNeedGetJWT =
+          router.asPath?.includes(ROUTE_PATHS.LISTING_APPLICATION) ||
+          router.asPath?.includes(ROUTE_PATHS.MY_APPLICATIONS) ||
+          isNeedGetJWT;
+
+        if (isLoginRef.current) {
+          if (_isNeedGetJWT) {
+            await getAuthRef.current(true, false);
+          }
+          await handleConnectedCallback?.();
+          return;
+        }
+
+        if (isStopLoading) {
+          setGlobalLoading(false);
+        }
         await connectWallet();
         if (_isNeedGetJWT) {
+          setGlobalLoading(true);
           await getAuthRef.current(true, false);
         }
         await handleConnectedCallback?.();
       } catch (error) {
         CommonMessage.error(handleWebLoginErrorMessage(error));
+      } finally {
+        setGlobalLoading(false);
       }
     },
     [connectWallet, router.asPath, setGlobalLoading],

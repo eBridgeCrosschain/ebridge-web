@@ -14,6 +14,7 @@ import { recoverPubKey } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { useEffectOnce } from 'react-use';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 
 export function useAelfAuthToken() {
   const { account } = useAElf();
@@ -28,7 +29,7 @@ export function useAelfAuthToken() {
 
   const walletInfoRef = useRef(walletInfo);
   walletInfoRef.current = walletInfo;
-  // const { setLoading } = useLoading(); // TODO
+  const { setGlobalLoading } = useGlobalLoading();
 
   const loginSuccessActive = useCallback(() => {
     console.log('%c login success and emit event', 'color: green');
@@ -99,6 +100,7 @@ export function useAelfAuthToken() {
       try {
         // Mark: only one signature process can be performed at the same time
         eBridgeInstance.setObtainingSignature(true);
+        setGlobalLoading(true);
         const { caHash, originChainId } = await getCaHashAndOriginChainIdByWallet(
           walletInfoRef.current as WebLoginWalletInfo,
           loginWalletTypeRef.current,
@@ -138,7 +140,7 @@ export function useAelfAuthToken() {
         eBridgeInstance.setObtainingSignature(false);
       }
     },
-    [handleSignMessage, loginSuccessActive, disConnectWallet],
+    [setGlobalLoading, handleSignMessage, loginSuccessActive, disConnectWallet],
   );
 
   const getAuth = useCallback(
