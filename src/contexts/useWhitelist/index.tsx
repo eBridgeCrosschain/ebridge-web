@@ -6,6 +6,7 @@ import { setDefaultWhitelist, WhitelistActions, WhitelistItem, WhitelistState } 
 import { getTokenWhiteList } from 'utils/api/common';
 import { useEffectOnce } from 'react-use';
 import { DefaultWhitelistMap } from 'constants/index';
+import useInterval from 'hooks/useInterval';
 
 const INITIAL_STATE = { defaultWhitelistMap: DefaultWhitelistMap };
 
@@ -66,9 +67,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       console.debug(error, '===onGetTokenWhiteList');
     }
   }, [dispatch]);
-  useEffectOnce(() => {
-    onGetTokenWhiteList();
-  });
+  useInterval(onGetTokenWhiteList, 30000, [onGetTokenWhiteList]);
 
   return (
     <WhitelistContext.Provider value={useMemo(() => [state, actions], [actions, state])}>
