@@ -10,19 +10,17 @@ import { DEFAULT_NULL_VALUE } from 'constants/misc';
 export default function ActionBox({
   symbol,
   tokenIcon,
-  chainName,
+  chainId,
   id,
   status,
 }: {
   symbol: string;
   tokenIcon?: string;
-  chainName: string;
+  chainId: string;
   id: string;
   status: ApplicationChainStatusEnum;
 }) {
   const router = useRouter();
-  // TODO
-  // const { setLoading } = useLoading();
   const [openViewProgress, setOpenViewProgress] = useState(false);
 
   const isSucceed = useMemo(() => {
@@ -93,7 +91,7 @@ export default function ActionBox({
         status={status}
         tokenSymbol={symbol}
         tokenIcon={tokenIcon}
-        chainName={chainName}
+        chainId={chainId}
         onClose={handleCloseViewProgress}
         onConfirm={handleConfirmViewProgress}
       />

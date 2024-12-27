@@ -14,7 +14,7 @@ import { recoverPubKey } from 'utils/aelfUtils';
 import { eBridgeInstance } from 'utils/eBridgeInstance';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { useEffectOnce } from 'react-use';
-import useGlobalLoading from 'hooks/useGlobalLoading';
+import useGlobalLoading from './useGlobalLoading';
 
 export function useAelfAuthToken() {
   const { account } = useAElf();

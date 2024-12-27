@@ -19,14 +19,17 @@ function ListingComplete() {
   }, [router]);
 
   return (
-    <div className={clsx('flex-column-center', styles['listing-complete-container'])}>
-      <CommonImage className={styles['complete-icon']} src={completeIcon} />
-      <div className={styles['title']}>{ListingCompleteTitle}</div>
-      <div className={styles['content']}>{ListingCompleteContent}</div>
+    <div className={clsx(styles['listing-complete-container'])}>
+      <div className={styles['component-title']}>Complete</div>
+      <div className={clsx('flex-column-center', styles['listing-complete-body'])}>
+        <CommonImage className={styles['complete-icon']} src={completeIcon} />
+        <div className={styles['title']}>{ListingCompleteTitle}</div>
+        <div className={styles['content']}>{ListingCompleteContent}</div>
 
-      <CommonButton className={clsx(styles['transfer-button'])} type="primary" onClick={handleGoBridge}>
-        {BRIDGE_NOW}
-      </CommonButton>
+        <CommonButton className={clsx(styles['transfer-button'])} type="primary" onClick={handleGoBridge}>
+          {BRIDGE_NOW}
+        </CommonButton>
+      </div>
     </div>
   );
 }

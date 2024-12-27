@@ -37,6 +37,7 @@ function InitializeTokenPool({ networks }: { networks: { name: string }[] }) {
 
   return (
     <div className={styles['init-token-pool']}>
+      <div className={styles['component-title']}>Initialize Token Pool</div>
       <div className={styles['init-token-pool-body']}>
         <CommonImage className={styles['view-progress-icon']} src={viewProgressIcon} />
         <div className={styles['init-token-pool-text']}>

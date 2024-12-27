@@ -6,20 +6,20 @@ import { ApplicationChainStatusEnum, TApplicationDetailItemChainTokenInfo } from
 import { sleep } from 'utils';
 import { changeAddLiquidityStatus, getApplicationDetail } from 'utils/api/application';
 import ListingTip from '../ListingTip';
-import { useAElf, useWeb3 } from 'hooks/web3';
+import { useAElf, useEVMSwitchChain, useWeb3 } from 'hooks/web3';
 import { useSetAelfAuthFromStorage, useShowLoginButtonLoading } from 'hooks/aelfAuthToken';
 import useMediaQueries from 'hooks/useMediaQueries';
 import styles from './styles.module.less';
 import { formatSymbol } from 'utils/token';
 import { useAelfLogin } from 'hooks/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
-import { divDecimals, formatWithCommas } from 'utils/calculate';
+import { AmountSign, divDecimals, formatWithCommas } from 'utils/calculate';
 import EmptyDataBox from 'components/EmptyDataBox';
 import CommonButton from 'components/CommonButton';
-import { BUTTON_TEXT_SUBMIT, CONNECT_AELF_WALLET, SERVICE_BUSY_TIP, ZERO } from 'constants/misc';
+import { CONNECT_AELF_WALLET, ZERO } from 'constants/misc';
 import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
 import CommonAmountRow from 'components/CommonAmountRow';
-import useLoadingModal from 'hooks/useLoadingModal';
+import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useConnect } from 'hooks/useConnect';
 import { useBalances } from 'hooks/useBalances';
 import { getMaxAmount, parseInputChange } from 'utils/input';
@@ -32,10 +32,12 @@ import { isELFChain } from 'utils/aelfUtils';
 import { useThrottleCallback } from 'hooks';
 import { usePoolContract, useTokenContract } from 'hooks/useContract';
 import { addLiquidity } from 'utils/pools';
-import { ResultType } from 'components/Loading/ResultModal';
-import { getChainIdByAPI, getChainType } from 'utils/chain';
+import { getChainIdByAPI, getChainName, getChainType } from 'utils/chain';
 import { useTokenPrice } from 'hooks/token';
 import { ROUTE_PATHS } from 'constants/link';
+import BigNumber from 'bignumber.js';
+import CommonMessage from 'components/CommonMessage';
+import { handleErrorMessage } from 'utils/error';
 
 export interface AddTokenPoolProps {
   id?: string;
@@ -65,11 +67,13 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
   }, [router.query?.symbol, symbol]);
 
   const isMd = useMediaQueries('md');
-  const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
+  const { setGlobalLoading } = useGlobalLoading();
+  const [loadingOpen, setLoadingOpen] = useState(false);
 
   // wallet data
   const web3Wallet = useWeb3();
   const { account: web3Account, library: web3Library } = web3Wallet || {};
+  const evmSwitchChain = useEVMSwitchChain();
   const connect = useConnect();
   const aelfWallet = useAElf();
   const { isActive: isAelfActive, account: aelfAccount, library: aelfLibrary } = aelfWallet || {};
@@ -91,9 +95,8 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
   const [tokenInfoList, setTokenInfoList] = useState<TApplicationDetailItemChainTokenInfo[]>([]);
   const [currentTokenInfo, setCurrentTokenInfo] = useState<TApplicationDetailItemChainTokenInfo | undefined>();
   const [tokenPoolSteps, setTokenPoolSteps] = useState<ICommonStepsProps['stepItems']>([]);
-  const [currentStep, setCurrentStep] = useState(0); // TODO
+  const [currentStep, setCurrentStep] = useState(0);
   const alreadySetCurrentStepRef = useRef(false);
-  const [addTokenPoolCount, setAddTokenPoolCount] = useState(0);
   const [submitDisabled, setSubmitDisable] = useState(true);
   const [amount, setAmount] = useState<string>();
   const { price } = useTokenPrice(currentSymbol);
@@ -104,9 +107,23 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
         : { ...web3Wallet, chainId: currentChainIdFormat };
     }, [aelfWallet, currentChainIdFormat, web3Wallet]),
     useMemo(() => {
-      if (isELFChain(currentChainIdFormat)) return [currentTokenInfo?.symbol];
+      if (isELFChain(currentChainIdFormat))
+        return [
+          {
+            name: currentTokenInfo?.tokenName,
+            decimals: currentTokenInfo?.decimals || 0,
+            symbol: currentTokenInfo?.symbol || '',
+            address: currentTokenInfo?.contractAddress,
+          },
+        ];
       return [currentTokenInfo?.contractAddress];
-    }, [currentChainIdFormat, currentTokenInfo?.symbol, currentTokenInfo?.contractAddress]),
+    }, [
+      currentChainIdFormat,
+      currentTokenInfo?.tokenName,
+      currentTokenInfo?.decimals,
+      currentTokenInfo?.symbol,
+      currentTokenInfo?.contractAddress,
+    ]),
   );
   const showBalance = useMemo(
     () => divDecimals(balance, currentTokenInfo?.decimals),
@@ -117,22 +134,20 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
     () => getMaxAmount({ chainId: currentChainIdFormat, symbol: currentTokenInfo?.symbol, balance: showBalance }),
     [currentChainIdFormat, currentTokenInfo?.symbol, showBalance],
   );
+  const inputAmountMin = useMemo(() => {
+    if (!currentTokenInfo?.minAmount) return min.dp(4, BigNumber.ROUND_CEIL).toFixed();
+    return ZERO.plus(currentTokenInfo?.minAmount).div(price).dp(4, BigNumber.ROUND_CEIL).toFixed();
+  }, [currentTokenInfo?.minAmount, min, price]);
   const showError = useMemo(() => amount && currentAccount && max.lt(amount), [amount, currentAccount, max]);
   const poolContract = usePoolContract(
-    useMemo(() => {
-      return currentChainIdFormat;
-    }, [currentChainIdFormat]),
+    currentChainIdFormat,
     undefined,
-    aelfWallet?.isPortkey,
+    isELFChain(currentChainIdFormat) ? aelfWallet?.isPortkey : web3Wallet?.isPortkey,
   );
   const tokenContract = useTokenContract(
-    useMemo(() => {
-      return currentChainIdFormat;
-    }, [currentChainIdFormat]),
-    useMemo(() => {
-      return currentTokenInfo?.contractAddress;
-    }, [currentTokenInfo?.contractAddress]),
-    aelfWallet?.isPortkey,
+    currentChainIdFormat,
+    currentTokenInfo?.contractAddress,
+    isELFChain(currentChainIdFormat) ? aelfWallet?.isPortkey : web3Wallet?.isPortkey,
   );
 
   const tipNode = useMemo(() => {
@@ -161,7 +176,7 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
   const getData = useCallback(async () => {
     if (!isAelfActive) return;
     try {
-      // isLoading && setLoading(true); // TODO
+      setGlobalLoading(true);
 
       await setAelfAuthFromStorage();
       await sleep(500);
@@ -176,16 +191,17 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
         concatList = chainTokenInfos;
       }
 
-      if (concatList.length === 0) {
-        router.push(ROUTE_PATHS.MY_APPLICATIONS);
-        return;
-      }
-
       // if all chain-pool is not initialized, go my-applications page
       const _poolInitializingList = concatList.filter(
         (item) => item.status === ApplicationChainStatusEnum.PoolInitializing,
       );
-      if (_poolInitializingList.length === concatList.length) {
+      // if all chain-pool is not added, go my-applications page
+      const _poolAddedList = concatList.filter((item) => AlreadyPoolAddedStatus.includes(item.status));
+      if (
+        concatList.length === 0 ||
+        _poolInitializingList.length === concatList.length ||
+        _poolAddedList.length === concatList.length
+      ) {
         router.push(ROUTE_PATHS.MY_APPLICATIONS);
         return;
       }
@@ -194,7 +210,7 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
       const _list: ICommonStepsProps['stepItems'] = [];
       concatList.forEach((item, index) => {
         _list.push({
-          title: 'Add pool on ' + item.chainName,
+          title: 'Add pool on ' + getChainName(getChainIdByAPI(item.chainId)),
         });
 
         if (!alreadySetCurrentStepRef.current && !AlreadyPoolAddedStatus.includes(item.status)) {
@@ -216,9 +232,9 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
     } catch (error) {
       console.log('InitializeLiquidityPool getData error', error);
     } finally {
-      // setLoading(false);
+      setGlobalLoading(false);
     }
-  }, [currentId, currentSymbol, isAelfActive, router, setAelfAuthFromStorage]);
+  }, [currentId, currentSymbol, isAelfActive, router, setAelfAuthFromStorage, setGlobalLoading]);
 
   const init = useCallback(async () => {
     if (currentId) {
@@ -240,11 +256,11 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
   const connectAndInitRef = useRef(connectAndInit);
   connectAndInitRef.current = connectAndInit;
   const connectAndInitSleep = useCallback(async () => {
-    // setLoading(true); // TODO
+    setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
     await sleep(3000);
     connectAndInitRef.current();
-  }, []);
+  }, [setGlobalLoading]);
   useEffectOnce(() => {
     connectAndInitSleep();
   });
@@ -298,9 +314,19 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
 
   const onAddLiquidity = useThrottleCallback(async () => {
     try {
-      if (!currentChainIdFormat || !currentTokenInfo || !currentAccount || !tokenContract || !poolContract || !amount)
+      if (
+        !currentChainId ||
+        !currentChainIdFormat ||
+        !currentTokenInfo ||
+        !currentAccount ||
+        !tokenContract ||
+        !poolContract ||
+        !amount
+      )
         return;
-      setLoadingModal({ open: true });
+      setGlobalLoading(true);
+      setLoadingOpen(true);
+      if (poolContract.contractType === 'ERC') await evmSwitchChain(currentChainIdFormat);
       const req = await addLiquidity({
         symbol: currentTokenInfo?.symbol,
         amount: amount,
@@ -309,46 +335,61 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
         poolContract,
         chainId: currentChainIdFormat,
         tokenContract,
+        tokenInfo: {
+          symbol: currentTokenInfo?.symbol,
+          address: currentTokenInfo?.contractAddress,
+          isNativeToken: false,
+          decimals: currentTokenInfo?.decimals,
+        },
       });
-      if (req.error) {
-        setResultModal({ open: true, type: ResultType.REJECTED });
-      } else {
-        setResultModal({ open: true, type: ResultType.APPROVED });
-        setAddTokenPoolCount(addTokenPoolCount + 1); // TODO
-      }
+      setGlobalLoading(false);
+      setLoadingOpen(false);
       console.log(req, '=====req');
+      if (req.error) {
+        CommonMessage.error(handleErrorMessage(req.error));
+      } else {
+        setAmount('');
+
+        // No need to display error messages
+        changeAddLiquidityStatus({
+          orderId: currentId,
+          chainId: currentChainId,
+          amount,
+        });
+
+        if (currentStep < tokenInfoList.length - 1) {
+          const _nextStepIndex = currentStep + 1;
+          setCurrentStep(_nextStepIndex);
+          alreadySetCurrentStepRef.current = true;
+          setCurrentTokenInfo(tokenInfoList[_nextStepIndex]);
+          setCurrentChainId(tokenInfoList[_nextStepIndex].chainId as TBridgeChainId);
+        } else if (currentStep === tokenInfoList.length - 1) {
+          await sleep(200);
+          onNext?.();
+        }
+      }
     } catch (error) {
-      setResultModal({ open: true, type: ResultType.REJECTED });
-    } finally {
-      setLoadingModal({ open: false });
+      setGlobalLoading(false);
+      setLoadingOpen(false);
+      CommonMessage.error(handleErrorMessage(error));
     }
   }, [
-    addTokenPoolCount,
     aelfLibrary,
     amount,
     currentAccount,
+    currentChainId,
     currentChainIdFormat,
+    currentId,
+    currentStep,
     currentTokenInfo,
+    evmSwitchChain,
+    onNext,
     poolContract,
-    setLoadingModal,
-    setResultModal,
+    setGlobalLoading,
     tokenContract,
+    tokenInfoList,
     web3Library,
   ]);
-
-  const onSubmit = useCallback(async () => {
-    try {
-      if (!currentChainId || !amount) return;
-      const res = await changeAddLiquidityStatus({ orderId: currentId, chainId: currentChainId, amount });
-      if (res) {
-        onNext?.();
-      } else {
-        setResultModal({ open: true, type: ResultType.REJECTED });
-      }
-    } catch (error) {
-      setResultModal({ open: true, type: ResultType.REJECTED, approvedDescription: SERVICE_BUSY_TIP });
-    }
-  }, [amount, currentChainId, currentId, onNext, setResultModal]);
 
   const btnProps = useMemo(() => {
     let children = 'Enter Amount';
@@ -369,26 +410,23 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
       return { children, disabled, onClick };
     }
 
-    if (amount && ZERO.lte(amount)) {
+    if (amount !== '0' && amount && ZERO.lte(amount) && ZERO.plus(inputAmountMin).lte(amount)) {
       children = 'Add';
       disabled = false;
     }
 
     return { children, disabled, onClick };
-  }, [amount, connect, currentAccount, currentChainIdFormat, max, onAddLiquidity, submitDisabled]);
-
-  const inputAmountPlaceholder = useMemo(() => {
-    if (!currentTokenInfo?.minAmount) return 'Min 0';
-
-    return 'Min ' + ZERO.plus(currentTokenInfo?.minAmount).times(price);
-  }, [currentTokenInfo?.minAmount, price]);
+  }, [amount, connect, currentAccount, currentChainIdFormat, inputAmountMin, max, onAddLiquidity, submitDisabled]);
 
   const renderInputAmountContent = useMemo(() => {
     return (
       <div className={styles['token-pool-input-container']}>
         <CommonAmountRow
-          inputWrapClassName={styles['token-pool-input-wrap']}
-          placeholder={inputAmountPlaceholder}
+          inputWrapClassName={clsx(
+            styles['token-pool-input-wrap'],
+            !!showError && styles['token-pool-input-wrap-error'],
+          )}
+          placeholder={'Min ' + inputAmountMin}
           showBalance={!!currentAccount}
           showError={!!showError}
           value={amount}
@@ -409,8 +447,14 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
           }
         />
         <div className={styles['estimated-value']}>
-          {`Estimated value: $ ${unitConverter(ZERO.plus(amount ?? 0).times(price))}`}
+          {`Estimated value: $${unitConverter(ZERO.plus(amount ?? 0).times(price))}`}
         </div>
+        {amount && ZERO.lte(amount) && ZERO.plus(inputAmountMin).gt(amount) && (
+          <div className={styles['input-error-tip']}>{`Liquidity cannot be less than ${formatWithCommas({
+            amount: currentTokenInfo?.minAmount,
+            sign: AmountSign.USD,
+          })}.`}</div>
+        )}
       </div>
     );
   }, [
@@ -419,8 +463,9 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
     currentChainIdFormat,
     currentTokenInfo?.decimals,
     currentTokenInfo?.icon,
+    currentTokenInfo?.minAmount,
     currentTokenInfo?.symbol,
-    inputAmountPlaceholder,
+    inputAmountMin,
     max,
     min,
     price,
@@ -438,33 +483,20 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
         </div>
         {tipNode}
       </div>
-      {modal}
 
       {isAelfActive ? (
         <>
           {renderMainContent}
           {renderInputAmountContent}
-          {addTokenPoolCount === tokenInfoList.length ? (
-            <div className={styles['action-btn-wrapper']}>
-              <CommonButton
-                className={styles['action-btn']}
-                type="primary"
-                onClick={onSubmit}
-                disabled={submitDisabled}>
-                {BUTTON_TEXT_SUBMIT}
-              </CommonButton>
-            </div>
-          ) : (
-            <div className={styles['action-btn-wrapper']}>
-              <CommonButton
-                {...btnProps}
-                loading={loadingOpen}
-                type="primary"
-                className={clsx(styles['action-btn'], loadingOpen && styles['action-btn-loading'])}>
-                {btnProps.children}
-              </CommonButton>
-            </div>
-          )}
+          <div className={styles['action-btn-wrapper']}>
+            <CommonButton
+              {...btnProps}
+              loading={loadingOpen}
+              type="primary"
+              className={clsx(styles['action-btn'], loadingOpen && styles['action-btn-loading'])}>
+              {btnProps.children}
+            </CommonButton>
+          </div>
         </>
       ) : (
         <>

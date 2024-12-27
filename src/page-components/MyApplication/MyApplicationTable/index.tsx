@@ -11,7 +11,7 @@ import { DEFAULT_NULL_VALUE } from 'constants/misc';
 import DisplayImage from 'components/DisplayImage';
 import { TablePagination } from 'page-components/Transactions/components';
 import IconFont from 'components/IconFont';
-import { getChainIdByAPI, getIconByChainId } from 'utils/chain';
+import { getChainIdByAPI, getChainName, getIconByChainId } from 'utils/chain';
 
 const MyApplicationTableColumns = [
   {
@@ -34,14 +34,11 @@ const MyApplicationTableColumns = [
     key: 'networkName',
     render: (_: any, item: TMyApplicationItem) => {
       const { chainTokenInfo } = getApplicationDisplayInfo(item);
-      // TODO
       const iconProps = getIconByChainId(getChainIdByAPI(chainTokenInfo?.chainId || ''));
       return chainTokenInfo?.chainId ? (
-        <div className="flex-row-center gap-8">
+        <div className="flex-row-center gap-4">
           <IconFont className={styles['network-icon']} type={iconProps?.type || ''} />
-          {/* TODO */}
-          {/* <div>{getChainName(getChainIdByAPI(chainTokenInfo?.chainId))}</div> */}
-          <span>{chainTokenInfo?.chainName}</span>
+          <div>{getChainName(getChainIdByAPI(chainTokenInfo?.chainId))}</div>
         </div>
       ) : (
         DEFAULT_NULL_VALUE
@@ -68,12 +65,12 @@ const MyApplicationTableColumns = [
     key: 'action',
     render: (_: any, item: TMyApplicationItem) => {
       const { chainTokenInfo } = getApplicationDisplayInfo(item);
-      return chainTokenInfo?.status && chainTokenInfo?.icon && chainTokenInfo.chainId && chainTokenInfo.chainName ? (
+      return chainTokenInfo?.status && chainTokenInfo?.icon && chainTokenInfo.chainId ? (
         <ActionBox
           status={chainTokenInfo.status}
           symbol={item.symbol}
           tokenIcon={chainTokenInfo.icon}
-          chainName={chainTokenInfo.chainName}
+          chainId={chainTokenInfo.chainId}
           id={item.id}
         />
       ) : (

@@ -30,7 +30,7 @@ export function valueToPercentage(input?: BigNumber.Value) {
 export enum AmountSign {
   PLUS = '+',
   MINUS = '-',
-  USD = '$ ',
+  USD = '$',
   EMPTY = '',
 }
 

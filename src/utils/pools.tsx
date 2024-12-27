@@ -17,6 +17,7 @@ export const addLiquidity = async ({
   poolContract,
   tokenContract,
   library,
+  tokenInfo,
 }: {
   symbol: string;
   account: string;
@@ -25,14 +26,18 @@ export const addLiquidity = async ({
   poolContract: ContractBasic;
   tokenContract?: ContractBasic;
   library: provider;
+  tokenInfo?: TokenInfo;
 }) => {
-  const tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
+  let _tokenInfo = tokenInfo;
+  if (!_tokenInfo?.symbol) {
+    _tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
+  }
 
-  const bigAmount = timesDecimals(amount, tokenInfo?.decimals).toFixed(0);
+  const bigAmount = timesDecimals(amount, _tokenInfo?.decimals).toFixed(0);
 
   const req = await checkApprove(
     library,
-    (isELFChain(chainId) ? tokenInfo?.symbol : tokenInfo?.address) as string,
+    (isELFChain(chainId) ? _tokenInfo?.symbol : _tokenInfo?.address) as string,
     account,
     poolContract.address || '',
     bigAmount,
@@ -48,9 +53,9 @@ export const addLiquidity = async ({
     });
   }
 
-  return poolContract?.callSendMethod('addLiquidity', account, [tokenInfo?.address, bigAmount], {
+  return poolContract?.callSendMethod('addLiquidity', account, [_tokenInfo?.address, bigAmount], {
     onMethod: 'receipt',
-    value: tokenInfo?.isNativeToken ? bigAmount : '0',
+    value: _tokenInfo?.isNativeToken ? bigAmount : '0',
   });
 };
 

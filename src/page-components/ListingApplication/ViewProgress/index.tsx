@@ -10,6 +10,7 @@ import { ListingProcessStep, VIEW_PROGRESS, VIEW_PROGRESS_STEPS } from 'constant
 import DisplayImage from 'components/DisplayImage';
 import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
 import CommonButton from 'components/CommonButton';
+import { getChainIdByAPI, getChainName } from 'utils/chain';
 
 export default function ViewProgress({
   className,
@@ -17,7 +18,7 @@ export default function ViewProgress({
   status,
   tokenSymbol,
   tokenIcon,
-  chainName,
+  chainId,
   onClose,
   onConfirm,
 }: {
@@ -26,7 +27,7 @@ export default function ViewProgress({
   status: ApplicationChainStatusEnum;
   tokenSymbol: string;
   tokenIcon?: string;
-  chainName: string;
+  chainId: string;
   onClose: () => void;
   onConfirm: () => void;
 }) {
@@ -68,7 +69,7 @@ export default function ViewProgress({
             <DisplayImage width={20} height={20} name={tokenSymbol} src={tokenIcon} />
             <span className={clsx(styles['token-symbol'])}>{formatSymbol(tokenSymbol)}</span>
           </div>
-          <div className={styles['token-network']}>{chainName}</div>
+          <div className={styles['token-network']}>{getChainName(getChainIdByAPI(chainId))}</div>
         </div>
         <div className={styles['view-progress-steps-wrapper']}>
           <CommonSteps
@@ -80,7 +81,7 @@ export default function ViewProgress({
         </div>
       </div>
     );
-  }, [chainName, currentStep, formatSteps, tokenIcon, tokenSymbol]);
+  }, [tokenSymbol, tokenIcon, chainId, formatSteps, currentStep]);
 
   return (
     <CommonModal
