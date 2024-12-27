@@ -16,6 +16,7 @@ export type TCommonAmountRowProps = {
   value?: InputProps['value'];
   onAmountInputChange?: InputProps['onChange'];
   showError?: boolean;
+  maxLength?: number;
 };
 
 export default function CommonAmountRow({
@@ -28,6 +29,7 @@ export default function CommonAmountRow({
   rightInputEle,
   value,
   showError,
+  maxLength = 25,
   onAmountInputChange,
 }: TCommonAmountRowProps) {
   const { t } = useLanguage();
@@ -47,6 +49,7 @@ export default function CommonAmountRow({
       </div>
       <div className={clsx(styles['amount-input-wrap'], 'flex-row-center')}>
         <AmountInput
+          maxLength={maxLength}
           className={clsx({ [styles['amount-input-red']]: showError })}
           value={value}
           onChange={onAmountInputChange}
