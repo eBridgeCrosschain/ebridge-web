@@ -474,7 +474,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     };
 
     if (unissuedOtherChains.length !== 0 || issuingOtherChains.length !== 0) {
-      if (unconnectedWallets.length !== 0) {
+      if (unconnectedWallets.length !== 0 && !isButtonDisabled) {
         props = {
           children: `Connect ${unconnectedWallets.join(', ')} Wallet${unconnectedWallets.length > 1 ? 's' : ''}`,
           onClick: handleConnectWallets,
@@ -502,6 +502,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     formData,
     issuedChains,
     unconnectedWallets,
+    isButtonDisabled,
     handleConnectWallets,
     handleCreateToken,
     handleAddChain,
