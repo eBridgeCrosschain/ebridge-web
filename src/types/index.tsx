@@ -53,6 +53,7 @@ export type TokenInfo = {
   isNativeToken?: boolean;
   onlyForm?: boolean;
   onlyTo?: boolean;
+  icon?: string;
 };
 
 export enum CrossChainType {

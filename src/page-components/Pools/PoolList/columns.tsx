@@ -19,7 +19,7 @@ const token: ColumnType<APIPoolItem> = {
     const chainId = getChainIdByAPI(item.chainId);
     return (
       <Row className="flex-row-center">
-        <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={token?.symbol} />
+        <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={token?.symbol} src={token?.icon} />
         <div>{formatSymbolAndNativeToken(token?.symbol)}</div>
       </Row>
     );

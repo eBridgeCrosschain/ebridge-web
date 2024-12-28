@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useActiveWhitelist } from './whitelist';
-import { ChainId } from 'types';
+import { ChainId, TokenInfo } from 'types';
 import { BRIDGE_TOKEN_MAP } from 'constants/index';
 import { getTokenPrice } from 'utils/api/common';
 import { useTokenDispatch, useTokenPriceByContext } from 'contexts/useToken/hooks';
@@ -17,7 +17,7 @@ export function useGetTokenInfoByWhitelist() {
     (chainId?: ChainId, symbol?: string) => {
       if (!chainId || !symbol) return;
       try {
-        return (activeWhitelist as any)[BRIDGE_TOKEN_MAP?.[symbol] || symbol]?.[chainId];
+        return (activeWhitelist as any)[BRIDGE_TOKEN_MAP?.[symbol] || symbol]?.[chainId] as TokenInfo;
       } catch (error) {
         console.debug(error, 'useGetTokenInfoByWhitelist');
       }
