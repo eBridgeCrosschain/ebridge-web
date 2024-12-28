@@ -16,6 +16,8 @@ import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIs
 import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
 import { useCallEVMCreateToken } from 'hooks/token';
+import useLockCallback from 'hooks/useLockCallback';
+import { useLatestRef } from 'hooks';
 
 export interface ICreationProgressModalProps {
   open: boolean;
@@ -52,6 +54,7 @@ export default function CreationProgressModal({
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
   const callEVMCreateToken = useCallEVMCreateToken();
+  const callEVMCreateTokenRef = useLatestRef(callEVMCreateToken);
   const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | number>>({});
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
@@ -181,7 +184,7 @@ export default function CreationProgressModal({
           throw new Error('No address found');
         }
         const chainId = getChainIdByAPI(chain.chainId || '');
-        const res = await callEVMCreateToken({
+        const res = await callEVMCreateTokenRef.current({
           chainId,
           account: evmAccount,
           name: chain.tokenName,
@@ -197,7 +200,7 @@ export default function CreationProgressModal({
         throw error;
       }
     },
-    [callEVMCreateToken, evmAccount, supply],
+    [callEVMCreateTokenRef, evmAccount, supply],
   );
 
   const handlePollingForIssueResult = useCallback(
@@ -256,7 +259,7 @@ export default function CreationProgressModal({
     );
   }, [handlePollingForIssueResult, handleStepItemChange, stepItems]);
 
-  const handleCreate = useCallback(async () => {
+  const handleCreate = useLockCallback(async () => {
     const create = async (step: number) => {
       try {
         const currentChain = stepItems[step].chain;
