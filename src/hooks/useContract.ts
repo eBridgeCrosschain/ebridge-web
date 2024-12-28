@@ -108,15 +108,15 @@ export function useERCContract(address: string | undefined, ABI: any, chainId?: 
 
 export async function getELFContract(
   contractAddress: string,
-  aelfInstance: AElfDappBridge,
+  aelfInstance?: AElfDappBridge,
   account?: string,
   chainId?: ChainId,
 ) {
-  const key = contractAddress + account + chainId + aelfInstance.chainId;
+  const key = contractAddress + account + chainId + aelfInstance?.chainId || '';
   if (!ContractMap[key]) {
     const viewInstance = chainId ? getAElf(chainId) : null;
     const wallet = account ? { address: account } : getWallet();
-    await checkAElfBridge(aelfInstance);
+    if (aelfInstance) await checkAElfBridge(aelfInstance);
     const [viewContract, aelfContract] = await Promise.all([
       viewInstance?.chain.contractAt(contractAddress, getWallet()),
       aelfInstance?.chain.contractAt(contractAddress, wallet),
@@ -140,7 +140,7 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
   const key = useMemo(() => contractAddress + '_' + chainId + '_' + account, [account, chainId, contractAddress]);
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!chainId || !aelfInstance || !contractAddress) return;
+      if (!chainId || !contractAddress) return;
       try {
         const contract = await getELFContract(contractAddress, aelfInstance, account, chainId);
         dispatch(setContract({ [key]: contract }));
