@@ -99,7 +99,7 @@ function MyApplications() {
 
   const connectAndInit = useCallback(() => {
     if (!isActive) {
-      handleAelfLogin(true, initRef.current);
+      handleAelfLogin(true, initRef.current, true);
     } else {
       initRef.current();
     }

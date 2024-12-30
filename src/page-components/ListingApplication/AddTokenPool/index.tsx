@@ -248,7 +248,7 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
 
   const connectAndInit = useCallback(() => {
     if (!isAelfActive) {
-      handleAelfLogin(true, initRef.current);
+      handleAelfLogin(true, initRef.current, true);
     } else {
       initRef.current();
     }
@@ -306,7 +306,7 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
             direction={isMd ? 'vertical' : 'horizontal'}
           />
         ) : (
-          <div className={styles['token-pool-step-title']}>{tokenPoolSteps?.[0].title}</div>
+          <div className={styles['token-pool-step-title']}>{tokenPoolSteps?.[0]?.title}</div>
         )}
       </div>
     );
