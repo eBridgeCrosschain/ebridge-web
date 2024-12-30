@@ -99,10 +99,10 @@ export default function WalletsModal() {
   }, [handleCloseModal, isFromELF]);
 
   useEffect(() => {
-    if (isLogin) {
+    if (isLogin && walletsModal) {
       handleConnectAELFWalletFinish();
     }
-  }, [handleConnectAELFWalletFinish, isLogin]);
+  }, [handleConnectAELFWalletFinish, isLogin, walletsModal]);
 
   return (
     <CommonModal
