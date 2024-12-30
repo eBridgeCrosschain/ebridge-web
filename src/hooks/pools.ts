@@ -25,6 +25,7 @@ export function usePoolTotalLiquidity(
   const [totalLiquidity, setTotalLiquidity] = useState<string>();
 
   const onGetTotalLiquidity = useCallback(async () => {
+    console.log(poolContract, tokenContract, tokenInfo);
     if (!poolContract || !tokenContract || !tokenInfo) return;
 
     try {
@@ -33,6 +34,8 @@ export function usePoolTotalLiquidity(
         tokenContract,
         symbol: tokenInfo.symbol,
       });
+      console.log(liquidity, '===liquidity');
+
       setTotalLiquidity(liquidity);
     } catch (error) {
       console.debug(error);

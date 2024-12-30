@@ -65,6 +65,7 @@
     "react-i18next": "^11.18.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-use": "^17.4.0",
+    "ton": "^11.16.0",
     "tonweb": "^0.0.66",
     "wagmi": "^2.14.3",
     "web3": "^1.7.4",

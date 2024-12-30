@@ -15,7 +15,12 @@ const toKey = (key: string) => {
   return BigInt(`0x${sha256(key).toString('hex')}`);
 };
 
-export function buildOnchainMetadata(data: { name: string; description: string; image: string }): Cell {
+export function buildOnchainMetadata(data: {
+  name: string;
+  description: string;
+  image: string;
+  decimals: string;
+}): Cell {
   const dict = Dictionary.empty(Dictionary.Keys.BigUint(256), Dictionary.Values.Cell());
 
   // Store the on-chain metadata in the dictionary

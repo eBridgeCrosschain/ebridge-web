@@ -12,18 +12,22 @@ export default function TestTon() {
         onClick={async () => {
           try {
             if (!wallet?.account.address) return;
-
-            const createTonTokenRequest = await getCreateTonTokenRequest({
+            const params = {
               ownerAddress: wallet?.account.address,
-              network: CHAIN.MAINNET,
+              network: CHAIN.TESTNET,
               tokenInfo: {
-                name: 'test on ton token name',
-                description: 'test on ton token description',
-                symbol: 'MASON',
+                name: 'test on ton token name fourth',
+                description: 'test on ton token description fourth',
+                symbol: 'FOURTH',
                 imageUri: 'https://avatars.githubusercontent.com/u/104382459?s=200&v=4',
-                tokenMaxSupply: 10000,
+                tokenMaxSupply: 20000,
+                decimals: '6',
               },
-            });
+            };
+
+            console.log(params, '====params');
+
+            const createTonTokenRequest = await getCreateTonTokenRequest(params);
             const result = await tonConnectUI.sendTransaction(createTonTokenRequest);
 
             console.log(result, '===result');

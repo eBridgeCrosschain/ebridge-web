@@ -3,6 +3,7 @@ import { buildOnchainMetadata } from './jettonHelpers';
 import { SampleJetton, storeMint } from './sampleJetton';
 import base64 from 'base64-js';
 import { SendTransactionRequest } from '@tonconnect/ui-react';
+import { timesDecimals } from 'utils/calculate';
 
 export async function getCreateTonTokenRequest({
   ownerAddress,
@@ -17,6 +18,7 @@ export async function getCreateTonTokenRequest({
     symbol: string;
     imageUri: string;
     tokenMaxSupply: number;
+    decimals: string;
   };
 }) {
   const workChain = 0; // workChain default 0
@@ -28,9 +30,10 @@ export async function getCreateTonTokenRequest({
     description: tokenInfo.description,
     symbol: tokenInfo.symbol,
     image: tokenInfo.imageUri,
+    decimals: tokenInfo.decimals,
   };
 
-  const tokenMaxSupply = toNano(tokenInfo.tokenMaxSupply);
+  const tokenMaxSupply = BigInt(timesDecimals(tokenInfo.tokenMaxSupply, tokenInfo.decimals).toFixed(0));
   const content = buildOnchainMetadata(jettonParams);
   const init = await SampleJetton.init(userAddress, content, tokenMaxSupply);
   const jettonMaster = contractAddress(workChain, init);
