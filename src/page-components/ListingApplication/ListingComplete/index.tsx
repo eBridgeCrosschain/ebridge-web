@@ -8,7 +8,7 @@ import { completeIcon } from 'assets/images';
 import { BRIDGE_NOW } from 'constants/listingApplication';
 import { ROUTE_PATHS } from 'constants/link';
 
-const ListingCompleteTitle = 'Listing is complete';
+const ListingCompleteTitle = 'Listing complete.';
 const ListingCompleteContent = 'The Bridge will be available in 10 minutes.';
 
 function ListingComplete() {
