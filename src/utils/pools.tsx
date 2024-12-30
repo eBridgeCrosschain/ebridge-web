@@ -45,7 +45,7 @@ export const addLiquidity = async ({
       isELFChain(chainId) ? tokenContract : undefined,
     );
 
-    if (req !== REQ_CODE.Success) throw req;
+    if (req !== REQ_CODE.Success) throw new Error('Failed to add liquidity.');
   }
   if (isELFChain(chainId)) {
     return poolContract?.callSendMethod('addLiquidity', account, {
