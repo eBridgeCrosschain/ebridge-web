@@ -138,7 +138,10 @@ function AddTokenPool({ id, symbol, onNext }: AddTokenPoolProps) {
     if (!currentTokenInfo?.minAmount) return min.dp(4, BigNumber.ROUND_CEIL).toFixed();
     return ZERO.plus(currentTokenInfo?.minAmount).div(price).dp(4, BigNumber.ROUND_CEIL).toFixed();
   }, [currentTokenInfo?.minAmount, min, price]);
-  const showError = useMemo(() => amount && currentAccount && max.lt(amount), [amount, currentAccount, max]);
+  const showError = useMemo(
+    () => amount && currentAccount && (max.lt(amount) || (ZERO.lte(amount) && ZERO.plus(inputAmountMin).gt(amount))),
+    [amount, currentAccount, inputAmountMin, max],
+  );
   const poolContract = usePoolContract(
     currentChainIdFormat,
     undefined,
