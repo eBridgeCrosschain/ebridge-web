@@ -108,7 +108,18 @@ export default function ActionButton() {
       setResultModal({ open: true, type: ResultType.REJECTED, onRetry: onCrossChainTransfer });
     }
     dispatch(setActionLoading(false));
-  }, [dispatch, fromAccount, fromChainId, fromInput, selectToken, toAccount, toChainId, tokenContract]);
+  }, [
+    checkPortkeyConnect,
+    dispatch,
+    fromAccount,
+    fromChainId,
+    fromInput,
+    selectToken,
+    setResultModal,
+    toAccount,
+    toChainId,
+    tokenContract,
+  ]);
 
   const onCreateReceipt = useCallback(async () => {
     console.log(
@@ -135,7 +146,7 @@ export default function ActionButton() {
     setIsBridgeButtonLoading(true);
     const params: any = {
       library,
-      fromToken: fromTokenInfo?.address || fromTokenInfo?.symbol,
+      fromToken: isELFChain(fromChainId) ? fromTokenInfo?.symbol : fromTokenInfo?.address,
       account: fromAccount,
       bridgeContract,
       amount: timesDecimals(fromInput, fromTokenInfo.decimals).toFixed(0),

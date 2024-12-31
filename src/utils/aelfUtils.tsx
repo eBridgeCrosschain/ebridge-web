@@ -24,7 +24,7 @@ export function getNodeByChainId(chainId: ChainId) {
 }
 
 export function getAElf(chainId: ChainId) {
-  const rpc = getNodeByChainId(chainId).rpcUrl;
+  const rpc = getNodeByChainId(chainId)?.rpcUrl;
   if (!httpProviders[rpc]) httpProviders[rpc] = new AElf(new AElf.providers.HttpProvider(rpc));
   return httpProviders[rpc];
 }
