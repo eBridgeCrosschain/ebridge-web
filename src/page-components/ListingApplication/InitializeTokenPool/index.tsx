@@ -45,7 +45,7 @@ function InitializeTokenPool({ networks }: { networks: { name: string }[] }) {
         </div>
 
         <div className={styles['init-token-pool-desc']}>
-          {`Initializing the token pool is expected to be completed in1-2 business days.`}
+          {`Initializing the token pool is expected to be completed in 1-2 business days.`}
         </div>
         <CommonButton type={'ghost'} className={styles['view-progress-button']} onClick={handleGoMyApplications}>
           {VIEW_PROGRESS}

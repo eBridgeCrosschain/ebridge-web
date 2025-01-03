@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { LISTING_STEP_PATHNAME_MAP, ListingStep, VIEW_PROGRESS } from 'constants/listingApplication';
+import { BRIDGE_NOW, LISTING_STEP_PATHNAME_MAP, ListingStep, VIEW_PROGRESS } from 'constants/listingApplication';
 import { useRouter } from 'next/router';
 import { ApplicationChainStatusEnum } from 'types/api';
 import styles from './styles.module.less';
@@ -11,13 +11,11 @@ export default function ActionBox({
   symbol,
   tokenIcon,
   chainId,
-  id,
   status,
 }: {
   symbol: string;
   tokenIcon?: string;
   chainId: string;
-  id: string;
   status: ApplicationChainStatusEnum;
 }) {
   const router = useRouter();
@@ -29,10 +27,6 @@ export default function ActionBox({
 
   const isFailed = useMemo(() => {
     return status === ApplicationChainStatusEnum.Failed;
-  }, [status]);
-
-  const isNeedAddTokenPool = useMemo(() => {
-    return status === ApplicationChainStatusEnum.PoolInitialized;
   }, [status]);
 
   const handleViewProgress = useCallback(() => {
@@ -47,14 +41,6 @@ export default function ActionBox({
     setOpenViewProgress(false);
   }, []);
 
-  const handleAddTokenPool = useCallback(() => {
-    router.push(
-      `${ROUTE_PATHS.LISTING_APPLICATION}${
-        LISTING_STEP_PATHNAME_MAP[ListingStep.ADD_TOKEN_POOL]
-      }?symbol=${symbol}&id=${id}`,
-    );
-  }, [id, router, symbol]);
-
   const handleLaunchOnOtherChain = useCallback(() => {
     router.push(
       `${ROUTE_PATHS.LISTING_APPLICATION}${LISTING_STEP_PATHNAME_MAP[ListingStep.SELECT_CHAIN]}?symbol=${symbol}`,
@@ -64,21 +50,13 @@ export default function ActionBox({
   if (isSucceed) {
     return (
       <div className={styles['action']} onClick={handleLaunchOnOtherChain}>
-        Launch on other chain
+        {BRIDGE_NOW}
       </div>
     );
   }
 
   if (isFailed) {
     return <div>{DEFAULT_NULL_VALUE}</div>;
-  }
-
-  if (isNeedAddTokenPool) {
-    return (
-      <div className={styles['action']} onClick={handleAddTokenPool}>
-        Add token pool
-      </div>
-    );
   }
 
   return (

@@ -40,11 +40,12 @@ export default function ViewProgress({
     if (status === ApplicationChainStatusEnum.Issuing) {
       return ListingProcessStep.SELECT_CHAIN;
     }
-    if (status === ApplicationChainStatusEnum.Issued || status === ApplicationChainStatusEnum.PoolInitializing) {
+    if (
+      status === ApplicationChainStatusEnum.Issued ||
+      status === ApplicationChainStatusEnum.PoolInitializing ||
+      status === ApplicationChainStatusEnum.PoolInitialized
+    ) {
       return ListingProcessStep.INITIALIZE_TOKEN_POOL;
-    }
-    if (status === ApplicationChainStatusEnum.PoolInitialized) {
-      return ListingProcessStep.ADD_TOKEN_POOL;
     }
 
     // ApplicationChainStatusEnum.Failed;

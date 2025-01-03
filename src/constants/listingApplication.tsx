@@ -25,16 +25,12 @@ export enum ListingStep {
   TOKEN_INFORMATION = 0,
   SELECT_CHAIN = 1,
   INITIALIZE_TOKEN_POOL = 2,
-  ADD_TOKEN_POOL = 3,
-  COMPLETE = 4,
 }
 
 export const LISTING_STEP_PATHNAME_MAP: Record<ListingStep, string> = {
   [ListingStep.TOKEN_INFORMATION]: '/token-information',
   [ListingStep.SELECT_CHAIN]: '/select-chain',
   [ListingStep.INITIALIZE_TOKEN_POOL]: '/initialize-token-pool',
-  [ListingStep.ADD_TOKEN_POOL]: '/add-token-pool',
-  [ListingStep.COMPLETE]: '/complete',
 };
 
 export const LISTING_STEP_ITEMS: ICommonStepsProps['stepItems'] = [
@@ -47,20 +43,13 @@ export const LISTING_STEP_ITEMS: ICommonStepsProps['stepItems'] = [
   {
     title: 'Initialize Token Pool',
   },
-  {
-    title: 'Add Token Pool',
-  },
-  {
-    title: 'Complete',
-  },
 ];
 
 export enum ListingProcessStep {
   BASIC_INFO = 0,
   SELECT_CHAIN = 1,
   INITIALIZE_TOKEN_POOL = 2,
-  ADD_TOKEN_POOL = 3,
-  COMPLETE = 4,
+  COMPLETE = 3,
 }
 
 export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
@@ -75,9 +64,6 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
     description: 'It is expected to be completed in 1 business day.',
   },
   {
-    title: 'Add token pool',
-  },
-  {
     title: 'Complete',
   },
 ];
@@ -86,11 +72,11 @@ export const VIEW_PROGRESS_STEPS: ICommonStepsProps['stepItems'] = [
 
 export const TOKEN_INFORMATION_FORM_LABEL_MAP: Record<TokenInformationFormKeys, string> = {
   [TokenInformationFormKeys.TOKEN]: 'Select token',
-  [TokenInformationFormKeys.OFFICIAL_WEBSITE]: 'Official website',
-  [TokenInformationFormKeys.OFFICIAL_TWITTER]: 'Official Twitter',
-  [TokenInformationFormKeys.TITLE]: 'What is your title on the project/team/company?',
-  [TokenInformationFormKeys.PERSON_NAME]: 'Contact person name',
-  [TokenInformationFormKeys.TELEGRAM_HANDLER]: 'Your Telegram handle (for contact purposes)',
+  [TokenInformationFormKeys.OFFICIAL_WEBSITE]: 'Official website (Optional)',
+  [TokenInformationFormKeys.OFFICIAL_TWITTER]: 'Official Twitter (Optional)',
+  [TokenInformationFormKeys.TITLE]: 'What is your title on the project/team/company? (Optional)',
+  [TokenInformationFormKeys.PERSON_NAME]: 'Contact person name (Optional)',
+  [TokenInformationFormKeys.TELEGRAM_HANDLER]: 'Your Telegram handle (Optional)',
   [TokenInformationFormKeys.EMAIL]: 'Contact E-mail',
 };
 
@@ -188,7 +174,6 @@ export const SELECT_CHAIN_FORM_CHAIN_NOT_CREATED_STATUS_LIST = [
 export const SELECT_CHAIN_FORM_CHAIN_CREATED_NOT_LISTED_STATUS_LIST = [
   ApplicationChainStatusEnum.PoolInitializing,
   ApplicationChainStatusEnum.PoolInitialized,
-  ApplicationChainStatusEnum.LiquidityAdded,
   ApplicationChainStatusEnum.Failed,
 ];
 

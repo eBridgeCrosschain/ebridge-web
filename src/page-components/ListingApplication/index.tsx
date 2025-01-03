@@ -6,8 +6,6 @@ import UnsavedChangesWarningModal from './UnsavedChangesWarningModal';
 import TokenInformation from './TokenInformation';
 import SelectChain from './SelectChain';
 import InitializeTokenPool from './InitializeTokenPool';
-import AddTokenPool from './AddTokenPool';
-import ListingComplete from './ListingComplete';
 import { backIcon } from 'assets/images';
 import { LISTING_STEP_ITEMS, ListingStep, LISTING_STEP_PATHNAME_MAP } from 'constants/listingApplication';
 import { ROUTE_PATHS } from 'constants/link';
@@ -25,7 +23,6 @@ function ListingApplication() {
   const router = useRouter();
   const { query } = router;
   const symbol = useMemo(() => (query.symbol as string) || undefined, [query]);
-  const id = useMemo(() => (query.id as string) || undefined, [query]);
   const networks = useMemo(() => {
     const str = query.networks || '';
     try {
@@ -49,12 +46,7 @@ function ListingApplication() {
       (item) => stepText && typeof stepText === 'string' && item.includes(stepText),
     );
 
-    if (
-      step === ListingStep.TOKEN_INFORMATION ||
-      step === ListingStep.SELECT_CHAIN ||
-      step === ListingStep.ADD_TOKEN_POOL ||
-      globalCanAccessStep
-    ) {
+    if (step === ListingStep.TOKEN_INFORMATION || step === ListingStep.SELECT_CHAIN || globalCanAccessStep) {
       setCurrentStep(step);
     } else {
       router.replace('/my-applications');
@@ -81,7 +73,7 @@ function ListingApplication() {
     (params?: TSearchParams) => {
       if (typeof currentStep !== 'number') return;
       const nextStep = currentStep + 1;
-      if (nextStep <= ListingStep.COMPLETE) {
+      if (nextStep <= ListingStep.INITIALIZE_TOKEN_POOL) {
         globalCanAccessStep = true;
         const replaceUrl = getListingUrl(nextStep, params);
         router.replace(replaceUrl);
@@ -127,10 +119,6 @@ function ListingApplication() {
         return <SelectChain symbol={symbol} handleNextStep={handleNextStep} handlePrevStep={handlePrevStep} />;
       case ListingStep.INITIALIZE_TOKEN_POOL:
         return <InitializeTokenPool networks={networks} />;
-      case ListingStep.ADD_TOKEN_POOL:
-        return <AddTokenPool id={id} symbol={symbol} onNext={handleNextStep} />;
-      case ListingStep.COMPLETE:
-        return <ListingComplete />;
       default:
         return null;
     }

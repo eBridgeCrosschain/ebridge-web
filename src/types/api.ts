@@ -1,4 +1,3 @@
-import { TBridgeChainId } from 'constants/chain';
 import { WhitelistMap } from 'contexts/useWhitelist/actions';
 import { ChainId, TokenInfo } from 'types';
 
@@ -126,7 +125,6 @@ export enum ApplicationChainStatusEnum {
   Issued = 'Issued',
   PoolInitializing = 'PoolInitializing',
   PoolInitialized = 'PoolInitialized',
-  LiquidityAdded = 'LiquidityAdded',
   Complete = 'Complete',
   Failed = 'Failed',
 }
@@ -265,18 +263,6 @@ export type TGetTokenPriceRequest = {
 export type TGetTokenPriceResult = {
   symbol: string;
   tokenAmountInUsd: number;
-};
-
-export type TChangeAddLiquidityStatusRequest = {
-  orderId: string;
-  chainId: TBridgeChainId;
-  amount: string;
-};
-
-export type TChangeAddLiquidityStatusResult = {
-  orderId: string;
-  chainId: TBridgeChainId;
-  success: boolean;
 };
 
 export type TGetTokenWhiteListResult = WhitelistMap;

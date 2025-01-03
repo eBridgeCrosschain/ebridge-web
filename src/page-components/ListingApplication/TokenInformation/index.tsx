@@ -88,7 +88,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         token.holders > currentTokenConfig.holders;
 
       const isDisabled =
-        Object.values(currentFormData).some((item) => !item) ||
         Object.values(currentFormValidateData).some((item) => item.validateStatus === FormValidateStatus.Error) ||
         !isTokenValid;
       setIsButtonDisabled(isDisabled);
@@ -285,41 +284,21 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const handleCommonInputChange = useCallback(
     (value: string, key: TokenInformationFormKeys) => {
-      if (!value) {
-        handleFormDataChange({
-          formKey: key,
-          value: value,
-          validateData: {
-            validateStatus: FormValidateStatus.Error,
-            errorMessage: REQUIRED_ERROR_MESSAGE,
-          },
-        });
-      } else {
-        handleFormDataChange({
-          formKey: key,
-          value: value,
-          validateData: {
-            validateStatus: FormValidateStatus.Normal,
-            errorMessage: '',
-          },
-        });
-      }
+      handleFormDataChange({
+        formKey: key,
+        value: value,
+        validateData: {
+          validateStatus: FormValidateStatus.Normal,
+          errorMessage: '',
+        },
+      });
     },
     [handleFormDataChange],
   );
 
   const handleUrlChange = useCallback(
     (value: string, key: TokenInformationFormKeys) => {
-      if (!value) {
-        handleFormDataChange({
-          formKey: key,
-          value: value,
-          validateData: {
-            validateStatus: FormValidateStatus.Error,
-            errorMessage: REQUIRED_ERROR_MESSAGE,
-          },
-        });
-      } else if (!value.startsWith('https://')) {
+      if (value && !value.startsWith('https://')) {
         handleFormDataChange({
           formKey: key,
           value: value,

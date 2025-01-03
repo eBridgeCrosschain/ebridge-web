@@ -71,7 +71,6 @@ const MyApplicationTableColumns = [
           symbol={item.symbol}
           tokenIcon={chainTokenInfo.icon}
           chainId={chainTokenInfo.chainId}
-          id={item.id}
         />
       ) : (
         DEFAULT_NULL_VALUE

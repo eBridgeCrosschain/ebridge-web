@@ -22,12 +22,6 @@ export const getListingUrl = (step: ListingStep, params?: TSearchParams) => {
           networks: params.networks,
         });
         break;
-      case ListingStep.ADD_TOKEN_POOL:
-        search = queryString.stringify({
-          symbol: params.symbol,
-          id: params.id,
-        });
-        break;
     }
   }
   return `${ROUTE_PATHS.LISTING_APPLICATION}${LISTING_STEP_PATHNAME_MAP[step]}${search ? '?' + search : ''}`;

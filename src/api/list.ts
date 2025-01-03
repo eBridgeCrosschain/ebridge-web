@@ -50,10 +50,6 @@ const ApplicationApiList = {
   getMyApplicationList: '/api/ebridge/application/list',
   getApplicationDetail: '/api/ebridge/application/detail',
   getTokenConfig: '/api/ebridge/application/token/config',
-  changeAddLiquidityStatus: {
-    target: '/api/ebridge/application/add-liquidity',
-    baseConfig: { method: 'POST' },
-  },
 };
 
 const CommonApiList = {

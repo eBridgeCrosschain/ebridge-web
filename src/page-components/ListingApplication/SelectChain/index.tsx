@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import clsx from 'clsx';
-import { useRouter } from 'next/router';
 import { Form, Checkbox, Row, Col, Input } from 'antd';
 import CommonMessage from 'components/CommonMessage';
 import CommonButton, { CommonButtonProps } from 'components/CommonButton';
@@ -51,7 +50,6 @@ import {
 } from 'utils/api/application';
 import { formatWithCommas } from 'utils/calculate';
 import { formatListWithAnd, parseWithCommas, parseWithStringCommas } from 'utils/format';
-import { getListingUrl } from 'utils/listingApplication';
 import { handleInputFocus } from 'utils/input';
 import { handleListingErrorMessage } from 'utils/error';
 import { getChainIdByAPI, getChainName, getIconByAPIChainId } from 'utils/chain';
@@ -67,7 +65,6 @@ interface ISelectChainProps {
 }
 
 export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: ISelectChainProps) {
-  const router = useRouter();
   const isMobile = useMobile();
   const { setGlobalLoading } = useGlobalLoading();
   const connect = useConnect();
@@ -395,26 +392,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     });
   }, [issuingOtherChains, unissuedOtherChains]);
 
-  const handleJump = useCallback(
-    ({ networksString, id, _symbol }: { networksString: string; id?: string; _symbol: string }) => {
-      if (
-        id &&
-        hasDisabledAELFChain &&
-        formData[SelectChainFormKeys.AELF_CHAINS].length !== 0 &&
-        formData[SelectChainFormKeys.OTHER_CHAINS].length === 0
-      ) {
-        const replaceUrl = getListingUrl(ListingStep.ADD_TOKEN_POOL, {
-          symbol: _symbol,
-          id,
-        });
-        router.replace(replaceUrl);
-      } else {
-        handleNextStep({ networks: networksString });
-      }
-    },
-    [formData, hasDisabledAELFChain, router, handleNextStep],
-  );
-
   const handleAddChain = useCallback(
     async ({ errorOtherChainIds }: { errorOtherChainIds?: string[] } = {}) => {
       if (!token?.symbol) return;
@@ -442,15 +419,15 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
           }));
         const networks = [...aelfNetworks, ...otherNetworks];
         const networksString = JSON.stringify(networks);
-        const id = data?.chainList?.[0]?.id;
-        handleJump({ networksString, id, _symbol: token.symbol });
+
+        handleNextStep({ networks: networksString });
       } catch (error: any) {
         CommonMessage.error(handleListingErrorMessage(error));
       } finally {
         setGlobalLoading(false);
       }
     },
-    [formData, handleJump, setGlobalLoading, token?.symbol],
+    [formData, handleNextStep, setGlobalLoading, token?.symbol],
   );
 
   const handleCreationProgressModalClose = useCallback(() => {
