@@ -55,6 +55,10 @@ export type TokensToken = {
   id?: string;
 } & TokenInfo;
 
+export type TGetApplicationTokenListRequest = {
+  symbol?: string;
+};
+
 export type TGetApplicationTokenListResult = {
   tokenList: TApplicationTokenItem[];
 };
@@ -65,7 +69,14 @@ export type TApplicationTokenItem = {
   tokenImage: string;
   liquidityInUsd: string;
   holders: number;
+  status: TApplicationTokenStatus;
 };
+
+export enum TApplicationTokenStatus {
+  Listed = 'Listed',
+  Integrating = 'Integrating',
+  Available = 'Available',
+}
 
 export type TCommitTokenInfoRequest = {
   symbol: string;
@@ -100,7 +111,6 @@ export type TGetApplicationChainStatusListRequest = {
 
 export type TGetApplicationChainStatusListResult = {
   chainList: TApplicationChainStatusItem[];
-  otherChainList: TApplicationChainStatusItem[];
 };
 
 export type TApplicationChainStatusItem = {
@@ -131,13 +141,11 @@ export enum ApplicationChainStatusEnum {
 
 export type TAddApplicationChainRequest = {
   chainIds?: string[];
-  otherChainIds?: string[];
   symbol: string;
 };
 
 export type TAddApplicationChainResult = {
   chainList?: TAddApplicationChainResultChainItem[];
-  otherChainList?: TAddApplicationChainResultChainItem[];
 };
 
 export type TAddApplicationChainResultChainItem = {
@@ -149,7 +157,6 @@ export type TPrepareBindIssueRequest = {
   address: string;
   symbol: string;
   chainId: string;
-  otherChainId?: string;
   contractAddress: string;
   supply: string;
 };
@@ -183,8 +190,7 @@ export type TMyApplicationItem = {
   updateTime: number;
   failedTime?: number; // status === ApplicationChainStatusEnum.Failed
   failedReason?: string; // status === ApplicationChainStatusEnum.Failed
-  chainTokenInfo?: TMyApplicationChainTokenInfo[];
-  otherChainTokenInfo?: TMyApplicationChainTokenInfo;
+  chainTokenInfo: TMyApplicationChainTokenInfo;
 };
 
 export type TMyApplicationChainTokenInfo = {
@@ -211,8 +217,7 @@ export type TApplicationDetailItem = {
   status: ApplicationChainStatusEnum;
   createTime: number;
   updateTime: number;
-  chainTokenInfo?: TApplicationDetailItemChainTokenInfo[];
-  otherChainTokenInfo?: TApplicationDetailItemChainTokenInfo;
+  chainTokenInfo?: TApplicationDetailItemChainTokenInfo;
 };
 
 export type TApplicationDetailItemChainTokenInfo = {

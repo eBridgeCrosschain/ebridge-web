@@ -102,7 +102,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
   const getToken = useCallback(async () => {
     if (!symbol) return;
-    const res = await getApplicationTokenList();
+    // TODO
+    const res = await getApplicationTokenList({});
     const list = (res.tokenList || []).map((item) => ({
       name: item.tokenName,
       symbol: item.symbol,
@@ -126,17 +127,13 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const getChainList = useCallback(async () => {
     if (!symbol) return;
     const res = await getApplicationChainStatusList({ symbol });
-    const aelfChains = (res.chainList || []).map((item) => ({
+    const _chains = (res.chainList || []).map((item) => ({
       ...item,
       chainName: getChainName(getChainIdByAPI(item.chainId)),
     }));
-    const otherChains = (res.otherChainList || []).map((item) => ({
-      ...item,
-      chainName: getChainName(getChainIdByAPI(item.chainId)),
-    }));
+
     const listData = {
-      [SelectChainFormKeys.AELF_CHAINS]: aelfChains,
-      [SelectChainFormKeys.OTHER_CHAINS]: otherChains,
+      [SelectChainFormKeys.CHAINS]: _chains,
     };
     setChainListData(listData);
   }, [symbol]);
@@ -145,40 +142,28 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     return SELECT_CHAIN_FORM_CHAIN_DISABLED_STATUS_LIST.includes(status);
   }, []);
 
-  const hasDisabledAELFChain = useMemo(
-    () => chainListData[SelectChainFormKeys.AELF_CHAINS].some((chain) => judgeIsChainDisabled(chain.status)),
+  const hasDisabledChain = useMemo(
+    () => chainListData[SelectChainFormKeys.CHAINS].some((chain) => judgeIsChainDisabled(chain.status)),
     [chainListData, judgeIsChainDisabled],
   );
 
-  const hasDisabledOtherChain = useMemo(
-    () => chainListData[SelectChainFormKeys.OTHER_CHAINS].some((chain) => judgeIsChainDisabled(chain.status)),
-    [chainListData, judgeIsChainDisabled],
-  );
-
-  const judgeIsShowInitialSupplyFormItem = useCallback((currentOtherChains: TApplicationChainStatusItem[]): boolean => {
-    return currentOtherChains.some((v) => v.status === ApplicationChainStatusEnum.Unissued);
+  const judgeIsShowInitialSupplyFormItem = useCallback((currentChains: TApplicationChainStatusItem[]): boolean => {
+    return currentChains.some((v) => v.status === ApplicationChainStatusEnum.Unissued);
   }, []);
 
   const judgeIsTokenError = useCallback(() => !token, [token]);
 
   const judgeIsChainsError = useCallback(
-    ({
-      aelfChains,
-      otherChains,
-    }: {
-      aelfChains: TApplicationChainStatusItem[];
-      otherChains: TApplicationChainStatusItem[];
-    }): boolean => {
-      const isAelfSelected = hasDisabledAELFChain || aelfChains.length > 0;
-      const isOtherSelected = hasDisabledOtherChain || otherChains.length > 0;
-      const hasValue = aelfChains.length > 0 || otherChains.length > 0;
+    ({ chains }: { chains: TApplicationChainStatusItem[] }): boolean => {
+      const isChainSelected = hasDisabledChain || chains.length > 0;
+      const hasValue = chains.length > 0;
 
-      if (isAelfSelected && isOtherSelected && hasValue) {
+      if (isChainSelected && hasValue) {
         return false;
       }
       return true;
     },
-    [hasDisabledAELFChain, hasDisabledOtherChain],
+    [hasDisabledChain],
   );
 
   const judgeIsInitialSupplyError = useCallback(
@@ -197,7 +182,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
   const unconnectedWallets = useMemo(() => {
     const list: WalletTypeEnum[] = [];
-    formData[SelectChainFormKeys.OTHER_CHAINS].forEach((item) => {
+    formData[SelectChainFormKeys.CHAINS].forEach((item) => {
       if (isEVMChain(item.chainId) && !isEVMConnected) {
         list.push(WalletTypeEnum.EVM);
       } else if (isTONChain(item.chainId) && !isTONConnected) {
@@ -211,8 +196,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     const isDisabled =
       judgeIsTokenError() ||
       judgeIsChainsError({
-        aelfChains: formData[SelectChainFormKeys.AELF_CHAINS],
-        otherChains: formData[SelectChainFormKeys.OTHER_CHAINS],
+        chains: formData[SelectChainFormKeys.CHAINS],
       }) ||
       judgeIsInitialSupplyError({
         _isShowInitialSupplyFormItem: isShowInitialSupplyFormItem,
@@ -255,9 +239,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         setFormValidateData(newFormValidateData);
       }
 
-      const _isShowInitialSupplyFormItem = judgeIsShowInitialSupplyFormItem(
-        newFormData[SelectChainFormKeys.OTHER_CHAINS],
-      );
+      const _isShowInitialSupplyFormItem = judgeIsShowInitialSupplyFormItem(newFormData[SelectChainFormKeys.CHAINS]);
       setIsShowInitialSupplyFormItem(_isShowInitialSupplyFormItem);
     },
     [formData, formValidateData, judgeIsShowInitialSupplyFormItem],
@@ -285,32 +267,16 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     [formData],
   );
 
-  const handleAELFChainsChange = useCallback(
+  const handleChainsChange = useCallback(
     ({ chain, checked }: { chain: TApplicationChainStatusItem; checked: boolean }) => {
       const newChains = getNewChains({
-        formKey: SelectChainFormKeys.AELF_CHAINS,
+        formKey: SelectChainFormKeys.CHAINS,
         value: chain,
         checked,
       });
 
       handleFormDataChange({
-        formKey: SelectChainFormKeys.AELF_CHAINS,
-        value: newChains,
-      });
-    },
-    [getNewChains, handleFormDataChange],
-  );
-
-  const handleOtherChainsChange = useCallback(
-    ({ chain, checked }: { chain: TApplicationChainStatusItem; checked: boolean }) => {
-      const newChains = getNewChains({
-        formKey: SelectChainFormKeys.OTHER_CHAINS,
-        value: chain,
-        checked,
-      });
-
-      handleFormDataChange({
-        formKey: SelectChainFormKeys.OTHER_CHAINS,
+        formKey: SelectChainFormKeys.CHAINS,
         value: newChains,
       });
     },
@@ -363,22 +329,19 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     [handleFormDataChange],
   );
 
-  const { unissuedOtherChains, issuingOtherChains, issuedChains } = useMemo(() => {
-    const unissuedOtherChains = formData[SelectChainFormKeys.OTHER_CHAINS].filter(
+  const { unissuedChains, issuingChains, issuedChains } = useMemo(() => {
+    const unissuedChains = formData[SelectChainFormKeys.CHAINS].filter(
       (chain) => chain.status === ApplicationChainStatusEnum.Unissued,
     );
-    const issuingOtherChains = formData[SelectChainFormKeys.OTHER_CHAINS].filter(
+    const issuingChains = formData[SelectChainFormKeys.CHAINS].filter(
       (chain) => chain.status === ApplicationChainStatusEnum.Issuing,
     );
     const issuedChains = {
-      [SelectChainFormKeys.AELF_CHAINS]: formData[SelectChainFormKeys.AELF_CHAINS].filter(
-        (chain) => chain.status === ApplicationChainStatusEnum.Issued,
-      ),
-      [SelectChainFormKeys.OTHER_CHAINS]: formData[SelectChainFormKeys.OTHER_CHAINS].filter(
+      [SelectChainFormKeys.CHAINS]: formData[SelectChainFormKeys.CHAINS].filter(
         (chain) => chain.status === ApplicationChainStatusEnum.Issued,
       ),
     };
-    return { unissuedOtherChains, issuingOtherChains, issuedChains };
+    return { unissuedChains, issuingChains, issuedChains };
   }, [formData]);
 
   const handleConnectWallets = useCallback(() => {
@@ -388,36 +351,29 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   const handleCreateToken = useCallback(() => {
     setCreationProgressModalProps({
       open: true,
-      chains: [...unissuedOtherChains, ...issuingOtherChains],
+      chains: [...unissuedChains, ...issuingChains],
     });
-  }, [issuingOtherChains, unissuedOtherChains]);
+  }, [issuingChains, unissuedChains]);
 
   const handleAddChain = useCallback(
-    async ({ errorOtherChainIds }: { errorOtherChainIds?: string[] } = {}) => {
+    async ({ errorChainIds }: { errorChainIds?: string[] } = {}) => {
       if (!token?.symbol) return;
       setGlobalLoading(true);
       try {
         const data = await addApplicationChain({
-          chainIds: formData[SelectChainFormKeys.AELF_CHAINS].map((v) => v.chainId),
-          otherChainIds: formData[SelectChainFormKeys.OTHER_CHAINS]
-            .filter((v) => !errorOtherChainIds?.includes(v.chainId))
+          chainIds: formData[SelectChainFormKeys.CHAINS]
+            .filter((v) => !errorChainIds?.includes(v.chainId))
             .map((v) => v.chainId),
           symbol: token.symbol,
         });
-        if (!data?.chainList && !data?.otherChainList) {
+        if (!data?.chainList) {
           throw new Error('Failed to add chain');
         }
-        const aelfNetworks = formData[SelectChainFormKeys.AELF_CHAINS]
-          .filter((item) => !data?.chainList || data.chainList.some((v) => v.chainId === item.chainId))
+        const networks = formData[SelectChainFormKeys.CHAINS]
+          .filter((item) => data?.chainList?.some((v) => v.chainId === item.chainId))
           .map((v) => ({
             name: v.chainName,
           }));
-        const otherNetworks = formData[SelectChainFormKeys.OTHER_CHAINS]
-          .filter((item) => data?.otherChainList?.some((v) => v.chainId === item.chainId))
-          .map((v) => ({
-            name: v.chainName,
-          }));
-        const networks = [...aelfNetworks, ...otherNetworks];
         const networksString = JSON.stringify(networks);
 
         handleNextStep({ networks: networksString });
@@ -438,9 +394,9 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
   }, []);
 
   const handleCreateFinish = useCallback(
-    async ({ errorOtherChainIds }: { errorOtherChainIds?: string[] } = {}) => {
+    async ({ errorChainIds }: { errorChainIds?: string[] } = {}) => {
       handleCreationProgressModalClose();
-      await handleAddChain({ errorOtherChainIds });
+      await handleAddChain({ errorChainIds });
     },
     [handleAddChain, handleCreationProgressModalClose],
   );
@@ -450,7 +406,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       children: SELECT_CHAIN,
     };
 
-    if (unissuedOtherChains.length !== 0 || issuingOtherChains.length !== 0) {
+    if (unissuedChains.length !== 0 || issuingChains.length !== 0) {
       if (unconnectedWallets.length !== 0 && !isButtonDisabled) {
         props = {
           children: `Connect ${unconnectedWallets.join(', ')} Wallet${unconnectedWallets.length > 1 ? 's' : ''}`,
@@ -462,10 +418,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
           onClick: handleCreateToken,
         };
       }
-    } else if (
-      formData[SelectChainFormKeys.AELF_CHAINS].length !== 0 ||
-      Object.values(issuedChains).some((v) => v.length !== 0)
-    ) {
+    } else if (Object.values(issuedChains).some((v) => v.length !== 0)) {
       props = {
         children: 'Submit',
         onClick: () => handleAddChain(),
@@ -474,9 +427,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
     return props;
   }, [
-    unissuedOtherChains.length,
-    issuingOtherChains.length,
-    formData,
+    unissuedChains.length,
+    issuingChains.length,
     issuedChains,
     unconnectedWallets,
     isButtonDisabled,
@@ -538,14 +490,15 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     };
   });
 
-  const renderChainsFormItem = (formKey: SelectChainFormKeys.AELF_CHAINS | SelectChainFormKeys.OTHER_CHAINS) => {
+  const renderChainsFormItem = useMemo(() => {
     return (
-      <Form.Item label={SELECT_CHAIN_FORM_LABEL_MAP[formKey]}>
+      <Form.Item label={SELECT_CHAIN_FORM_LABEL_MAP[SelectChainFormKeys.CHAINS]}>
         <Row gutter={[12, 8]}>
-          {chainListData[formKey].map((chain) => {
+          {chainListData[SelectChainFormKeys.CHAINS].map((chain) => {
             const isDisabled = judgeIsChainDisabled(chain.status);
 
-            const checked = isDisabled || formData[formKey]?.some((v) => v.chainId === chain.chainId);
+            const checked =
+              isDisabled || formData[SelectChainFormKeys.CHAINS]?.some((v) => v.chainId === chain.chainId);
 
             let tooltip = '';
             if (isDisabled) {
@@ -557,11 +510,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
                   chain.chainName,
                 );
               }
-            }
-
-            let handleChainsChange = handleAELFChainsChange;
-            if (formKey === SelectChainFormKeys.OTHER_CHAINS) {
-              handleChainsChange = handleOtherChainsChange;
             }
 
             return (
@@ -599,7 +547,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         </Row>
       </Form.Item>
     );
-  };
+  }, [chainListData, formData, handleChainsChange, isMobile, judgeIsChainDisabled]);
 
   return (
     <>
@@ -612,7 +560,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
               <>
                 <p className={clsx(!isMobile && 'font-15')}>Tips:</p>
                 <ul className="list-style-decimal">
-                  <li>Please select at least one aelf chain and one other chain.</li>
+                  <li>Please select at least one chain.</li>
                   <li>
                     You can select multiple chains simultaneously, and Transfers will be supported between any two
                     selected chains.
@@ -632,8 +580,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
                   </div>
                 )}
               </Form.Item>
-              {renderChainsFormItem(SelectChainFormKeys.AELF_CHAINS)}
-              {renderChainsFormItem(SelectChainFormKeys.OTHER_CHAINS)}
+              {renderChainsFormItem}
               {isShowInitialSupplyFormItem && (
                 <Form.Item
                   validateStatus={formValidateData[SelectChainFormKeys.INITIAL_SUPPLY].validateStatus}
@@ -646,10 +593,10 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
                       <div className={styles['select-chain-description']}>
                         <p>
                           {`The token information on ${formatListWithAnd(
-                            formData[SelectChainFormKeys.OTHER_CHAINS].map((v) => v.chainName),
+                            formData[SelectChainFormKeys.CHAINS].map((v) => v.chainName),
                           )} is the same as that on the aelf chain.`}
                         </p>
-                        <p>{'You only need to fill in the issuance amount of the token on the other chains.'}</p>
+                        <p>{'You only need to fill in the issuance amount of the token on the chains.'}</p>
                       </div>
                     </div>
                   }>
@@ -684,8 +631,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       </div>
       <CreationProgressModal
         {...creationProgressModalProps}
-        isFirstTimeCreation={!hasDisabledAELFChain || !hasDisabledOtherChain}
-        isSelectAelfChains={formData[SelectChainFormKeys.AELF_CHAINS].length !== 0}
+        isFirstTimeCreation={!hasDisabledChain}
+        isSelectAelfChains={false} // TODO
         supply={formData[SelectChainFormKeys.INITIAL_SUPPLY]}
         handleCreateFinish={handleCreateFinish}
         handleClose={handleCreationProgressModalClose}

@@ -138,8 +138,7 @@ export const LISTING_TOKEN_TIP = 'Only tokens owned by your connected aelf walle
 // ================ Select chain ================
 
 export const SELECT_CHAIN_FORM_LABEL_MAP: Record<SelectChainFormKeys, string> = {
-  [SelectChainFormKeys.AELF_CHAINS]: 'Select aelf chain(s)',
-  [SelectChainFormKeys.OTHER_CHAINS]: 'Select other chain(s)',
+  [SelectChainFormKeys.CHAINS]: 'Select chain(s)',
   [SelectChainFormKeys.INITIAL_SUPPLY]: 'Create & Issue Token',
 };
 
@@ -148,8 +147,7 @@ export const SELECT_CHAIN_FORM_PLACEHOLDER_MAP: Partial<Record<SelectChainFormKe
 };
 
 export const SELECT_CHAIN_FORM_INITIAL_VALUES: TSelectChainFormValues = {
-  [SelectChainFormKeys.AELF_CHAINS]: [],
-  [SelectChainFormKeys.OTHER_CHAINS]: [],
+  [SelectChainFormKeys.CHAINS]: [],
   [SelectChainFormKeys.INITIAL_SUPPLY]: '',
 };
 
@@ -161,8 +159,7 @@ export const SELECT_CHAIN_FORM_INITIAL_VALIDATE_DATA: TSelectChainFormValidateDa
 };
 
 export const DEFAULT_CHAINS: TChains = {
-  [SelectChainFormKeys.AELF_CHAINS]: [],
-  [SelectChainFormKeys.OTHER_CHAINS]: [],
+  [SelectChainFormKeys.CHAINS]: [],
 };
 
 export const SELECT_CHAIN_FORM_CHAIN_NOT_CREATED_STATUS_LIST = [

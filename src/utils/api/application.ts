@@ -9,6 +9,7 @@ import {
   TGetApplicationIssueResult,
   TGetApplicationTokenInfoRequest,
   TGetApplicationTokenInfoResult,
+  TGetApplicationTokenListRequest,
   TGetApplicationTokenListResult,
   TCommitTokenInfoRequest,
   TCommitTokenInfoResult,
@@ -21,8 +22,10 @@ import {
   TGetTokenConfigResult,
 } from 'types/api';
 
-export const getApplicationTokenList = async (): Promise<TGetApplicationTokenListResult> => {
-  const res = await request.application.getTokenList();
+export const getApplicationTokenList = async (
+  params: TGetApplicationTokenListRequest,
+): Promise<TGetApplicationTokenListResult> => {
+  const res = await request.application.getTokenList({ params });
   return res.data;
 };
 

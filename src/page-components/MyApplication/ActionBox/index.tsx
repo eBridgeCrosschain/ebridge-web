@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { BRIDGE_NOW, LISTING_STEP_PATHNAME_MAP, ListingStep, VIEW_PROGRESS } from 'constants/listingApplication';
+import { BRIDGE_NOW, VIEW_PROGRESS } from 'constants/listingApplication';
 import { useRouter } from 'next/router';
 import { ApplicationChainStatusEnum } from 'types/api';
 import styles from './styles.module.less';
@@ -41,15 +41,13 @@ export default function ActionBox({
     setOpenViewProgress(false);
   }, []);
 
-  const handleLaunchOnOtherChain = useCallback(() => {
-    router.push(
-      `${ROUTE_PATHS.LISTING_APPLICATION}${LISTING_STEP_PATHNAME_MAP[ListingStep.SELECT_CHAIN]}?symbol=${symbol}`,
-    );
-  }, [router, symbol]);
+  const handleGoBridge = useCallback(() => {
+    router.push(ROUTE_PATHS.BRIDGE);
+  }, [router]);
 
   if (isSucceed) {
     return (
-      <div className={styles['action']} onClick={handleLaunchOnOtherChain}>
+      <div className={styles['action']} onClick={handleGoBridge}>
         {BRIDGE_NOW}
       </div>
     );

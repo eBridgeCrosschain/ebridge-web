@@ -58,14 +58,12 @@ export type TTokenInformationFormValidateData = {
 };
 
 export enum SelectChainFormKeys {
-  AELF_CHAINS = 'aelfChains',
-  OTHER_CHAINS = 'otherChains',
+  CHAINS = 'chains',
   INITIAL_SUPPLY = 'initialSupply',
 }
 
 export type TChains = {
-  [SelectChainFormKeys.AELF_CHAINS]: TApplicationChainStatusItem[];
-  [SelectChainFormKeys.OTHER_CHAINS]: TApplicationChainStatusItem[];
+  [SelectChainFormKeys.CHAINS]: TApplicationChainStatusItem[];
 };
 
 export type TSelectChainFormValues = TChains & {

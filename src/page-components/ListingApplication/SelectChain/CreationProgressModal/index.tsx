@@ -13,7 +13,6 @@ import { getTransactionReceiptAutoRetry } from 'utils/wagmi';
 import { getBridgeChainInfo, getChainIdByAPI } from 'utils/chain';
 import { handleListingErrorMessage } from 'utils/error';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
-import { CHAIN_ID_MAP, SupportedELFChainId } from 'constants/chain';
 import styles from './styles.module.less';
 import { useCallEVMCreateToken } from 'hooks/token';
 import useLockCallback from 'hooks/useLockCallback';
@@ -25,7 +24,7 @@ export interface ICreationProgressModalProps {
   supply: string;
   isFirstTimeCreation: boolean;
   isSelectAelfChains: boolean;
-  handleCreateFinish: (params?: { errorOtherChainIds?: string[] }) => void;
+  handleCreateFinish: (params?: { errorChainIds?: string[] }) => void;
   handleClose: () => void;
 }
 
@@ -158,8 +157,7 @@ export default function CreationProgressModal({
         const params: TPrepareBindIssueRequest = {
           address: evmAccount,
           symbol: chain.symbol,
-          chainId: CHAIN_ID_MAP[SupportedELFChainId.AELF],
-          otherChainId: chain.chainId,
+          chainId: chain.chainId,
           contractAddress,
           supply,
         };
@@ -317,8 +315,8 @@ export default function CreationProgressModal({
   }, []);
 
   const handleSkip = useCallback(() => {
-    const errorOtherChainIds = stepItems.filter((item) => item.status === 'error').map((item) => item.chain.chainId);
-    handleCreateFinish({ errorOtherChainIds });
+    const errorChainIds = stepItems.filter((item) => item.status === 'error').map((item) => item.chain.chainId);
+    handleCreateFinish({ errorChainIds });
   }, [stepItems, handleCreateFinish]);
 
   const steps: ICommonStepsProps['stepItems'] = useMemo(() => {

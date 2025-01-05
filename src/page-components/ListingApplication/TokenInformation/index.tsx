@@ -106,7 +106,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     try {
       await setAelfAuthFromStorage();
       await sleep(500);
-      const res = await getApplicationTokenList();
+      const res = await getApplicationTokenList({});
       const list = (res.tokenList || []).map((item) => ({
         name: item.tokenName,
         symbol: item.symbol,

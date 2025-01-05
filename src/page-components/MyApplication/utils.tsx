@@ -1,22 +1,15 @@
 import { ApplicationChainStatusEnum, TMyApplicationItem } from 'types/api';
 
 export const getApplicationDisplayInfo = (data: TMyApplicationItem) => {
-  const chainTokenInfo = data?.otherChainTokenInfo?.chainId ? data?.otherChainTokenInfo : data?.chainTokenInfo?.[0];
+  const chainTokenInfo = data?.chainTokenInfo;
   if (!chainTokenInfo) {
     return {
       chainTokenInfo: undefined,
       failTime: 0,
       failReason: '',
-      aelfChainIds: [],
-      otherChainId: '',
+      chainId: '',
     };
   }
-
-  const aelfChainIds: string[] = [];
-  data?.chainTokenInfo?.forEach((item) => {
-    aelfChainIds.push(item.chainId);
-  }, []);
-  const otherChainId = data?.otherChainTokenInfo?.chainId || '';
 
   const getFailResult = () => {
     switch (chainTokenInfo.status) {
@@ -35,8 +28,7 @@ export const getApplicationDisplayInfo = (data: TMyApplicationItem) => {
 
   return {
     chainTokenInfo,
-    aelfChainIds,
-    otherChainId,
+    chainId: chainTokenInfo.chainId,
     failTime: getFailResult().time,
     failReason: getFailResult().reason,
   };
