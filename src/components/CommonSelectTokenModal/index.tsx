@@ -17,6 +17,9 @@ type TToken<T> = T & {
   symbol: string;
   icon?: string;
   displaySymbol?: string;
+  status?: string;
+  isShowSuffix?: boolean;
+  disable?: boolean;
 };
 
 interface ISelectTokenProps<T> {
@@ -82,12 +85,16 @@ function SelectToken<T>({
             <Row
               onClick={() => onSelect(item)}
               key={k}
-              className={clsx('cursor-pointer', {
+              className={clsx('flex-row-center-between', {
                 [styles['token-item']]: true,
                 [styles['token-item-selected']]: item.symbol === selectSymbol,
+                [styles['token-item-disable']]: item?.disable,
               })}>
-              <TokenLogo className={styles['token-logo']} chainId={chainId} src={item.icon} symbol={item.symbol} />
-              <span className={styles['token-name']}>{formatSymbol(item.displaySymbol || item.symbol)}</span>
+              <div className={clsx('flex-row-center', item?.disable && styles['token-info-disable'])}>
+                <TokenLogo className={styles['token-logo']} chainId={chainId} src={item.icon} symbol={item.symbol} />
+                <span className={styles['token-name']}>{formatSymbol(item.displaySymbol || item.symbol)}</span>
+              </div>
+              {item?.isShowSuffix && <div className={styles['token-suffix']}>{item?.status}</div>}
             </Row>
           );
         })}

@@ -49,6 +49,7 @@
       flex-wrap: nowrap;
       padding: 13px @margin-left-right-web;
       line-height: 24px;
+      cursor: pointer;
       .font-family-medium();
       .token-logo {
         flex: none;
@@ -63,12 +64,23 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+      .token-suffix {
+        font-size: 14px;
+        color: @font-13;
+        .font-family-regular();
+      }
+      .token-info-disable {
+        opacity: 0.5;
+      }
       &:hover {
         background: @bg-15;
       }
     }
     .token-item-selected {
       background: @bg-15;
+    }
+    .token-item-disable {
+      cursor: not-allowed;
     }
   }
   .token-list-add-token {

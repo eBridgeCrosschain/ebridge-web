@@ -1,4 +1,4 @@
-import { TApplicationChainStatusItem } from './api';
+import { TApplicationChainStatusItem, TApplicationTokenStatus } from './api';
 
 export enum TMyApplicationStatus {
   Processing = 'Processing',
@@ -28,6 +28,7 @@ export type TTokenItem = {
   icon: string;
   liquidityInUsd: string;
   holders: number;
+  status?: TApplicationTokenStatus;
 };
 
 export type TTokenConfig = {

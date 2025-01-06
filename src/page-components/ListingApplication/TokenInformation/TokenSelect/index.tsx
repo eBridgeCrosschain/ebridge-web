@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import CommonLink from 'components/CommonLink';
 import DynamicArrow from 'components/DynamicArrow';
@@ -10,6 +10,7 @@ import { TTokenConfig, TTokenItem } from 'types/listingApplication';
 import { AwakenHost } from 'constants/index';
 import { LISTING_TOKEN_TIP } from 'constants/listingApplication';
 import styles from './styles.module.less';
+import { TApplicationTokenStatus } from 'types/api';
 
 interface ITokenSelectProps {
   className?: string;
@@ -30,6 +31,19 @@ export default function TokenSelect({
 }: ITokenSelectProps) {
   const [isShowTokenSelectModal, setIsShowTokenSelectModal] = useState(false);
 
+  const formatTokenList = useMemo(() => {
+    const _list: Array<TTokenItem & { isShowSuffix: boolean; disable: boolean }> = [];
+    tokenList.forEach((item) => {
+      _list.push({
+        ...item,
+        isShowSuffix: item.status !== TApplicationTokenStatus.Available,
+        disable: item.status !== TApplicationTokenStatus.Available,
+      });
+    }, []);
+
+    return _list;
+  }, [tokenList]);
+
   const getInfoValidateIcon = useCallback((isPass: boolean) => {
     return (
       <CommonImage
@@ -41,6 +55,9 @@ export default function TokenSelect({
 
   const onSelectToken = useCallback(
     async (item: TTokenItem) => {
+      if (item?.status !== TApplicationTokenStatus.Available) {
+        return;
+      }
       setIsShowTokenSelectModal(false);
       selectCallback?.(item);
     },
@@ -92,7 +109,7 @@ export default function TokenSelect({
         remindContent={LISTING_TOKEN_TIP}
         open={isShowTokenSelectModal}
         selectSymbol={token?.symbol}
-        tokenList={tokenList}
+        tokenList={formatTokenList}
         onSelect={onSelectToken}
         onClose={() => setIsShowTokenSelectModal(false)}
       />
