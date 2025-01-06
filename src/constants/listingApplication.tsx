@@ -183,5 +183,5 @@ export const SELECT_CHAIN_FORM_CHAIN_DISABLED_STATUS_LIST = [
 
 export const SELECT_CHAIN_FORM_CHAIN_TOOLTIP_MAP = {
   LISTED: 'The token is already listed on eBridge.',
-  CREATED_NOT_LISTED: 'The token has been created on {{chainName}}.',
+  CREATED_NOT_LISTED: 'The token is in the process of being integrated.',
 };

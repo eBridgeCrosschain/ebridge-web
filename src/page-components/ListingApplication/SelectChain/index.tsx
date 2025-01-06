@@ -505,10 +505,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
               if (SELECT_CHAIN_FORM_CHAIN_LISTED_STATUS_LIST.includes(chain.status)) {
                 tooltip = SELECT_CHAIN_FORM_CHAIN_TOOLTIP_MAP.LISTED;
               } else if (SELECT_CHAIN_FORM_CHAIN_CREATED_NOT_LISTED_STATUS_LIST.includes(chain.status)) {
-                tooltip = SELECT_CHAIN_FORM_CHAIN_TOOLTIP_MAP.CREATED_NOT_LISTED.replace(
-                  '{{chainName}}',
-                  chain.chainName,
-                );
+                tooltip = SELECT_CHAIN_FORM_CHAIN_TOOLTIP_MAP.CREATED_NOT_LISTED;
               }
             }
 
@@ -560,11 +557,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
               <>
                 <p className={clsx(!isMobile && 'font-15')}>Tips:</p>
                 <ul className="list-style-decimal">
-                  <li>Please select at least one chain.</li>
-                  <li>
-                    You can select multiple chains simultaneously, and Transfers will be supported between any two
-                    selected chains.
-                  </li>
+                  <li>{`You can select multiple chains at the same time, and it will support bridging between the aelf chain and other chains.`}</li>
+                  <li>{`After the token is listed, you can go to the "homepage" → "Pool" page to add liquidity.`}</li>
                 </ul>
               </>
             }
