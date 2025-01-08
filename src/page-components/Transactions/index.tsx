@@ -159,7 +159,7 @@ function useHistory({ crossChainType }: { crossChainType: CrossChainType }) {
   useEffect(() => {
     if (preFromAccount !== fromAccount || preToAccount !== toAccount) setState(DefaultListState);
   }, [fromAccount, preFromAccount, preToAccount, setState, toAccount]);
-  useInterval(getReceiveList, 10000, [getReceiveList]);
+  useInterval(getReceiveList, [getReceiveList], 10000);
   const isomorphismNetworkList = useMemo(() => NetworkList.filter((i) => isELFChain(i.info.chainId)), []);
   return useMemo(
     () => ({

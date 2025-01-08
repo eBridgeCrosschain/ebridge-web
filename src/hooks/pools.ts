@@ -39,7 +39,7 @@ export function usePoolTotalLiquidity(
     }
   }, [poolContract, tokenContract, tokenInfo]);
 
-  useInterval(onGetTotalLiquidity, delay, [onGetTotalLiquidity]);
+  useInterval(onGetTotalLiquidity, [onGetTotalLiquidity], delay);
 
   return {
     totalLiquidity,
@@ -75,7 +75,7 @@ export function usePoolMyLiquidity(
     }
   }, [account, poolContract, tokenInfo]);
 
-  useInterval(onGetMyLiquidity, delay, [getTotalLiquidity]);
+  useInterval(onGetMyLiquidity, [getTotalLiquidity], delay);
 
   return {
     myLiquidity,

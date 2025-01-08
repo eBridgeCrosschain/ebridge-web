@@ -66,7 +66,7 @@ export const useBalances = (
     });
     setBalanceMap((preObj) => ({ ...preObj, ...obj }));
   }, [account, chainId, tokensList, tokenContract, getTokenInfoByWhitelist]);
-  useInterval(onGetBalance, delay, [onGetBalance, chainId, tokenContract]);
+  useInterval(onGetBalance, [onGetBalance, chainId, tokenContract], delay);
   const memoBalances = useMemo(() => {
     if (tokensList)
       return tokensList.map((key) => (balanceMap && key ? balanceMap[key + (account || '') + chainId] : ZERO));

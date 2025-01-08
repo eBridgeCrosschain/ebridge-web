@@ -35,6 +35,6 @@ export function useCrossFee() {
     }
   }, [getFeeByChainId]);
 
-  useInterval(refreshFeeByChainId, 30000, [refreshFeeByChainId]);
+  useInterval(refreshFeeByChainId, [refreshFeeByChainId], 30000);
   return fee;
 }

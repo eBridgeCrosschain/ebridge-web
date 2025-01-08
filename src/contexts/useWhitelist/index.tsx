@@ -4,7 +4,6 @@ import useStorageReducer from 'hooks/useStorageReducer';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import { setDefaultWhitelist, WhitelistActions, WhitelistItem, WhitelistState } from './actions';
 import { getTokenWhiteList } from 'utils/api/common';
-import { useEffectOnce } from 'react-use';
 import { DefaultWhitelistMap } from 'constants/index';
 import useInterval from 'hooks/useInterval';
 
@@ -67,7 +66,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       console.debug(error, '===onGetTokenWhiteList');
     }
   }, [dispatch]);
-  useInterval(onGetTokenWhiteList, 30000, [onGetTokenWhiteList]);
+  useInterval(onGetTokenWhiteList, [onGetTokenWhiteList], 30000);
 
   return (
     <WhitelistContext.Provider value={useMemo(() => [state, actions], [actions, state])}>
