@@ -39,7 +39,7 @@ export function usePoolTotalLiquidity(
     }
   }, [poolContract, tokenContract, tokenInfo]);
 
-  useInterval(onGetTotalLiquidity, delay, [getTotalLiquidity]);
+  useInterval(onGetTotalLiquidity, delay, [onGetTotalLiquidity]);
 
   return {
     totalLiquidity,
