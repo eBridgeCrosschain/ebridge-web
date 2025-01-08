@@ -53,68 +53,68 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
 
 export const DEFAULT_CHAIN_ICON: { [chainId in TBridgeChainId]: IconInfo } = {
   [SupportedChainId.MAINNET]: {
-    type: 'Ethereum',
+    type: 'ETHEREUM-CHAIN',
   },
   [SupportedChainId.KOVAN]: {
-    type: 'Ethereum',
+    type: 'ETHEREUM-CHAIN',
   },
   [SupportedChainId.GORELI]: {
-    type: 'Ethereum',
+    type: 'ETHEREUM-CHAIN',
   },
   [SupportedChainId.BSC_MAINNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.BSC_TESTNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.HECO_MAINNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.HECO_TESTNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.OEC_MAINNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.OEC_TESTNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.POLYGON_MAINNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedChainId.POLYGON_TESTNET]: {
-    type: 'Binance',
+    type: 'BINANCE-CHAIN',
   },
   [SupportedELFChainId.AELF]: {
-    type: 'MainChain',
+    type: 'AELF-CHAIN',
   },
   [SupportedELFChainId.tDVV]: {
-    type: 'dAppChain',
+    type: 'tDVV-CHAIN',
   },
   [SupportedELFChainId.tDVW]: {
-    type: 'dAppChain',
+    type: 'tDVV-CHAIN',
   },
   [SupportedChainId.SEPOLIA]: {
     // type: 'SEPOLIA',
-    type: 'Ethereum',
+    type: 'ETHEREUM-CHAIN',
   },
   [SupportedChainId.BASE_SEPOLIA]: {
     // type: 'BASE_SEPOLIA',
-    type: 'BaseChain',
+    type: 'BASE-CHAIN',
   },
   [SupportedChainId.BASE]: {
     // type: 'BASE_SEPOLIA',
-    type: 'BaseChain',
+    type: 'BASE-CHAIN',
   },
   [SupportedTONChainId.TESTNET]: {
     // type: 'BASE_SEPOLIA',
     // TODO: icon
-    type: 'ton',
+    type: 'TON-CHAIN',
   },
   [SupportedTONChainId.MAINNET]: {
     // type: 'BASE_SEPOLIA',
     // TODO: icon
-    type: 'ton',
+    type: 'TON-CHAIN',
   },
 };
 
