@@ -89,7 +89,7 @@ export const removeLiquidity = async ({
 
 export type TGetTotalLiquidityParams = {
   poolContract?: ContractBasic;
-  tokenContract?: ContractBasic;
+  tokenContract?: { address?: string; chainId?: ChainId };
   symbol?: string;
 };
 

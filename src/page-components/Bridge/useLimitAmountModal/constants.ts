@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ChainId } from 'types';
 
-export const tokenFormat: { [key: string]: number } = {
+export const TokenFormat: { [key: string]: number } = {
   ETH: 6,
   BNB: 3,
   USDC: 0,

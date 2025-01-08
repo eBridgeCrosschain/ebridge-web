@@ -117,6 +117,7 @@
     "have a daily limit and your current transaction": "{{tokenSymbol}} transfers from {{fromChain}} to {{toChain}} have a daily limit and your current transaction exceeds the remaining quota of {{amount}} {{tokenSymbol}}. The limit will reset at 00:00 (UTC) each day. Please try again after the reset or consider transferring a smaller amount.",
     "have a maximum capacity and your current transaction exceeds the available capacity": "{{tokenSymbol}} transfers from {{fromChain}} to {{toChain}} have a maximum capacity and your current transaction exceeds the available capacity of {{amount}} {{tokenSymbol}}. The capacity will be refilled in {{time}} minutes. Please try again after that.",
     "Your current transaction exceeds the capacity and can't be processed": "{{tokenSymbol}} transfers from {{fromChain}} to {{toChain}} have a maximum capacity of {{amount}} {{tokenSymbol}}. Your current transaction exceeds the capacity and can't be processed. Please consider transferring a smaller amount.",
+    "Insufficient liquidity tip": "{{tokenSymbol}} liquidity on {{toChain}} is only {{amount}} {{tokenSymbol}}. Please lower the transfer amount or try again later.",
     "eBridge limit rules": "About eBridge's transfer/rate limits",
     "eBridge limit rules title": "eBridge's Transfer/Rate Limits",
     "eBridge daily limit specification": "Daily Transfer Limits",
