@@ -113,6 +113,8 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         icon: item.tokenImage,
         liquidityInUsd: item.liquidityInUsd,
         holders: item.holders,
+        status: item.status,
+        totalSupply: item.totalSupply,
       }));
       setTokenList(list);
       return list;

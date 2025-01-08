@@ -69,6 +69,7 @@ export type TApplicationTokenItem = {
   tokenImage: string;
   liquidityInUsd: string;
   holders: number;
+  totalSupply: number;
   status: TApplicationTokenStatus;
 };
 
@@ -169,6 +170,7 @@ export type TPrepareBindIssueResult = {
 export type TGetApplicationIssueRequest = {
   bindingId: string;
   thirdTokenId: string;
+  mintToAddress: string;
 };
 
 export type TGetApplicationIssueResult = boolean;

@@ -29,3 +29,5 @@ export const EVMProviderConfig = createConfig({
     [baseSepolia.id]: http(),
   },
 });
+
+export const DEFAULT_MINT_TO_ADDRESS = '0x0000000000000000000000000000000000000000';

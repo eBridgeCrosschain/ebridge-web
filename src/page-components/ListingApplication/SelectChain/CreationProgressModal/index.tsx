@@ -17,6 +17,7 @@ import styles from './styles.module.less';
 import { useCallEVMCreateToken } from 'hooks/token';
 import useLockCallback from 'hooks/useLockCallback';
 import { useLatestRef } from 'hooks';
+import { DEFAULT_MINT_TO_ADDRESS } from 'constants/evm';
 
 export interface ICreationProgressModalProps {
   open: boolean;
@@ -207,7 +208,11 @@ export default function CreationProgressModal({
         return Promise.resolve();
       }
       try {
-        const isFinished = await getApplicationIssue({ bindingId, thirdTokenId });
+        const isFinished = await getApplicationIssue({
+          bindingId,
+          thirdTokenId,
+          mintToAddress: DEFAULT_MINT_TO_ADDRESS,
+        });
         if (!isFinished) {
           if (poolingTimerForIssueResultRef.current[bindingId]) {
             clearTimeout(poolingTimerForIssueResultRef.current[bindingId]);

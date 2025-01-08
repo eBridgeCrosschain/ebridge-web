@@ -29,14 +29,12 @@ import {
   SELECT_CHAIN_FORM_INITIAL_VALUES,
   SELECT_CHAIN_FORM_INITIAL_VALIDATE_DATA,
   SELECT_CHAIN_FORM_LABEL_MAP,
-  SELECT_CHAIN_FORM_PLACEHOLDER_MAP,
-  REQUIRED_ERROR_MESSAGE,
   DEFAULT_CHAINS,
   WALLET_CONNECTION_REQUIRED,
   ListingStep,
   LISTING_STEP_ITEMS,
 } from 'constants/listingApplication';
-import { BUTTON_TEXT_BACK, SELECT_CHAIN, ZERO, LANG_MAX } from 'constants/misc';
+import { BUTTON_TEXT_BACK, SELECT_CHAIN } from 'constants/misc';
 import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useAElf, useTon, useWeb3 } from 'hooks/web3';
 import { useConnect } from 'hooks/useConnect';
@@ -49,14 +47,14 @@ import {
   getApplicationTokenInfo,
 } from 'utils/api/application';
 import { formatWithCommas } from 'utils/calculate';
-import { formatListWithAnd, parseWithCommas, parseWithStringCommas } from 'utils/format';
-import { handleInputFocus } from 'utils/input';
+import { formatListWithAnd } from 'utils/format';
 import { handleListingErrorMessage } from 'utils/error';
 import { getChainIdByAPI, getChainName, getIconByAPIChainId } from 'utils/chain';
 import { isEVMChain, isTONChain } from 'utils/wallet';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { sleep } from 'utils';
 import styles from './styles.module.less';
+import { formatSymbol } from 'utils/token';
 
 interface ISelectChainProps {
   symbol?: string;
@@ -102,7 +100,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
   const getToken = useCallback(async () => {
     if (!symbol) return;
-    // TODO
     const res = await getApplicationTokenList({});
     const list = (res.tokenList || []).map((item) => ({
       name: item.tokenName,
@@ -110,6 +107,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       icon: item.tokenImage,
       liquidityInUsd: item.liquidityInUsd,
       holders: item.holders,
+      status: item.status,
+      totalSupply: item.totalSupply,
     }));
     const _token = list.find((item) => item.symbol === symbol);
     if (_token) {
@@ -200,17 +199,18 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       }) ||
       judgeIsInitialSupplyError({
         _isShowInitialSupplyFormItem: isShowInitialSupplyFormItem,
-        value: formData[SelectChainFormKeys.INITIAL_SUPPLY],
+        value: String(token?.totalSupply),
         validateStatus: formValidateData[SelectChainFormKeys.INITIAL_SUPPLY].validateStatus,
       });
     setIsButtonDisabled(isDisabled);
   }, [
     judgeIsTokenError,
     judgeIsChainsError,
-    judgeIsInitialSupplyError,
     formData,
-    formValidateData,
+    judgeIsInitialSupplyError,
     isShowInitialSupplyFormItem,
+    token?.totalSupply,
+    formValidateData,
   ]);
 
   useEffect(() => {
@@ -281,52 +281,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       });
     },
     [getNewChains, handleFormDataChange],
-  );
-
-  const handleInitialSupplyInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.trim();
-      const oldValue = formData[SelectChainFormKeys.INITIAL_SUPPLY];
-
-      if (!value) return (e.target.value = '');
-
-      const valueNotComma = parseWithStringCommas(value);
-      const integerReg = /^[0-9]+$/;
-      if (!integerReg.test(valueNotComma)) {
-        return (e.target.value = oldValue);
-      }
-
-      return (e.target.value = formatWithCommas({ amount: valueNotComma }));
-    },
-    [formData],
-  );
-
-  const handleInitialSupplyChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const valueNotComma = parseWithCommas(value);
-
-      if (!valueNotComma) {
-        handleFormDataChange({
-          formKey: SelectChainFormKeys.INITIAL_SUPPLY,
-          value: '',
-          validateData: {
-            validateStatus: FormValidateStatus.Error,
-            errorMessage: REQUIRED_ERROR_MESSAGE,
-          },
-        });
-      } else if (ZERO.plus(valueNotComma).lte(LANG_MAX)) {
-        handleFormDataChange({
-          formKey: SelectChainFormKeys.INITIAL_SUPPLY,
-          value: valueNotComma,
-          validateData: {
-            validateStatus: FormValidateStatus.Normal,
-            errorMessage: '',
-          },
-        });
-      }
-    },
-    [handleFormDataChange],
   );
 
   const { unissuedChains, issuingChains, issuedChains } = useMemo(() => {
@@ -586,23 +540,22 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
                       </span>
                       <div className={styles['select-chain-description']}>
                         <p>
-                          {`The token information on ${formatListWithAnd(
+                          {`The tokens are issued on ${formatListWithAnd(
                             formData[SelectChainFormKeys.CHAINS].map((v) => v.chainName),
-                          )} is the same as that on the aelf chain.`}
+                          )}, with the total supply as the issuance amount.`}
                         </p>
-                        <p>{'You only need to fill in the issuance amount of the token on the chains.'}</p>
+                        <p>{'The issued tokens will be directly transferred to the eBridge contract.'}</p>
                       </div>
                     </div>
                   }>
+                  <div className={styles['supply-amount']}>{formatSymbol(token?.symbol)} issuance amount</div>
                   <Input
                     id="initialSupplyInput"
                     autoComplete="off"
-                    allowClear
-                    placeholder={SELECT_CHAIN_FORM_PLACEHOLDER_MAP[SelectChainFormKeys.INITIAL_SUPPLY]}
-                    value={formData[SelectChainFormKeys.INITIAL_SUPPLY]}
-                    onInput={handleInitialSupplyInput}
-                    onChange={handleInitialSupplyChange}
-                    onFocus={() => handleInputFocus('initialSupplyInput')}
+                    disabled
+                    value={
+                      formatWithCommas({ amount: token?.totalSupply, digits: 8 }) + ' ' + formatSymbol(token?.symbol)
+                    }
                   />
                 </Form.Item>
               )}
@@ -626,8 +579,8 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       <CreationProgressModal
         {...creationProgressModalProps}
         isFirstTimeCreation={!hasDisabledChain}
-        isSelectAelfChains={false} // TODO
-        supply={formData[SelectChainFormKeys.INITIAL_SUPPLY]}
+        isSelectAelfChains={false}
+        supply={String(token?.totalSupply)}
         handleCreateFinish={handleCreateFinish}
         handleClose={handleCreationProgressModalClose}
       />

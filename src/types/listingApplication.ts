@@ -28,6 +28,7 @@ export type TTokenItem = {
   icon: string;
   liquidityInUsd: string;
   holders: number;
+  totalSupply: number;
   status?: TApplicationTokenStatus;
 };
 
