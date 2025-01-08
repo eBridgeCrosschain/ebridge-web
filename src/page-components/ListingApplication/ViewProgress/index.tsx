@@ -67,7 +67,13 @@ export default function ViewProgress({
       <div>
         <div className={clsx('flex-row-center-between', styles['token-info'])}>
           <div className="flex-row-center gap-8">
-            <DisplayImage width={20} height={20} name={tokenSymbol} src={tokenIcon} />
+            <DisplayImage
+              width={20}
+              height={20}
+              name={tokenSymbol}
+              src={tokenIcon}
+              defaultIconClassName={styles['token-symbol-icon']}
+            />
             <span className={clsx(styles['token-symbol'])}>{formatSymbol(tokenSymbol)}</span>
           </div>
           <div className={styles['token-network']}>{getChainName(getChainIdByAPI(chainId))}</div>

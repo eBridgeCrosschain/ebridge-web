@@ -49,6 +49,7 @@ import viewProgressIcon from './view-progress.svg';
 import poolsIcon from './pools.svg';
 import poolsBlueIcon from './pools-blue.svg';
 import listingIcon from './listing.svg';
+import searchIcon from './search.svg';
 
 export {
   metamask,
@@ -102,4 +103,5 @@ export {
   poolsIcon,
   poolsBlueIcon,
   listingIcon,
+  searchIcon,
 };

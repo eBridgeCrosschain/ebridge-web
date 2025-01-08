@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { Input, Row } from 'antd';
 import LinkForBlank from 'components/LinkForBlank';
 import CommonModal from 'components/CommonModal';
-import IconFont from 'components/IconFont';
 import TokenLogo from 'components/TokenLogo';
 import Remind, { RemindType } from 'components/Remind';
 import { formatSymbol } from 'utils/token';
@@ -12,6 +11,8 @@ import { getListingUrl } from 'utils/listingApplication';
 import { TBridgeChainId } from 'constants/chain';
 import { ListingStep } from 'constants/listingApplication';
 import styles from './styles.module.less';
+import CommonImage from 'components/CommonImage';
+import { searchIcon } from 'assets/images';
 
 type TToken<T> = T & {
   symbol: string;
@@ -72,7 +73,7 @@ function SelectToken<T>({
         onPressEnter={onSearch}
         className={styles['input-search']}
         placeholder={t('Search token')}
-        suffix={<IconFont onClick={onSearch} className="cursor-pointer" type="Icon-search" />}
+        suffix={<CommonImage onClick={onSearch} className={styles['input-search-suffix']} src={searchIcon} />}
       />
       {remindContent && (
         <Remind className={styles['token-tip']} type={RemindType.INFO} isBorder={false}>

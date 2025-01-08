@@ -11,5 +11,20 @@
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "string", "name": "symbol", "type": "string" },
+      { "internalType": "uint256", "name": "initialSupply", "type": "uint256" },
+      { "internalType": "string", "name": "officialAddress", "type": "string" },
+      { "internalType": "string", "name": "mintToAddress", "type": "string" }
+    ],
+    "name": "createOfficialToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]

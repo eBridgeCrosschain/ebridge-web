@@ -21,7 +21,7 @@ const MyApplicationTableColumns = [
     render: (symbol: string, item: TMyApplicationItem) => {
       const { chainTokenInfo } = getApplicationDisplayInfo(item);
       return (
-        <div className="flex-row-center gap-8">
+        <div className="flex-row-center gap-4">
           <DisplayImage width={24} height={24} name={symbol} src={chainTokenInfo?.icon || ''} />
           <span className={clsx(styles['token-symbol'])}>{formatSymbol(symbol)}</span>
         </div>
@@ -63,9 +63,10 @@ const MyApplicationTableColumns = [
     title: 'Action',
     dataIndex: 'action',
     key: 'action',
+    align: 'right' as any,
     render: (_: any, item: TMyApplicationItem) => {
       const { chainTokenInfo } = getApplicationDisplayInfo(item);
-      return chainTokenInfo?.status && chainTokenInfo?.icon && chainTokenInfo.chainId ? (
+      return chainTokenInfo?.status && chainTokenInfo.chainId ? (
         <ActionBox
           status={chainTokenInfo.status}
           symbol={item.symbol}

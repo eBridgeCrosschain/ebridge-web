@@ -9,7 +9,7 @@ import { useEVMSwitchChain, useWeb3 } from './web3';
 import { CREATE_TOKEN_ABI } from 'constants/abis';
 import { getContract } from './useContract';
 import { getBridgeChainInfo } from 'utils/chain';
-import { createToken } from 'contracts';
+import { createOfficialToken, createToken } from 'contracts';
 
 export function useGetTokenInfoByWhitelist() {
   const activeWhitelist = useActiveWhitelist();
@@ -70,6 +70,32 @@ export function useCallEVMCreateToken() {
       const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
       const contract = getContract(address, CREATE_TOKEN_ABI, library, chainId);
       return createToken({ createTokenContract: contract, ...args });
+    },
+    [evmSwitchChain, library],
+  );
+}
+
+export function useCallEVMCreateOfficialToken() {
+  const { library } = useWeb3();
+  const evmSwitchChain = useEVMSwitchChain();
+
+  return useCallback(
+    async ({
+      chainId,
+      ...args
+    }: {
+      chainId: ChainId;
+      account: string;
+      name: string;
+      symbol: string;
+      initialSupply: string;
+      officialAddress: string;
+      mintToAddress: string;
+    }) => {
+      await evmSwitchChain(chainId);
+      const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
+      const contract = getContract(address, CREATE_TOKEN_ABI, library, chainId);
+      return createOfficialToken({ createTokenContract: contract, ...args });
     },
     [evmSwitchChain, library],
   );

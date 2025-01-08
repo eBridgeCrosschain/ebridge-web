@@ -41,7 +41,7 @@ function InitializeTokenPool({ networks }: { networks: { name: string }[] }) {
       <div className={styles['init-token-pool-body']}>
         <CommonImage className={styles['view-progress-icon']} src={viewProgressIcon} />
         <div className={styles['init-token-pool-text']}>
-          {`The token is successfully created on ${networksString} and the initialization of the token pool is in progress. Please resubmit for networks where creation has failed.`}
+          {`The token is successfully created on ${networksString} and the initialization of the token pool is in progress.`}
         </div>
 
         <div className={styles['init-token-pool-desc']}>

@@ -14,10 +14,10 @@ import { getBridgeChainInfo, getChainIdByAPI } from 'utils/chain';
 import { handleListingErrorMessage } from 'utils/error';
 import { ApplicationChainStatusEnum, TApplicationChainStatusItem, TPrepareBindIssueRequest } from 'types/api';
 import styles from './styles.module.less';
-import { useCallEVMCreateToken } from 'hooks/token';
+import { useCallEVMCreateOfficialToken } from 'hooks/token';
 import useLockCallback from 'hooks/useLockCallback';
 import { useLatestRef } from 'hooks';
-import { DEFAULT_MINT_TO_ADDRESS } from 'constants/evm';
+import { DEFAULT_EVM_0_ADDRESS } from 'constants/evm';
 
 export interface ICreationProgressModalProps {
   open: boolean;
@@ -53,8 +53,8 @@ export default function CreationProgressModal({
 }: ICreationProgressModalProps) {
   const { account: evmAccount } = useWeb3();
   const isMobile = useMobile();
-  const callEVMCreateToken = useCallEVMCreateToken();
-  const callEVMCreateTokenRef = useLatestRef(callEVMCreateToken);
+  const callEVMCreateOfficialToken = useCallEVMCreateOfficialToken();
+  const callEVMCreateOfficialTokenRef = useLatestRef(callEVMCreateOfficialToken);
   const poolingTimerForIssueResultRef = useRef<Record<string, NodeJS.Timeout | number>>({});
   const [isCreateStart, setIsCreateStart] = useState(false);
   const [isPollingStart, setIsPollingStart] = useState(false);
@@ -183,12 +183,15 @@ export default function CreationProgressModal({
           throw new Error('No address found');
         }
         const chainId = getChainIdByAPI(chain.chainId || '');
-        const res = await callEVMCreateTokenRef.current({
+        const _officialAddress = getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
+        const res = await callEVMCreateOfficialTokenRef.current({
           chainId,
           account: evmAccount,
           name: chain.tokenName,
           symbol: chain.symbol,
           initialSupply: supply,
+          officialAddress: _officialAddress,
+          mintToAddress: DEFAULT_EVM_0_ADDRESS,
         });
         if (!res || !res.TransactionId) {
           throw new Error('Failed to create token');
@@ -199,7 +202,7 @@ export default function CreationProgressModal({
         throw error;
       }
     },
-    [callEVMCreateTokenRef, evmAccount, supply],
+    [callEVMCreateOfficialTokenRef, evmAccount, supply],
   );
 
   const handlePollingForIssueResult = useCallback(
@@ -211,7 +214,7 @@ export default function CreationProgressModal({
         const isFinished = await getApplicationIssue({
           bindingId,
           thirdTokenId,
-          mintToAddress: DEFAULT_MINT_TO_ADDRESS,
+          mintToAddress: DEFAULT_EVM_0_ADDRESS,
         });
         if (!isFinished) {
           if (poolingTimerForIssueResultRef.current[bindingId]) {

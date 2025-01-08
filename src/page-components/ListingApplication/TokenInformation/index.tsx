@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
@@ -47,6 +47,8 @@ import {
 import { CONNECT_AELF_WALLET, BUTTON_TEXT_NEXT } from 'constants/misc';
 import { MAIN_SIDE_CHAIN_ID } from 'constants/index';
 import styles from './styles.module.less';
+import { useWallet } from 'contexts/useWallet/hooks';
+import { isELFChain } from 'utils/aelfUtils';
 
 interface ITokenInformationProps {
   symbol?: string;
@@ -62,9 +64,18 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const handleAelfLogin = useAelfLogin();
   const { setGlobalLoading } = useGlobalLoading();
   const [form] = Form.useForm<TTokenInformationFormValues>();
-  const chainType = getChainType(AELF_CHAIN_ID);
   const aelfWallet = useAElf();
   const { isActive: isAelfActive, account: aelfAccount } = aelfWallet || {};
+  const { fromWallet, fromOptions, toWallet, toOptions } = useWallet();
+
+  const currentChain = useMemo(() => {
+    const fromChainId = fromWallet?.chainId;
+    const toChainId = toWallet?.chainId;
+
+    if (isELFChain(fromChainId)) return { chainId: fromChainId, chainType: fromOptions?.chainType };
+    if (isELFChain(toChainId)) return { chainId: toChainId, chainType: toOptions?.chainType };
+    return { chainId: AELF_CHAIN_ID, chainType: getChainType(AELF_CHAIN_ID) };
+  }, [fromOptions?.chainType, fromWallet?.chainId, toOptions?.chainType, toWallet?.chainId]);
 
   const [formValues, setFormValues] = useState(TOKEN_INFORMATION_FORM_INITIAL_VALUES);
   const [formValidateData, setFormValidateData] = useState(TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA);
@@ -438,8 +449,8 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
                 {TOKEN_INFORMATION_FORM_LABEL_MAP[TokenInformationFormKeys.TOKEN]}
               </span>
               <ConnectWallet
-                chainType={chainType}
-                chainId={AELF_CHAIN_ID}
+                chainType={currentChain.chainType}
+                chainId={currentChain.chainId}
                 account={aelfAccount}
                 buttonText={CONNECT_AELF_WALLET}
               />
