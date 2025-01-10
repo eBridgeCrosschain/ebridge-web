@@ -187,7 +187,7 @@ export default function CreationProgressModal({
         const res = await callEVMCreateOfficialTokenRef.current({
           chainId,
           account: evmAccount,
-          name: chain.tokenName || 'usdt aa',
+          name: chain.tokenName,
           symbol: chain.symbol,
           initialSupply: supply,
           officialAddress: _officialAddress,
