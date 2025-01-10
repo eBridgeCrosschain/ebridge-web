@@ -97,13 +97,14 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         parseFloat(token.liquidityInUsd) > parseFloat(currentTokenConfig.liquidityInUsd) &&
         currentTokenConfig?.holders !== undefined &&
         token.holders > currentTokenConfig.holders;
-
+      const emailValid = !!formValues[TokenInformationFormKeys.EMAIL];
       const isDisabled =
         Object.values(currentFormValidateData).some((item) => item.validateStatus === FormValidateStatus.Error) ||
-        !isTokenValid;
+        !isTokenValid ||
+        !emailValid;
       setIsButtonDisabled(isDisabled);
     },
-    [],
+    [formValues],
   );
 
   const reset = useCallback(() => {

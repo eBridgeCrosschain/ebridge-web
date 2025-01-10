@@ -36,7 +36,7 @@ export function useCurrentWhitelist() {
       const fromItem = item?.[fromChainId];
       const toItem = item?.[toChainId];
       const canForm = fromItem && !fromItem?.onlyTo;
-      const canTo = toItem && !toItem?.onlyForm;
+      const canTo = toItem && !toItem?.onlyFrom;
       return canForm && canTo;
     });
   }, [allList, fromChainId, toChainId]);
