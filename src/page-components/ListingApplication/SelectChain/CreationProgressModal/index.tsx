@@ -151,7 +151,7 @@ export default function CreationProgressModal({
           throw new Error('No address found');
         }
         const chainId = getChainIdByAPI(chain.chainId || '');
-        const contractAddress = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
+        const contractAddress = getBridgeChainInfo(chainId)?.CREATE_OFFICIAL_TOKEN_CONTRACT;
         if (!contractAddress) {
           throw new Error('No create token contract found');
         }
@@ -187,7 +187,7 @@ export default function CreationProgressModal({
         const res = await callEVMCreateOfficialTokenRef.current({
           chainId,
           account: evmAccount,
-          name: chain.tokenName,
+          name: chain.tokenName || 'usdt aa',
           symbol: chain.symbol,
           initialSupply: supply,
           officialAddress: _officialAddress,

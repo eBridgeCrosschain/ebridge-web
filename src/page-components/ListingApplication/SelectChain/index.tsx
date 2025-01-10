@@ -91,6 +91,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     chains: [],
   });
   const [token, setToken] = useState<TTokenItem | undefined>();
+  const tokenRef = useRef(token);
   const [isShowInitialSupplyFormItem, setIsShowInitialSupplyFormItem] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -115,6 +116,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       const tokenInfo = await getApplicationTokenInfo({ symbol });
       if (tokenInfo && tokenInfo.symbol) {
         setToken(_token);
+        tokenRef.current = _token;
       } else {
         throw new Error('Failed to get token info');
       }
@@ -129,6 +131,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
     const _chains = (res.chainList || []).map((item) => ({
       ...item,
       chainName: getChainName(getChainIdByAPI(item.chainId)),
+      tokenName: item.tokenName || tokenRef.current?.name || '',
     }));
 
     const listData = {

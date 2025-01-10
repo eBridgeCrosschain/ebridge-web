@@ -51,7 +51,7 @@ export type TokenInfo = {
   isBurnable?: boolean;
   totalSupply?: number;
   isNativeToken?: boolean;
-  onlyForm?: boolean;
+  onlyFrom?: boolean;
   onlyTo?: boolean;
   icon?: string;
 };

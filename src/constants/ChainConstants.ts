@@ -17,6 +17,7 @@ type AElfOwnConstants = {
   BRIDGE_CONTRACT_OUT?: string;
   LIMIT_CONTRACT?: string;
   CREATE_TOKEN_CONTRACT?: string;
+  CREATE_OFFICIAL_TOKEN_CONTRACT?: string;
 };
 
 type Constants = ChainConstantsType & AElfOwnConstants;

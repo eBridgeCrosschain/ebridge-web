@@ -107,7 +107,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       const fromItem = selectToken?.[fromChainId];
       const toItem = selectToken?.[toChainId];
       const canForm = fromItem && !fromItem?.onlyTo;
-      const canTo = toItem && !toItem?.onlyForm;
+      const canTo = toItem && !toItem?.onlyFrom;
       if (!tokenInfo || !(canTo && canForm)) {
         if (latestAllWhitelist.current.some((i: any) => i[fromChainId]?.symbol === defaultSelectToken)) {
           dispatch(setSelectToken(defaultSelectToken));
