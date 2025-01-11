@@ -109,7 +109,7 @@ function MyApplications() {
   const connectAndInitSleep = useCallback(async () => {
     setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
-    await sleep(3000);
+    await sleep(5000); // TODO
     connectAndInitRef.current();
   }, [setGlobalLoading]);
   useEffectOnce(() => {
