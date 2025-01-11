@@ -278,14 +278,6 @@ export function useCreateTokenContract(chainId?: ChainId) {
   return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
 }
 
-export function useCreateOfficialTokenContract(chainId?: ChainId) {
-  const contractAddress = useMemo(() => {
-    if (isELFChain(chainId) || isTonChain(chainId)) return '';
-    return ERCChainConstants.constants.CREATE_OFFICIAL_TOKEN_CONTRACT || '';
-  }, [chainId]);
-  return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
-}
-
 export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {
   const contractAddress = useMemo(() => {
     return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
