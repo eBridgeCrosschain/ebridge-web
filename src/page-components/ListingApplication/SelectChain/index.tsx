@@ -371,7 +371,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         };
       } else {
         props = {
-          children: 'Create & Issue Token',
+          children: 'Create Token and Submit',
           onClick: handleCreateToken,
         };
       }
