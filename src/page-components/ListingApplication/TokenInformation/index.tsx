@@ -412,7 +412,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
 
   const renderTokenRequirements = () => {
     const requirements = [];
-    if (tokenConfig?.liquidityInUsd && parseFloat(tokenConfig.liquidityInUsd) > 0) {
+    if (tokenConfig?.liquidityInUsd) {
       requirements.push(`Liquidity > $${tokenConfig.liquidityInUsd}`);
     }
     if (tokenConfig?.holders) {
@@ -429,7 +429,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         <span className={styles['token-information-title']}>
           {LISTING_STEP_ITEMS[ListingStep.TOKEN_INFORMATION].title}
         </span>
-        {((tokenConfig?.liquidityInUsd && parseFloat(tokenConfig.liquidityInUsd) > 0) || !!tokenConfig?.holders) && (
+        {(tokenConfig?.liquidityInUsd || tokenConfig?.holders) && (
           <ListingTip
             title="Token Requirements"
             tip={

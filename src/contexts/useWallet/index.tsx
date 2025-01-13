@@ -125,7 +125,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       dispatch((isForm ? setFromWallet : setToWallet)({ chainId: activeChainId, chainType: 'ELF' }));
       chainDispatch(setUserELFChainId(activeChainId));
     }
-  }, [dispatch, chainDispatch, fromWallet, toWallet]);
+  }, [fromWallet, toWallet, portkeyActive, fromOptions?.chainId, toOptions?.chainId, dispatch, chainDispatch]);
 
   useEffect(() => {
     if (isSelectPortkey(selectELFWallet) && portkeyActive && fromOptions?.chainType === toOptions?.chainType) {

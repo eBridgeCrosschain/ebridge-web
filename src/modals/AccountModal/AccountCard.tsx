@@ -31,7 +31,7 @@ function AccountCard() {
   const connect = useConnect();
   const [tonConnectUI] = useTonConnectUI();
 
-  const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
+  const { connector, account, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -84,14 +84,14 @@ function AccountCard() {
       basicModalView.setWalletModal(true, {
         walletWalletType: walletType,
         walletChainType: walletType === 'ERC' ? 'ERC' : 'ELF',
-        walletChainId: chainId,
+        walletChainId: accountChainId,
       }),
     );
   }, [
     connector,
     walletType,
     dispatch,
-    chainId,
+    accountChainId,
     connection?.connector,
     chainDispatch,
     tonConnectUI,
@@ -110,16 +110,16 @@ function AccountCard() {
         basicModalView.setWalletModal(true, {
           walletWalletType: walletType,
           walletChainType: walletType === 'ERC' ? 'ERC' : 'ELF',
-          walletChainId: chainId,
+          walletChainId: accountChainId,
         }),
       );
     } catch (error: any) {
       console.debug(`connection error: ${error}`);
       CommonMessage.error(`connection error: ${error.message}`);
     }
-  }, [chainId, dispatch, onDisconnect, walletType]);
+  }, [accountChainId, dispatch, onDisconnect, walletType]);
 
-  const isELF = isELFChain(chainId);
+  const isELF = isELFChain(accountChainId);
 
   const jumpAssets = useCallback(() => {
     dispatch(basicModalView.modalDestroy());
