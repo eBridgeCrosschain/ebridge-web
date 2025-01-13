@@ -93,8 +93,10 @@ export function useCallEVMCreateOfficialToken() {
       mintToAddress: string;
     }) => {
       await evmSwitchChain(chainId);
+      console.log('====== useCallEVMCreateOfficialToken', '');
       const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
       const contract = getContract(address, CREATE_TOKEN_ABI, library, chainId);
+      console.log('====== useCallEVMCreateOfficialToken address', address, contract);
       return createOfficialToken({ createTokenContract: contract, ...args });
     },
     [evmSwitchChain, library],
