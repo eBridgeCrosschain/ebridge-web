@@ -19,7 +19,7 @@ export const addLiquidity = async ({
   library,
   tokenInfo,
 }: {
-  symbol: string;
+  symbol?: string;
   account: string;
   amount: string;
   chainId: ChainId;

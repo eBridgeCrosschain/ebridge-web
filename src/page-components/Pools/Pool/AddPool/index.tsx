@@ -68,7 +68,7 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
       setLoadingModal({ open: true });
       if (poolContract.contractType === 'ERC') await evmSwitchChain(chainId);
       const req = await addLiquidity({
-        symbol: tokenInfo?.symbol,
+        tokenInfo,
         amount: amount,
         account: account,
         library: library as any,
