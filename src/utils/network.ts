@@ -160,6 +160,7 @@ export const switchChain = async (
         )
       ) {
         CommonMessage.error(`${chainName} is unsupported by your wallet.`);
+        throw `${chainName} is unsupported by your wallet.`;
       } else {
         console.log('====== ====== ====== 2', '');
         await connector.activate(chainId);

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import clsx from 'clsx';
-import { Form, Checkbox, Row, Col, Input } from 'antd';
+import { Form, Checkbox, Row, Col, Input, Radio } from 'antd';
 import CommonMessage from 'components/CommonMessage';
 import CommonButton, { CommonButtonProps } from 'components/CommonButton';
 import CommonTooltipSwitchModal, { ICommonTooltipSwitchModalRef } from 'components/CommonTooltipSwitchModal';
@@ -55,6 +55,7 @@ import eBridgeEventBus from 'utils/eBridgeEventBus';
 import { sleep } from 'utils';
 import styles from './styles.module.less';
 import { formatSymbol } from 'utils/token';
+import { isMobileDevices } from 'utils/isMobile';
 
 interface ISelectChainProps {
   symbol?: string;
@@ -64,6 +65,7 @@ interface ISelectChainProps {
 
 export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: ISelectChainProps) {
   const isMobile = useMobile();
+  const _isMobileDevices = isMobileDevices();
   const { setGlobalLoading } = useGlobalLoading();
   const connect = useConnect();
   const { account: aelfAccount } = useAElf();
@@ -272,18 +274,26 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
 
   const handleChainsChange = useCallback(
     ({ chain, checked }: { chain: TApplicationChainStatusItem; checked: boolean }) => {
-      const newChains = getNewChains({
-        formKey: SelectChainFormKeys.CHAINS,
-        value: chain,
-        checked,
-      });
+      let newChains: TApplicationChainStatusItem[] = [];
+      if (_isMobileDevices) {
+        if (checked) {
+          newChains = [chain];
+        }
+      } else {
+        newChains = getNewChains({
+          formKey: SelectChainFormKeys.CHAINS,
+          value: chain,
+          checked,
+        });
+      }
+      console.log('====== newChains', newChains);
 
       handleFormDataChange({
         formKey: SelectChainFormKeys.CHAINS,
         value: newChains,
       });
     },
-    [getNewChains, handleFormDataChange],
+    [_isMobileDevices, getNewChains, handleFormDataChange],
   );
 
   const { unissuedChains, issuingChains, issuedChains } = useMemo(() => {
@@ -492,7 +502,11 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
                       <IconFont type={chain.chainId ? getIconByAPIChainId(chain.chainId)?.type : ''} />
                       <span className={styles['select-chain-checkbox-label']}>{chain.chainName}</span>
                     </div>
-                    <Checkbox value={chain.chainId} checked={checked} disabled={isDisabled} />
+                    {_isMobileDevices ? (
+                      <Radio value={chain.chainId} checked={checked} disabled={isDisabled} />
+                    ) : (
+                      <Checkbox value={chain.chainId} checked={checked} disabled={isDisabled} />
+                    )}
                   </div>
                 </CommonTooltipSwitchModal>
               </Col>
@@ -501,7 +515,7 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
         </Row>
       </Form.Item>
     );
-  }, [chainListData, formData, handleChainsChange, isMobile, judgeIsChainDisabled]);
+  }, [_isMobileDevices, chainListData, formData, handleChainsChange, isMobile, judgeIsChainDisabled]);
 
   return (
     <>
