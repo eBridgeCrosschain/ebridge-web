@@ -15,6 +15,7 @@ import { useGetTokenInfoByWhitelist, useTokenPrice } from 'hooks/token';
 import CommonImage from 'components/CommonImage';
 import { backIcon } from 'assets/images';
 import Col from 'antd/es/grid/col';
+import { useGetTokenInfoByPoolList } from 'hooks/pools';
 export default function Pool() {
   const { t } = useLanguage();
 
@@ -27,12 +28,12 @@ export default function Pool() {
   const chainId = useMemo(() => getChainIdByAPI(apiChainId), [apiChainId]);
 
   const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
+  const getTokenInfoByPoolList = useGetTokenInfoByPoolList();
   const { price } = useTokenPrice(symbol);
 
-  const tokenInfo = useMemo(
-    () => getTokenInfoByWhitelist(chainId as ChainId, symbol),
-    [chainId, getTokenInfoByWhitelist, symbol],
-  );
+  const tokenInfo = useMemo(() => {
+    return getTokenInfoByWhitelist(chainId as ChainId, symbol) || getTokenInfoByPoolList(chainId as ChainId, symbol);
+  }, [chainId, getTokenInfoByPoolList, getTokenInfoByWhitelist, symbol]);
 
   const chainIcon = useMemo(() => {
     const iconProps = getIconByChainId(chainId);
@@ -46,9 +47,7 @@ export default function Pool() {
   }, [chainId]);
 
   useEffect(() => {
-    if (!chainIcon || !tokenInfo) {
-      push('/pools');
-    }
+    if (!chainIcon || !tokenInfo) push('/pools');
   }, [chainIcon, push, tokenInfo]);
   return (
     <div className={clsx('page-content', 'main-page-content-wrap')}>

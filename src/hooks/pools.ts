@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { TokenInfo } from 'types';
+import { ChainId, TokenInfo } from 'types';
 import { ContractBasic } from 'utils/contract';
 import useInterval from './useInterval';
 import { getMyLiquidity, getTotalLiquidity } from 'utils/pools';
@@ -9,6 +9,7 @@ import { useActiveAddresses } from './web3';
 import { usePoolsDispatch } from 'contexts/usePools/hooks';
 import { setPoolList, setPoolOverview } from 'contexts/usePools/actions';
 import { usePools } from 'contexts/usePools';
+import { getChainIdByAPI } from 'utils/chain';
 
 export function usePoolTotalLiquidity(
   {
@@ -122,4 +123,20 @@ export function usePoolList() {
   }, [getPoolList]);
 
   return { poolList, getPoolList };
+}
+
+export function useGetTokenInfoByPoolList() {
+  const { poolList } = usePoolList();
+  return useCallback(
+    (chainId?: ChainId, symbol?: string) => {
+      if (!chainId || !symbol) return;
+      try {
+        const item = poolList?.items.find((i) => getChainIdByAPI(i.chainId) === chainId && i.token?.symbol === symbol);
+        if (item?.token?.chainId) return { ...item?.token, chainId: getChainIdByAPI(item.token.chainId) };
+      } catch (error) {
+        console.debug(error, 'useGetTokenInfoByPoolList');
+      }
+    },
+    [poolList],
+  );
 }
