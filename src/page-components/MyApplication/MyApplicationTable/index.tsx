@@ -96,7 +96,10 @@ export default function MyApplicationTable({
   return (
     <>
       <CommonTable
-        className={styles['my-application-table']}
+        className={clsx(
+          styles['my-application-table'],
+          applicationList.length > 0 ? null : styles['my-application-table-empty'],
+        )}
         rowKey={'id'}
         dataSource={applicationList}
         columns={MyApplicationTableColumns}

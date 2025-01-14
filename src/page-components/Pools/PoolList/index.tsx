@@ -46,7 +46,7 @@ export default function PoolList() {
       <CommonTable
         pagination={Pagination}
         rowKey={(item: APIPoolItem) => item?.chainId + item?.token?.symbol}
-        className={styles.table}
+        className={clsx(styles.table, Array.isArray(sortList) && sortList.length > 0 ? null : styles['table-empty'])}
         columns={columns}
         dataSource={sortList}
         scroll={{ x: 700 }}
