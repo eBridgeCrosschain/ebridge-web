@@ -95,7 +95,7 @@ export default function TokenSelect({
             {!!tokenConfig?.holders && (
               <div className={styles['token-selected-info-card-row']}>
                 <div className={styles['token-selected-info-card-row-content']}>
-                  {getInfoValidateIcon(!!token?.holders && token.holders > tokenConfig.holders)}
+                  {getInfoValidateIcon(tokenConfig?.holders !== undefined && token.holders > tokenConfig.holders)}
                   <span>{`Holders > ${tokenConfig.holders}`}</span>
                 </div>
               </div>
