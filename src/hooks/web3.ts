@@ -69,6 +69,8 @@ export function useWeb3(): Web3Type {
   return tmpContext;
 }
 
+const PORTKEY_TYPE = ['PortkeyDiscover', 'PortkeyAA'];
+
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
   const { walletInfo, walletType, isConnected } = useConnectWallet();
@@ -86,7 +88,7 @@ export function useAElf(): Web3Type {
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
-    const isPortkey = walletType === 'PortkeyDiscover' ? true : false;
+    const isPortkey = PORTKEY_TYPE.includes(walletType) ? true : false;
     const _walletType = isPortkey ? 'PORTKEY' : 'NIGHTELF';
     return {
       ...contextNetwork,

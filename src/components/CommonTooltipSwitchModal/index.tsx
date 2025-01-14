@@ -24,6 +24,7 @@ interface ICommonTooltipSwitchModalProps {
   confirmButtonText?: string;
   confirmButtonClassName?: string;
   onConfirm?: () => void;
+  autoOpen?: boolean;
 }
 
 const CommonTooltipSwitchModal = forwardRef<ICommonTooltipSwitchModalRef, ICommonTooltipSwitchModalProps>(
@@ -38,6 +39,7 @@ const CommonTooltipSwitchModal = forwardRef<ICommonTooltipSwitchModalRef, ICommo
       confirmButtonText = GOT_IT,
       confirmButtonClassName,
       onConfirm,
+      autoOpen,
     },
     ref,
   ) => {
@@ -68,7 +70,7 @@ const CommonTooltipSwitchModal = forwardRef<ICommonTooltipSwitchModalRef, ICommo
     return (
       <>
         <CommonTooltip {...tooltipProps} placement="top" title={isTooltip && tip}>
-          {children}
+          {autoOpen ? <div onClick={() => handleModalOpen()}>{children}</div> : children}
         </CommonTooltip>
         <CommonModal
           {...modalProps}

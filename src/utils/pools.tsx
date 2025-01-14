@@ -29,9 +29,8 @@ export const addLiquidity = async ({
   tokenInfo?: TokenInfo;
 }) => {
   let _tokenInfo = tokenInfo;
-  if (!_tokenInfo?.symbol) {
-    _tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
-  }
+  if (!_tokenInfo?.symbol) _tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
+  if (!symbol) symbol = _tokenInfo?.symbol;
 
   const bigAmount = timesDecimals(amount, _tokenInfo?.decimals).toFixed(0);
   if (!_tokenInfo?.isNativeToken) {
