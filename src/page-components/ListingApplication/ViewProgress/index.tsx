@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-import styles from './styles.module.less';
 import CommonModal from 'components/CommonModal';
 import { useMemo } from 'react';
 import { formatSymbol } from 'utils/token';
@@ -11,6 +9,9 @@ import DisplayImage from 'components/DisplayImage';
 import CommonSteps, { ICommonStepsProps } from 'components/CommonSteps';
 import CommonButton from 'components/CommonButton';
 import { getChainIdByAPI, getChainName } from 'utils/chain';
+import clsx from 'clsx';
+import styles from './styles.module.less';
+import { TelegramPlatform } from 'utils/telegram/telegram';
 
 export default function ViewProgress({
   className,
@@ -92,7 +93,11 @@ export default function ViewProgress({
 
   return (
     <CommonModal
-      className={clsx(styles['view-progress-modal'], className)}
+      className={clsx(
+        styles['view-progress-modal'],
+        TelegramPlatform.isTelegramPlatform() && 'tg-view-progress-modal',
+        className,
+      )}
       width={438}
       open={open}
       type={isMd ? 'pop-bottom' : 'default'}
