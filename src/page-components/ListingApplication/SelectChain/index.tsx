@@ -108,8 +108,6 @@ export default function SelectChain({ symbol, handleNextStep, handlePrevStep }: 
       name: item.tokenName,
       symbol: item.symbol,
       icon: item.tokenImage,
-      liquidityInUsd: item.liquidityInUsd,
-      holders: item.holders,
       status: item.status,
       totalSupply: item.totalSupply,
     }));

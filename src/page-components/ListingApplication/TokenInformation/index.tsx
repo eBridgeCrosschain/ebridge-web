@@ -81,6 +81,8 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const [formValidateData, setFormValidateData] = useState(TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [tokenList, setTokenList] = useState<TTokenItem[]>([]);
+  const [liquidityInUsd, setLiquidityInUsd] = useState<string>();
+  const [holders, setHolders] = useState<number>();
   const [tokenConfig, setTokenConfig] = useState<TTokenConfig | undefined>();
   const [isActionButtonLoading, setIsActionButtonLoading] = useState(false);
 
@@ -90,13 +92,13 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       currentFormValidateData: TTokenInformationFormValidateData,
       currentTokenConfig?: TTokenConfig,
     ) => {
-      const token = currentFormData[TokenInformationFormKeys.TOKEN];
       const isTokenValid =
-        !!token?.liquidityInUsd &&
+        !!liquidityInUsd &&
         !!currentTokenConfig?.liquidityInUsd &&
-        parseFloat(token.liquidityInUsd) > parseFloat(currentTokenConfig.liquidityInUsd) &&
+        parseFloat(liquidityInUsd) > parseFloat(currentTokenConfig.liquidityInUsd) &&
+        holders !== undefined &&
         currentTokenConfig?.holders !== undefined &&
-        token.holders > currentTokenConfig.holders;
+        holders > currentTokenConfig.holders;
       const emailValid = !!currentFormData[TokenInformationFormKeys.EMAIL];
       const isDisabled =
         Object.values(currentFormValidateData).some((item) => item.validateStatus === FormValidateStatus.Error) ||
@@ -104,7 +106,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         !emailValid;
       setIsButtonDisabled(isDisabled);
     },
-    [],
+    [holders, liquidityInUsd],
   );
 
   const reset = useCallback(() => {
@@ -123,8 +125,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         name: item.tokenName,
         symbol: item.symbol,
         icon: item.tokenImage,
-        liquidityInUsd: item.liquidityInUsd,
-        holders: item.holders,
         status: item.status,
         totalSupply: item.totalSupply,
       }));
@@ -296,6 +296,11 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     [setGlobalLoading, getTokenList, tokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
   );
 
+  const handleSelectTokenLiquidityCallback = useCallback((liquidityInUsd: string, holders: number) => {
+    setLiquidityInUsd(liquidityInUsd);
+    setHolders(holders);
+  }, []);
+
   const handleCommonInputChange = useCallback(
     (value: string, key: TokenInformationFormKeys) => {
       handleFormDataChange({
@@ -369,7 +374,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     [handleFormDataChange],
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setIsActionButtonLoading(true);
     const params = {
       symbol: formValues[TokenInformationFormKeys.TOKEN]?.symbol,
@@ -390,27 +395,33 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     } finally {
       setIsActionButtonLoading(false);
     }
-  };
+  }, [formValues, handleNextStep]);
 
-  const getCommonFormItemProps = (key: TokenInformationFormKeys) => ({
-    validateStatus: formValidateData[key].validateStatus,
-    help: formValidateData[key].errorMessage,
-  });
+  const getCommonFormItemProps = useCallback(
+    (key: TokenInformationFormKeys) => ({
+      validateStatus: formValidateData[key].validateStatus,
+      help: formValidateData[key].errorMessage,
+    }),
+    [formValidateData],
+  );
 
-  const getCommonInputProps = (key: TokenInformationFormKeys): Partial<InputProps> => {
-    const id = `tokenInformationInput_${key}`;
-    return {
-      size: 'large',
-      allowClear: true,
-      autoComplete: 'off',
-      placeholder: TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[key],
-      value: formValues[key] as string,
-      id,
-      onFocus: () => handleInputFocus(id),
-    };
-  };
+  const getCommonInputProps = useCallback(
+    (key: TokenInformationFormKeys): Partial<InputProps> => {
+      const id = `tokenInformationInput_${key}`;
+      return {
+        size: 'large',
+        allowClear: true,
+        autoComplete: 'off',
+        placeholder: TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[key],
+        value: formValues[key] as string,
+        id,
+        onFocus: () => handleInputFocus(id),
+      };
+    },
+    [formValues],
+  );
 
-  const renderTokenRequirements = () => {
+  const renderTokenRequirements = useCallback(() => {
     const requirements = [];
     if (tokenConfig?.liquidityInUsd) {
       requirements.push(`Liquidity > $${tokenConfig.liquidityInUsd}`);
@@ -421,7 +432,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     return requirements.map((requirement, index) => (
       <p key={index}>{`${!isMobile ? `${index + 1}. ` : ''}${requirement}`}</p>
     ));
-  };
+  }, [isMobile, tokenConfig?.holders, tokenConfig?.liquidityInUsd]);
 
   return (
     <div className={styles['token-information']}>
@@ -463,6 +474,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
             token={formValues[TokenInformationFormKeys.TOKEN]}
             placeholder={TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[TokenInformationFormKeys.TOKEN]}
             selectCallback={handleSelectToken}
+            selectTokenLiquidityCallback={handleSelectTokenLiquidityCallback}
           />
         </Form.Item>
         <Form.Item

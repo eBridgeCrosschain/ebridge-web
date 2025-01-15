@@ -67,8 +67,6 @@ export type TApplicationTokenItem = {
   tokenName: string;
   symbol: string;
   tokenImage: string;
-  liquidityInUsd: string;
-  holders: number;
   totalSupply: number;
   status: TApplicationTokenStatus;
 };
@@ -78,6 +76,15 @@ export enum TApplicationTokenStatus {
   Integrating = 'Integrating',
   Available = 'Available',
 }
+
+export type TGetApplicationTokenDetailRequest = {
+  symbol: string;
+};
+
+export type TGetApplicationTokenDetailResult = {
+  liquidityInUsd: string;
+  holders: number;
+};
 
 export type TCommitTokenInfoRequest = {
   symbol: string;

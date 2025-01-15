@@ -29,6 +29,7 @@ const CrossApiList = {
 
 const ApplicationApiList = {
   getTokenList: '/api/ebridge/application/tokens',
+  getTokenDetail: '/api/ebridge/application/token-detail',
   commitTokenInfo: {
     target: '/api/ebridge/application/commit-basic-info',
     baseConfig: { method: 'POST' },

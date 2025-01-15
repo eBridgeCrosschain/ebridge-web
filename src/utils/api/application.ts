@@ -20,12 +20,21 @@ import {
   TGetApplicationIssueRequest,
   TGetTokenConfigRequest,
   TGetTokenConfigResult,
+  TGetApplicationTokenDetailRequest,
+  TGetApplicationTokenDetailResult,
 } from 'types/api';
 
 export const getApplicationTokenList = async (
   params: TGetApplicationTokenListRequest,
 ): Promise<TGetApplicationTokenListResult> => {
   const res = await request.application.getTokenList({ params });
+  return res.data;
+};
+
+export const getApplicationTokenDetail = async (
+  params: TGetApplicationTokenDetailRequest,
+): Promise<TGetApplicationTokenDetailResult> => {
+  const res = await request.application.getTokenDetail({ params });
   return res.data;
 };
 
