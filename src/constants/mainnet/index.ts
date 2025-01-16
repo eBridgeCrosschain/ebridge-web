@@ -3,6 +3,7 @@ import * as AELF from '../platform/AELF';
 import * as tDVV from '../platform/tDVV';
 import * as BSC from '../platform/BSC';
 import * as BASE from '../platform/base';
+import * as TON_TESTNET from '../platform/TON_Test';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 
 import {
@@ -10,6 +11,7 @@ import {
   DEFAULT_CHAIN_NAME,
   SupportedChainId,
   SupportedELFChainId,
+  SupportedTONChainId,
   TBridgeChainId,
 } from '../chain';
 import { NetworkType } from 'types';
@@ -22,8 +24,13 @@ export const MAIN_SIDE_CHAIN_ID = {
   sideChain: SupportedELFChainId.tDVV,
 };
 
-export type ChainConstantsType = typeof MAINNET | typeof AELF | typeof tDVV | typeof BSC | typeof BASE;
-
+export type ChainConstantsType =
+  | typeof MAINNET
+  | typeof AELF
+  | typeof tDVV
+  | typeof BSC
+  | typeof BASE
+  | typeof TON_TESTNET;
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
 
@@ -42,6 +49,17 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedChainId.BSC_MAINNET]: BSC,
   [SupportedChainId.BASE]: BASE,
 };
+
+export const SupportedTONChain: { [k: string | number]: ChainConstantsType } = {
+  // TODO: fix TON
+  [SupportedTONChainId.TESTNET]: TON_TESTNET,
+};
+
+export const SupportedExternalChain: { [k: string | number]: ChainConstantsType } = {
+  ...SupportedERCChain,
+  ...SupportedTONChain,
+};
+
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
 export type TELFChainConstantsType = typeof AELF | typeof tDVV;
