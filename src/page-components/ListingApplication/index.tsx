@@ -95,7 +95,7 @@ function ListingApplication() {
     [currentStep, router],
   );
 
-  const handleWarningModalConfirm = () => {
+  const handleWarningModalConfirm = useCallback(() => {
     setIsWarningModalOpen(false);
     if (nextUrlRef.current === 'back') {
       isNavigatingRef.current = true;
@@ -104,14 +104,14 @@ function ListingApplication() {
       isNavigatingRef.current = true;
       router.push(nextUrlRef.current);
     }
-  };
+  }, [router]);
 
-  const handleWarningModalCancel = () => {
+  const handleWarningModalCancel = useCallback(() => {
     setIsWarningModalOpen(false);
     nextUrlRef.current = '';
-  };
+  }, []);
 
-  const renderForm = () => {
+  const renderForm = useMemo(() => {
     switch (currentStep) {
       case ListingStep.TOKEN_INFORMATION:
         return <TokenInformation symbol={symbol} handleNextStep={handleNextStep} />;
@@ -122,7 +122,7 @@ function ListingApplication() {
       default:
         return null;
     }
-  };
+  }, [currentStep, handleNextStep, handlePrevStep, networks, symbol]);
 
   return (
     <>
@@ -152,7 +152,7 @@ function ListingApplication() {
                 <CommonSteps stepItems={LISTING_STEP_ITEMS} current={currentStep} />
               </div>
               <div className={styles['listing-card']}>
-                <div className={styles['listing-card-form-content']}>{renderForm()}</div>
+                <div className={styles['listing-card-form-content']}>{renderForm}</div>
               </div>
             </div>
           </div>

@@ -88,11 +88,11 @@ export type TGetApplicationTokenDetailResult = {
 
 export type TCommitTokenInfoRequest = {
   symbol: string;
-  officialWebsite: string;
-  officialTwitter: string;
-  title: string;
-  personName: string;
-  telegramHandler: string;
+  officialWebsite?: string;
+  officialTwitter?: string;
+  title?: string;
+  personName?: string;
+  telegramHandler?: string;
   email: string;
 };
 

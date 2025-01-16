@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import CommonLink from 'components/CommonLink';
 import DynamicArrow from 'components/DynamicArrow';
@@ -11,32 +11,30 @@ import { AwakenHost } from 'constants/index';
 import { LISTING_TOKEN_TIP } from 'constants/listingApplication';
 import styles from './styles.module.less';
 import { TApplicationTokenStatus } from 'types/api';
-import { getApplicationTokenDetail } from 'utils/api/application';
-import useGlobalLoading from 'hooks/useGlobalLoading';
 
 interface ITokenSelectProps {
   className?: string;
   token?: TTokenItem;
+  liquidityInUsd?: string;
+  holders?: number;
   tokenList: TTokenItem[];
   tokenConfig?: TTokenConfig;
   placeholder?: string;
   selectCallback?: (item: TTokenItem) => void;
-  selectTokenLiquidityCallback?: (liquidityInUsd: string, holders: number) => void;
 }
 
 export default function TokenSelect({
   className,
   token,
+  liquidityInUsd,
+  holders,
   tokenList,
   tokenConfig,
   placeholder,
   selectCallback,
-  selectTokenLiquidityCallback,
 }: ITokenSelectProps) {
-  const { setGlobalLoading } = useGlobalLoading();
   const [isShowTokenSelectModal, setIsShowTokenSelectModal] = useState(false);
-  const [liquidityInUsd, setLiquidityInUsd] = useState<string>();
-  const [holders, setHolders] = useState<number>();
+  const tokenSymbolRef = useRef<string | undefined>(token?.symbol);
 
   const formatTokenList = useMemo(() => {
     const _list: Array<TTokenItem & { isShowSuffix: boolean; disable: boolean }> = [];
@@ -66,34 +64,12 @@ export default function TokenSelect({
         return;
       }
 
+      tokenSymbolRef.current = item.symbol;
       setIsShowTokenSelectModal(false);
       selectCallback?.(item);
     },
     [selectCallback],
   );
-
-  const getTokenDetail = useCallback(
-    async (symbol: string) => {
-      try {
-        setGlobalLoading(true);
-        const tokenDetail = await getApplicationTokenDetail({ symbol: symbol });
-        setLiquidityInUsd(tokenDetail.liquidityInUsd);
-        setHolders(tokenDetail.holders);
-        selectTokenLiquidityCallback?.(tokenDetail.liquidityInUsd, tokenDetail.holders);
-      } catch (error) {
-        console.log('getApplicationTokenDetail error', error);
-      } finally {
-        setGlobalLoading(false);
-      }
-    },
-    [selectTokenLiquidityCallback, setGlobalLoading],
-  );
-
-  useEffect(() => {
-    if (token?.symbol) {
-      getTokenDetail(token.symbol);
-    }
-  }, [getTokenDetail, token?.symbol]);
 
   return (
     <>

@@ -14,6 +14,7 @@ import {
   getApplicationTokenInfo,
   getApplicationTokenList,
   getApplicationTokenConfig,
+  getApplicationTokenDetail,
 } from 'utils/api/application';
 import { getListingUrl } from 'utils/listingApplication';
 import { getChainType } from 'utils/chain';
@@ -25,7 +26,7 @@ import { useAelfLogin } from 'hooks/wallet';
 import { useSetAelfAuthFromStorage } from 'hooks/aelfAuthToken';
 import useGlobalLoading from 'hooks/useGlobalLoading';
 import { useMobile } from 'contexts/useStore/hooks';
-import { TCommitTokenInfoRequest } from 'types/api';
+import { TCommitTokenInfoRequest, TGetApplicationTokenInfoResult } from 'types/api';
 import {
   TTokenInformationFormValues,
   TokenInformationFormKeys,
@@ -83,7 +84,10 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const [tokenList, setTokenList] = useState<TTokenItem[]>([]);
   const [liquidityInUsd, setLiquidityInUsd] = useState<string>();
   const [holders, setHolders] = useState<number>();
+  const liquidityInUsdRef = useRef<string>();
+  const holdersRef = useRef<number>();
   const [tokenConfig, setTokenConfig] = useState<TTokenConfig | undefined>();
+  const currentTokenInfoRef = useRef<TGetApplicationTokenInfoResult>();
   const [isActionButtonLoading, setIsActionButtonLoading] = useState(false);
 
   const judgeIsButtonDisabled = useCallback(
@@ -93,12 +97,12 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       currentTokenConfig?: TTokenConfig,
     ) => {
       const isTokenValid =
-        !!liquidityInUsd &&
+        !!liquidityInUsdRef.current &&
         !!currentTokenConfig?.liquidityInUsd &&
-        parseFloat(liquidityInUsd) > parseFloat(currentTokenConfig.liquidityInUsd) &&
-        holders !== undefined &&
+        parseFloat(liquidityInUsdRef.current) > parseFloat(currentTokenConfig.liquidityInUsd) &&
+        holdersRef.current !== undefined &&
         currentTokenConfig?.holders !== undefined &&
-        holders > currentTokenConfig.holders;
+        holdersRef.current > currentTokenConfig.holders;
       const emailValid = !!currentFormData[TokenInformationFormKeys.EMAIL];
       const isDisabled =
         Object.values(currentFormValidateData).some((item) => item.validateStatus === FormValidateStatus.Error) ||
@@ -106,7 +110,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
         !emailValid;
       setIsButtonDisabled(isDisabled);
     },
-    [holders, liquidityInUsd],
+    [],
   );
 
   const reset = useCallback(() => {
@@ -147,6 +151,18 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     }
   }, []);
 
+  const getTokenDetail = useCallback(async (symbol: string) => {
+    try {
+      const _tokenDetail = await getApplicationTokenDetail({ symbol: symbol });
+      setLiquidityInUsd(_tokenDetail.liquidityInUsd);
+      liquidityInUsdRef.current = _tokenDetail.liquidityInUsd;
+      setHolders(_tokenDetail.holders);
+      holdersRef.current = _tokenDetail.holders;
+    } catch (error) {
+      console.log('getApplicationTokenDetail error', error);
+    }
+  }, []);
+
   const getTokenInfo = useCallback(
     async (_symbol: string, _tokenList: TTokenItem[], _tokenConfig: TTokenConfig) => {
       const token = _tokenList.find((item) => item.symbol === _symbol);
@@ -159,6 +175,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       try {
         const res = await getApplicationTokenInfo({ symbol: _symbol });
         if (token && res && res.symbol) {
+          currentTokenInfoRef.current = res;
           newFormValues[TokenInformationFormKeys.OFFICIAL_WEBSITE] = res.officialWebsite;
           newFormValues[TokenInformationFormKeys.OFFICIAL_TWITTER] = res.officialTwitter;
           newFormValues[TokenInformationFormKeys.TITLE] = res.title;
@@ -166,15 +183,17 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           newFormValues[TokenInformationFormKeys.TELEGRAM_HANDLER] = res.telegramHandler;
           newFormValues[TokenInformationFormKeys.EMAIL] = res.email;
         }
+        await getTokenDetail(_symbol);
       } catch (error) {
         console.error(error);
+        currentTokenInfoRef.current = undefined;
       } finally {
         setFormValues(newFormValues);
         setFormValidateData(newFormValidateData);
         judgeIsButtonDisabled(newFormValues, newFormValidateData, _tokenConfig);
       }
     },
-    [judgeIsButtonDisabled],
+    [getTokenDetail, judgeIsButtonDisabled],
   );
 
   const init = useCallback(async () => {
@@ -203,7 +222,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const connectAndInitSleep = useCallback(async () => {
     setGlobalLoading(true);
     // Delay 3s to determine the login status, because the login data is acquired slowly, to prevent the login pop-up window from being displayed first and then automatically logging in successfully later.
-    await sleep(5000); // TODO
+    await sleep(3000);
     connectAndInitRef.current();
   }, [setGlobalLoading]);
   useEffectOnce(() => {
@@ -263,6 +282,7 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
   const handleSelectToken = useCallback(
     async (item: TTokenItem) => {
       setGlobalLoading(true);
+      // Re-obtain the token list data by switching tokens, so that users can see the latest operable tokens.
       const list = await getTokenList();
       const currentList = list.length > 0 ? list : tokenList;
       const newItem = currentList.find((v) => v.symbol === item.symbol);
@@ -295,11 +315,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     },
     [setGlobalLoading, getTokenList, tokenList, handleFormDataChange, router, getTokenConfig, getTokenInfo],
   );
-
-  const handleSelectTokenLiquidityCallback = useCallback((liquidityInUsd: string, holders: number) => {
-    setLiquidityInUsd(liquidityInUsd);
-    setHolders(holders);
-  }, []);
 
   const handleCommonInputChange = useCallback(
     (value: string, key: TokenInformationFormKeys) => {
@@ -374,9 +389,23 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
     [handleFormDataChange],
   );
 
+  const checkFormChange = useCallback((params: TCommitTokenInfoRequest) => {
+    return (
+      params.symbol === currentTokenInfoRef.current?.symbol &&
+      params.officialWebsite === currentTokenInfoRef.current?.officialWebsite &&
+      params.officialTwitter === currentTokenInfoRef.current?.officialTwitter &&
+      params.title === currentTokenInfoRef.current?.title &&
+      params.personName === currentTokenInfoRef.current?.personName &&
+      params.telegramHandler === currentTokenInfoRef.current?.telegramHandler &&
+      params.email === currentTokenInfoRef.current?.email
+    );
+  }, []);
+
   const handleSubmit = useCallback(async () => {
+    if (!formValues[TokenInformationFormKeys.TOKEN]?.symbol || !formValues[TokenInformationFormKeys.EMAIL]) return;
+
     setIsActionButtonLoading(true);
-    const params = {
+    const params: TCommitTokenInfoRequest = {
       symbol: formValues[TokenInformationFormKeys.TOKEN]?.symbol,
       officialWebsite: formValues[TokenInformationFormKeys.OFFICIAL_WEBSITE],
       officialTwitter: formValues[TokenInformationFormKeys.OFFICIAL_TWITTER],
@@ -384,18 +413,24 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       personName: formValues[TokenInformationFormKeys.PERSON_NAME],
       telegramHandler: formValues[TokenInformationFormKeys.TELEGRAM_HANDLER],
       email: formValues[TokenInformationFormKeys.EMAIL],
-    } as TCommitTokenInfoRequest;
-    try {
-      const isSuccess = await commitTokenInfo(params);
-      if (isSuccess) {
-        handleNextStep({ symbol: params.symbol });
-      }
-    } catch (error: any) {
-      CommonMessage.error(handleListingErrorMessage(error));
-    } finally {
+    };
+
+    if (checkFormChange(params)) {
+      handleNextStep({ symbol: params.symbol });
       setIsActionButtonLoading(false);
+    } else {
+      try {
+        const isSuccess = await commitTokenInfo(params);
+        if (isSuccess) {
+          handleNextStep({ symbol: params.symbol });
+        }
+      } catch (error: any) {
+        CommonMessage.error(handleListingErrorMessage(error));
+      } finally {
+        setIsActionButtonLoading(false);
+      }
     }
-  }, [formValues, handleNextStep]);
+  }, [checkFormChange, formValues, handleNextStep]);
 
   const getCommonFormItemProps = useCallback(
     (key: TokenInformationFormKeys) => ({
@@ -472,9 +507,10 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
             tokenConfig={tokenConfig}
             tokenList={tokenList}
             token={formValues[TokenInformationFormKeys.TOKEN]}
+            liquidityInUsd={liquidityInUsd}
+            holders={holders}
             placeholder={TOKEN_INFORMATION_FORM_PLACEHOLDER_MAP[TokenInformationFormKeys.TOKEN]}
             selectCallback={handleSelectToken}
-            selectTokenLiquidityCallback={handleSelectTokenLiquidityCallback}
           />
         </Form.Item>
         <Form.Item
