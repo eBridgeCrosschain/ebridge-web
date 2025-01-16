@@ -1,11 +1,11 @@
-import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, LIMIT_ABI } from 'constants/abis';
+import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, CREATE_TOKEN_ABI, LIMIT_ABI, POOLS_ABI } from 'constants/abis';
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
 import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
 import { provider } from 'web3-core';
 import { useAElf, useWeb3 } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
-import { sleep } from 'utils';
+import { isELFAddress, isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from 'utils/checkAElfBridge';
 import { setContract } from 'contexts/useAElfContract/actions';
@@ -14,20 +14,23 @@ import { ContractBasic, PortkeySDKContractBasic } from 'utils/contract';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { getContractBasic } from '@portkey/contracts';
-import { WEB_LOGIN_CONFIG } from 'constants/index';
+import { SupportedTONChain, WEB_LOGIN_CONFIG } from 'constants/index';
 import { IContract } from '@portkey/types';
 
 import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
 import { useGetAccount } from './wallet';
 import { SupportedELFChainId } from 'constants/chain';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { getBridgeChainInfo } from 'utils/chain';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
-export function getContract(address: string, ABI: any, library?: provider) {
+export function getContract(address: string, ABI: any, library?: provider, chainId?: ChainId) {
   return new ContractBasic({
     contractAddress: address,
     contractABI: ABI,
     provider: library,
+    chainId,
   });
 }
 
@@ -92,9 +95,9 @@ export const getPortkeyContract = async (
 export function useERCContract(address: string | undefined, ABI: any, chainId?: ChainId) {
   const { library } = useWeb3();
   return useMemo(() => {
-    if (!address || isELFChain(chainId)) return undefined;
+    if (!address || isELFChain(chainId) || isTonChain(chainId)) return undefined;
     try {
-      return getContract(address, ABI, library);
+      return getContract(address, ABI, library, chainId);
     } catch (error) {
       console.log(error, '====useERCContract');
       return undefined;
@@ -105,17 +108,15 @@ export function useERCContract(address: string | undefined, ABI: any, chainId?: 
 
 export async function getELFContract(
   contractAddress: string,
-  aelfInstance: AElfDappBridge,
+  aelfInstance?: AElfDappBridge,
   account?: string,
   chainId?: ChainId,
 ) {
-  const key = contractAddress + account + chainId + aelfInstance.chainId;
-  console.log(ContractMap, ContractMap[key], '====ContractMap');
-
+  const key = contractAddress + account + chainId + aelfInstance?.chainId || '';
   if (!ContractMap[key]) {
     const viewInstance = chainId ? getAElf(chainId) : null;
     const wallet = account ? { address: account } : getWallet();
-    await checkAElfBridge(aelfInstance);
+    if (aelfInstance) await checkAElfBridge(aelfInstance);
     const [viewContract, aelfContract] = await Promise.all([
       viewInstance?.chain.contractAt(contractAddress, getWallet()),
       aelfInstance?.chain.contractAt(contractAddress, wallet),
@@ -139,7 +140,7 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
   const key = useMemo(() => contractAddress + '_' + chainId + '_' + account, [account, chainId, contractAddress]);
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!chainId || !aelfInstance || !contractAddress) return;
+      if (!chainId || !contractAddress) return;
       try {
         const contract = await getELFContract(contractAddress, aelfInstance, account, chainId);
         dispatch(setContract({ [key]: contract }));
@@ -165,6 +166,15 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
   }, [contracts, key]);
 }
 
+export function useTonContract(contractAddress: string, chainId?: ChainId) {
+  const [tonConnectUI] = useTonConnectUI();
+
+  return useMemo(() => {
+    if (!isTonChain(chainId)) return;
+    return new ContractBasic({ contractAddress, chainId, tonConnectUI });
+  }, [chainId, contractAddress, tonConnectUI]);
+}
+
 export function usePortkeyContract(contractAddress: string, chainId?: SupportedELFChainId) {
   const { walletType, walletInfo } = useConnectWallet();
   const accounts = useGetAccount();
@@ -177,7 +187,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
   const key = useMemo(() => `${contractAddress}_${chainId}_${account}`, [account, chainId, contractAddress]);
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!chainId || !isELFChain(chainId)) return;
+      if (!chainId || !isELFChain(chainId) || !isELFAddress(contractAddress)) return;
       try {
         dispatch(
           setContract({
@@ -185,7 +195,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
           }),
         );
       } catch (error) {
-        console.log(error, '====error');
+        console.log(error, '====error-getContract');
         await sleep(1000);
         reCount++;
         if (reCount < 5) {
@@ -210,11 +220,13 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
 function useContract(address: string, ABI: any, chainId?: ChainId, isPortkey?: boolean): ContractBasic | undefined {
   const ercContract = useERCContract(address, ABI, chainId);
   const elfContract = useAElfContract(address, chainId);
+  const tonContract = useTonContract(address, chainId);
   const portkeyContract = usePortkeyContract(address, chainId as SupportedELFChainId);
   return useMemo(() => {
     if (isPortkey) return portkeyContract;
+    if (isTonChain(chainId)) return tonContract;
     return isELFChain(chainId) ? elfContract : ercContract;
-  }, [chainId, elfContract, ercContract, isPortkey, portkeyContract]);
+  }, [chainId, elfContract, ercContract, isPortkey, portkeyContract, tonContract]);
 }
 
 export function useTokenContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {
@@ -235,8 +247,10 @@ export function useCrossChainContract(chainId?: ChainId, address?: string, isPor
 export function useBridgeContract(chainId?: ChainId, isPortkey?: boolean) {
   const contractAddress = useMemo(() => {
     if (isELFChain(chainId)) return ELFChainConstants.constants[chainId as AelfInstancesKey]?.BRIDGE_CONTRACT;
+    if (chainId && isTonChain(chainId)) return SupportedTONChain[chainId].BRIDGE_CONTRACT;
     return ERCChainConstants.constants?.BRIDGE_CONTRACT;
   }, [chainId]);
+
   return useContract(contractAddress || '', BRIDGE_IN_ABI, chainId, isPortkey);
 }
 export function useBridgeOutContract(chainId?: ChainId, isPortkey?: boolean) {
@@ -248,9 +262,25 @@ export function useBridgeOutContract(chainId?: ChainId, isPortkey?: boolean) {
 }
 
 export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
-  return useERCContract(
-    ERCChainConstants.constants.LIMIT_CONTRACT || '',
-    LIMIT_ABI,
-    isELFChain(fromChainId) ? toChainId : fromChainId,
-  );
+  const contractAddress = useMemo(() => {
+    if (fromChainId && isTonChain(fromChainId)) return (SupportedTONChain[fromChainId] as any).LIMIT_CONTRACT;
+    return ERCChainConstants?.constants?.LIMIT_CONTRACT || '';
+  }, [fromChainId]);
+
+  return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
+}
+
+export function useCreateTokenContract(chainId?: ChainId) {
+  const contractAddress = useMemo(() => {
+    if (isELFChain(chainId) || isTonChain(chainId)) return '';
+    return ERCChainConstants.constants.CREATE_TOKEN_CONTRACT || '';
+  }, [chainId]);
+  return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
+}
+
+export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {
+  const contractAddress = useMemo(() => {
+    return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
+  }, [chainId]);
+  return useContract(address || contractAddress, POOLS_ABI, chainId, isPortkey);
 }

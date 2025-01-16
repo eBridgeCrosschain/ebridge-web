@@ -1,0 +1,27 @@
+@import '/src/assets/theme/color.less';
+@import 'src/assets/theme/constants.less';
+
+.empty-data-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 0;
+  color: @font-13;
+  .empty-data-box-icon {
+    width: 140px;
+    height: 140px;
+  }
+  .empty-data-box-text {
+    color: @font-13;
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .empty-data-box {
+    .empty-data-box-icon {
+      width: 30vw;
+      height: 30vw;
+    }
+  }
+}

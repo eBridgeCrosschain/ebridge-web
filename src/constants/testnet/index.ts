@@ -5,13 +5,22 @@ import * as AELF_Test from '../platform/AELF_Test';
 import * as tDVV_Test from '../platform/tDVV_Test';
 import * as tDVW_Test from '../platform/tDVW_Test';
 import * as BSC_TESTNET from '../platform/BSC_Test';
+import * as TON_TESTNET from '../platform/TON_Test';
 import * as SEPOLIA from '../platform/sepolia';
 import * as BASE_SEPOLIA from '../platform/base_sepolia';
 import DefaultWhitelistMap from './tokenWhitelist.json';
-import { DEFAULT_CHAIN_ICON, DEFAULT_CHAIN_NAME, SupportedChainId, SupportedELFChainId } from '../chain';
+import {
+  DEFAULT_CHAIN_ICON,
+  DEFAULT_CHAIN_NAME,
+  SupportedChainId,
+  SupportedELFChainId,
+  SupportedTONChainId,
+  TBridgeChainId,
+} from '../chain';
 import { NetworkType } from 'types';
-import { IconInfo } from 'types/misc';
 import { NetworkEnum } from '@aelf-web-login/wallet-adapter-base';
+
+export const NETWORK_TYPE: NetworkEnum = NetworkEnum.TESTNET;
 
 export const MAIN_SIDE_CHAIN_ID = {
   mainChain: SupportedELFChainId.AELF,
@@ -27,7 +36,8 @@ export type ChainConstantsType =
   | typeof GORELI
   | typeof SEPOLIA
   | typeof BSC_TESTNET
-  | typeof BASE_SEPOLIA;
+  | typeof BASE_SEPOLIA
+  | typeof TON_TESTNET;
 
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
@@ -50,6 +60,17 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
   [SupportedChainId.SEPOLIA]: SEPOLIA,
   [SupportedChainId.BASE_SEPOLIA]: BASE_SEPOLIA,
 };
+
+export const SupportedTONChain: { [k: string | number]: ChainConstantsType } = {
+  // TODO: TON
+  [SupportedTONChainId.TESTNET]: TON_TESTNET,
+};
+
+export const SupportedExternalChain: { [k: string | number]: ChainConstantsType } = {
+  ...SupportedERCChain,
+  ...SupportedTONChain,
+};
+
 export const DEFAULT_ERC_CHAIN_INFO = SupportedERCChain[DEFAULT_ERC_CHAIN].CHAIN_INFO;
 
 export type TELFChainConstantsType = typeof AELF_Test | typeof tDVW_Test;
@@ -64,10 +85,11 @@ export const ACTIVE_CHAIN: any = {
   [SupportedChainId.BSC_TESTNET]: true,
   [SupportedChainId.SEPOLIA]: true,
   [SupportedChainId.BASE_SEPOLIA]: true,
+  [SupportedTONChainId.TESTNET]: true,
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
-export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = {
+export const CHAIN_NAME: { [chainId in TBridgeChainId]: string } = {
   ...DEFAULT_CHAIN_NAME,
   [SupportedELFChainId.AELF]: 'aelf MainChain Testnet',
   [SupportedELFChainId.tDVV]: 'aelf dAppChain Testnet',
@@ -183,6 +205,10 @@ export const INDEXER_URL = 'https://test-indexer-api.aefinder.io/api/app/graphql
 
 export const BASE_URL = 'https://test.ebridge.exchange';
 
+export const BASE_AUTH_URL = 'https://test.ebridge.exchange';
+
 export const TELEGRAM_BOT_ID = '7220041137';
 
 export const SHOW_V_CONSOLE = true;
+
+export const AwakenHost = 'https://test-app.awaken.finance/';

@@ -2,6 +2,11 @@ import type { Accounts, IPortkeyProvider } from '@portkey/provider-types';
 import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
 import { AElfDappBridge } from '@aelf-react/types';
 
+export enum PortkeyVersion {
+  v1 = 'v1',
+  v2 = 'v2',
+}
+
 export type TAelfAccounts = {
   AELF?: string;
   tDVV?: string;
@@ -46,3 +51,11 @@ export declare type TAelfNode = {
   rpcUrl: string;
   chainId: string;
 };
+
+export enum WalletTypeEnum {
+  EVM = 'EVM',
+  SOL = 'Solana',
+  TON = 'TON',
+  TRON = 'TRON',
+  AELF = 'Aelf',
+}

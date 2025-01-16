@@ -7,6 +7,7 @@ import { getChainIdToMap } from 'utils/chain';
 import { useBridgeContract } from './useContract';
 import useInterval from './useInterval';
 import { useReturnLastCallback } from 'hooks';
+import BigNumber from 'bignumber.js';
 
 export function useCrossFee() {
   const { fromWallet, toWallet } = useWallet();
@@ -18,8 +19,9 @@ export function useCrossFee() {
     if (!bridgeContract || !(isELFChain(fromChainId) && !isELFChain(toChainId))) return undefined;
 
     const req = await bridgeContract.callViewMethod('GetFeeByChainId', [getChainIdToMap(toChainId)]);
+
     if (req && !req.error) {
-      return divDecimals(req.value, CrossFeeTokenDecimals).dp(2).toFixed();
+      return divDecimals(req.value, CrossFeeTokenDecimals).dp(2, BigNumber.ROUND_UP).toFixed();
     }
     return undefined;
   }, [bridgeContract, fromChainId, toChainId]);
@@ -33,6 +35,6 @@ export function useCrossFee() {
     }
   }, [getFeeByChainId]);
 
-  useInterval(refreshFeeByChainId, 30000, [refreshFeeByChainId]);
+  useInterval(refreshFeeByChainId, [refreshFeeByChainId], 30000);
   return fee;
 }

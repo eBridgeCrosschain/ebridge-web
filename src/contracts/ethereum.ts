@@ -128,6 +128,51 @@ export const checkAllowanceAndApprove = async ({
   return true;
 };
 
+export const createToken = async ({
+  createTokenContract,
+  account,
+  name,
+  symbol,
+  initialSupply,
+}: {
+  createTokenContract: ContractBasic;
+  account: string;
+  name: string;
+  symbol: string;
+  initialSupply: string;
+}) => {
+  return createTokenContract.callSendMethod('createToken', account, [name, symbol, initialSupply], {
+    onMethod: 'transactionHash',
+  });
+};
+
+export const createOfficialToken = async ({
+  createTokenContract,
+  account,
+  name,
+  symbol,
+  initialSupply,
+  officialAddress,
+  mintToAddress,
+}: {
+  createTokenContract: ContractBasic;
+  account: string;
+  name: string;
+  symbol: string;
+  initialSupply: string;
+  officialAddress: string;
+  mintToAddress: string;
+}) => {
+  return createTokenContract.callSendMethod(
+    'createOfficialToken',
+    account,
+    [name, symbol, initialSupply, officialAddress, mintToAddress],
+    {
+      onMethod: 'transactionHash',
+    },
+  );
+};
+
 export const getETHBalance = async (address: string, library?: provider) => {
   const web3 = new Web3(library || getDefaultProvider());
   return web3.eth.getBalance(address);

@@ -7,14 +7,33 @@ import {
   bridgeBlueIcon,
   transactionsIcon,
   transactionsBlueIcon,
+  poolsIcon,
+  poolsBlueIcon,
 } from 'assets/images';
+import { ListingStep } from './listingApplication';
+import { getListingUrl } from 'utils/listingApplication';
 
 export const ROUTE_PATHS = {
+  HOME: '/',
   BRIDGE: '/bridge',
   TRANSACTIONS: '/transactions',
   TERMS_OF_SERVICE: '/terms-of-service',
   PRIVACY_POLICY: '/privacy-policy',
+  LISTING_APPLICATION: '/listing-application',
+  MY_APPLICATIONS: '/my-applications',
+  POOLS: '/pools',
 };
+
+export const HIDE_MAIN_PAGE_LIST = [
+  {
+    icon: poolsIcon,
+    selectedIcon: poolsBlueIcon,
+    title: 'Pools',
+    href: ROUTE_PATHS.POOLS,
+  },
+];
+
+export const HIDE_BACKGROUND_IMAGE_PATH_LIST = [ROUTE_PATHS.LISTING_APPLICATION, ROUTE_PATHS.MY_APPLICATIONS];
 
 export const NAV_LIST = [
   {
@@ -24,10 +43,27 @@ export const NAV_LIST = [
     href: ROUTE_PATHS.BRIDGE,
   },
   {
+    icon: poolsIcon,
+    selectedIcon: poolsBlueIcon,
+    title: 'Pools',
+    href: ROUTE_PATHS.POOLS,
+  },
+  {
     icon: transactionsIcon,
     selectedIcon: transactionsBlueIcon,
     title: 'Transactions',
     href: ROUTE_PATHS.TRANSACTIONS,
+  },
+];
+
+export const LISTING_MENU_CONFIG = [
+  {
+    label: 'Listing Application',
+    link: getListingUrl(ListingStep.TOKEN_INFORMATION),
+  },
+  {
+    label: 'My Applications',
+    link: ROUTE_PATHS.MY_APPLICATIONS,
   },
 ];
 
@@ -39,6 +75,17 @@ export const LEGAL_MENU_CONFIG = [
   {
     label: 'Privacy Policy',
     link: ROUTE_PATHS.PRIVACY_POLICY,
+  },
+];
+
+export const FOOTER_MENU_LIST_CONFIG = [
+  {
+    title: 'Listing',
+    menu: LISTING_MENU_CONFIG,
+  },
+  {
+    title: 'Legal',
+    menu: LEGAL_MENU_CONFIG,
   },
 ];
 
@@ -73,3 +120,5 @@ export const HEADER_COMMUNITY_CONFIG = [
     link: COMMUNITY_LINK_MAP.TWITTER,
   },
 ];
+
+export const CONTACT_US_FORM_URL = 'https://form.ebridge.exchange/contact';

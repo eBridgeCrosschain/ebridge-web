@@ -24,7 +24,7 @@ export function getNodeByChainId(chainId: ChainId) {
 }
 
 export function getAElf(chainId: ChainId) {
-  const rpc = getNodeByChainId(chainId).rpcUrl;
+  const rpc = getNodeByChainId(chainId)?.rpcUrl;
   if (!httpProviders[rpc]) httpProviders[rpc] = new AElf(new AElf.providers.HttpProvider(rpc));
   return httpProviders[rpc];
 }
@@ -262,8 +262,7 @@ export function transformArrayToMap(inputType: any, origin: any[]) {
     const i = fieldsArray[0];
     return { [i.name]: origin[0] };
   }
-
-  let result = origin;
+  let result = {};
   Array.isArray(fieldsArray) &&
     Array.isArray(origin) &&
     fieldsArray.forEach((i, k) => {
@@ -297,7 +296,6 @@ export const isElfChainSymbol = (symbol?: string | null) => {
 export const isELFChain = (chainId?: ChainId) => {
   return !!(typeof chainId === 'string' && SupportedELFChainId[chainId as SupportedELFChainId]);
 };
-
 export const getRawTx = ({
   blockHeight,
   blockHash,
@@ -340,4 +338,24 @@ export const getELFAddress = (address?: string) => {
   if (!address) return;
   const list = address.split('_');
   if (list.length === 3 && isELFAddress(list[1])) return list[1];
+};
+
+export const recoverPubKey = (msg: any, signature: string) => {
+  const signatureObj = {
+    r: signature.slice(0, 64),
+    s: signature.slice(64, 128),
+    recoveryParam: Number(signature.slice(128, 130)),
+  };
+
+  const hexMsg = AElf.utils.sha256(msg);
+  const publicKey = AElf.wallet.ellipticEc
+    .recoverPubKey(Buffer.from(hexMsg, 'hex'), signatureObj, signatureObj.recoveryParam)
+    .encode('hex', false);
+  return publicKey;
+};
+
+export const pubKeyToAddress = (pubKey: string) => {
+  const onceSHAResult = Buffer.from(AElf.utils.sha256(Buffer.from(pubKey, 'hex')), 'hex');
+  const hash = AElf.utils.sha256(onceSHAResult).slice(0, 64);
+  return AElf.utils.encodeAddressRep(hash);
 };

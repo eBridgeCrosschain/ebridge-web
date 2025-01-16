@@ -6,7 +6,7 @@ export enum REQ_CODE {
   Success = 1,
 }
 
-export const LANG_MAX = new BigNumber('9223372036854774784');
+export const LANG_MAX = new BigNumber('9223372036854775807');
 
 export const ZERO = new BigNumber(0);
 export const ONE = new BigNumber(1);
@@ -40,3 +40,21 @@ export const WEBSITE_NAME = 'eBridge';
 export const IS_ONLY_SIDE_CHAIN_LIST: string[] = [];
 
 export const EBRIDGE_PORTKEY_PROJECT_CODE = '13003';
+
+export const CONNECT_AELF_WALLET = 'Connect aelf Wallet';
+
+export const SERVICE_BUSY_TIP = 'The service is busy. Please try again later.';
+
+export const GOT_IT = 'Got it';
+
+export const LOADING_TEXT = 'Loading...';
+
+export const DEFAULT_NULL_VALUE = '--';
+
+export const BUTTON_TEXT_NEXT = 'Next';
+
+export const BUTTON_TEXT_SUBMIT = 'Submit';
+
+export const BUTTON_TEXT_BACK = 'Back';
+
+export const SELECT_CHAIN = 'Select Chain';

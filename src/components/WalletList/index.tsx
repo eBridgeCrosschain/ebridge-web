@@ -19,15 +19,27 @@ import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { WalletConnect } from '@web3-react/walletconnect-v2';
-export default function WalletList({ onFinish }: { onFinish?: () => void }) {
+import { ChainType } from 'types';
+import { useTonConnectModal } from '@tonconnect/ui-react';
+import { useTon } from 'hooks/web3';
+import { usePrevious } from 'react-use';
+export default function WalletList({ onFinish, chainType }: { onFinish?: () => void; chainType?: ChainType }) {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, account } = walletWallet || {};
-  const [loading, setLoading] = useState<any>();
-  const [{ userERCChainId }, { dispatch: chainDispatch }] = useChain();
+  const { open } = useTonConnectModal();
+  const { isActive } = useTon();
+  const prevIsActive = usePrevious(isActive);
   const onCancel = useCallback(() => {
     setLoading(undefined);
     onFinish?.();
   }, [onFinish]);
+  useEffect(() => {
+    if (chainType === 'TON' && prevIsActive === false && prevIsActive !== isActive) {
+      onCancel();
+    }
+  }, [chainType, isActive, onCancel, prevIsActive]);
+  const [loading, setLoading] = useState<any>();
+  const [{ userERCChainId }, { dispatch: chainDispatch }] = useChain();
   const timerRef = useRef<NodeJS.Timer | number>();
   useEffect(() => {
     if (TelegramPlatform.isTelegramPlatform()) {
@@ -65,59 +77,68 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
 
   const tryActivation = useCallback(
     async (connector: Connector | string, key: string) => {
-      if (loading || typeof connector === 'string') return;
+      if (loading || (typeof connector === 'string' && connector !== 'TON')) return;
+
       setLoading({ [key]: true });
       try {
-        try {
-          delete (connector as any).eagerConnection;
-        } catch (error) {
-          // fix network error
-        }
-
-        if (connector instanceof WalletConnect) document.getElementsByTagName('wcm-modal')?.[0]?.remove();
-
-        await connector.activate();
-        chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
-        if (connector instanceof CoinbaseWallet) {
-          await sleep(500);
-          await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
-        } else if (userERCChainId) {
+        if (typeof connector === 'string') {
+          open();
+        } else {
           try {
-            // Whether the switch is successful or not does not affect the link status
-            const info = getNetworkInfo(userERCChainId);
-            if (info) await switchChain(info.info, connector, true);
+            delete (connector as any).eagerConnection;
           } catch (error) {
-            console.debug(error, '====error');
+            // fix network error
           }
+
+          if (connector instanceof WalletConnect) document.getElementsByTagName('wcm-modal')?.[0]?.remove();
+
+          await connector.activate();
+          chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
+          if (connector instanceof CoinbaseWallet) {
+            await sleep(500);
+            await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
+          } else if (userERCChainId) {
+            try {
+              // Whether the switch is successful or not does not affect the link status
+              const info = getNetworkInfo(userERCChainId);
+              if (info) await switchChain(info.info, connector, true);
+            } catch (error) {
+              console.debug(error, '====error');
+            }
+          }
+          onCancel();
         }
-        onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
         CommonMessage.error(`connection error: ${error.message}`);
       }
       setLoading(undefined);
     },
-    [chainDispatch, loading, onCancel, userERCChainId],
+    [chainDispatch, loading, onCancel, open, userERCChainId],
   );
 
   const walletList = useMemo(
     () =>
       Object.keys(SUPPORTED_WALLETS).filter((key) => {
-        const option = SUPPORTED_WALLETS[key];
-        const isStringConnector = typeof option.connector === 'string';
-        const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
-        if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === 'METAMASK') return false;
-        if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
-          if (option.connector instanceof CoinbaseWallet) return false;
+        if (chainType) {
+          return SUPPORTED_WALLETS[key].chainType === chainType;
+        } else {
+          const option = SUPPORTED_WALLETS[key];
+          const isStringConnector = typeof option.connector === 'string';
+          const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
+          if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === 'METAMASK') return false;
+          if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
+            if (option.connector instanceof CoinbaseWallet) return false;
+          }
+          if (isPortkey()) {
+            if (option.connector instanceof CoinbaseWallet) return false;
+            if (isStringChain) return isPortkeyConnector(option.connector as string);
+            if (!isStringConnector) return !(option.connector instanceof MetaMask);
+          }
+          return isStringConnector ? isStringChain : !isStringChain;
         }
-        if (isPortkey()) {
-          if (option.connector instanceof CoinbaseWallet) return false;
-          if (isStringChain) return isPortkeyConnector(option.connector as string);
-          if (!isStringConnector) return !(option.connector instanceof MetaMask);
-        }
-        return isStringConnector ? isStringChain : !isStringChain;
       }),
-    [chainId, walletChainType],
+    [chainId, chainType, walletChainType],
   );
 
   return (

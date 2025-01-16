@@ -17,17 +17,21 @@ export function getWalletByOptions(
   aelfWallet: Web3Type,
   web3Wallet: Web3Type,
   portkeyWallet: Web3Type,
+  tonWallet: Web3Type,
   options?: Options,
   selectELFWallet?: WalletType,
 ) {
   const { chainType, chainId } = options || {};
   let wallet: any;
+
   if (chainType === 'ELF') {
     if (isSelectPortkey(selectELFWallet)) {
       wallet = formatPortkeyWallet(portkeyWallet, chainId as ChainId);
     } else {
       wallet = { ...aelfWallet, chainId };
     }
+  } else if (chainType === 'TON') {
+    wallet = tonWallet;
   } else {
     wallet = web3Wallet;
   }
@@ -38,9 +42,12 @@ export function isChange(stateOptions?: Options, payloadOptions?: Options) {
   const { chainType: stateType, chainId: stateChainId } = stateOptions || {};
   const { chainType, chainId, isPortkey } = payloadOptions || {};
 
+  const isExternalState = stateType !== 'ELF';
+  const isExternalPayload = chainType !== 'ELF';
+
   return (
     (isPortkey && stateType === 'ELF' && chainType === 'ELF') ||
-    ((stateType === 'ERC' || chainType === 'ERC') && stateType === chainType) ||
+    ((isExternalState || isExternalPayload) && isExternalState === isExternalPayload) ||
     (stateType === 'ELF' && chainType === 'ELF' && stateChainId === chainId)
   );
 }

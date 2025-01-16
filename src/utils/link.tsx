@@ -10,3 +10,10 @@ export function getTXLink(txId: string, chainId: ChainId, shortenChars?: number)
     </a>
   );
 }
+
+export function openWithBlank(url: string): void {
+  const newWindow = window.open(url, '_blank');
+  if (newWindow) {
+    newWindow.opener = null;
+  }
+}

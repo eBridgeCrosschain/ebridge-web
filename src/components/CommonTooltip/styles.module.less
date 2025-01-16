@@ -1,0 +1,24 @@
+@import 'src/assets/theme/font.less';
+@import 'src/assets/theme/constants.less';
+
+.common-tooltip-overlay {
+  font-size: 12px;
+  line-height: 20px;
+
+  :global {
+    .@{app-prefix}-tooltip-inner {
+      padding: 8px;
+      border-radius: 8px;
+    }
+  }
+}
+
+@media screen and (max-width: @md-width) {
+  .common-tooltip-overlay {
+    :global {
+      .@{app-prefix}-tooltip-inner {
+        padding: 6px 8px;
+      }
+    }
+  }
+}

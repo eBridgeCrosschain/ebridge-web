@@ -180,3 +180,13 @@ export function isMobileDevices() {
   const isM = isMobile();
   return isM.apple.device || isM.android.device;
 }
+
+export function isAndroid() {
+  const isM = isMobile();
+  return isM.android.device;
+}
+
+export function isIOS() {
+  const isM = isMobile();
+  return isM.apple.device;
+}

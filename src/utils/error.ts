@@ -34,3 +34,9 @@ export const handleWebLoginErrorMessage = (error: any, errorText?: string) => {
 
   return handleErrorMessage(error, errorText);
 };
+
+export const handleListingErrorMessage = (error: any, errorText?: string) => {
+  const _error = error?.response?.data?.error;
+  if (_error && typeof _error.message === 'string') errorText = _error.message;
+  return errorText || '';
+};

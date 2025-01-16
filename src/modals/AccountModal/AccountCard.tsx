@@ -18,16 +18,20 @@ import CommonMessage from 'components/CommonMessage';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
-import { useLogout } from 'hooks/wallet';
+import { useAelfLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useConnect } from 'hooks/useConnect';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
   const router = useRouter();
-  const logoutWebLogin = useLogout();
+  const logoutWebLogin = useAelfLogout();
+  const connect = useConnect();
+  const [tonConnectUI] = useTonConnectUI();
 
-  const { connector, account, chainId, aelfInstance, walletType, loginWalletType } = accountWallet || {};
+  const { connector, account, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: string) => {
       const isMetaMask = !!window.ethereum?.isMetaMask;
@@ -49,7 +53,7 @@ function AccountCard() {
   }, [filter]);
 
   const showAelfDisconnectButton = useMemo(() => {
-    return !(TelegramPlatform.isTelegramPlatform() && walletType !== 'ERC');
+    return !(TelegramPlatform.isTelegramPlatform() && walletType === 'PORTKEY');
   }, [walletType]);
 
   const onDisconnect = useCallback(async () => {
@@ -64,6 +68,9 @@ function AccountCard() {
         chainDispatch(setSelectERCWallet(undefined));
         clearWCStorageByDisconnect();
       }
+    } else if (connector === 'TON') {
+      tonConnectUI.disconnect?.();
+      connect('TON');
     } else {
       // Aelf
       logoutWebLogin?.();
@@ -77,10 +84,20 @@ function AccountCard() {
       basicModalView.setWalletModal(true, {
         walletWalletType: walletType,
         walletChainType: walletType === 'ERC' ? 'ERC' : 'ELF',
-        walletChainId: chainId,
+        walletChainId: accountChainId,
       }),
     );
-  }, [connector, walletType, dispatch, chainId, connection?.connector, chainDispatch, logoutWebLogin]);
+  }, [
+    connector,
+    walletType,
+    dispatch,
+    accountChainId,
+    connection?.connector,
+    chainDispatch,
+    tonConnectUI,
+    connect,
+    logoutWebLogin,
+  ]);
 
   const changeWallet = useCallback(async () => {
     if (walletType !== 'ERC') {
@@ -93,16 +110,16 @@ function AccountCard() {
         basicModalView.setWalletModal(true, {
           walletWalletType: walletType,
           walletChainType: walletType === 'ERC' ? 'ERC' : 'ELF',
-          walletChainId: chainId,
+          walletChainId: accountChainId,
         }),
       );
     } catch (error: any) {
       console.debug(`connection error: ${error}`);
       CommonMessage.error(`connection error: ${error.message}`);
     }
-  }, [chainId, dispatch, onDisconnect, walletType]);
+  }, [accountChainId, dispatch, onDisconnect, walletType]);
 
-  const isELF = isELFChain(chainId);
+  const isELF = isELFChain(accountChainId);
 
   const jumpAssets = useCallback(() => {
     dispatch(basicModalView.modalDestroy());
@@ -163,9 +180,11 @@ function AccountCard() {
                 <Button type="primary" onClick={onDisconnect}>
                   Disconnect
                 </Button>
-                <Button type="primary" onClick={changeWallet}>
-                  Change
-                </Button>
+                {walletType !== 'TON' && (
+                  <Button type="primary" onClick={changeWallet}>
+                    Change
+                  </Button>
+                )}
               </>
             )}
           </Row>

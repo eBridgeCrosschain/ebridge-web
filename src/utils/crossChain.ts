@@ -11,7 +11,7 @@ import type { provider } from 'web3-core';
 import { CrossFeeToken, REQ_CODE, ZERO } from 'constants/misc';
 import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
-import { formatAddress, isIncludesChainId } from 'utils';
+import { formatAddress, isIncludesChainId, isTonChain } from 'utils';
 import { FormatTokenList } from 'constants/index';
 import { LimitDataProps } from 'page-components/Bridge/useLimitAmountModal/constants';
 import BigNumber from 'bignumber.js';
@@ -220,7 +220,9 @@ export async function CreateReceipt({
   tokenContract: ContractBasic;
   crossFee?: string;
 }) {
-  const toAddress = formatAddress(to);
+  let toAddress = to;
+  if (bridgeContract.contractType !== 'ELF') toAddress = formatAddress(to);
+  const fromTonChain = bridgeContract.contractType === 'TON';
   const fromELFChain = bridgeContract.contractType === 'ELF';
   if (fromELFChain && fromToken !== CrossFeeToken) {
     const req = await checkApprove(
@@ -234,26 +236,34 @@ export async function CreateReceipt({
     );
     if (req !== REQ_CODE.Success) throw req;
   }
-  let checkAmount = amount;
-  if (fromToken === CrossFeeToken) {
-    if (crossFee) {
-      // fee ELF decimals 8
-      crossFee = timesDecimals(crossFee, 8).toFixed(0);
+  if (!fromTonChain) {
+    let checkAmount = amount;
+    if (fromToken === CrossFeeToken) {
+      if (crossFee) {
+        // fee ELF decimals 8
+        crossFee = timesDecimals(crossFee, 8).toFixed(0);
+      }
+      checkAmount = ZERO.plus(amount)
+        .plus(crossFee || 0)
+        .toFixed(0);
     }
-    checkAmount = ZERO.plus(amount)
-      .plus(crossFee || 0)
-      .toFixed(0);
+    const req = await checkApprove(
+      library,
+      fromToken,
+      account,
+      bridgeContract.address || '',
+      checkAmount,
+      undefined,
+      fromELFChain ? tokenContract : undefined,
+    );
+    if (req !== REQ_CODE.Success) throw req;
   }
-  const req = await checkApprove(
-    library,
-    fromToken,
-    account,
-    bridgeContract.address || '',
-    checkAmount,
-    undefined,
-    fromELFChain ? tokenContract : undefined,
+  console.log(
+    fromELFChain,
+    toChainId,
+    [fromToken, account, toAddress, amount, getChainIdToMap(toChainId), isTonChain(toChainId) ? 1 : 0],
+    '======toChainId',
   );
-  if (req !== REQ_CODE.Success) throw req;
   if (fromELFChain) {
     return bridgeContract.callSendMethod('createReceipt', account, [
       fromToken,
@@ -261,6 +271,7 @@ export async function CreateReceipt({
       toAddress,
       amount,
       getChainIdToMap(toChainId),
+      isTonChain(toChainId) ? 1 : 0,
     ]);
   }
   return bridgeContract.callSendMethod(
@@ -389,12 +400,14 @@ export async function getReceiptLimit({
       throw new Error(receiptDailyLimit.error || receiptTokenBucket.error);
     }
 
+    const isEnable = receiptTokenBucket.isEnable;
+
     return {
       remain: new BigNumber(receiptDailyLimit.tokenAmount),
       maxCapcity: new BigNumber(receiptTokenBucket.tokenCapacity),
       currentCapcity: new BigNumber(receiptTokenBucket.currentTokenAmount),
       fillRate: new BigNumber(receiptTokenBucket.rate),
-      isEnable: receiptTokenBucket.isEnabled,
+      isEnable,
     };
   } catch (error: any) {
     CommonMessage.error(error.message);

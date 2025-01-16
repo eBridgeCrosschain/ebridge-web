@@ -1,6 +1,6 @@
 import { useLanguage } from 'i18n';
 import clsx from 'clsx';
-import ConnectWallet from './ConnectWallet';
+import ConnectWallet from 'components/ConnectWallet';
 import NetworkSelect from './NetworkSelect';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { useWalletContext } from 'contexts/useWallet';

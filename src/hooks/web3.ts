@@ -2,19 +2,26 @@ import { useWeb3React } from '@web3-react/core';
 import { ZERO } from 'constants/misc';
 import { useCallback, useMemo } from 'react';
 import { getProvider } from 'utils/provider';
-import { Web3Type } from 'types';
+import { ChainId, Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
-import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN } from 'constants/index';
+import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, IS_MAINNET } from 'constants/index';
 import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
-import { useLogin } from './wallet';
+import { useAelfLogin } from './wallet';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
+import { useTonWallet } from '@tonconnect/ui-react';
+import { toUserFriendlyAddress } from '@tonconnect/sdk';
+import { SupportedTONChainId } from 'constants/chain';
+import { isELFChain } from 'utils/aelfUtils';
+import { isTonChain } from 'utils';
+import { getNetworkInfo, switchChain } from 'utils/network';
+import { useLatestRef } from 'hooks';
 
 export function useAElfConnect() {
-  const login = useLogin();
+  const login = useAelfLogin();
   const chainDispatch = useChainDispatch();
 
   return useCallback(async () => {
@@ -24,7 +31,7 @@ export function useAElfConnect() {
 }
 
 export function usePortkeyConnect() {
-  const login = useLogin();
+  const login = useAelfLogin();
   const chainDispatch = useChainDispatch();
   return useCallback(async () => {
     await login();
@@ -62,6 +69,8 @@ export function useWeb3(): Web3Type {
   return tmpContext;
 }
 
+const PORTKEY_TYPE = ['PortkeyDiscover', 'PortkeyAA'];
+
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
   const { walletInfo, walletType, isConnected } = useConnectWallet();
@@ -79,6 +88,8 @@ export function useAElf(): Web3Type {
     if (chainId && ACTIVE_CHAIN[chainId] && aelfBridges) {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
+    const isPortkey = PORTKEY_TYPE.includes(walletType) ? true : false;
+    const _walletType = isPortkey ? 'PORTKEY' : 'NIGHTELF';
     return {
       ...contextNetwork,
       account: walletInfo?.address,
@@ -87,8 +98,9 @@ export function useAElf(): Web3Type {
       library: undefined,
       provider: undefined,
       loginWalletType: walletType,
-      walletType: 'NIGHTELF',
-      connector: walletInfo?.address ? 'NIGHT ELF' : undefined,
+      walletType: _walletType,
+      connector: walletInfo?.address ? _walletType : undefined,
+      isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
   return tmpContext;
@@ -132,4 +144,59 @@ export function usePortkey(): Web3Type {
   }, [isConnected, walletInfo, walletType]);
 
   return tmpContext;
+}
+
+export function useTon(): Web3Type {
+  const wallet = useTonWallet();
+  return useMemo(() => {
+    return {
+      ...wallet,
+      account: wallet?.account.address ? toUserFriendlyAddress(wallet?.account.address, !IS_MAINNET) : undefined,
+      wallet: { ...wallet },
+      isActive: !!wallet?.account,
+      library: undefined,
+      provider: undefined,
+      loginWalletType: undefined,
+      walletType: 'TON',
+      connector: 'TON',
+      isTON: true,
+      chainId: IS_MAINNET ? SupportedTONChainId.MAINNET : SupportedTONChainId.TESTNET,
+      baseAccount: wallet?.account,
+    } as any;
+  }, [wallet]);
+}
+
+export function useWeb3Wallet(chainId?: ChainId) {
+  const tonWallet = useTon();
+  const aelfWallet = useAElf();
+  const web3Wallet = useWeb3();
+  return useMemo(() => {
+    if (isELFChain(chainId)) return aelfWallet;
+    if (isTonChain(chainId)) return tonWallet;
+    return web3Wallet;
+  }, [aelfWallet, chainId, tonWallet, web3Wallet]);
+}
+
+export function useEVMSwitchChain() {
+  const web3 = useWeb3();
+  const latestWeb3Ref = useLatestRef(web3);
+  return useCallback(
+    (chainId: ChainId) => {
+      if (latestWeb3Ref.current.chainId === chainId) return;
+      // Whether the switch is successful or not does not affect the link status
+      const info = getNetworkInfo(chainId);
+      if (!info) throw new Error('Invalid chainId');
+      return switchChain(info.info, latestWeb3Ref.current.connector, true);
+    },
+    [latestWeb3Ref],
+  );
+}
+
+export function useActiveAddresses() {
+  // const { account: tonAccount } = useTon();
+  const { account: aelfAccount } = useAElf();
+  const { account: evmAccount } = useWeb3();
+  return useMemo(() => {
+    return [evmAccount, aelfAccount].filter(Boolean).join(',');
+  }, [aelfAccount, evmAccount]);
 }

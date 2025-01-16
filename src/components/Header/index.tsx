@@ -12,6 +12,7 @@ import {
   communityIcon,
   legalIcon,
   aelfLogo,
+  listingIcon,
 } from 'assets/images';
 import clsx from 'clsx';
 import { Button, Drawer, Dropdown, Menu } from 'antd';
@@ -23,18 +24,19 @@ import CommonImage from 'components/CommonImage';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { IS_MAINNET } from 'constants/index';
-import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS } from 'constants/link';
-import { setAccountModal, setWalletModal, setWalletsModal } from 'contexts/useModal/actions';
+import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS, LISTING_MENU_CONFIG } from 'constants/link';
+import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
 import { ChainType } from 'types';
-import { useLogin } from 'hooks/wallet';
+import { useAelfLogin } from 'hooks/wallet';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import { isPortkey } from 'utils/portkey';
 import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
+import { useConnect } from 'hooks/useConnect';
 
 function SelectLanguage() {
   const { language, changeLanguage } = useLanguage();
@@ -87,7 +89,7 @@ function Logo({ clickable = false }: { clickable?: boolean }) {
 function ConnectWalletsButton() {
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const login = useLogin();
+  const login = useAelfLogin();
   const { isHomogeneous } = useWallet();
 
   return (
@@ -109,7 +111,8 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
   const isMd = useMediaQueries('md');
   const { t } = useLanguage();
   const dispatch = useModalDispatch();
-  const login = useLogin();
+  const connect = useConnect();
+
   const { fromWallet, toWallet, fromOptions } = useWallet();
   const wallet = fromOptions?.chainType === chainType ? fromWallet : toWallet;
   const { walletType, chainId, account, connector } = wallet || {};
@@ -135,25 +138,13 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
       )}
     </Button>
   ) : (
-    <Button
-      type="primary"
-      onClick={() => {
-        if (isELF) {
-          login();
-        } else {
-          dispatch(
-            setWalletModal(true, {
-              walletWalletType: walletType,
-              walletChainType: chainType,
-              walletChainId: chainId,
-            }),
-          );
-        }
-      }}>
+    <Button type="primary" onClick={() => connect(chainType, chainId)}>
       {isMd ? (
         <div className={clsx(styles['mobile-wallet-button-content'], 'flex-row-center')}>
           {isELF ? (
             <WalletIcon connector="PORTKEY" className={styles['wallet-icon']} />
+          ) : chainType === 'TON' ? (
+            <WalletIcon connector={'TON'} className={styles['wallet-icon']} type="ton-wallet-white" />
           ) : (
             <div className="flex-row-center">
               {!isPortkey() && <WalletIcon connector={injected} className={styles['wallet-icon']} />}
@@ -171,7 +162,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
 }
 
 function WalletButtonList() {
-  const { fromWallet, toWallet } = useWallet();
+  const { fromWallet, toWallet, fromOptions, toOptions } = useWallet();
   const { account: fromAccount } = fromWallet || {};
   const { account: toAccount } = toWallet || {};
   if (!fromAccount && !toAccount) {
@@ -179,8 +170,8 @@ function WalletButtonList() {
   } else {
     return (
       <div className={clsx(styles['wallet-button-list'], 'flex-row')}>
-        <WalletButton chainType="ERC" />
-        <WalletButton chainType="ELF" />
+        <WalletButton chainType={fromOptions?.chainType} />
+        <WalletButton chainType={toOptions?.chainType} />
       </div>
     );
   }
@@ -223,6 +214,11 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
         })),
       },
       {
+        icon: listingIcon,
+        label: 'Listing',
+        children: LISTING_MENU_CONFIG,
+      },
+      {
         icon: communityIcon,
         label: 'Community',
         children: HEADER_COMMUNITY_CONFIG,
@@ -236,40 +232,44 @@ function MobileDrawerMenu({ isDrawerVisible, onCloseDrawer }: { isDrawerVisible:
     [changeLanguage, language],
   );
 
-  const items = mobileDrawerMenuConfig.map(({ icon, label, children }) => ({
-    key: label,
-    label: (
-      <div className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}>
-        {icon && <CommonImage className={styles['menu-item-icon']} src={icon} />}
-        <span className={styles['menu-item-text']}>{t(label)}</span>
-        <CommonImage
-          className={clsx(styles['menu-expand-icon'], {
-            [styles['menu-expand-icon-rotate']]: openKeys.includes(label),
-          })}
-          src={arrowGrayIcon}
-        />
-      </div>
-    ),
-    children: children?.map((child) => {
-      const isExternalLink = child.link?.startsWith('https:');
-      return {
-        key: child.label,
+  const items = useMemo(
+    () =>
+      mobileDrawerMenuConfig.map(({ icon, label, children }) => ({
+        key: label,
         label: (
-          <Link href={child.link || ''}>
-            <a
-              className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}
-              target={isExternalLink ? '_blank' : '_self'}
-              onClick={isExternalLink ? undefined : () => onCloseDrawer()}>
-              {child.icon && <CommonImage className={styles['menu-item-icon']} src={child.icon} />}
-              <span className={styles['menu-item-text']}>{t(child.label)}</span>
-              {child.checked && <CommonImage className={styles['menu-checked-icon']} src={checkBlueIcon} />}
-            </a>
-          </Link>
+          <div className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}>
+            {icon && <CommonImage className={styles['menu-item-icon']} src={icon} />}
+            <span className={styles['menu-item-text']}>{t(label)}</span>
+            <CommonImage
+              className={clsx(styles['menu-expand-icon'], {
+                [styles['menu-expand-icon-rotate']]: openKeys.includes(label),
+              })}
+              src={arrowGrayIcon}
+            />
+          </div>
         ),
-        onClick: child.onClick,
-      };
-    }),
-  }));
+        children: children?.map((child) => {
+          const isExternalLink = child.link?.startsWith('https:');
+          return {
+            key: child.label,
+            label: (
+              <Link href={child.link || ''}>
+                <a
+                  className={clsx(styles['mobile-drawer-menu-label-wrap'], 'flex-row-center')}
+                  target={isExternalLink ? '_blank' : '_self'}
+                  onClick={isExternalLink ? undefined : () => onCloseDrawer()}>
+                  {child.icon && <CommonImage className={styles['menu-item-icon']} src={child.icon} />}
+                  <span className={styles['menu-item-text']}>{t(child.label)}</span>
+                  {child.checked && <CommonImage className={styles['menu-checked-icon']} src={checkBlueIcon} />}
+                </a>
+              </Link>
+            ),
+            onClick: child.onClick,
+          };
+        }),
+      })),
+    [mobileDrawerMenuConfig, onCloseDrawer, openKeys, t],
+  );
 
   return (
     <Menu

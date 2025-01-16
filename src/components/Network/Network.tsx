@@ -28,6 +28,7 @@ export default function Network({
         selectedKeys={chainId ? [chainId.toString()] : ['']}
         items={networkList.map((i) => {
           return {
+            icon: <IconFont type={getIconByChainId(i.info.chainId).type} />,
             key: i.info.chainId,
             label: i.title,
             onClick: () => (onChange || switchNetwork)(i.info),

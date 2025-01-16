@@ -1,0 +1,66 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/font.less';
+
+.my-application-table {
+  .token-symbol {
+    max-width: 152px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .network-icon {
+    height: 24px !important;
+    width: 24px !important;
+    border-radius: 50%;
+    font-size: 24px;
+  }
+  :global {
+    .@{app-prefix}-table-cell-ellipsis {
+      white-space: normal;
+      word-break: normal;
+    }
+    .@{app-prefix}-table-thead > tr > th {
+      padding: 13px 12px;
+      background: @bg-19;
+      border-bottom-width: 0;
+      color: @font-15;
+      line-height: 22px;
+      .font-family-medium();
+      .text-overflow(1);
+
+      white-space: nowrap;
+    }
+    .@{app-prefix}-table-container table > thead > tr:first-child th:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+    .@{app-prefix}-table-container table > thead > tr:first-child th:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    .@{app-prefix}-table-tbody > tr > td {
+      padding: 16px 8px;
+      color: @font-15;
+      .font-family-medium();
+    }
+    .@{app-prefix}-table-thead > tr > th,
+    .@{app-prefix}-table-tbody > tr > td,
+    .@{app-prefix}-table tfoot > tr > th,
+    .@{app-prefix}-table tfoot > tr > td {
+      font-size: 14px;
+      line-height: 20px;
+      &::before {
+        display: none;
+      }
+    }
+  }
+}
+
+.my-application-table-empty {
+  :global {
+    .@{app-prefix}-table-tbody > tr > td {
+      border-bottom: none;
+    }
+  }
+}

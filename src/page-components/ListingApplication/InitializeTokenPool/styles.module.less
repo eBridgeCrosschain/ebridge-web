@@ -1,0 +1,55 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/font.less';
+
+.component-title {
+  font-size: 20px;
+  line-height: 28px;
+  .font-family-semibold();
+
+  margin-bottom: 32px;
+  @media screen and (max-width: @md-width) {
+    margin-bottom: 24px;
+  }
+}
+
+.init-token-pool-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  @media screen and (max-width: @md-width) {
+    padding: 32px 0;
+  }
+}
+
+.view-progress-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.init-token-pool-text {
+  font-size: 16px;
+  line-height: 24px;
+  .font-family-medium();
+
+  text-align: center;
+  margin: 12px auto 4px;
+}
+
+.init-token-pool-desc {
+  font-size: 14px;
+  line-height: 22px;
+  color: @font-13;
+  margin-bottom: 48px;
+}
+
+.view-progress-button {
+  width: 240px;
+  height: 48px;
+  font-size: 16px;
+  line-height: 24px;
+  color: @font-14;
+  border: 1px solid @font-14;
+  .font-family-medium();
+}

@@ -1,17 +1,18 @@
 import clsx from 'clsx';
 import type { ImageProps } from 'next/image';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChainId } from 'types';
 import { getTokenLogoURL } from 'utils';
 import styles from './styles.module.less';
+import { useGetTokenInfoByWhitelist } from 'hooks/token';
 const BAD_SRCS: { [src: string]: true } = {};
 
 export default function TokenLogo({
   chainId,
   symbol,
   className,
-  src = getTokenLogoURL(symbol, chainId),
+  src,
   alt = 'logo',
   layout = 'fill',
   style,
@@ -27,8 +28,13 @@ export default function TokenLogo({
   className?: string;
   onClick?: ImageProps['onClick'];
 }) {
+  const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
+  const memoSrc = useMemo(() => {
+    if (src) return src;
+    return getTokenInfoByWhitelist(chainId, symbol)?.icon ?? getTokenLogoURL(symbol, chainId);
+  }, [chainId, getTokenInfoByWhitelist, src, symbol]);
   const [, refresh] = useState<number>(0);
-  const tmpSrc = BAD_SRCS[src] ? undefined : src;
+  const tmpSrc = BAD_SRCS[memoSrc] ? undefined : memoSrc;
   return (
     <div
       className={clsx(
@@ -46,10 +52,10 @@ export default function TokenLogo({
         <Image
           {...props}
           onError={() => {
-            if (src) BAD_SRCS[src] = true;
+            if (memoSrc) BAD_SRCS[memoSrc] = true;
             refresh((i) => i + 1);
           }}
-          src={src}
+          src={memoSrc}
           layout={layout}
           alt={alt}
         />

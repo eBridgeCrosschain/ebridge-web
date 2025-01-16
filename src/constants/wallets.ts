@@ -23,11 +23,11 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     description: 'Connect to Coinbase Wallet',
     href: null,
   },
-  NIGHT_ELF: {
-    connector: 'NIGHT ELF',
-    name: 'NIGHT ELF',
+  NIGHTELF: {
+    connector: 'NIGHTELF',
+    name: 'NIGHTELF',
     iconType: 'nightElf',
-    description: 'NIGHT ELF',
+    description: 'NIGHTELF',
     href: null,
   },
   PORTKEY: {
@@ -35,6 +35,14 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     name: 'Portkey Wallet',
     iconType: 'portkeyV2',
     description: 'Portkey Wallet',
+    href: null,
+  },
+  TON: {
+    chainType: 'TON',
+    connector: 'TON',
+    name: 'Ton connect',
+    iconType: 'ton-wallet',
+    description: 'Ton connect',
     href: null,
   },
 };

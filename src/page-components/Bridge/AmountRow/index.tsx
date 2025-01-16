@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 import { useLanguage } from 'i18n';
-import clsx from 'clsx';
-import { Button } from 'antd';
-import AmountInput from './AmountInput';
 import TokenSelect from './TokenSelect';
 import { useHomeContext } from '../HomeContext';
 import { setFrom, setSelectModal } from '../HomeContext/actions';
@@ -11,9 +8,9 @@ import { unitConverter } from 'utils/converter';
 import { formatSymbol } from 'utils/token';
 import { getMaxAmount, parseInputChange } from 'utils/input';
 import { divDecimals } from 'utils/calculate';
-import { SupportedChainId, SupportedELFChainId } from 'constants/chain';
+import { TBridgeChainId } from 'constants/chain';
 import { ZERO } from 'constants/misc';
-import styles from './styles.module.less';
+import CommonAmountRow from 'components/CommonAmountRow';
 
 export default function AmountRow() {
   const { t } = useLanguage();
@@ -31,37 +28,19 @@ export default function AmountRow() {
   );
 
   return (
-    <div className={clsx(styles['amount-row'], 'flex-column')}>
-      <div className={clsx(styles['amount-label-wrap'], 'flex-row-between', 'flex-row-center')}>
-        <span className={styles['amount-label']}>{t('Amount')}</span>
-        {account && (
-          <div className={clsx(styles['balance-wrap'], 'flex-row-center')}>
-            <span className={styles.balance}>
-              {unitConverter(show)}{' '}
-              {formatSymbol(selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol)}
-            </span>
-            <Button
-              className={styles['max-button']}
-              type="link"
-              onClick={() => {
-                dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)));
-              }}>
-              {t('MAX')}
-            </Button>
-          </div>
-        )}
-      </div>
-      <div className={clsx(styles['amount-input-wrap'], 'flex-row-center')}>
-        <AmountInput
-          className={clsx({ [styles['amount-input-red']]: !changing && showError })}
-          value={fromInput}
-          onChange={(e) => {
-            dispatch(setFrom(parseInputChange(e.target.value, min, token?.decimals)));
-          }}
-        />
-        <div className={styles.divider} />
+    <CommonAmountRow
+      showBalance={!!account}
+      showError={!!(!changing && showError)}
+      value={fromInput}
+      onClickMAX={() => dispatch(setFrom(parseInputChange(max.toFixed(), min, token?.decimals)))}
+      onAmountInputChange={(e) => dispatch(setFrom(parseInputChange(e.target.value, min, token?.decimals)))}
+      leftHeaderTitle={t('Amount')}
+      rightHeaderTitle={`${unitConverter(show)} ${formatSymbol(
+        selectToken && selectToken[chainId as TBridgeChainId]?.symbol,
+      )}`}
+      rightInputEle={
         <TokenSelect
-          title={selectToken && selectToken[chainId as SupportedChainId | SupportedELFChainId]?.symbol}
+          title={selectToken && selectToken[chainId as TBridgeChainId]?.symbol}
           symbol={selectToken?.symbol}
           chainId={chainId}
           onClick={() =>
@@ -73,7 +52,7 @@ export default function AmountRow() {
             )
           }
         />
-      </div>
-    </div>
+      }
+    />
   );
 }

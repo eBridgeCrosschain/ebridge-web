@@ -2,7 +2,7 @@ import storages from 'constants/storages';
 import { BasicActions } from 'contexts/utils';
 import useStorageReducer from 'hooks/useStorageReducer';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
-import { eventBus } from 'utils';
+import { eventBus } from 'utils/eBridgeEventBus';
 import { ChainActions, ChainState, setUserELFChainId, setUserERCChainId } from './actions';
 
 const INITIAL_STATE = { userERCChainId: undefined };

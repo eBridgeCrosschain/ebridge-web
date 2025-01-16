@@ -2,12 +2,12 @@
 import { provider } from 'web3-core';
 import type { Contract } from 'web3-eth-contract';
 import Web3 from 'web3';
-import { ACTIVE_CHAIN, SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
-import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
+import { SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
+import { ELFChainConstants } from 'constants/ChainConstants';
 import { getContractMethods, transformArrayToMap, getTxResult, isELFChain, encodedTransfer } from './aelfUtils';
 import { ChainId, ChainType } from 'types';
-import { getDefaultProvider } from './provider';
-import { sleep } from 'utils';
+import { getDefaultProviderByChainId } from './provider';
+import { isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
 import { IAElfChain } from '@portkey/provider-types';
@@ -15,6 +15,9 @@ import { IContract } from '@portkey/types';
 import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
 import { ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
 import { ZERO } from 'constants/misc';
+import { TonConnectUI } from '@tonconnect/ui-react';
+import { getTransactionResponseHash } from './ton';
+import { CallTonContract, TonContractCallData } from './tonContractCall';
 
 export interface AbiType {
   internalType?: string;
@@ -49,6 +52,7 @@ export interface ContractProps {
   aelfInstance?: AElfDappBridge;
   viewContract?: any;
   portkeyChain?: IAElfChain;
+  tonConnectUI?: TonConnectUI;
 }
 
 interface ErrorMsg {
@@ -83,18 +87,23 @@ type CallSendMethod = (
 export type ContractBasicErrorMsg = ErrorMsg;
 export class ContractBasic {
   public address?: string;
-  public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic;
+  public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic | TONContractBasic;
   public contractType: ChainType;
+  public chainId?: ChainId;
   // public isPortkey?: boolean;
   constructor(options: ContractProps) {
     this.address = options.contractAddress;
+    this.chainId = options.chainId;
     const isELF = isELFChain(options.chainId);
+    const isTON = isTonChain(options.chainId);
     this.callContract = options.portkeyChain
       ? new PortkeyContractBasic(options)
       : isELF
       ? new AElfContractBasic(options)
+      : isTON
+      ? new TONContractBasic(options)
       : new WB3ContractBasic(options);
-    this.contractType = isELF ? 'ELF' : 'ERC';
+    this.contractType = isELF ? 'ELF' : isTON ? 'TON' : 'ERC';
   }
 
   public callViewMethod: CallViewMethod = async (
@@ -109,7 +118,7 @@ export class ContractBasic {
   };
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    console.log(paramsOption, '++++paramsOption');
+    console.log(functionName, paramsOption, '++++paramsOption');
     if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
       return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
     return this.callContract.callSendMethod(functionName, account, paramsOption, sendOptions);
@@ -132,17 +141,18 @@ export class WB3ContractBasic {
   public provider?: provider;
   public chainId?: number;
   public web3?: Web3;
+  contractABI: AbiItem[] | undefined;
   constructor(options: ContractProps) {
     const { contractABI, provider, contractAddress, chainId } = options;
+    this.contractABI = contractABI;
     const contactABITemp = contractABI;
-
+    this.chainId = chainId as number;
     this.contract =
       contractAddress && provider ? this.initContract(provider, contractAddress, contactABITemp as AbiItem) : null;
 
     this.contractForView = this.initViewOnlyContract(contractAddress, contactABITemp as AbiItem);
     this.address = contractAddress;
     this.provider = provider;
-    this.chainId = chainId as number;
   }
 
   public initContract: InitContract = (provider, address, ABI) => {
@@ -150,7 +160,7 @@ export class WB3ContractBasic {
     return new this.web3.eth.Contract(ABI as any, address);
   };
   public initViewOnlyContract: InitViewOnlyContract = (address, ABI) => {
-    const defaultProvider = getDefaultProvider();
+    const defaultProvider = getDefaultProviderByChainId(this.chainId as ChainId);
     const defaultWeb3 = new Web3(defaultProvider);
     return new defaultWeb3.eth.Contract(ABI as any, address);
   };
@@ -160,17 +170,29 @@ export class WB3ContractBasic {
     paramsOption,
     callOptions = { defaultBlock: 'latest' },
   ) => {
+    const contract = this.chainId ? this.contractForView : this.contract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
-      const chainId = this.chainId || ERCChainConstants.chainId;
       const { defaultBlock, options } = callOptions;
-      let contract = this.contractForView;
-      // active chain
-      if (ACTIVE_CHAIN[chainId]) contract = this.contract || this.contractForView;
       // BlockTag
       contract.defaultBlock = defaultBlock;
-
       return await contract.methods[functionName](...(paramsOption || [])).call(options);
+
+      // const chainId = this.chainId || ERCChainConstants.chainId;
+      // const { defaultBlock } = callOptions;
+
+      // const params = {
+      //   abi: this.contractABI,
+      //   functionName,
+      //   address: this.address as string,
+      //   chainId,
+      //   args: paramsOption,
+      // } as TreadContractByWagmiParams;
+      // if (defaultBlock === 'latest') delete params.blockNumber;
+      // return await readContractByWagmi(params);
     } catch (e) {
+      console.log(e, '=====e');
+
       return { error: e };
     }
   };
@@ -178,6 +200,8 @@ export class WB3ContractBasic {
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     if (!this.contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
+      console.log(this.provider, '===provider');
+
       const contract = this.contract;
       const { onMethod = 'receipt', ...options } = sendOptions || {};
 
@@ -279,8 +303,9 @@ export class AElfContractBasic {
       await this.checkConnected();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
-      console.log(transformArrayToMap(inputType, paramsOption), '=Option');
-      const req = await this.aelfContract[functionNameUpper](transformArrayToMap(inputType, paramsOption));
+      const params = transformArrayToMap(inputType, paramsOption);
+      console.log(params, functionNameUpper, '=======params', paramsOption, inputType);
+      const req = await this.aelfContract[functionNameUpper](params);
       if (req.error) {
         return {
           error: {
@@ -404,6 +429,7 @@ export class PortkeyContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public callSendPromiseMethod: CallSendMethod = async (_functionName, _account, _paramsOption, _sendOptions) => {
     throw new Error('Method not implemented.');
   };
@@ -526,4 +552,45 @@ export class PortkeySDKContractBasic {
       return { error: { message: error.Error || error.Status } };
     }
   };
+}
+
+export class TONContractBasic {
+  public tonConnectUI?: TonConnectUI;
+  public address?: string;
+  public provider?: provider;
+  public chainId?: number;
+  public web3?: Web3;
+  constructor(options: ContractProps) {
+    this.tonConnectUI = options.tonConnectUI;
+    const { contractAddress, chainId } = options;
+    this.chainId = chainId as number;
+    this.address = contractAddress;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    try {
+      return (CallTonContract as any)[functionName](this.address, paramsOption);
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public callSendMethod: CallSendMethod = async (functionName, _account, paramsOption, _sendOptions) => {
+    const account = this.tonConnectUI?.account;
+    if (!this.address || !account || !this.tonConnectUI)
+      return { error: { code: 401, message: 'Contract init error' } };
+    try {
+      const callData = await (TonContractCallData as any)[functionName](this.address, account.address, paramsOption);
+      const result = await this.tonConnectUI?.sendTransaction(callData);
+      const hashBase64 = await getTransactionResponseHash(result);
+      return { TransactionId: hashBase64 };
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public callSendPromiseMethod: CallSendMethod = async (_functionName, account, paramsOption, sendOptions) => {};
 }

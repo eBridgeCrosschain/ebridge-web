@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
 import Link from 'next/link';
-import { useIsLogin, useLogin } from 'hooks/wallet';
+import { useAelfLogin, useIsAelfLogin } from 'hooks/wallet';
 import { useModal } from 'contexts/useModal';
 import { setWalletsModal } from 'contexts/useModal/actions';
 import { useWalletContext } from 'contexts/useWallet';
@@ -10,9 +10,10 @@ import { Button } from 'antd';
 import CommonModal from '../../components/CommonModal';
 import CommonImage from 'components/CommonImage';
 import WalletList from '../../components/WalletList';
-import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon } from 'assets/images';
+import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon, tonLogo } from 'assets/images';
 import { ROUTE_PATHS } from 'constants/link';
 import styles from './styles.module.less';
+import { ChainType } from 'types';
 
 const WALLET_STEP = {
   FROM: 0,
@@ -30,25 +31,42 @@ const STEP_ITEM_CONFIG = {
     iconList: [aelfChainLogo],
     text: 'aelf',
   },
+  TON: {
+    chainType: 'TON',
+    iconList: [tonLogo],
+    text: 'External Chain',
+  },
 };
 
 export default function WalletsModal() {
   const { t } = useLanguage();
-  const login = useLogin();
-  const isLogin = useIsLogin();
+  const login = useAelfLogin();
+  const isLogin = useIsAelfLogin();
   const [{ walletsModal }, { dispatch }] = useModal();
-  const [{ fromOptions }] = useWalletContext();
+  const [{ fromOptions, toOptions }] = useWalletContext();
   const [walletStep, setWalletStep] = useState(WALLET_STEP.FROM);
 
-  const isFromERC = useMemo(() => fromOptions?.chainType === 'ERC', [fromOptions?.chainType]);
+  const isFromELF = useMemo(() => fromOptions?.chainType === 'ELF', [fromOptions?.chainType]);
+
+  const externalWallet = useMemo(
+    () =>
+      isFromELF
+        ? toOptions?.chainType === 'ERC'
+          ? STEP_ITEM_CONFIG.ERC
+          : STEP_ITEM_CONFIG.TON
+        : fromOptions?.chainType === 'ERC'
+        ? STEP_ITEM_CONFIG.ERC
+        : STEP_ITEM_CONFIG.TON,
+    [fromOptions?.chainType, isFromELF, toOptions?.chainType],
+  );
 
   const stepConfig = useMemo(() => {
-    if (isFromERC) {
-      return [STEP_ITEM_CONFIG.ERC, STEP_ITEM_CONFIG.ELF];
+    if (!isFromELF) {
+      return [externalWallet, STEP_ITEM_CONFIG.ELF];
     } else {
-      return [STEP_ITEM_CONFIG.ELF, STEP_ITEM_CONFIG.ERC];
+      return [STEP_ITEM_CONFIG.ELF, externalWallet];
     }
-  }, [isFromERC]);
+  }, [externalWallet, isFromELF]);
 
   useEffect(() => {
     if (!walletsModal) {
@@ -61,7 +79,7 @@ export default function WalletsModal() {
   }, [dispatch]);
 
   const handleConnectExternalWalletFinish = () => {
-    if (isFromERC) {
+    if (!isFromELF) {
       setWalletStep(WALLET_STEP.TO);
     } else {
       handleCloseModal();
@@ -73,24 +91,24 @@ export default function WalletsModal() {
   }, [login]);
 
   const handleConnectAELFWalletFinish = useCallback(() => {
-    if (isFromERC) {
+    if (!isFromELF) {
       handleCloseModal();
     } else {
       setWalletStep(WALLET_STEP.TO);
     }
-  }, [handleCloseModal, isFromERC]);
+  }, [handleCloseModal, isFromELF]);
 
   useEffect(() => {
-    if (isLogin) {
+    if (isLogin && walletsModal) {
       handleConnectAELFWalletFinish();
     }
-  }, [handleConnectAELFWalletFinish, isLogin]);
+  }, [handleConnectAELFWalletFinish, isLogin, walletsModal]);
 
   return (
     <CommonModal
       width={438}
       open={walletsModal}
-      title={t(stepConfig[walletStep].chainType === 'ERC' ? 'Select your wallet' : 'Connect aelf wallet')}
+      title={t(stepConfig[walletStep].chainType !== 'ELF' ? 'Select your wallet' : 'Connect aelf wallet')}
       onCancel={handleCloseModal}
       className={clsx('modals', styles['wallets-modal'])}
       type="pop-bottom">
@@ -122,15 +140,20 @@ export default function WalletsModal() {
             );
           })}
         </div>
-        {stepConfig[walletStep].chainType === 'ERC' ? (
-          <WalletList onFinish={handleConnectExternalWalletFinish} />
+        {stepConfig[walletStep].chainType !== 'ELF' ? (
+          <WalletList
+            onFinish={handleConnectExternalWalletFinish}
+            chainType={
+              (stepConfig[walletStep].chainType === 'TON' ? stepConfig[walletStep].chainType : undefined) as ChainType
+            }
+          />
         ) : (
           <>
             <div className={clsx(styles['aelf-tip-wrap'], 'flex-column-center')}>
               <CommonImage className={styles['aelf-chain-logo']} src={aelfChainLogo} />
               <span>
                 {t(
-                  isFromERC
+                  !isFromELF
                     ? 'Nice! Now let’s connect your aelf wallet.'
                     : 'Let’s connect your aelf wallet to get started.',
                 )}

@@ -1,4 +1,7 @@
 import BigNumber from 'bignumber.js';
+import { sleep } from 'utils';
+import { TelegramPlatform } from 'utils/telegram/telegram';
+import { isAndroid } from 'utils/isMobile';
 import { isELFChain } from 'utils/aelfUtils';
 import { ZERO } from 'constants/misc';
 import { ChainId } from 'types';
@@ -56,3 +59,15 @@ export function getMaxAmount({
   }
   return value;
 }
+
+export const handleInputFocus = async (id: string) => {
+  const _isAndroid = isAndroid();
+  if (!TelegramPlatform.isTelegramPlatform() && _isAndroid) {
+    // The keyboard does not block the input box
+    await sleep(200);
+    document.getElementById(id)?.scrollIntoView({
+      block: 'center',
+      behavior: 'smooth',
+    });
+  }
+};

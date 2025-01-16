@@ -16,6 +16,7 @@ type AElfOwnConstants = {
   BRIDGE_CONTRACT?: string;
   BRIDGE_CONTRACT_OUT?: string;
   LIMIT_CONTRACT?: string;
+  CREATE_TOKEN_CONTRACT?: string;
 };
 
 type Constants = ChainConstantsType & AElfOwnConstants;
@@ -36,6 +37,7 @@ export class ERCChainConstants extends ChainConstants {
   constructor(id: number | string, library?: provider) {
     super(id);
     ERCChainConstants['library'] = library;
+    // eslint-disable-next-line react/no-is-mounted
     this.setStaticAttrs();
   }
   setStaticAttrs() {
@@ -57,6 +59,7 @@ export class ELFChainConstants extends ChainConstants {
   constructor(id: number | string, aelfInstances?: Web3Type['aelfInstances']) {
     super(id);
     ELFChainConstants['aelfInstances'] = aelfInstances;
+    // eslint-disable-next-line react/no-is-mounted
     this.setStaticAttrs();
   }
   setStaticAttrs() {

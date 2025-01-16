@@ -27,14 +27,57 @@ const CrossApiList = {
   getRateLimits: 'api/app/limiter/rateLimits',
 };
 
+const ApplicationApiList = {
+  getTokenList: '/api/ebridge/application/tokens',
+  getTokenDetail: '/api/ebridge/application/token-detail',
+  commitTokenInfo: {
+    target: '/api/ebridge/application/commit-basic-info',
+    baseConfig: { method: 'POST' },
+  },
+  getTokenInfo: '/api/ebridge/application/user-token-access-info',
+  getChainStatus: '/api/ebridge/application/check-chain-access-status',
+  addChain: {
+    target: '/api/ebridge/application/add-chain',
+    baseConfig: { method: 'POST' },
+  },
+  prepareBindIssue: {
+    target: '/api/ebridge/application/prepare-binding-issue',
+    baseConfig: { method: 'POST' },
+  },
+  getIssue: {
+    target: '/api/ebridge/application/issue-binding',
+    baseConfig: { method: 'POST' },
+  },
+  getMyApplicationList: '/api/ebridge/application/list',
+  getApplicationDetail: '/api/ebridge/application/detail',
+  getTokenConfig: '/api/ebridge/application/token/config',
+};
+
+const CommonApiList = {
+  getTokenWhiteList: '/api/ebridge/application/token-white-list',
+  getTokenPrice: '/api/ebridge/application/token/price',
+};
+
 const CMSApiList = {
-  getToggleReslutOfMask: '/cms/items/home',
+  getToggleResultOfMask: '/cms/items/home',
+};
+
+const PoolApiList = {
+  overview: '/api/ebridge/application/pool-overview',
+  detail: '/api/ebridge/application/pool-detail',
+  list: '/api/ebridge/application/pool-list',
 };
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { cross: CrossApiList, cms: CMSApiList };
+export const EXPAND_APIS = {
+  cross: CrossApiList,
+  cms: CMSApiList,
+  application: ApplicationApiList,
+  common: CommonApiList,
+  pool: PoolApiList,
+};
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

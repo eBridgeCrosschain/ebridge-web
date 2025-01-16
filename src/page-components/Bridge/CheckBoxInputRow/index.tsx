@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useLanguage } from 'i18n';
-import { Checkbox, Input, Row, Tooltip } from 'antd';
+import { Checkbox, Input, Row } from 'antd';
 import CommonImage from 'components/CommonImage';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useWallet } from 'contexts/useWallet/hooks';
@@ -11,6 +11,7 @@ import { isChainAddress } from 'utils';
 import { getNameByChainId } from 'utils/chain';
 import { clearIcon, questionFilledIcon } from 'assets/images';
 import styles from './styles.module.less';
+import CommonTooltipSwitchModal from 'components/CommonTooltipSwitchModal';
 
 const TextArea = Input.TextArea;
 
@@ -57,13 +58,12 @@ export default function CheckBoxInputRow() {
           }}>
           <span className={clsx(styles['check-box-label-wrap'], 'flex-row-center')}>
             <span className={styles['check-box-label']}>{t('Send to another address manually')}</span>
-            <Tooltip
-              trigger="hover"
-              placement="topLeft"
-              arrowPointAtCenter
-              title={t('Choose this option if you wish to send to an address without connecting wallet.')}>
+            <CommonTooltipSwitchModal
+              modalProps={{ title: t('Send to another address manually') }}
+              autoOpen
+              tip={t('Choose this option if you wish to send to an address without connecting wallet.')}>
               <CommonImage priority className={styles['question-icon']} src={questionFilledIcon} />
-            </Tooltip>
+            </CommonTooltipSwitchModal>
           </span>
         </Checkbox>
       </Row>

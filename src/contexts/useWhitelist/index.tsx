@@ -1,10 +1,13 @@
 import storages from 'constants/storages';
 import { BasicActions } from 'contexts/utils';
 import useStorageReducer from 'hooks/useStorageReducer';
-import { createContext, useContext, useMemo } from 'react';
-import { WhitelistActions, WhitelistItem, WhitelistState } from './actions';
+import { createContext, useCallback, useContext, useMemo } from 'react';
+import { setDefaultWhitelist, WhitelistActions, WhitelistItem, WhitelistState } from './actions';
+import { getTokenWhiteList } from 'utils/api/common';
+import { DefaultWhitelistMap } from 'constants/index';
+import useInterval from 'hooks/useInterval';
 
-const INITIAL_STATE = { userERCChainId: undefined };
+const INITIAL_STATE = { defaultWhitelistMap: DefaultWhitelistMap };
 
 const WhitelistContext = createContext<any>([INITIAL_STATE]);
 
@@ -54,6 +57,17 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     options,
   );
   const actions = useMemo(() => ({ dispatch }), [dispatch]);
+
+  const onGetTokenWhiteList = useCallback(async () => {
+    try {
+      const data = await getTokenWhiteList();
+      dispatch(setDefaultWhitelist(data));
+    } catch (error) {
+      console.debug(error, '===onGetTokenWhiteList');
+    }
+  }, [dispatch]);
+  useInterval(onGetTokenWhiteList, [onGetTokenWhiteList], 30000);
+
   return (
     <WhitelistContext.Provider value={useMemo(() => [state, actions], [actions, state])}>
       {children}

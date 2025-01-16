@@ -1,7 +1,7 @@
 import { Connector } from '@web3-react/types';
 import { ALL_SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chain';
 import storages from 'constants/storages';
-import { eventBus } from 'utils';
+import { eventBus } from 'utils/eBridgeEventBus';
 import {
   coinbaseWalletConnection,
   injectedConnection,
@@ -33,6 +33,7 @@ type Info = {
  */
 export const switchNetwork = async (info: Info): Promise<boolean> => {
   let provider = window.ethereum;
+  console.log('====== ====== switchNetwork provider', provider);
   try {
     if (provider?.providerMap) {
       for (const [key, value] of provider.providerMap) {
@@ -55,6 +56,14 @@ export const switchNetwork = async (info: Info): Promise<boolean> => {
   }
   try {
     if (nativeCurrency && chainName) {
+      console.log('====== ====== switchNetwork wallet_addEthereumChain', {
+        chainId: `0x${chainId.toString(16)}`,
+        chainName,
+        nativeCurrency,
+        rpcUrls,
+        iconUrls,
+        blockExplorerUrls,
+      });
       await provider.request({
         method: 'wallet_addEthereumChain',
         params: [
@@ -69,6 +78,9 @@ export const switchNetwork = async (info: Info): Promise<boolean> => {
         ],
       });
     } else {
+      console.log('====== ====== switchNetwork wallet_switchEthereumChain', {
+        chainId: `0x${chainId.toString(16)}`,
+      });
       await provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${chainId.toString(16)}` }],
@@ -137,17 +149,24 @@ export const switchChain = async (
   eventBus.emit(storages.userERCChainId, info.chainId);
   if (!connector || typeof connector === 'string') return;
   if (isWeb3Active) {
+    console.log('====== ====== ====== 0', connector);
     if (!isChainAllowed(connector, chainId)) {
       throw new Error(`Chain ${chainId} not supported for connector (${typeof connector})`);
     } else if (connector === walletConnectConnection.connector) {
+      console.log('====== ====== ====== 1');
       if (
-        !getSupportedChainIdsFromWalletConnectSession((connector as WalletConnect).provider?.session).includes(chainId)
+        !getSupportedChainIdsFromWalletConnectSession((connector as WalletConnect).provider?.session).includes(
+          chainId as any,
+        )
       ) {
         CommonMessage.error(`${chainName} is unsupported by your wallet.`);
+        throw `${chainName} is unsupported by your wallet.`;
       } else {
+        console.log('====== ====== ====== 2', '');
         await connector.activate(chainId);
       }
     } else if (connector === networkConnection.connector) {
+      console.log('====== ====== ====== 3', '');
       await connector.activate(chainId);
     } else {
       const addChainParameter = {
@@ -158,13 +177,15 @@ export const switchChain = async (
         iconUrls,
         blockExplorerUrls,
       };
+      console.log('====== ====== ====== 4', addChainParameter);
       await connector.activate(addChainParameter);
       // fix disconnect metamask
       if (connector === injectedConnection.connector && !window.ethereum?.selectedAddress) connector.connectEagerly?.();
     }
   } else {
+    console.log('====== ====== ====== 5', info);
     // unlink metamask
-    switchNetwork(info);
+    await switchNetwork(info);
   }
 };
 

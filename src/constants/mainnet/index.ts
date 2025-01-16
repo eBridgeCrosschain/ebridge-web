@@ -5,9 +5,17 @@ import * as BSC from '../platform/BSC';
 import * as BASE from '../platform/base';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 
-import { DEFAULT_CHAIN_ICON, DEFAULT_CHAIN_NAME, SupportedChainId, SupportedELFChainId } from '../chain';
+import {
+  DEFAULT_CHAIN_ICON,
+  DEFAULT_CHAIN_NAME,
+  SupportedChainId,
+  SupportedELFChainId,
+  TBridgeChainId,
+} from '../chain';
 import { NetworkType } from 'types';
 import { NetworkEnum } from '@aelf-web-login/wallet-adapter-base';
+
+export const NETWORK_TYPE: NetworkEnum = NetworkEnum.MAINNET;
 
 export const MAIN_SIDE_CHAIN_ID = {
   mainChain: SupportedELFChainId.AELF,
@@ -51,7 +59,7 @@ export const ACTIVE_CHAIN: any = {
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
-export const CHAIN_NAME: { [chainId in SupportedChainId | SupportedELFChainId]: string } = DEFAULT_CHAIN_NAME;
+export const CHAIN_NAME: { [chainId in TBridgeChainId]: string } = DEFAULT_CHAIN_NAME;
 
 export const CHAIN_ICON = DEFAULT_CHAIN_ICON;
 
@@ -157,6 +165,10 @@ export const INDEXER_URL = 'https://indexer-api.aefinder.io/api/app/graphql/ebri
 
 export const BASE_URL = 'https://ebridge.exchange';
 
+export const BASE_AUTH_URL = 'https://ebridge.exchange';
+
 export const TELEGRAM_BOT_ID = '6932375590';
 
 export const SHOW_V_CONSOLE = false;
+
+export const AwakenHost = 'https://app.awaken.finance/';

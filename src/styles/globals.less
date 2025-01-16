@@ -57,6 +57,9 @@ div#__next {
 .tg-page-body {
   min-height: unset !important;
 }
+.page-body-hide-background-image {
+  background-image: none;
+}
 .main-page-content-wrap {
   display: flex;
   align-items: flex-start;
@@ -96,5 +99,13 @@ div#__next {
   }
   .tg-page-content {
     min-height: unset !important;
+  }
+}
+
+#tc-widget-root{
+  tc-root{
+    div{
+      z-index: 99999;
+    }
   }
 }

@@ -1,0 +1,31 @@
+@import '/src/assets/theme/color.less';
+
+.loading-modal {
+  width: 380px;
+
+  :global {
+    .@{app-prefix}-modal-body {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+  .loading-modal-body {
+    gap: 10px;
+    padding: 16px 0;
+  }
+  .loading-text {
+    color: @font-13;
+    text-align: left;
+    line-height: 20px;
+  }
+  &-hide-title {
+    :global {
+      .@{app-prefix}-modal-header {
+        display: none;
+      }
+      .@{app-prefix}-modal-body {
+        padding-top: 24px;
+      }
+    }
+  }
+}
