@@ -126,7 +126,12 @@ export default function RemovePool({ chainId, tokenInfo, price }: TRemovePoolPro
         rightHeaderTitle={`${unitConverter(myLiquidity.showMyLiquidity)} ${formatSymbol(tokenInfo?.symbol)}`}
         rightInputEle={
           <Row className={clsx('flex-row-center', styles['token-logo-row'], 'font-family-medium')}>
-            <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={tokenInfo?.symbol} />
+            <TokenLogo
+              className={styles['token-logo']}
+              chainId={chainId}
+              symbol={tokenInfo?.symbol}
+              src={tokenInfo?.icon}
+            />
             <div>{formatSymbol(tokenInfo?.symbol)}</div>
           </Row>
         }

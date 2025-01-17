@@ -139,7 +139,12 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
         rightHeaderTitle={`${unitConverter(showBalance)} ${formatSymbol(tokenInfo?.symbol)}`}
         rightInputEle={
           <Row className={clsx('flex-row-center', styles['token-logo-row'], 'font-family-medium')}>
-            <TokenLogo className={styles['token-logo']} chainId={chainId} symbol={tokenInfo?.symbol} />
+            <TokenLogo
+              className={styles['token-logo']}
+              chainId={chainId}
+              symbol={tokenInfo?.symbol}
+              src={tokenInfo?.icon}
+            />
             <div>{formatSymbol(tokenInfo?.symbol)}</div>
           </Row>
         }
