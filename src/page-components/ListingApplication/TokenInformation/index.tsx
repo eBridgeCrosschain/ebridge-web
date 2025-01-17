@@ -172,6 +172,8 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
       };
       const newFormValidateData = TOKEN_INFORMATION_FORM_INITIAL_VALIDATE_DATA;
 
+      await getTokenDetail(_symbol);
+
       try {
         const res = await getApplicationTokenInfo({ symbol: _symbol });
         if (token && res && res.symbol) {
@@ -183,7 +185,6 @@ export default function TokenInformation({ symbol, handleNextStep }: ITokenInfor
           newFormValues[TokenInformationFormKeys.TELEGRAM_HANDLER] = res.telegramHandler;
           newFormValues[TokenInformationFormKeys.EMAIL] = res.email;
         }
-        await getTokenDetail(_symbol);
       } catch (error) {
         console.error(error);
         currentTokenInfoRef.current = undefined;
