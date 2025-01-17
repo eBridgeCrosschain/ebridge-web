@@ -57,7 +57,7 @@ export default function RemovePool({ chainId, tokenInfo, price }: TRemovePoolPro
       setLoadingModal({ open: true });
       if (poolContract.contractType === 'ERC') await evmSwitchChain(chainId);
       const req = await removeLiquidity({
-        symbol: tokenInfo?.symbol,
+        tokenInfo,
         amount: amount,
         account: account,
         poolContract,
