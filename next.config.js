@@ -44,6 +44,7 @@ const nextConfig = {
       'raw.githubusercontent.com',
       'forest-mainnet.s3.ap-northeast-1.amazonaws.com',
       'forest-testnet.s3.ap-northeast-1.amazonaws.com',
+      'portkey-did.s3.ap-northeast-1.amazonaws.com',
     ],
   },
 };

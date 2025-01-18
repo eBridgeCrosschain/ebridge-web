@@ -12,12 +12,13 @@ import {
   sepolia,
 } from 'wagmi/chains';
 import { metaMask } from 'wagmi/connectors';
+import * as MAINNET from './platform/main';
 
 export const EVMProviderConfig = createConfig({
   chains: [mainnet, bsc, base, polygon, avalanche, arbitrum, optimism, sepolia, bscTestnet, baseSepolia],
   connectors: [metaMask()],
   transports: {
-    [mainnet.id]: http(),
+    [mainnet.id]: http(MAINNET.CHAIN_INFO.rpcUrl),
     [bsc.id]: http(),
     [base.id]: http(),
     [polygon.id]: http(),
