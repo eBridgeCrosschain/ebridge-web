@@ -9,7 +9,7 @@ import { getTONJettonMinter, packCreateReceiptBody, tonWeb } from './ton';
 export class TonContractCallData {
   static async createReceipt(contractAddress: string, account: string, paramsOption: any[]) {
     const forwardTonAmount = '0.15';
-    const feeAmount = '0.2';
+    const feeAmount = '0.3';
     const tokenJettonAddress = paramsOption[0];
 
     const jettonMinter = getTONJettonMinter(tokenJettonAddress);
