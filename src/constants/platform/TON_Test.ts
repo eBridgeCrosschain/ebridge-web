@@ -18,3 +18,5 @@ export const CHAIN_INFO = {
 
 export const BRIDGE_CONTRACT = 'kQDS511tzowt2x1xyIDgpglhaz6wG9uVP2t4BixFTViYQoM_';
 export const LIMIT_CONTRACT = 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9';
+// TODO:TOKEN_POOL
+export const TOKEN_POOL = 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9';

@@ -101,6 +101,12 @@ export const getTotalLiquidity = async ({ poolContract, tokenContract, symbol }:
     return req.liquidity;
   }
 
+  if (poolContract?.contractType === 'TON') {
+    const req = await poolContract.callViewMethod('GetTokenPoolInfo', []);
+    if (req.error) throw req.error;
+    return req.liquidity;
+  }
+
   const req = await getBalanceByWagmi({
     address: poolContract?.address as any,
     token: tokenContract?.address as any,

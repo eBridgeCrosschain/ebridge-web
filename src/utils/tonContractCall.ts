@@ -62,6 +62,13 @@ export class CallTonContract {
       dailyLimit: ZERO.plus(req.stack[2][1]),
     };
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static async GetTokenPoolInfo(contractAddress: string, _paramsOption: any[]) {
+    const req = await tonWeb.provider.call(contractAddress, 'get_pool_liquidity', []);
+    return {
+      liquidity: ZERO.plus(req.stack[0][1]).toFixed(),
+    };
+  }
   static async getCurrentReceiptTokenBucketState(contractAddress: string, paramsOption: any[]) {
     const req = await tonWeb.provider.call(contractAddress, 'get_receipt_rate_limit_state', [
       ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],

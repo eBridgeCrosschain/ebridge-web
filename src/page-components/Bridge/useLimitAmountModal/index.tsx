@@ -213,9 +213,8 @@ export default function useLimitAmountModal() {
 
       if (
         checkCapacity(input, limitAndRateData, crossInfo) ||
-        checkDailyLimit(input, limitAndRateData, crossInfo)
-        //  ||
-        // (await checkToLiquidity(input, crossInfo, toTokenInfo))
+        checkDailyLimit(input, limitAndRateData, crossInfo) ||
+        (await checkToLiquidity(input, crossInfo, toTokenInfo))
       ) {
         setVisible(true);
         return true;
