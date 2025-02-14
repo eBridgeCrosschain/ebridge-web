@@ -17,4 +17,4 @@ export const CHAIN_INFO = {
 };
 
 export const BRIDGE_CONTRACT = 'kQDS511tzowt2x1xyIDgpglhaz6wG9uVP2t4BixFTViYQoM_';
-export const LIMIT_CONTRACT = 'kQCPfgNN-077aNCCUlKm59ZbDDbwdRfiuOyofEr41sw1KTEC';
+export const LIMIT_CONTRACT = 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9';

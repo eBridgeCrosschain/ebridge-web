@@ -208,12 +208,14 @@ export default function useLimitAmountModal() {
         : getLimitDataByContract(type, crossInfo, crossInfo?.fromDecimals));
 
       const limitAndRateData = calculateMinValue(result);
+
       if (!limitAndRateData) return true;
 
       if (
         checkCapacity(input, limitAndRateData, crossInfo) ||
-        checkDailyLimit(input, limitAndRateData, crossInfo) ||
-        (await checkToLiquidity(input, crossInfo, toTokenInfo))
+        checkDailyLimit(input, limitAndRateData, crossInfo)
+        //  ||
+        // (await checkToLiquidity(input, crossInfo, toTokenInfo))
       ) {
         setVisible(true);
         return true;
