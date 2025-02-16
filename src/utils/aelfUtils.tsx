@@ -236,7 +236,7 @@ export const getServicesFromFileDescriptors = (descriptors: any) => {
     });
 };
 const isWrappedBytes = (resolvedType: any, name: string) => {
-  if (!resolvedType.name || resolvedType.name !== name) {
+  if (!resolvedType?.name || resolvedType.name !== name) {
     return false;
   }
   if (!resolvedType.fieldsArray || resolvedType.fieldsArray.length !== 1) {

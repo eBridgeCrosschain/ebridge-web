@@ -14,19 +14,19 @@ export class TelegramPlatform {
 
   static isTelegramPlatform() {
     const Telegram = TelegramPlatform.getTelegram();
-    return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform !== 'unknown');
+    return !!(Telegram && Telegram.WebApp?.platform && Telegram.WebApp?.platform !== 'unknown');
   }
 
   static isTelegramPlatformWeb() {
     const Telegram = TelegramPlatform.getTelegram();
-    return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform === 'web');
+    return !!(Telegram && Telegram.WebApp?.platform && Telegram.WebApp?.platform === 'web');
   }
 
   static isTelegramPlatformAndNotWeb() {
     const Telegram = TelegramPlatform.getTelegram();
     return !!(
       Telegram &&
-      Telegram.WebApp.platform &&
+      Telegram.WebApp?.platform &&
       Telegram.WebApp.platform !== 'unknown' &&
       Telegram.WebApp.platform !== 'web'
     );
@@ -34,6 +34,6 @@ export class TelegramPlatform {
 
   static isTelegramPlatformDesktop() {
     const Telegram = TelegramPlatform.getTelegram();
-    return !!(Telegram && Telegram.WebApp.platform && Telegram.WebApp.platform.includes('desktop'));
+    return !!(Telegram && Telegram.WebApp?.platform && Telegram.WebApp.platform.includes('desktop'));
   }
 }
