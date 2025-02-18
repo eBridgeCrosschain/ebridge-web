@@ -1,6 +1,5 @@
 import { describe, it, expect, test } from 'vitest';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
 import { timesDecimals, divDecimals, divDecimalsStr, bigNumberToWeb3Input, valueToPercentage } from '../calculate';
 
 describe('timesDecimals', () => {
