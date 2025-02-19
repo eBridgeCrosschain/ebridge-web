@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { afterEach, beforeEach, describe, it, expect, Mock } from 'vitest';
 import {
   approveELF,
@@ -15,6 +16,7 @@ import {
   MessageTxToExplore,
   uint8ArrayToHex,
   getContractMethods,
+  initContracts,
 } from 'utils/aelfUtils';
 import { ChainId } from 'types';
 import { isMobileDevices } from '../isMobile';
@@ -436,9 +438,7 @@ describe('checkElfAllowanceAndApprove', () => {
     expect(result).toBe(true);
   });
 
-  it('2 should check allowance and approve successfully', async () => {
-    // const mockCallViewMethod = vi.fn().mockResolvedValue({ allowance: '10' })
-
+  it('should check allowance and approve successfully if allowance is lt amount', async () => {
     const mockTokenContract = {
       callSendMethod: vi.fn().mockResolvedValue(TransactionId),
       callViewMethod: vi.fn().mockResolvedValue({ allowance: '10' }),
@@ -766,7 +766,7 @@ describe('getContractFileDescriptorSet', () => {
     expect(result).toBeUndefined();
   });
 
-  it('4', async () => {
+  it('should return undefined if localStorage cache error', async () => {
     // set localStorage
     const key = storages.contractsFileDescriptorBase64 + chainId;
     localStorageMock.setItem(key, JSON.stringify({ address: { error: 'error' } }));
@@ -851,5 +851,147 @@ describe('getContractMethods', () => {
     const result = await getContractMethods(chainId, tokenContractAddress);
 
     expect(result).toEqual({ Transfer: 'Transfer', Approve: 'Approve' });
+  });
+});
+
+describe('initContracts', () => {
+  const mockContracts = {
+    contract1: 'address1',
+    contract2: 'address2',
+  };
+
+  const mockAelfInstance = {
+    chain: {
+      contractAt: vi.fn(),
+    },
+  };
+
+  const mockAccount = 'mock_account_address';
+
+  beforeEach(() => {
+    // Reset all mocks before each test
+    vi.clearAllMocks();
+    mockAelfInstance.chain.contractAt.mockReset();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should initialize contracts successfully without account', async () => {
+    // Mock successful contract initialization
+    mockAelfInstance.chain.contractAt
+      .mockResolvedValueOnce({ address: 'address1' })
+      .mockResolvedValueOnce({ address: 'address2' });
+
+    const result = await initContracts(mockContracts, mockAelfInstance);
+
+    // Verify the result
+    expect(result).toEqual({
+      address1: { address: 'address1' },
+      address2: { address: 'address2' },
+    });
+
+    // Verify contractAt was called with the correct arguments
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalledWith('address1', {
+      address: managerAddress,
+    });
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalledWith('address2', {
+      address: managerAddress,
+    });
+  });
+
+  it('should initialize contracts successfully with account', async () => {
+    // Mock successful contract initialization
+    mockAelfInstance.chain.contractAt
+      .mockResolvedValueOnce({ address: 'address1' })
+      .mockResolvedValueOnce({ address: 'address2' });
+
+    const result = await initContracts(mockContracts, mockAelfInstance, mockAccount);
+
+    // Verify the result
+    expect(result).toEqual({
+      address1: { address: 'address1' },
+      address2: { address: 'address2' },
+    });
+
+    // Verify contractAt was called with the correct arguments
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalledWith('address1', {
+      address: mockAccount,
+    });
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalledWith('address2', {
+      address: mockAccount,
+    });
+  });
+
+  it('should handle contract initialization failures', async () => {
+    // Mock one successful and one failed contract initialization
+    mockAelfInstance.chain.contractAt
+      .mockResolvedValueOnce({ address: 'address1' })
+      .mockRejectedValueOnce(new Error('Failed to initialize contract'));
+
+    const result = await initContracts(mockContracts, mockAelfInstance);
+
+    // Verify the result
+    expect(result).toEqual({
+      address1: { address: 'address1' },
+      address2: undefined,
+    });
+
+    // Verify contractAt was called
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalledTimes(2);
+  });
+
+  it('should handle empty contracts object', async () => {
+    const result = await initContracts({}, mockAelfInstance);
+
+    // Verify the result
+    expect(result).toEqual({});
+
+    // Verify contractAt was not called
+    expect(mockAelfInstance.chain.contractAt).not.toHaveBeenCalled();
+  });
+
+  it('should handle global error', async () => {
+    // Mock global error
+    mockAelfInstance.chain.contractAt.mockRejectedValue(new Error('Global error'));
+
+    const result = await initContracts(mockContracts, mockAelfInstance);
+
+    // Verify the result
+    expect(result).toEqual({
+      address1: undefined,
+      address2: undefined,
+    });
+
+    // Verify contractAt was called
+    expect(mockAelfInstance.chain.contractAt).toHaveBeenCalled();
+  });
+
+  it('should log errors when contract initialization fails', async () => {
+    // Mock console.debug
+    const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
+
+    // Mock contract initialization failure
+    mockAelfInstance.chain.contractAt.mockRejectedValue(new Error('Failed to initialize contract'));
+
+    await initContracts(mockContracts, mockAelfInstance);
+
+    // Verify console.debug was called
+    expect(consoleDebugSpy).toHaveBeenCalledWith(expect.any(Error), mockAelfInstance, '=====contractAt');
+  });
+
+  it('should log global errors', async () => {
+    // Mock Promise.all
+    const promiseAllSpy = vi.spyOn(Promise, 'all').mockRejectedValue(new Error('Promise error'));
+
+    // Mock console.log
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    await initContracts(mockContracts, mockAelfInstance);
+
+    // Verify Promise.all and console.log was called
+    expect(promiseAllSpy).toHaveBeenCalled();
+    expect(consoleLogSpy).toHaveBeenCalledWith(expect.any(Error), 'initContracts');
   });
 });

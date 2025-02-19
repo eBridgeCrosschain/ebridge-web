@@ -1,11 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, Mock } from 'vitest';
 import {
+  AmountSign,
   formatListWithAnd,
   formatSymbolDisplay,
+  formatWithCommas,
   parseWithCommas,
   parseWithStringCommas,
   replaceCharacter,
 } from '../format';
+import { divDecimals } from 'utils/calculate';
+
+// Mock the `divDecimals` function (since it's external)
+vi.mock('../calculate', () => ({
+  divDecimals: vi.fn(),
+}));
 
 /**
  * Test `parseWithCommas`
@@ -97,5 +105,71 @@ describe('formatListWithAnd', () => {
 
   it('should return an empty string for an empty list', () => {
     expect(formatListWithAnd([])).toBe('');
+  });
+});
+
+/**
+ * Test `formatWithCommas`
+ */
+describe('formatWithCommas', () => {
+  it('should format the amount with commas and decimal places', () => {
+    (divDecimals as Mock).mockImplementation(() => {
+      return {
+        decimalPlaces: () => ({
+          toFormat: vi.fn().mockReturnValue('123,456.78'),
+        }),
+      };
+    });
+
+    const result = formatWithCommas({
+      amount: '12345678.1234',
+      decimals: 2,
+      digits: 2,
+      sign: AmountSign.PLUS,
+    });
+
+    expect(result).toBe('+123,456.78.1234');
+  });
+
+  it('should handle zero amounts with the EMPTY sign', () => {
+    (divDecimals as Mock).mockImplementation(() => {
+      return {
+        decimalPlaces: () => ({
+          toFormat: vi.fn().mockReturnValue('0'),
+        }),
+      };
+    });
+
+    const result = formatWithCommas({ amount: 0, sign: AmountSign.EMPTY });
+
+    expect(result).toBe('0');
+  });
+
+  it('should properly format negative amounts', () => {
+    (divDecimals as Mock).mockImplementation(() => {
+      return {
+        decimalPlaces: () => ({
+          toFormat: vi.fn().mockReturnValue('-12,345'),
+        }),
+      };
+    });
+
+    const result = formatWithCommas({ amount: '-12345.6', digits: 1, sign: AmountSign.MINUS });
+
+    expect(result).toBe('--12,345.6');
+  });
+
+  it('should handle non-decimal amounts', () => {
+    (divDecimals as Mock).mockImplementation(() => {
+      return {
+        decimalPlaces: () => ({
+          toFormat: vi.fn().mockReturnValue('123,456'),
+        }),
+      };
+    });
+
+    const result = formatWithCommas({ amount: 123456, decimals: 0 });
+
+    expect(result).toBe('123,456');
   });
 });

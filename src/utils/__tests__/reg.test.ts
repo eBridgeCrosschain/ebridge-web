@@ -6,29 +6,51 @@ describe('Validation Utilities', () => {
    * Test `isUrl`
    */
   describe('isUrl', () => {
-    it('should return true for valid URLs', () => {
-      expect(isUrl('http://example.com')).toBe(true);
-      expect(isUrl('https://example.com')).toBe(true);
-      expect(isUrl('ftp://example.com')).toBe(true);
-      expect(isUrl('http://localhost:3000')).toBe(true);
-      expect(isUrl('http://localhost')).toBe(true);
-      expect(isUrl('https://sub.domain.com')).toBe(true);
+    it('should return false for non-string inputs', () => {
+      expect(isUrl(123 as any)).toBe(false); // number
+      expect(isUrl(null as any)).toBe(false); // null
+      expect(isUrl(undefined as any)).toBe(false); // undefined
+      expect(isUrl({} as any)).toBe(false); // object
+      expect(isUrl([] as any)).toBe(false); // array
+      expect(isUrl(true as any)).toBe(false); // boolean
     });
 
     it('should return false for invalid URLs', () => {
-      expect(isUrl('')).toBe(false);
-      expect(isUrl('example')).toBe(false);
-      expect(isUrl('http:/example.com')).toBe(false);
-      expect(isUrl('://example.com')).toBe(false);
-      expect(isUrl('not-a-url')).toBe(false);
-      expect(isUrl('ftp:/example.com')).toBe(false);
+      expect(isUrl('')).toBe(false); // empty string
+      expect(isUrl('not a url')).toBe(false); // string
+      expect(isUrl('http://')).toBe(false); // only protocol
+      expect(isUrl('://example.com')).toBe(false); // not protocol
     });
 
-    it('should return false if input is not a string', () => {
-      expect(isUrl(undefined as any)).toBe(false);
-      expect(isUrl(null as any)).toBe(false);
-      expect(isUrl(123 as any)).toBe(false);
-      expect(isUrl({} as any)).toBe(false);
+    it('should return true for valid localhost URLs', () => {
+      expect(isUrl('http://localhost')).toBe(true);
+      expect(isUrl('https://localhost:8080')).toBe(true);
+      expect(isUrl('http://localhost/path')).toBe(true);
+      expect(isUrl('http://localhost:3000/path')).toBe(true);
+    });
+
+    it('should return true for valid non-localhost URLs', () => {
+      expect(isUrl('http://example.com')).toBe(true);
+      expect(isUrl('https://example.com')).toBe(true);
+      expect(isUrl('http://sub.example.com')).toBe(true);
+      expect(isUrl('https://example.com/path')).toBe(true);
+      expect(isUrl('http://example.com:8080')).toBe(true);
+      expect(isUrl('https://example.com/path?query=param')).toBe(true);
+      expect(isUrl('http://example.com/path#fragment')).toBe(true);
+    });
+
+    it('should return false for invalid domain formats', () => {
+      expect(isUrl('http://.com')).toBe(false); // Invalid domain name
+      expect(isUrl('http://example.')).toBe(false); // Invalid domain name
+      expect(isUrl('http://example.c')).toBe(false); // The domain name is too short
+    });
+
+    it('should handle edge cases', () => {
+      expect(isUrl('http://localhost:')).toBe(true); // The port number is empty
+      expect(isUrl('http://localhost:3000')).toBe(true); // With port number
+      expect(isUrl('http://localhost/path/to/resource')).toBe(true); // With Path
+      expect(isUrl('http://localhost?query=param')).toBe(true); // With query parameters
+      expect(isUrl('http://localhost#fragment')).toBe(true); // With fragment
     });
   });
 

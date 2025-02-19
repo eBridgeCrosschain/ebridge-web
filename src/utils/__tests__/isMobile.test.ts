@@ -1,19 +1,24 @@
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import isMobile, { isMobileDevices } from '../isMobile';
+import isMobile, { isAndroid, isIOS, isMobileDevices } from '../isMobile';
+
+const operaAndroidAgent = 'Opera/9.80 (Android; Opera Mini/36.2.2254/120.147; U; en) Presto/2.12.423 Version/12.16';
+const facebookIOSAgent = `Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone14,2;FBMD/iPhone;FBSN/iOS;FBSV/16.3;FBSS/3;FBCR/T-Mobile;FBLC/en_US;FBOP/5]`;
+const twitterIOSAgent =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Twitter/9.59.1';
+
+// Utility function to mock `navigator` for tests
+function mockNavigator(userAgent: string, platform?: string, maxTouchPoints?: number) {
+  Object.defineProperty(global, 'navigator', {
+    value: {
+      userAgent: userAgent,
+      platform: platform || '',
+      maxTouchPoints: maxTouchPoints || 0,
+    },
+    writable: true,
+  });
+}
 
 describe('isMobile', () => {
-  // Utility function to mock `navigator` for tests
-  function mockNavigator(userAgent: string, platform?: string, maxTouchPoints?: number) {
-    Object.defineProperty(global, 'navigator', {
-      value: {
-        userAgent: userAgent,
-        platform: platform || '',
-        maxTouchPoints: maxTouchPoints || 0,
-      },
-      writable: true,
-    });
-  }
-
   afterEach(() => {
     // Reset any mocks after each test
     vi.resetModules();
@@ -212,11 +217,6 @@ describe('isMobile', () => {
    * Custom Params Tests
    */
   describe('Custom Params', () => {
-    const operaAndroidAgent = 'Opera/9.80 (Android; Opera Mini/36.2.2254/120.147; U; en) Presto/2.12.423 Version/12.16';
-    const facebookIOSAgent = `Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone14,2;FBMD/iPhone;FBSN/iOS;FBSV/16.3;FBSS/3;FBCR/T-Mobile;FBLC/en_US;FBOP/5]`;
-    const twitterIOSAgent =
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Twitter/9.59.1';
-
     it('should detect an Opera Mini browser with string params', () => {
       const result = isMobile(operaAndroidAgent);
 
@@ -274,18 +274,6 @@ describe('isMobile', () => {
  * isMobileDevices Tests
  */
 describe('isMobileDevices', () => {
-  // Utility function to mock `navigator` for tests
-  function mockNavigator(userAgent: string, platform?: string, maxTouchPoints?: number) {
-    Object.defineProperty(global, 'navigator', {
-      value: {
-        userAgent: userAgent,
-        platform: platform || '',
-        maxTouchPoints: maxTouchPoints || 0,
-      },
-      writable: true,
-    });
-  }
-
   afterEach(() => {
     // Reset any mocks after each test
     vi.resetModules();
@@ -307,6 +295,61 @@ describe('isMobileDevices', () => {
     );
 
     const result = isMobileDevices();
+
+    expect(result).toBe(false);
+  });
+});
+
+/**
+ * isAndroid Tests
+ */
+describe('isAndroid', () => {
+  afterEach(() => {
+    // Reset any mocks after each test
+    vi.resetModules();
+  });
+
+  it('should return true for Apple or Android devices', () => {
+    mockNavigator(operaAndroidAgent);
+
+    const result = isAndroid();
+
+    expect(result).toBe(true);
+  });
+
+  it('should return false for non-mobile devices', () => {
+    mockNavigator(facebookIOSAgent);
+
+    const result = isAndroid();
+
+    expect(result).toBe(false);
+  });
+});
+
+/**
+ * isIOS Tests
+ */
+describe('isIOS', () => {
+  const operaAndroidAgent = 'Opera/9.80 (Android; Opera Mini/36.2.2254/120.147; U; en) Presto/2.12.423 Version/12.16';
+  const facebookIOSAgent = `Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone14,2;FBMD/iPhone;FBSN/iOS;FBSV/16.3;FBSS/3;FBCR/T-Mobile;FBLC/en_US;FBOP/5]`;
+
+  afterEach(() => {
+    // Reset any mocks after each test
+    vi.resetModules();
+  });
+
+  it('should return true for Apple or Android devices', () => {
+    mockNavigator(facebookIOSAgent);
+
+    const result = isIOS();
+
+    expect(result).toBe(true);
+  });
+
+  it('should return false for non-mobile devices', () => {
+    mockNavigator(operaAndroidAgent);
+
+    const result = isIOS();
 
     expect(result).toBe(false);
   });

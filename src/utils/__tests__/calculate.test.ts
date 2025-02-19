@@ -50,7 +50,7 @@ describe('divDecimalsStr', () => {
     expect(result).toBe('0.01');
   });
 
-  it('should return default value if not effective', () => {
+  it('should return default value if not effective and with decimals', () => {
     const value = new BigNumber(0);
     const decimals = 2;
 
@@ -59,7 +59,7 @@ describe('divDecimalsStr', () => {
     expect(result).toBe('DEFAULT');
   });
 
-  it('should return default value if not effective', () => {
+  it('should return default value if not effective and without decimals', () => {
     const value = new BigNumber(0);
 
     const result = divDecimalsStr(value, undefined, 'DEFAULT');

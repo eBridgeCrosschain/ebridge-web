@@ -24,6 +24,16 @@ describe('getListingUrl', () => {
     expect(result).toBe(`/listing-application/select-chain?${expectedSearch}`);
   });
 
+  it('should generate the correct URL for INITIALIZE_TOKEN_POOL with a symbol param', () => {
+    const step = ListingStep.INITIALIZE_TOKEN_POOL;
+    const params = { networks: 'ETH' };
+
+    const result = getListingUrl(step, params);
+    const expectedSearch = queryString.stringify({ networks: 'ETH' });
+
+    expect(result).toBe(`/listing-application/initialize-token-pool?${expectedSearch}`);
+  });
+
   it('should return the correct base path when no params are provided for TOKEN_INFORMATION', () => {
     const step = ListingStep.TOKEN_INFORMATION;
 
@@ -38,5 +48,13 @@ describe('getListingUrl', () => {
     const result = getListingUrl(step);
 
     expect(result).toBe('/listing-application/select-chain');
+  });
+
+  it('should return the correct base path when no params are provided for INITIALIZE_TOKEN_POOL', () => {
+    const step = ListingStep.INITIALIZE_TOKEN_POOL;
+
+    const result = getListingUrl(step);
+
+    expect(result).toBe('/listing-application/initialize-token-pool');
   });
 });
