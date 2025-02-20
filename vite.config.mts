@@ -41,7 +41,7 @@ export default defineConfig({
     },
     server: {
       deps: {
-        inline: ['@aelf-web-login', '@etransfer/ui-react', '@portkey/did-ui-react'],
+        inline: ['@aelf-web-login', '@portkey/did-ui-react'],
       },
     },
     globals: true,
