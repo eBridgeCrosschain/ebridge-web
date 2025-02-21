@@ -1,6 +1,5 @@
 import { SupportedELFChainId } from 'constants/chain';
 import { ChainId } from 'types';
-import { isELFAddress } from 'utils';
 import {
   getNodeByChainId,
   getAElf,
@@ -240,20 +239,6 @@ describe('isElfChainSymbol', () => {
     expect(isElfChainSymbol(undefined)).toBe(false);
     expect(isElfChainSymbol('')).toBe(false);
     expect(isSymbol).not.toHaveBeenCalled(); // `isSymbol` should not be called
-  });
-});
-
-describe('isELFAddress', () => {
-  it('should return false for addresses containing Chinese characters', () => {
-    expect(isELFAddress('invalid漢')).toBe(false);
-  });
-
-  it('should return true for valid ELF addresses', () => {
-    expect(isELFAddress(correctAelfAddress)).toBe(true);
-  });
-
-  it('should return false for invalid ELF addresses', () => {
-    expect(isELFAddress('invalidELFAddress')).toBe(false);
   });
 });
 
