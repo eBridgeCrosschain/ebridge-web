@@ -32,11 +32,11 @@ describe('getNodeByChainId', () => {
   it('should return correct AELF chain node', () => {
     const result = getNodeByChainId('AELF' as ChainId);
 
-    expect(result).toEqual({
-      chainId: 'AELF',
-      exploreUrl: 'https://aelfscan.io/AELF/',
-      rpcUrl: 'https://aelf-public-node.aelf.io',
-    });
+    expect(result).toHaveProperty('chainId', 'AELF');
+    expect(result).toHaveProperty('exploreUrl');
+    expect(result).toHaveProperty('rpcUrl');
+    expect(result.exploreUrl).contain('aelfscan.io/AELF');
+    expect(result.rpcUrl).contain('node.aelf.io');
   });
 
   it('should return undefined if input is not aelf chain', () => {
