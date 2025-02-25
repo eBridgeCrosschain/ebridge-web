@@ -45,6 +45,22 @@ vi.mock('utils/provider', () => {
   };
 });
 
+// Mock ELFChainConstants and ERCChainConstants
+vi.mock('constants/ChainConstants', () => {
+  return {
+    ELFChainConstants: {
+      aelfInstances: {
+        AELF: {
+          // appName: 'AELF_appName',
+          // options: {},
+          appName: undefined,
+          options: undefined,
+        },
+      },
+    },
+  };
+});
+
 vi.mock('@aelf-web-login/wallet-adapter-bridge', () => {
   return {
     PortkeyDid: vi.fn(),

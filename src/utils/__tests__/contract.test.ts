@@ -1,18 +1,20 @@
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { ChainId, ChainType } from 'types';
-import { encodedTransfer, getContractMethods, getTxResult, isELFChain, transformArrayToMap } from 'utils/aelfUtils';
-import { checkAElfBridge } from 'utils/checkAElfBridge';
-import { TonConnectUI } from '@tonconnect/ui-react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ChainId } from 'types';
+import { encodedTransfer, getContractMethods, getTxResult, isELFChain } from 'utils/aelfUtils';
 import { getTransactionResponseHash } from 'utils/ton';
 import {
   AElfContractBasic,
   ContractBasic,
   PortkeyContractBasic,
+  PortkeySDKContractBasic,
   TONContractBasic,
   WB3ContractBasic,
 } from 'utils/contract';
 import { TonContractCallData } from 'utils/tonContractCall';
 import { isTonChain } from 'utils';
+import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
+import { getDefaultProviderByChainId } from 'utils/provider';
+import { ZERO } from 'constants/misc';
 
 // Mock external dependencies
 vi.mock('utils/index', () => {
@@ -78,6 +80,17 @@ vi.mock('constants/ChainConstants', () => {
   };
 });
 
+vi.mock('constants/misc', async (importOriginal) => {
+  const originalModule: any = await importOriginal();
+
+  return {
+    ...originalModule,
+    ZERO: {
+      plus: vi.fn(),
+    },
+  };
+});
+
 vi.mock('@tonconnect/ui-react', () => {
   return {
     TonConnectUI: vi.fn(),
@@ -86,7 +99,9 @@ vi.mock('@tonconnect/ui-react', () => {
 
 vi.mock('@aelf-web-login/wallet-adapter-bridge', () => {
   return {
-    PortkeyDid: vi.fn(),
+    PortkeyDid: {
+      managerApprove: vi.fn(),
+    },
   };
 });
 
@@ -100,7 +115,43 @@ vi.mock('web3', () => {
   const Web3Mock: any = vi.fn().mockImplementation((provider) => ({
     provider,
     eth: {
-      Contract: vi.fn(),
+      Contract: vi.fn().mockImplementation((ABI, address) => ({
+        methods: {
+          testMethod: vi.fn().mockReturnThis(),
+          getBalance: vi.fn().mockImplementation(() => ({
+            call: vi.fn().mockRejectedValue('Failed to get balance'),
+          })),
+          crossChainCreateToken: vi.fn().mockImplementation(() => {
+            return {
+              send: vi.fn().mockImplementation(() => ({
+                on: vi.fn().mockImplementation((_onMethod, resolve) => {
+                  resolve({ transactionHash: 'mockHash' });
+                }),
+              })),
+            };
+          }),
+          swapToken: vi.fn().mockImplementation(() => {
+            return {
+              send: vi.fn().mockImplementation(() => ({
+                on: vi.fn().mockImplementation(() => ({
+                  on: vi.fn().mockImplementation((_onMethod, reject) => {
+                    reject({ error: 'Failed' });
+                  }),
+                })),
+              })),
+            };
+          }),
+          createToken: vi.fn().mockReturnThis(),
+          createReceipt: vi.fn().mockImplementation(() => ({
+            send: vi.fn().mockImplementation(() => {
+              throw 'Failed to create receipt';
+            }),
+          })),
+          send: vi.fn().mockResolvedValue({ transactionHash: 'mockHash' }),
+          call: vi.fn().mockResolvedValue({ result: 'mockResult' }),
+        },
+      })),
+
       getGasPrice: vi.fn(),
     },
     providers: {
@@ -135,95 +186,487 @@ describe('ContractBasic Class', () => {
   const mockERCProps = {
     contractAddress: 'ERC_ADDRESS',
     chainId: 11155111 as ChainId,
-    // provider: {},
-    // contractABI: [],
   };
 
   const mockTONProps = {
     contractAddress: 'TON_ADDRESS',
     chainId: 1100 as ChainId,
-    // tonConnectUI: { sendTransaction: vi.fn() },
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  const mockProvider = {
+    host: 'http://localhost:3001',
+    connected: true,
+    supportsSubscriptions: vi.fn(),
+    send: vi.fn(),
+    disconnect: vi.fn(),
+  };
+
+  describe('initialize', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should initialize portkey contract correctly', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
+
+      const contract = new ContractBasic(mockPortkeyProps);
+
+      expect(contract.contractType).toBe('ELF');
+      expect(contract.callContract).toBeInstanceOf(PortkeyContractBasic);
+    });
+
+    it('should initialize aelf contract correctly', () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
+
+      const contract = new ContractBasic(mockAelfProps);
+
+      expect(contract.contractType).toBe('ELF');
+      expect(contract.callContract).toBeInstanceOf(AElfContractBasic);
+    });
+
+    it('should initialize ERC contract correctly', () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(false);
+      vi.mocked(isTonChain).mockReturnValue(false);
+
+      const contract = new ContractBasic(mockERCProps);
+
+      expect(contract.contractType).toBe('ERC');
+      expect(contract.callContract).toBeInstanceOf(WB3ContractBasic);
+    });
+
+    it('should initialize TON contract correctly', () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(false);
+      vi.mocked(isTonChain).mockReturnValue(true);
+
+      const contract = new ContractBasic(mockTONProps);
+
+      expect(contract.contractType).toBe('TON');
+      expect(contract.callContract).toBeInstanceOf(TONContractBasic);
+    });
   });
 
-  it('should initialize portkey contract correctly', async () => {
-    // Setup chain environment
-    vi.mocked(isELFChain).mockReturnValue(true);
+  describe('callViewMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-    const contract = new ContractBasic(mockPortkeyProps);
+    it('should handle view method calls with aelf contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
 
-    expect(contract.contractType).toBe('ELF');
-    expect(contract.callContract).toBeInstanceOf(PortkeyContractBasic);
+      const contract = new ContractBasic({
+        ...mockAelfProps,
+        aelfContract: {
+          GetBalance: {
+            call: vi.fn().mockResolvedValue({ balance: '1000' }),
+          },
+        },
+      });
 
-    // const viewResult = await contract.callViewMethod('GetBalance', {
-    //   symbol: 'ELF',
-    //   owner: correctAelfAddress,
-    // });
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance', {
+        symbol: 'ELF',
+        owner: correctAelfAddress,
+      });
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle view method calls with portkey contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
+
+      const contract = new ContractBasic({
+        ...mockPortkeyProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callViewMethod: vi.fn().mockResolvedValue({ data: { balance: '1000' } }),
+          }),
+        },
+      });
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle view method calls with web3 contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(false);
+      vi.mocked(isTonChain).mockReturnValue(false);
+
+      const contract = new ContractBasic(mockERCProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callViewMethod('testMethod');
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.result).toBe('mockResult');
+    });
   });
 
-  it('should initialize aelf contract correctly', () => {
-    // Setup chain environment
-    vi.mocked(isELFChain).mockReturnValue(true);
+  describe('callSendMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-    const contract = new ContractBasic(mockAelfProps);
+    it('should handle send method calls with aelf contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
 
-    expect(contract.contractType).toBe('ELF');
-    expect(contract.callContract).toBeInstanceOf(AElfContractBasic);
+      const contract = new ContractBasic({
+        ...mockAelfProps,
+        aelfContract: {
+          GetTransaction: vi.fn().mockResolvedValue({ TransactionId: 'mockId' }),
+        },
+        aelfInstance: {} as any,
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+      vi.mocked(getTxResult).mockResolvedValue({ txResult: 'success' });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(getTxResult).toHaveBeenCalled();
+      expect(result.txResult).toBe('success');
+    });
+
+    it('should handle send method calls with portkey contract', async () => {
+      const contract = new ContractBasic({
+        ...mockPortkeyProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockResolvedValue({ status: 'success' }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {}, GetWalletInfo: {} });
+
+      const result = await contract.callSendMethod('CreateToken', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('status', 'success');
+    });
+
+    it('should handle send method calls with web3 contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(false);
+      vi.mocked(isTonChain).mockReturnValue(false);
+
+      const contract = new ContractBasic({ ...mockERCProps, provider: {}, contractABI: [] } as any);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', []);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+
+      expect(result.transactionHash).toBe('mockHash');
+      expect(result.TransactionId).toBe('mockHash');
+    });
   });
 
-  it('should initialize ERC contract correctly', () => {
-    // Setup chain environment
-    vi.mocked(isELFChain).mockReturnValue(false);
-    vi.mocked(isTonChain).mockReturnValue(false);
+  describe('callSendPromiseMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-    const contract = new ContractBasic(mockERCProps);
+    it('should handle send promise method calls with aelf contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
 
-    expect(contract.contractType).toBe('ERC');
-    expect(contract.callContract).toBeInstanceOf(WB3ContractBasic);
+      const contract = new ContractBasic({
+        ...mockAelfProps,
+        aelfContract: {
+          GetTransaction: vi.fn().mockResolvedValue({ result: 'data' }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendPromiseMethod('GetTransaction', correctAelfAddress);
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('result', 'data');
+    });
+
+    it('should handle send promise method calls with portkey contract', async () => {
+      const contract = new ContractBasic(mockPortkeyProps);
+
+      await expect(contract.callSendPromiseMethod('CreateToken', correctAelfAddress)).rejects.toThrow(
+        Error('Method not implemented.'),
+      );
+    });
+
+    it('should handle send promise method calls with web3 contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(false);
+      vi.mocked(isTonChain).mockReturnValue(false);
+
+      const contract = new ContractBasic({ ...mockERCProps, provider: {}, contractABI: [] } as any);
+
+      const result = await contract.callSendPromiseMethod('createToken', '0xAccount', []);
+
+      expect(result.transactionHash).toBe('mockHash');
+    });
   });
 
-  it('should initialize TON contract correctly', () => {
-    // Setup chain environment
-    vi.mocked(isELFChain).mockReturnValue(false);
-    vi.mocked(isTonChain).mockReturnValue(true);
+  describe('encodedTx', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-    const contract = new ContractBasic(mockTONProps);
+    it('should handle encode method calls with aelf contract', async () => {
+      // Setup chain environment
+      vi.mocked(isELFChain).mockReturnValue(true);
 
-    expect(contract.contractType).toBe('TON');
-    expect(contract.callContract).toBeInstanceOf(TONContractBasic);
+      const contract = new ContractBasic({
+        ...mockAelfProps,
+        aelfContract: {
+          GetTransaction: {
+            call: vi.fn().mockResolvedValue({ result: 'data' }),
+          },
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+      vi.mocked(encodedTransfer).mockResolvedValue({
+        data: 'encodedData',
+        inputType: 'inputType',
+      });
+
+      const result = await contract.encodedTx('GetTransaction', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(encodedTransfer).toHaveBeenCalled();
+      expect(result).toEqual({ data: 'encodedData', inputType: 'inputType' });
+    });
   });
 });
 
 describe('WB3ContractBasic Class', () => {
   const mockProps = {
     contractAddress: '0x123',
-    chainId: 1 as ChainId,
+    chainId: 11155111 as ChainId,
     provider: {},
     contractABI: [],
   } as any;
 
-  it('should initialize web3 contract successfully', () => {
-    const contract = new WB3ContractBasic(mockProps);
-    expect(contract.contract).toBeDefined();
+  const mockProvider = {
+    host: 'http://localhost:3001',
+    connected: true,
+    supportsSubscriptions: vi.fn(),
+    send: vi.fn(),
+    disconnect: vi.fn(),
+  };
+
+  describe('initContract', () => {
+    it('should initialize web3 contract successfully', () => {
+      const contract = new WB3ContractBasic(mockProps);
+      expect(contract.chainId).toBe(11155111);
+    });
   });
 
-  // it('should handle view method calls', async () => {
-  //   const contract = new WB3ContractBasic(mockProps);
-  //   vi.spyOn(contract.contractForView.methods, 'testMethod').mockReturnValue({
-  //     call: vi.fn().mockResolvedValue('result'),
-  //   });
+  describe('initContract', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-  //   const result = await contract.callViewMethod('testMethod', ['param']);
-  //   expect(result).toBe('result');
-  // });
+    it('should return contract instance', () => {
+      const contract = new WB3ContractBasic(mockProps);
+      expect(contract.chainId).toBe(11155111);
 
-  it('should handle send method errors', async () => {
-    const contract = new WB3ContractBasic({ ...mockProps, provider: undefined });
-    const result = await contract.callSendMethod('testMethod', '0xAccount', []);
-    expect(result.error).toBeDefined();
+      const result = contract.initContract(mockProvider, '0x123', [] as any);
+
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('initViewOnlyContract', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should return contract instance', () => {
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const contract = new WB3ContractBasic(mockProps);
+      expect(contract.chainId).toBe(11155111);
+
+      const result = contract.initViewOnlyContract('0x123', [] as any);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('callViewMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle view method calls', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callViewMethod('testMethod');
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.result).toBe('mockResult');
+    });
+
+    it('should handle view method calls when there is no chainId', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null });
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callViewMethod('testMethod', ['param']);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.result).toBe('mockResult');
+    });
+
+    it('should return error if there is no chainId, contractAddress and provider', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null, contractAddress: '', provider: undefined });
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callViewMethod('testMethod', ['param']);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.error).toEqual({ code: 401, message: 'Contract init error4' });
+    });
+
+    it('should return error if getBalance return error', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callViewMethod('getBalance', ['param']);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.error).toBe('Failed to get balance');
+    });
+  });
+
+  describe('callSendMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle send method and return result correctly', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', []);
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.transactionHash).toBe('mockHash');
+      expect(result.TransactionId).toBe('mockHash');
+    });
+
+    it('should console error if ZERO throw error', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      vi.mocked(ZERO.plus).mockImplementation(() => {
+        throw 'ZERO throw error';
+      });
+
+      const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', undefined, {
+        onMethod: 'confirmation',
+      });
+
+      expect(getDefaultProviderByChainId).toHaveBeenCalled();
+      expect(result.TransactionId).toEqual({ transactionHash: 'mockHash' });
+    });
+
+    it('should catch error if callSendMethod rejected', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callSendMethod('swapToken', '0xAccount', []);
+
+      expect(result.error.error).toBe('Failed');
+    });
+
+    it('should handle send method errors', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null, contractAddress: '', provider: undefined });
+
+      // Mock
+      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+
+      const result = await contract.callSendMethod('createToken', '0xAccount');
+
+      expect(result.error).toBeDefined();
+    });
+  });
+
+  describe('callSendPromiseMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle createToken and return successfully', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      const result = await contract.callSendPromiseMethod('createToken', '0xAccount', []);
+
+      expect(result.transactionHash).toBe('mockHash');
+    });
+
+    it('should handle createToken and return successfully if no paramsOption', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      const result = await contract.callSendPromiseMethod('createToken', '0xAccount');
+
+      expect(result.transactionHash).toBe('mockHash');
+    });
+
+    it('should catch error if callSendPromiseMethod throw error', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      const result = await contract.callSendPromiseMethod('createReceipt', '0xAccount');
+
+      expect(result.error).toBe('Failed to create receipt');
+    });
+
+    it('should return error if there is no chainId, contractAddress and provider', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, provider: undefined });
+
+      const result = await contract.callSendPromiseMethod('testMethod', '0xAccount');
+
+      expect(result.error).toEqual({ code: 401, message: 'Contract init error5' });
+    });
   });
 });
 
@@ -232,6 +675,49 @@ describe('AElfContractBasic Class', () => {
     contractAddress: 'ELF_ADDRESS',
     chainId: 999 as ChainId,
   } as any;
+
+  describe('getFileDescriptorsSet', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should set methods', async () => {
+      // Mock contract
+      const contract = new AElfContractBasic(mockProps);
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      await contract.getFileDescriptorsSet(AELFTestnetContractAddress);
+
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
+
+    it('should set methods error if getContractMethods rejected', async () => {
+      const contract = new AElfContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getContractMethods).mockRejectedValueOnce('Failed to get GetBalance method');
+
+      await expect(contract.getFileDescriptorsSet(AELFTestnetContractAddress)).rejects.toThrow(
+        `"Failed to get GetBalance method"address:JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaEContract:getContractMethods`,
+      );
+    });
+  });
+
+  describe('checkMethods', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should check methods successfully if there is no method cache', async () => {
+      // Mock contract
+      const contract = new AElfContractBasic(mockProps);
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      await contract.checkMethods();
+
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
+  });
 
   describe('callViewMethod', () => {
     beforeEach(() => {
@@ -342,6 +828,8 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.callSendMethod('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(getTxResult).toHaveBeenCalled();
       expect(result.txResult).toBe('success');
     });
 
@@ -355,10 +843,10 @@ describe('AElfContractBasic Class', () => {
       });
 
       vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
-      vi.mocked(getTxResult).mockResolvedValue({ txResult: 'success' });
 
       const result = await contract.callSendMethod('GetTransaction', {}, { onMethod: 'transactionHash' });
 
+      expect(getContractMethods).toHaveBeenCalled();
       expect(result).toHaveProperty('TransactionId', 'mockId');
     });
 
@@ -371,10 +859,10 @@ describe('AElfContractBasic Class', () => {
       });
 
       vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
-      vi.mocked(getTxResult).mockResolvedValue({ txResult: 'success' });
 
       const result = await contract.callSendMethod('GetTransaction', {}, { onMethod: 'transactionHash' });
 
+      expect(getContractMethods).toHaveBeenCalled();
       expect(result).toEqual({ error: new Error('aelfInstance is undefined') });
     });
 
@@ -402,6 +890,8 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.callSendMethod('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(getTxResult).toHaveBeenCalled();
       expect(result.error).toEqual({ message: 'Failed to get tx result' });
     });
 
@@ -424,6 +914,7 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.callSendMethod('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
       expect(result.error).toEqual({ message: 'Failed to get tx result' });
     });
 
@@ -446,6 +937,7 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.callSendMethod('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
       expect(result.error).toEqual({
         message: 'Failed to get tx result',
         code: {
@@ -456,32 +948,27 @@ describe('AElfContractBasic Class', () => {
       });
     });
 
-    // it('should catch error if getContractMethods rejected', async () => {
-    //   const contract = new AElfContractBasic({
-    //     ...mockProps,
-    //     aelfContract: {
-    //       GetTransactionInfo: vi.fn().mockResolvedValue({ TransactionId: 'mockId' }),
-    //     },
-    //     aelfInstance: {},
-    //   });
+    it('should return error if aelfContract[method] throw error and errorMessage', async () => {
+      const contract = new AElfContractBasic({
+        ...mockProps,
+        aelfContract: {
+          GetTransaction: vi.fn().mockResolvedValue({
+            TransactionId: '',
+            error: '500',
+            errorMessage: { message: 'Failed to get tx result' },
+          }),
+        },
+        aelfInstance: {},
+      });
 
-    //   vi.mocked(getContractMethods)
-    //     .mockResolvedValueOnce({ testMethod: {} })
-    //     .mockRejectedValueOnce('Failed to get GetTransactionInfo method');
-    //   // vi.mocked(getTxResult).mockResolvedValue({ txResult: 'success' });
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
 
-    //   await expect(await contract.callSendMethod('GetTransactionInfo', {})).rejects.toThrow();
-    //   // try {
-    //   //   const result = await contract.callSendMethod('GetTransactionInfo', {});
-    //   //   console.log('🌹 result', result);
-    //   //   expect(result).toHaveProperty('error', {
-    //   //     message: `"Failed to get GetTransactionInfo method"address:ELF_ADDRESSContract:getContractMethods`,
-    //   //   });
-    //   // } catch (error) {
-    //   //   console.log('🌹 error', error);
-    //   // }
-    // });
-    //
+      const result = await contract.callSendMethod('GetTransaction', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.error).toEqual({ code: '500', message: 'Failed to get tx result' });
+    });
   });
 
   describe('encodedTx', () => {
@@ -508,6 +995,8 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.encodedTx('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(encodedTransfer).toHaveBeenCalled();
       expect(result).toEqual({ data: 'encodedData', inputType: 'inputType' });
     });
 
@@ -518,13 +1007,10 @@ describe('AElfContractBasic Class', () => {
 
       // Mock
       vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
-      vi.mocked(encodedTransfer).mockResolvedValue({
-        data: 'encodedData',
-        inputType: 'inputType',
-      });
 
       const result = await contract.encodedTx('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
       expect(result).toEqual({ error: { code: 401, message: 'Contract init error2' } });
     });
 
@@ -546,6 +1032,8 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.encodedTx('GetTransaction', {});
 
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(encodedTransfer).toHaveBeenCalled();
       expect(result).toEqual({ error: 'Failed encode tx' });
     });
   });
@@ -559,9 +1047,7 @@ describe('AElfContractBasic Class', () => {
       const contract = new AElfContractBasic({
         ...mockProps,
         aelfContract: {
-          GetTransaction: {
-            call: vi.fn().mockResolvedValue({ result: 'data' }),
-          },
+          GetTransaction: vi.fn().mockResolvedValue({ result: 'data' }),
         },
       });
 
@@ -570,7 +1056,27 @@ describe('AElfContractBasic Class', () => {
 
       const result = await contract.callSendPromiseMethod('GetTransaction', {});
 
-      expect(result).toBeDefined();
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('result', 'data');
+    });
+
+    it('should handle callSendPromiseMethod method error', async () => {
+      const contract = new AElfContractBasic({
+        ...mockProps,
+        aelfContract: {
+          SendTransaction: vi.fn().mockImplementation(() => {
+            throw 'Failed send tx';
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ SendTransaction: {} });
+
+      const result = await contract.callSendPromiseMethod('SendTransaction', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('error', 'Failed send tx');
     });
 
     it('should return error if there is no aelfContract', async () => {
@@ -591,60 +1097,596 @@ describe('PortkeyContractBasic Class', () => {
     chainId: 'AELF' as ChainId,
   } as any;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  describe('getFileDescriptorsSet', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-  it('should catch error if there is no contract method', async () => {
-    // Mock contract
-    const contract = new PortkeyContractBasic({ ...mockProps, portkeyChain: { getContract: vi.fn() } });
-    vi.mocked(getContractMethods).mockResolvedValue({ TestMethod: {} });
+    it('should set methods', async () => {
+      // Mock contract
+      const contract = new PortkeyContractBasic({ ...mockProps, portkeyChain: { getContract: vi.fn() } });
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
 
-    const result = await contract.callViewMethod('GetBalance');
+      await contract.getFileDescriptorsSet(AELFTestnetContractAddress);
 
-    expect(result).toEqual({
-      error: {
-        code: 401,
-        message: 'Contract init error1',
-      },
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
+
+    it('should set methods error if getContractMethods rejected', async () => {
+      const contract = new PortkeyContractBasic({ ...mockProps, portkeyChain: { getContract: vi.fn() } });
+
+      // Mock
+      vi.mocked(getContractMethods).mockRejectedValueOnce('Failed to get GetBalance method');
+
+      await expect(contract.getFileDescriptorsSet(AELFTestnetContractAddress)).rejects.toThrow(
+        `"Failed to get GetBalance method"address:JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaEContract:getContractMethods`,
+      );
     });
   });
 
-  it('should handle portkey view methods', async () => {
-    const contract = new PortkeyContractBasic({
-      ...mockProps,
-      portkeyChain: {
-        getContract: vi.fn().mockReturnValue({
-          callViewMethod: vi.fn().mockResolvedValue({ data: { balance: '1000' } }),
-        }),
-      },
+  describe('checkMethods', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
     });
-    vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
 
-    const result = await contract.callViewMethod('GetBalance');
+    it('should check methods successfully if there is no method cache', async () => {
+      // Mock contract
+      const contract = new PortkeyContractBasic(mockProps);
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
 
-    expect(result).toHaveProperty('balance', '1000');
+      await contract.checkMethods();
+
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
   });
 
-  it('should catch error if there is no contract "GetWalletInfo" method', async () => {
-    const contract = new PortkeyContractBasic({
-      ...mockProps,
-      portkeyChain: {
-        getContract: vi.fn().mockReturnValue({
-          callViewMethod: vi.fn(),
-        }),
-      },
+  describe('callViewMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
     });
-    vi.mocked(getContractMethods).mockRejectedValue('Failed to get GetWalletInfo method');
 
-    const result = await contract.callViewMethod('GetWalletInfo');
+    it('should catch error if there is no contract method', async () => {
+      // Mock contract
+      const contract = new PortkeyContractBasic({ ...mockProps, portkeyChain: { getContract: vi.fn() } });
+      vi.mocked(getContractMethods).mockResolvedValue({ TestMethod: {} });
 
-    expect(result).toHaveProperty(
-      'error',
-      new Error(
-        `"Failed to get GetWalletInfo method"address:JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaEContract:getContractMethods`,
-      ),
-    );
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toEqual({
+        error: {
+          code: 401,
+          message: 'Contract init error1',
+        },
+      });
+    });
+
+    it('should handle portkey view methods', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callViewMethod: vi.fn().mockResolvedValue({ balance: '1000' }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle portkey view methods if callViewMethod return data', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callViewMethod: vi.fn().mockResolvedValue({ data: { balance: '1000' } }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle portkey view methods if callViewMethod return data', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callViewMethod: vi.fn().mockResolvedValue({ error: 'Failed to get balance' }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('error', 'Failed to get balance');
+    });
+
+    it('should handle portkey view methods if callViewMethod rejected', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callViewMethod: vi.fn().mockRejectedValue('Failed to get balance'),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('error', 'Failed to get balance');
+    });
+  });
+
+  describe('callSendMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle callSendMethod method', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockResolvedValue({ status: 'success' }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {}, GetWalletInfo: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('status', 'success');
+    });
+
+    it('should handle callSendMethod method if callSendMethod return data', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockResolvedValue({ data: { status: 'success' } }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {}, GetWalletInfo: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('status', 'success');
+    });
+
+    it('should return error if there is no contract', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn(),
+        },
+      });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(result).toHaveProperty('error', { code: 401, message: 'Contract init error2' });
+    });
+
+    it('should return error if callSendMethod return string error', async () => {
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockResolvedValue({ error: 'Failed' }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {}, GetWalletInfo: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('error', 'Failed');
+    });
+
+    it('should return error if callSendMethod return error.message', async () => {
+      const error = { message: 'Failed to create token' };
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockRejectedValue(error),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('error', error);
+    });
+
+    it('should return error if callSendMethod return error.Error', async () => {
+      const errorMessage = 'Failed to create token';
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockRejectedValue({ Error: errorMessage }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('error', { message: errorMessage });
+    });
+
+    it('should return error if callSendMethod return error.Status', async () => {
+      const errorMessage = 'Failed to create token';
+      const contract = new PortkeyContractBasic({
+        ...mockProps,
+        portkeyChain: {
+          getContract: vi.fn().mockReturnValue({
+            callSendMethod: vi.fn().mockRejectedValue({ Status: errorMessage }),
+          }),
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ CreateToken: {} });
+
+      const result = await contract.callSendMethod('CreateToken', {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+      expect(result).toHaveProperty('error', { message: errorMessage });
+    });
+  });
+
+  describe('callSendPromiseMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle callSendPromiseMethod method', async () => {
+      const contract = new PortkeyContractBasic(mockProps);
+
+      await expect(contract.callSendPromiseMethod('CreateToken', correctAelfAddress)).rejects.toThrow(
+        Error('Method not implemented.'),
+      );
+    });
+  });
+});
+
+describe('PortkeySDKContractBasic', () => {
+  const mockProps = {
+    contractAddress: AELFTestnetContractAddress,
+    chainId: 'AELF' as ChainId,
+  } as any;
+
+  describe('initialize', () => {
+    it('initialization class successful', () => {
+      const contract = new PortkeySDKContractBasic(mockProps);
+
+      expect(contract.contractType).toBe('ELF');
+    });
+  });
+
+  describe('getFileDescriptorsSet', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should set methods', async () => {
+      // Mock contract
+      const contract = new PortkeySDKContractBasic(mockProps);
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      await contract.getFileDescriptorsSet(AELFTestnetContractAddress);
+
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
+
+    it('should set methods error if getContractMethods rejected', async () => {
+      const contract = new PortkeySDKContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getContractMethods).mockRejectedValueOnce('Failed to get GetBalance method');
+
+      await expect(contract.getFileDescriptorsSet(AELFTestnetContractAddress)).rejects.toThrow(
+        `"Failed to get GetBalance method"address:JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaEContract:getContractMethods`,
+      );
+    });
+  });
+
+  describe('checkMethods', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should check methods successfully if there is no method cache', async () => {
+      // Mock contract
+      const contract = new PortkeySDKContractBasic(mockProps);
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      await contract.checkMethods();
+
+      expect(contract.methods).toEqual({ GetBalance: {} });
+    });
+  });
+
+  describe('callViewMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should catch error if there is no contract method', async () => {
+      // Mock contract
+      const contract = new PortkeySDKContractBasic({ ...mockProps, aelfContract: vi.fn() });
+      vi.mocked(getContractMethods).mockResolvedValue({ TestMethod: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toEqual({
+        error: {
+          code: 401,
+          message: 'Contract init error1',
+        },
+      });
+    });
+
+    it('should handle portkey view methods', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        viewContract: {
+          GetBalance: {
+            call: vi.fn().mockResolvedValue({ balance: '1000' }),
+          },
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle portkey view methods if callViewMethod return data', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        viewContract: {
+          GetBalance: {
+            call: vi.fn().mockResolvedValue({ result: { balance: '1000' } }),
+          },
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result).toHaveProperty('balance', '1000');
+    });
+
+    it('should handle portkey view methods if callViewMethod return data', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        viewContract: {
+          GetBalance: {
+            call: vi.fn().mockResolvedValue({ error: 'Failed to get balance' }),
+          },
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('error', 'Failed to get balance');
+    });
+
+    it('should handle portkey view methods if callViewMethod rejected', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        viewContract: {
+          GetBalance: {
+            call: vi.fn().mockRejectedValue('Failed to get balance'),
+          },
+        },
+      });
+
+      // Mock
+      vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
+
+      const result = await contract.callViewMethod('GetBalance');
+
+      expect(result).toHaveProperty('error', 'Failed to get balance');
+    });
+  });
+
+  describe('callSendMethod', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should handle send method transaction flow and return tx id', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        sdkContract: {
+          callSendMethod: vi.fn().mockResolvedValue({ TransactionId: 'mockId' }),
+        },
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.TransactionId).toBe('mockId');
+    });
+
+    it('should handle send method transaction flow and return tx id', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        sdkContract: {
+          callSendMethod: vi.fn().mockResolvedValue({ error: 'Failed' }),
+        },
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.error).toBe('Failed');
+    });
+
+    it('should return error if callSendMethod return error.Error', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        sdkContract: {
+          callSendMethod: vi.fn().mockRejectedValue({ Error: 'Failed' }),
+        },
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.error.message).toBe('Failed');
+    });
+
+    it('should return error if callSendMethod return error.Status', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        sdkContract: {
+          callSendMethod: vi.fn().mockRejectedValue({ Status: 'Failed' }),
+        },
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.error.message).toBe('Failed');
+    });
+
+    it('should return error if callSendMethod return error.message', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        sdkContract: {
+          callSendMethod: vi.fn().mockRejectedValue({ message: 'Failed' }),
+        },
+      });
+
+      vi.mocked(getContractMethods).mockResolvedValue({ GetTransaction: {} });
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(getContractMethods).toHaveBeenCalled();
+
+      expect(result.error.message).toBe('Failed');
+    });
+
+    it('should throw error if there is no sdkContract', async () => {
+      const contract = new PortkeySDKContractBasic(mockProps);
+
+      const result = await contract.callSendMethod('GetTransaction', correctAelfAddress, {});
+
+      expect(result.error).toEqual({ code: 401, message: 'Contract init error2' });
+    });
+
+    it('should handle send approve method return successfully', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        caContract: {
+          callSendMethod: vi.fn().mockResolvedValue({ result: 'success' }),
+        },
+        portkeyWallet: {
+          extraInfo: {
+            portkeyInfo: {
+              caInfo: {
+                caHash: 'mockCaHash',
+              },
+              chainId: 'AELF',
+            },
+          },
+        },
+      });
+
+      // Mock managerApprove
+      vi.mocked(PortkeyDid.managerApprove).mockResolvedValue({ amount: '1000', guardiansApproved: [], symbol: 'ELF' });
+
+      const result = await contract.callSendMethod('approve', correctAelfAddress, {});
+
+      expect(PortkeyDid.managerApprove).toHaveBeenCalled();
+
+      expect(result.result).toBe('success');
+    });
+
+    it('should return error when called approve method and callSendMethod return error', async () => {
+      const contract = new PortkeySDKContractBasic({
+        ...mockProps,
+        caContract: {
+          callSendMethod: vi.fn().mockResolvedValue({ error: 'Failed to approve' }),
+        },
+      });
+
+      // Mock managerApprove
+      vi.mocked(PortkeyDid.managerApprove).mockResolvedValue({ amount: '1000', guardiansApproved: [], symbol: 'ELF' });
+
+      const result = await contract.callSendMethod('approve', correctAelfAddress, {});
+
+      expect(PortkeyDid.managerApprove).toHaveBeenCalled();
+
+      expect(result.error).toBe('Failed to approve');
+    });
+
+    it('should throw error if called approve method and there is no sdkContract', async () => {
+      const contract = new PortkeySDKContractBasic(mockProps);
+
+      const result = await contract.callSendMethod('approve', correctAelfAddress, {});
+
+      expect(result.error).toEqual({ code: 401, message: 'Contract init error2' });
+    });
   });
 });
 
@@ -795,12 +1837,19 @@ describe('Boundary Cases', () => {
     chainId: 11155111 as ChainId,
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should handle invalid chain IDs', () => {
+    // Setup chain environment
+    vi.mocked(isELFChain).mockReturnValue(false);
+
     vi.mocked(getContractMethods).mockResolvedValue({ GetBalance: {} });
 
-    const contract = new ContractBasic({ contractAddress: '0x123', chainId: 0 as ChainId });
+    const contract = new ContractBasic({ contractAddress: '0x123', chainId: 11155111 as ChainId });
 
-    expect(contract.contractType).toBe('TON');
+    expect(contract.contractType).toBe('ERC');
   });
 
   it('should handle empty contract addresses', () => {
