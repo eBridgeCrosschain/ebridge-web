@@ -3,7 +3,6 @@ import { txSuccess, txError, txMessage, copyTxMessage } from '../message';
 import { message as antMessage } from 'antd';
 import writeText from 'copy-to-clipboard';
 import CommonMessage from 'components/CommonMessage';
-import { getTXLink } from 'utils/link';
 import { ChainId } from 'types';
 import { render, screen } from '@testing-library/react';
 
