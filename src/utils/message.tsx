@@ -71,7 +71,7 @@ export function txError({
     TransactionId && CommonMessage.error(getTXLink(TransactionId, chainId));
   }
 
-  const s = req.error.message || message;
+  const s = req?.error?.message || message;
   const text = decimals ? formatMessage(s, decimals) : s;
   !isTransactionHash &&
     CommonMessage.error(
