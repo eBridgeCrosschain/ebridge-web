@@ -1,4 +1,4 @@
-class EBridgeInstance {
+export class EBridgeInstance {
   public unauthorized: boolean;
   public obtainingSignature: boolean;
 

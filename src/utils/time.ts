@@ -3,7 +3,7 @@ import Moment from 'moment';
 import { ChainId } from 'types';
 import { isIncludesChainId } from 'utils';
 
-const getMillisecond = (time: any) => {
+export const getMillisecond = (time: any) => {
   const { seconds } = time || {};
   const tim = seconds || time;
   if (String(tim).length <= 10) {
