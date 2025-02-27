@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import {
   CreateReceipt,
+  CrossChainCreateToken,
+  CrossChainReceive,
   CrossChainTransfer,
   getReceiptLimit,
   getSwapId,
@@ -20,6 +22,10 @@ import { timesDecimals } from 'utils/calculate';
 import { isIncludesChainId, isTonChain } from 'utils/index';
 import { checkApprove } from 'contracts/index';
 import { CrossFeeToken, REQ_CODE } from 'constants/misc';
+import { encodeTransaction, getAElf, uint8ArrayToHex } from 'utils/aelfUtils';
+import { TransactionResult } from '@aelf-react/types';
+import AElf from 'aelf-sdk';
+import { CrossChainItem } from 'types/api';
 
 // Mock external dependencies
 vi.mock('components/CommonMessage', () => {
@@ -104,6 +110,14 @@ vi.mock('constants/index', async (importOriginal) => {
   };
 });
 
+vi.mock('aelf-sdk');
+
+vi.mock('utils/aelfUtils', () => ({
+  encodeTransaction: vi.fn(),
+  getAElf: vi.fn((_, params) => params),
+  uint8ArrayToHex: vi.fn(),
+}));
+
 const mainChainId = 'AELF' as ChainId;
 const dappChainId = 'tDVV' as ChainId;
 
@@ -180,6 +194,194 @@ describe('CrossChainTransfer', () => {
   });
 });
 
+describe('CrossChainReceive', () => {
+  const mockTxId = 'mock_tx_123';
+  const mockCrossChainItem: CrossChainItem = {
+    transferTransactionId: mockTxId,
+    fromChainId: SupportedELFChainId.AELF,
+  };
+  let mockSendCrossChainContract: ContractBasic;
+  let mockSendTokenContract: ContractBasic;
+  let mockReceiveTokenContract: ContractBasic;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockSendCrossChainContract = new ContractBasic({ contractAddress: 'mockContractAddress' });
+    mockSendTokenContract = new ContractBasic({ contractAddress: '0xSend' });
+    mockReceiveTokenContract = new ContractBasic({ contractAddress: 'mockContractAddress' });
+
+    // Default mock implementations
+    vi.mocked(getAElf).mockReturnValue({
+      chain: {
+        getTxResult: vi.fn().mockResolvedValue({
+          BlockNumber: 1000,
+          Transaction: {
+            Params: JSON.stringify({ symbol: 'ELF' }),
+            From: 'from',
+            To: 'to',
+            MethodName: 'sign',
+            RefBlockNumber: 1000,
+            RefBlockPrefix: 'refBlockPrefix',
+            Signature: 'signature',
+          },
+        } as unknown as TransactionResult),
+        getMerklePathByTxId: vi.fn().mockResolvedValue({
+          MerklePathNodes: [
+            { Hash: '1', IsLeftChildNode: true },
+            { Hash: '2', IsLeftChildNode: false },
+          ],
+        }),
+      },
+    });
+
+    // Mock AElf.pbUtils.getSerializedDataFromLog
+    AElf.pbUtils.getTransaction.mockReturnValue({});
+  });
+
+  // Test 1: Main success flow for AELF chain
+  test('should process AELF chain transactions without parent chain lookup', async () => {
+    // Mock encodeTransaction
+    vi.mocked(encodeTransaction).mockReturnValue(Buffer.from(mockTxId));
+
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainReceive({
+      sendChainID: SupportedELFChainId.AELF,
+      receiveItem: mockCrossChainItem,
+      sendCrossChainContract: mockSendCrossChainContract,
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result).toEqual({ result: 'success' });
+
+    // Verify transaction lookup
+    expect(getAElf).toHaveBeenCalledWith('AELF');
+
+    // Verify final contract call parameters
+    expect(receiveTokenContractCallSendMethod).toHaveBeenCalledWith(
+      'CrossChainReceiveToken',
+      '',
+      expect.objectContaining({
+        parentChainHeight: 1000, // Original BlockNumber
+        transferTransactionBytes: 'bW9ja190eF8xMjM=',
+      }),
+    );
+  });
+
+  // Test 2: Non-AELF chain with parent chain processing
+  test('should merge merkle paths and update parent height for non-AELF chains', async () => {
+    // Mock encodeTransaction
+    vi.mocked(encodeTransaction).mockReturnValue(Buffer.from(mockTxId));
+
+    const sendCrossChainContractCallViewMethod = vi.fn().mockResolvedValue({
+      merklePathFromParentChain: {
+        merklePathNodes: [
+          { hash: '1', sLeftChildNode: true },
+          { hash: '2', isLeftChildNode: false },
+        ],
+      },
+      boundParentChainHeight: 12345,
+    });
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainReceive({
+      sendChainID: 'NON_AELF' as ChainId,
+      receiveItem: mockCrossChainItem,
+      sendCrossChainContract: {
+        ...mockSendCrossChainContract,
+        callViewMethod: sendCrossChainContractCallViewMethod,
+      },
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result).toEqual({ result: 'success' });
+
+    // Verify receiveTokenContractCallSendMethod called
+    const callArgs = receiveTokenContractCallSendMethod.mock.calls[0];
+
+    expect(callArgs).toEqual(expect.arrayContaining(['CrossChainReceiveToken']));
+  });
+
+  // Test 3: Main success flow for AELF chain with Uint8Array signature
+  test('should handle AELF chain correctly with Uint8Array signature', async () => {
+    // Mock encodeTransaction
+    const uint8Array = new Uint8Array([0, 1, 2, 3, 15, 16, 255]);
+    vi.mocked(encodeTransaction).mockReturnValue(uint8Array);
+
+    const expectedHex = '000102030f10ff';
+    vi.mocked(uint8ArrayToHex).mockReturnValue(expectedHex);
+
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainReceive({
+      sendChainID: SupportedELFChainId.AELF,
+      receiveItem: mockCrossChainItem,
+      sendCrossChainContract: mockSendCrossChainContract,
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result.result).toBe('success');
+
+    // Verify chain interactions
+    expect(getAElf).toHaveBeenCalledWith(SupportedELFChainId.AELF);
+
+    // Verify final contract call parameters
+    expect(receiveTokenContractCallSendMethod).toHaveBeenCalledWith(
+      'CrossChainReceiveToken',
+      '',
+      expect.objectContaining({
+        fromChainId: 'base58ChainId',
+        transferTransactionBytes: 'AAECAw8Q/w==',
+      }),
+    );
+  });
+
+  // Test 4: Error handling in transaction lookup
+  test('should propagate errors from getTxResult', async () => {
+    // Default mock implementations
+    vi.mocked(getAElf).mockReturnValue({
+      chain: {
+        getTxResult: vi.fn().mockRejectedValueOnce(new Error('Blockchain timeout')),
+      },
+    });
+
+    await expect(
+      CrossChainReceive({
+        sendChainID: SupportedELFChainId.AELF,
+        receiveItem: mockCrossChainItem,
+        sendCrossChainContract: mockSendCrossChainContract,
+        sendTokenContract: mockSendTokenContract,
+        receiveTokenContract: mockReceiveTokenContract,
+      }),
+    ).rejects.toThrow('Blockchain timeout');
+  });
+});
+
 describe('ValidateTokenInfoExists', () => {
   let mockContract: ContractBasic;
 
@@ -209,6 +411,171 @@ describe('ValidateTokenInfoExists', () => {
         account: mockAccount,
       }),
     ).rejects.toThrow(errorMessage);
+  });
+});
+
+describe('CrossChainCreateToken', () => {
+  const mockTxId = 'mock_tx_123';
+  let mockSendCrossChainContract: ContractBasic;
+  let mockSendTokenContract: ContractBasic;
+  let mockReceiveTokenContract: ContractBasic;
+
+  beforeEach(() => {
+    // Reset all mocks before each test
+    vi.clearAllMocks();
+
+    mockSendCrossChainContract = new ContractBasic({ contractAddress: 'mockContractAddress' });
+    mockSendTokenContract = new ContractBasic({ contractAddress: '0xSend' });
+    mockReceiveTokenContract = new ContractBasic({ contractAddress: 'mockContractAddress' });
+
+    // Default mock implementations
+    vi.mocked(getAElf).mockReturnValue({
+      chain: {
+        getTxResult: vi.fn().mockResolvedValue({
+          BlockNumber: 1000,
+          Transaction: {
+            Params: JSON.stringify({ symbol: 'ELF' }),
+            From: 'from',
+            To: 'to',
+            MethodName: 'sign',
+            RefBlockNumber: 1000,
+            RefBlockPrefix: 'refBlockPrefix',
+            Signature: 'signature',
+          },
+        } as unknown as TransactionResult),
+        getMerklePathByTxId: vi.fn().mockResolvedValue({
+          MerklePathNodes: [
+            { Hash: '1', IsLeftChildNode: true },
+            { Hash: '2', IsLeftChildNode: false },
+          ],
+        }),
+      },
+    });
+
+    // Mock AElf.pbUtils.getSerializedDataFromLog
+    AElf.pbUtils.getTransaction.mockReturnValue({});
+  });
+
+  // Test case 1: Main success scenario for AELF chain
+  test('should handle AELF chain correctly', async () => {
+    // Mock encodeTransaction
+    vi.mocked(encodeTransaction).mockReturnValue(Buffer.from(mockTxId));
+
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainCreateToken({
+      sendChainID: SupportedELFChainId.AELF,
+      transactionId: mockTxId,
+      sendCrossChainContract: mockSendCrossChainContract,
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result.result).toBe('success');
+
+    // Verify chain interactions
+    expect(getAElf).toHaveBeenCalledWith(SupportedELFChainId.AELF);
+
+    // Verify final contract call parameters
+    expect(receiveTokenContractCallSendMethod).toHaveBeenCalledWith(
+      'CrossChainCreateToken',
+      '',
+      expect.objectContaining({
+        fromChainId: 'base58ChainId',
+        transactionBytes: 'bW9ja190eF8xMjM=',
+      }),
+    );
+  });
+
+  // Test case 2: Non-AELF chain with parent chain lookup
+  test('should merge merkle paths for non-AELF chains', async () => {
+    // Mock encodeTransaction
+    vi.mocked(encodeTransaction).mockReturnValue(Buffer.from(mockTxId));
+
+    const sendCrossChainContractCallViewMethod = vi.fn().mockResolvedValue({
+      merklePathFromParentChain: {
+        merklePathNodes: [
+          { hash: '1', sLeftChildNode: true },
+          { hash: '2', isLeftChildNode: false },
+        ],
+      },
+      boundParentChainHeight: 12345,
+    });
+
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainCreateToken({
+      sendChainID: 'NON_AELF' as ChainId,
+      transactionId: mockTxId,
+      sendCrossChainContract: {
+        ...mockSendCrossChainContract,
+        callViewMethod: sendCrossChainContractCallViewMethod,
+      },
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result.result).toBe('success');
+
+    // Verify receiveTokenContractCallSendMethod called
+    const callArgs = receiveTokenContractCallSendMethod.mock.calls[0];
+
+    expect(callArgs).toEqual(expect.arrayContaining(['CrossChainCreateToken']));
+  });
+
+  test('should handle AELF chain correctly with Uint8Array signature', async () => {
+    // Mock encodeTransaction
+    const uint8Array = new Uint8Array([0, 1, 2, 3, 15, 16, 255]);
+    vi.mocked(encodeTransaction).mockReturnValue(uint8Array);
+
+    const expectedHex = '000102030f10ff';
+    vi.mocked(uint8ArrayToHex).mockReturnValue(expectedHex);
+
+    const receiveTokenContractEncodedTx = vi.fn().mockResolvedValue('mock_encode_value');
+    const receiveTokenContractCallSendMethod = vi.fn().mockResolvedValue({ result: 'success' });
+
+    const result = await CrossChainCreateToken({
+      sendChainID: SupportedELFChainId.AELF,
+      transactionId: mockTxId,
+      sendCrossChainContract: mockSendCrossChainContract,
+      sendTokenContract: {
+        ...mockSendTokenContract,
+        encodedTx: receiveTokenContractEncodedTx,
+      },
+      receiveTokenContract: {
+        ...mockReceiveTokenContract,
+        callSendMethod: receiveTokenContractCallSendMethod,
+      },
+    });
+
+    expect(result.result).toBe('success');
+
+    // Verify chain interactions
+    expect(getAElf).toHaveBeenCalledWith(SupportedELFChainId.AELF);
+
+    // Verify final contract call parameters
+    expect(receiveTokenContractCallSendMethod).toHaveBeenCalledWith(
+      'CrossChainCreateToken',
+      '',
+      expect.objectContaining({
+        parentChainHeight: 1000,
+        transactionBytes: 'AAECAw8Q/w==',
+      }),
+    );
   });
 });
 
