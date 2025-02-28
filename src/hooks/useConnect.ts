@@ -21,6 +21,7 @@ export function useConnect() {
           break;
         }
         default: {
+          // ERC
           dispatch(
             setWalletModal(true, {
               walletWalletType: 'ERC',

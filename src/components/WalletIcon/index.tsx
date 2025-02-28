@@ -2,42 +2,38 @@ import clsx from 'clsx';
 import IconFont from 'components/IconFont';
 import { SUPPORTED_WALLETS } from 'constants/wallets';
 import React, { useCallback, useMemo } from 'react';
-import { Web3Type } from 'types';
-import { injected } from 'walletConnectors';
+import { EVMConnectorId, TWalletConnectorId } from 'types';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
+
 export default function WalletIcon({
-  connector,
+  connectorId,
   className,
   type,
 }: {
-  connector: Web3Type['connector'];
+  connectorId?: TWalletConnectorId;
   className?: string;
   type?: string;
 }) {
   const filter = useCallback(
-    (k: string) => {
+    (k: TWalletConnectorId) => {
       const isTelegramPlatformAndNotWeb = TelegramPlatform.isTelegramPlatformAndNotWeb();
       if (
         isTelegramPlatformAndNotWeb &&
-        SUPPORTED_WALLETS[k].connector instanceof CoinbaseWallet &&
+        SUPPORTED_WALLETS[k].connectorId === EVMConnectorId.COINBASE_WALLET &&
         isTelegramPlatformAndNotWeb
       ) {
         return false;
       }
 
       const isMetaMask = !!window.ethereum?.isMetaMask;
-      return (
-        SUPPORTED_WALLETS[k].connector === connector && (connector !== injected || isMetaMask === (k === 'METAMASK'))
-      );
+      return SUPPORTED_WALLETS[k].connectorId === connectorId && isMetaMask === (k === EVMConnectorId.METAMASK);
     },
-    [connector],
+    [connectorId],
   );
   const iconType = useMemo(() => {
-    return Object.keys(SUPPORTED_WALLETS)
-      .filter((k) => filter(k))
-      .map((k) => SUPPORTED_WALLETS[k].iconType)[0];
+    const keys: TWalletConnectorId[] = Object.keys(SUPPORTED_WALLETS) as TWalletConnectorId[];
+    return keys.filter((k) => filter(k)).map((k) => SUPPORTED_WALLETS[k].iconType)[0];
   }, [filter]);
   return <IconFont className={clsx(styles.icon, className)} type={type || iconType} />;
 }

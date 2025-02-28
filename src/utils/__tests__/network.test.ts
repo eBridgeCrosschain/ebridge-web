@@ -9,15 +9,9 @@ import {
 import { ChainId } from 'types';
 import { eventBus } from 'utils/eBridgeEventBus';
 import { isELFChain } from 'utils/aelfUtils';
-import {
-  walletConnectConnection,
-  networkConnection,
-  injectedConnection,
-  coinbaseWalletConnection,
-} from 'walletConnectors';
 import storages from 'constants/storages';
 import CommonMessage from 'components/CommonMessage';
-import { Connector } from '@web3-react/types';
+import { Connector } from 'wagmi';
 
 // Mock the NetworkList in the network module
 vi.mock('constants/index', async (importOriginal) => {

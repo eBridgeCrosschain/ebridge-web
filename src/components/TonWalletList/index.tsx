@@ -1,33 +1,24 @@
 import { Button } from 'antd';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Connector } from '@web3-react/types';
-import { useChain } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
-import { setSelectERCWallet } from 'contexts/useChain/actions';
 import IconFont from 'components/IconFont';
 import { SUPPORTED_WALLETS } from 'constants/wallets';
-import { getConnection } from 'walletConnectors/utils';
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
-
-import { DEFAULT_ERC_CHAIN_INFO } from 'constants/index';
-import { getNetworkInfo, switchChain } from 'utils/network';
-import { sleep } from 'utils';
-import { isPortkey, isPortkeyConnector } from 'utils/portkey';
-import { isMobileDevices } from 'utils/isMobile';
-import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
-import { WalletConnect } from '@web3-react/walletconnect-v2';
+import { ChainType, TWalletConnectorId } from 'types';
+import { useConnect } from 'hooks/useConnect';
+
 export default function WalletList({ onFinish }: { onFinish?: () => void }) {
-  const [{ walletWallet, walletChainType }] = useModal();
-  const { chainId, connector: connectedConnector, account } = walletWallet || {};
+  const [{ walletWallet }] = useModal();
+  const { connectorId, account, isActive } = walletWallet || {};
   const [loading, setLoading] = useState<any>();
-  const [{ userERCChainId }, { dispatch: chainDispatch }] = useChain();
+
   const onCancel = useCallback(() => {
     setLoading(undefined);
     onFinish?.();
   }, [onFinish]);
+
   const timerRef = useRef<NodeJS.Timer | number>();
   useEffect(() => {
     if (TelegramPlatform.isTelegramPlatform()) {
@@ -63,33 +54,16 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
     };
   }, []);
 
+  const connect = useConnect();
   const tryActivation = useCallback(
-    async (connector: Connector | string, key: string) => {
-      if (loading || typeof connector === 'string') return;
+    async (chainType: ChainType, key: string) => {
+      if (loading) return;
       setLoading({ [key]: true });
       try {
-        try {
-          delete (connector as any).eagerConnection;
-        } catch (error) {
-          // fix network error
-        }
+        // TODO await
+        connect(chainType);
 
-        if (connector instanceof WalletConnect) document.getElementsByTagName('wcm-modal')?.[0]?.remove();
-
-        await connector.activate();
-        chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
-        if (connector instanceof CoinbaseWallet) {
-          await sleep(500);
-          await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
-        } else if (userERCChainId) {
-          try {
-            // Whether the switch is successful or not does not affect the link status
-            const info = getNetworkInfo(userERCChainId);
-            if (info) await switchChain(info.info, connector, true);
-          } catch (error) {
-            console.debug(error, '====error');
-          }
-        }
+        // TODO connect need await?
         onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
@@ -97,41 +71,31 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
       }
       setLoading(undefined);
     },
-    [chainDispatch, loading, onCancel, userERCChainId],
+    [connect, loading, onCancel],
   );
 
-  const walletList = useMemo(
-    () =>
-      Object.keys(SUPPORTED_WALLETS).filter((key) => {
-        const option = SUPPORTED_WALLETS[key];
-        const isStringConnector = typeof option.connector === 'string';
-        const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
-        if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === 'METAMASK') return false;
-        if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
-          if (option.connector instanceof CoinbaseWallet) return false;
-        }
-        if (isPortkey()) {
-          if (option.connector instanceof CoinbaseWallet) return false;
-          if (isStringChain) return isPortkeyConnector(option.connector as string);
-          if (!isStringConnector) return !(option.connector instanceof MetaMask);
-        }
-        return isStringConnector ? isStringChain : !isStringChain;
-      }),
-    [chainId, walletChainType],
-  );
+  const walletList = useMemo(() => {
+    const keys = Object.keys(SUPPORTED_WALLETS) as TWalletConnectorId[];
+
+    return keys.filter((key: TWalletConnectorId) => {
+      const option = SUPPORTED_WALLETS[key];
+      return option.chainType === 'TON';
+    });
+  }, []);
 
   return (
     <div className={styles['wallet-list']}>
       {walletList.map((key) => {
         const option = SUPPORTED_WALLETS[key];
-        const disabled = !!(account && option.connector && option.connector === connectedConnector);
+        const disabled = !!(isActive && account && option.connectorId && option.connectorId === connectorId);
+
         return (
           <Button
             disabled={disabled}
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
-              tryActivation(option.connector, option.name);
+              tryActivation(option.chainType, option.name);
             }}>
             <IconFont className={styles['wallet-icon']} type={option.iconType} />
             <div>

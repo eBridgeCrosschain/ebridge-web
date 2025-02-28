@@ -1,11 +1,10 @@
-import { useWeb3React } from '@web3-react/core';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { ZERO } from 'constants/misc';
 import { useCallback, useMemo } from 'react';
 import { getProvider } from 'utils/provider';
-import { ChainId, Web3Type } from 'types';
+import { AElfConnectorId, ChainId, EVMConnectorId, TONConnectorId, Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
 import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, IS_MAINNET } from 'constants/index';
-import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
@@ -40,11 +39,25 @@ export function usePortkeyConnect() {
 }
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useWeb3(): Web3Type {
-  const web3React = useWeb3React();
+  const accountInfo = useAccount();
+  const { disconnectAsync } = useDisconnect();
   const [{ userERCChainId }] = useChain();
+
   const tmpContext = useMemo(() => {
-    const contextNetwork: Web3Type = { ...web3React, accounts: web3React?.accounts as Accounts };
-    if (!web3React.account) {
+    const contextNetwork: Web3Type = {
+      ...accountInfo,
+      connector: accountInfo.connector,
+      connectorId: accountInfo.connector?.type as EVMConnectorId,
+      chainId: accountInfo.chainId,
+      isActive: accountInfo.isConnected,
+      isPortkey: false,
+      walletType: 'ERC',
+      loginWalletType: WalletTypeEnum.unknown,
+      account: accountInfo.address,
+      accounts: accountInfo.addresses,
+      deactivate: disconnectAsync,
+    };
+    if (!accountInfo.address) {
       if (typeof window === 'object') {
         contextNetwork.chainId = DEFAULT_ERC_CHAIN;
         const chainId = ZERO.plus(window.ethereum?.chainId ?? '');
@@ -55,6 +68,7 @@ export function useWeb3(): Web3Type {
         }
       }
       const provider = getProvider(contextNetwork.chainId);
+      // const provider = await accountInfo.connector?.getProvider({ chainId: contextNetwork.chainId as number });
       if (provider) {
         contextNetwork.library = provider;
         contextNetwork.provider = { provider } as any;
@@ -65,7 +79,8 @@ export function useWeb3(): Web3Type {
       contextNetwork.library = contextNetwork.provider?.provider;
     }
     return contextNetwork;
-  }, [web3React, userERCChainId]);
+  }, [accountInfo, disconnectAsync, userERCChainId]);
+
   return tmpContext;
 }
 
@@ -100,6 +115,7 @@ export function useAElf(): Web3Type {
       loginWalletType: walletType,
       walletType: _walletType,
       connector: walletInfo?.address ? _walletType : undefined,
+      connectorId: isPortkey ? AElfConnectorId.PORTKEY : AElfConnectorId.NIGHTELF,
       isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
@@ -139,6 +155,7 @@ export function usePortkey(): Web3Type {
       loginWalletType: walletType,
       walletType: 'PORTKEY',
       connector: 'PORTKEY',
+      connectorId: AElfConnectorId.PORTKEY,
       isPortkey: true,
     };
   }, [isConnected, walletInfo, walletType]);
@@ -159,6 +176,7 @@ export function useTon(): Web3Type {
       loginWalletType: undefined,
       walletType: 'TON',
       connector: 'TON',
+      connectorId: TONConnectorId.TON,
       isTON: true,
       chainId: IS_MAINNET ? SupportedTONChainId.MAINNET : SupportedTONChainId.TESTNET,
       baseAccount: wallet?.account,
@@ -199,4 +217,18 @@ export function useActiveAddresses() {
   return useMemo(() => {
     return [evmAccount, aelfAccount].filter(Boolean).join(',');
   }, [aelfAccount, evmAccount]);
+}
+
+export function useEVMConnectWallet() {
+  const { connectAsync, connectors } = useConnect();
+
+  return useCallback(
+    async (connectorId: EVMConnectorId, chainId?: number) => {
+      const connector = connectors.find((item) => item.id === connectorId);
+      if (!connector) return;
+
+      await connectAsync({ connector: connector, chainId });
+    },
+    [connectAsync, connectors],
+  );
 }
