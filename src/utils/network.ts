@@ -3,9 +3,8 @@ import { ALL_SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chain';
 import storages from 'constants/storages';
 import { eventBus } from 'utils/eBridgeEventBus';
 import { isELFChain } from './aelfUtils';
-import { NetworkType } from 'types';
+import { COINBASE_WALLET_ID, METAMASK_WALLET_ID, NetworkType, WALLET_CONNECT_ID } from 'types';
 import { ChainId } from 'types';
-import CommonMessage from 'components/CommonMessage';
 import { NetworkList } from 'constants/index';
 
 type Info = {
@@ -86,11 +85,10 @@ export const switchNetwork = async (info: Info): Promise<boolean> => {
   }
 };
 export function isChainAllowed(connector: Connector, chainId: number) {
-  switch (connector.type) {
-    case 'metaMask':
-    case 'coinbaseWallet':
-    case 'walletConnect':
-    case 'injected':
+  switch (connector.id) {
+    case METAMASK_WALLET_ID:
+    case COINBASE_WALLET_ID:
+    case WALLET_CONNECT_ID:
       return ALL_SUPPORTED_CHAIN_IDS.includes(chainId);
     default:
       return false;
@@ -134,7 +132,7 @@ export const switchChain = async (
   isWeb3Active?: boolean,
   web3ChainId?: ChainId,
 ) => {
-  const { chainId, chainName } = info;
+  const { chainId } = info;
   if (typeof chainId === 'string') {
     eventBus.emit(storages.userELFChainId, info.chainId);
     return true;
@@ -143,12 +141,12 @@ export const switchChain = async (
   eventBus.emit(storages.userERCChainId, info.chainId);
   if (!connector || typeof connector === 'string') return;
   if (isWeb3Active) {
-    console.log('====== ====== ====== 0', connector);
+    console.log('====== ====== ====== 0', connector, chainId);
     if (!isChainAllowed(connector, chainId)) {
       throw new Error(`Chain ${chainId} not supported for connector (${typeof connector})`);
-    } else if (connector.type === 'walletConnect') {
+    } else if (connector.id === WALLET_CONNECT_ID) {
       console.log('====== ====== ====== 1');
-      // TODO
+      // TODO evm delete
       // if (!getSupportedChainIdsFromWalletConnectSession(connector.provider?.session).includes(chainId as any)) {
       //   CommonMessage.error(`${chainName} is unsupported by your wallet.`);
       //   throw `${chainName} is unsupported by your wallet.`;

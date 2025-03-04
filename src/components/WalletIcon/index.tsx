@@ -26,8 +26,7 @@ export default function WalletIcon({
         return false;
       }
 
-      const isMetaMask = !!window.ethereum?.isMetaMask;
-      return SUPPORTED_WALLETS[k].connectorId === connectorId && isMetaMask === (k === EVMConnectorId.METAMASK);
+      return SUPPORTED_WALLETS[k].connectorId === connectorId;
     },
     [connectorId],
   );

@@ -1,4 +1,3 @@
-import type { HttpProvider } from 'web3-core';
 import type { AElfDappBridge } from '@aelf-react/types';
 import type { AElfContextType } from '@aelf-react/core/dist/types';
 import { AElfNodes } from 'constants/aelf';
@@ -8,6 +7,7 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { Wallet as TonWallet } from '@tonconnect/ui-react';
 import { DisconnectMutateAsync } from 'wagmi/query';
 import { Connector } from 'wagmi';
+import { SupportedChainId } from 'constants/chain';
 
 export type ChainId = keyof typeof CHAIN_NAME;
 export type ChainType = 'ERC' | 'ELF' | 'TON';
@@ -25,7 +25,7 @@ export type NetworkType = {
 
 export type AelfInstancesKey = keyof typeof AElfNodes;
 
-export const METAMASK_WALLET_ID = 'metaMaskSDK'; // 'io.metamask'
+export const METAMASK_WALLET_ID = 'io.metamask'; // 'metaMaskSDK'
 export const COINBASE_WALLET_ID = 'coinbaseWalletSDK'; // 'com.coinbase.wallet'
 export const WALLET_CONNECT_ID = 'walletConnect';
 
@@ -48,9 +48,7 @@ export type TWalletConnectorId = EVMConnectorId | AElfConnectorId | TONConnector
 
 export type Web3Type = {
   chainId?: ChainId;
-  library?: HttpProvider | any;
   aelfInstance?: AElfDappBridge;
-  provider?: any;
   isActive?: boolean;
   account?: string;
   connector?: Connector | string;
@@ -62,6 +60,7 @@ export type Web3Type = {
   loginWalletType?: WalletTypeEnum;
   accounts?: Accounts | readonly [`0x${string}`, ...`0x${string}`[]] | readonly `0x${string}`[];
   baseAccount?: TonWallet['account'];
+  getProvider?: (chainId?: SupportedChainId) => Promise<unknown>;
 };
 export type TokenInfo = {
   decimals: number;

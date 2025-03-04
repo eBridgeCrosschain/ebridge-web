@@ -6,8 +6,9 @@ import BigNumber from 'bignumber.js';
 import { ContractBasic } from '../utils/contract';
 import { ERC20_ABI } from 'constants/abis';
 import { MaxUint256, REQ_CODE } from 'constants/misc';
-import { getDefaultProvider, isUserDenied } from 'utils/provider';
+import { isUserDenied } from 'utils/provider';
 import CommonMessage from 'components/CommonMessage';
+import { ChainId } from 'types';
 // ethereum
 export const getContract = (provider: provider, address: string) => {
   const web3 = new Web3(provider);
@@ -65,7 +66,7 @@ export const getTotalSupply = async (provider: provider, tokenAddress: string): 
 };
 
 export const checkErcApprove = async (
-  ethereum: provider,
+  fromChainId: ChainId,
   contractAddress: string,
   account: string,
   approveTargetAddress: string,
@@ -74,8 +75,8 @@ export const checkErcApprove = async (
 ): Promise<boolean | any> => {
   const lpContract = new ContractBasic({
     contractABI: ERC20_ABI,
-    provider: ethereum,
     contractAddress: contractAddress,
+    chainId: fromChainId,
   });
   const approveResult = await checkAllowanceAndApprove({
     erc20Contract: lpContract,
@@ -86,8 +87,8 @@ export const checkErcApprove = async (
   });
   if (typeof approveResult !== 'boolean' && approveResult.error) {
     CommonMessage.error('Check allowance and Approved failed');
-    CommonMessage.error(approveResult.error.message);
-    if (isUserDenied(approveResult.error.message)) return REQ_CODE.UserDenied;
+    CommonMessage.error(approveResult.error.details);
+    if (isUserDenied(approveResult.error.details)) return REQ_CODE.UserDenied;
     return REQ_CODE.Fail;
   }
   return REQ_CODE.Success;
@@ -171,9 +172,4 @@ export const createOfficialToken = async ({
       onMethod: 'transactionHash',
     },
   );
-};
-
-export const getETHBalance = async (address: string, library?: provider) => {
-  const web3 = new Web3(library || getDefaultProvider());
-  return web3.eth.getBalance(address);
 };

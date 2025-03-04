@@ -1,5 +1,4 @@
 import { AelfInstancesKey, ChainType, Web3Type } from 'types';
-import type { provider } from 'web3-core';
 import {
   ACTIVE_CHAIN,
   ChainConstantsType,
@@ -33,10 +32,8 @@ export class ChainConstants {
 export class ERCChainConstants extends ChainConstants {
   static constants: Constants = SupportedERCChain[DEFAULT_ERC_CHAIN];
   static chainType: ChainType = 'ERC';
-  static library?: provider;
-  constructor(id: number | string, library?: provider) {
+  constructor(id: number | string) {
     super(id);
-    ERCChainConstants['library'] = library;
     // eslint-disable-next-line react/no-is-mounted
     this.setStaticAttrs();
   }

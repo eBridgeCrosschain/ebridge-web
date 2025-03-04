@@ -7,7 +7,6 @@ import type { ContractBasic } from './contract';
 import AElf from 'aelf-sdk';
 import { AElfTransaction, TransactionResult } from '@aelf-react/types';
 import { checkApprove } from 'contracts';
-import type { provider } from 'web3-core';
 import { CrossFeeToken, REQ_CODE, ZERO } from 'constants/misc';
 import { getTokenInfoByWhitelist } from './whitelist';
 import { timesDecimals } from './calculate';
@@ -200,21 +199,21 @@ export async function CrossChainCreateToken({
 }
 
 export async function CreateReceipt({
-  library,
   fromToken,
   account,
   bridgeContract,
   amount,
+  fromChainId,
   toChainId,
   to,
   tokenContract,
   crossFee,
 }: {
   bridgeContract: ContractBasic;
-  library: provider;
   fromToken: string;
   account: string;
   amount: string;
+  fromChainId: ChainId;
   toChainId: ChainId;
   to: string;
   tokenContract: ContractBasic;
@@ -226,7 +225,7 @@ export async function CreateReceipt({
   const fromELFChain = bridgeContract.contractType === 'ELF';
   if (fromELFChain && fromToken !== CrossFeeToken) {
     const req = await checkApprove(
-      library,
+      fromChainId,
       CrossFeeToken,
       account,
       bridgeContract.address || '',
@@ -248,7 +247,7 @@ export async function CreateReceipt({
         .toFixed(0);
     }
     const req = await checkApprove(
-      library,
+      fromChainId,
       fromToken,
       account,
       bridgeContract.address || '',
@@ -292,13 +291,10 @@ export async function LockToken({
   to,
 }: {
   bridgeContract: ContractBasic;
-  library: provider;
-  fromToken: string;
   account: string;
   amount: string;
   toChainId: ChainId;
   to: string;
-  tokenContract?: ContractBasic;
 }) {
   const toAddress = formatAddress(to);
   return bridgeContract.callSendMethod('createNativeTokenReceipt', account, [getChainIdToMap(toChainId), toAddress], {
@@ -410,6 +406,7 @@ export async function getReceiptLimit({
       isEnable,
     };
   } catch (error: any) {
+    // TODO evm error.details || error.message
     CommonMessage.error(error.message);
     console.log('getReceiptLimit error :', error);
   }
@@ -451,6 +448,7 @@ export async function getSwapLimit({
       isEnable: swapTokenBucket.isEnabled,
     };
   } catch (error: any) {
+    // TODO evm error.details || error.message
     CommonMessage.error(error.message);
     console.log('getSwapLimit error :', error);
   }

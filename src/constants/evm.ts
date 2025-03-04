@@ -29,7 +29,6 @@ export const EVMProviderConfig = createConfig({
       appLogoUrl: WEBSITE_ICON,
       reloadOnDisconnect: false,
     }),
-
     walletConnect({
       projectId: WalletConnectProjectId,
       showQrModal: true,

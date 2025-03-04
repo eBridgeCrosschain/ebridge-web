@@ -4,7 +4,6 @@ import { timesDecimals } from './calculate';
 import { isELFChain } from './aelfUtils';
 import { ContractBasic } from './contract';
 import { checkApprove } from 'contracts';
-import { provider } from 'web3-core';
 import { REQ_CODE } from 'constants/misc';
 import { getBalanceByWagmi, readContractByWagmi } from './wagmi';
 import { POOLS_ABI } from 'constants/abis';
@@ -16,7 +15,6 @@ export const addLiquidity = async ({
   chainId,
   poolContract,
   tokenContract,
-  library,
   tokenInfo,
 }: {
   symbol?: string;
@@ -25,7 +23,6 @@ export const addLiquidity = async ({
   chainId: ChainId;
   poolContract: ContractBasic;
   tokenContract?: ContractBasic;
-  library: provider;
   tokenInfo?: TokenInfo;
 }) => {
   if (!tokenInfo?.symbol) tokenInfo = getTokenInfoByWhitelist(chainId as ChainId, symbol);
@@ -33,7 +30,7 @@ export const addLiquidity = async ({
   const bigAmount = timesDecimals(amount, tokenInfo?.decimals).toFixed(0);
   if (!tokenInfo?.isNativeToken) {
     const req = await checkApprove(
-      library,
+      chainId,
       (isELFChain(chainId) ? tokenInfo?.symbol : tokenInfo?.address) as string,
       account,
       poolContract.address || '',

@@ -13,7 +13,7 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { toUserFriendlyAddress } from '@tonconnect/sdk';
-import { SupportedTONChainId } from 'constants/chain';
+import { SupportedChainId, SupportedTONChainId } from 'constants/chain';
 import { isELFChain } from 'utils/aelfUtils';
 import { isTonChain } from 'utils';
 import { getNetworkInfo, switchChain } from 'utils/network';
@@ -47,7 +47,7 @@ export function useWeb3(): Web3Type {
     const contextNetwork: Web3Type = {
       ...accountInfo,
       connector: accountInfo.connector,
-      connectorId: accountInfo.connector?.type as EVMConnectorId,
+      connectorId: accountInfo.connector?.id as EVMConnectorId,
       chainId: accountInfo.chainId,
       isActive: accountInfo.isConnected,
       isPortkey: false,
@@ -67,17 +67,23 @@ export function useWeb3(): Web3Type {
           contextNetwork.chainId = userERCChainId;
         }
       }
-      const provider = getProvider(contextNetwork.chainId);
-      // const provider = await accountInfo.connector?.getProvider({ chainId: contextNetwork.chainId as number });
-      if (provider) {
-        contextNetwork.library = provider;
-        contextNetwork.provider = { provider } as any;
-      }
+      contextNetwork.getProvider = async (chainId?: SupportedChainId) => {
+        const _chainId = typeof chainId !== 'undefined' ? chainId : contextNetwork.chainId;
+
+        // TODO evm delete this branch?
+        const provider = getProvider(_chainId);
+        return provider;
+      };
       return contextNetwork;
     } else {
-      contextNetwork.walletType = 'ERC';
-      contextNetwork.library = contextNetwork.provider?.provider;
+      contextNetwork.getProvider = async (chainId?: SupportedChainId) => {
+        const _chainId = typeof chainId !== 'undefined' ? chainId : accountInfo.chainId;
+
+        const provider = await accountInfo.connector?.getProvider?.({ chainId: _chainId });
+        return provider;
+      };
     }
+
     return contextNetwork;
   }, [accountInfo, disconnectAsync, userERCChainId]);
 
@@ -110,8 +116,6 @@ export function useAElf(): Web3Type {
       account: walletInfo?.address,
       isActive: isConnected && !!walletInfo,
       chainId,
-      library: undefined,
-      provider: undefined,
       loginWalletType: walletType,
       walletType: _walletType,
       connector: walletInfo?.address ? _walletType : undefined,
@@ -150,8 +154,6 @@ export function usePortkey(): Web3Type {
       accounts: _accounts,
       wallet: { ...contextNetwork },
       isActive: isConnected && !!walletInfo,
-      library: undefined,
-      provider: walletInfo?.extraInfo?.provider,
       loginWalletType: walletType,
       walletType: 'PORTKEY',
       connector: 'PORTKEY',
@@ -171,8 +173,6 @@ export function useTon(): Web3Type {
       account: wallet?.account.address ? toUserFriendlyAddress(wallet?.account.address, !IS_MAINNET) : undefined,
       wallet: { ...wallet },
       isActive: !!wallet?.account,
-      library: undefined,
-      provider: undefined,
       loginWalletType: undefined,
       walletType: 'TON',
       connector: 'TON',

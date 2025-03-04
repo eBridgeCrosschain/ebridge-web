@@ -81,9 +81,11 @@ export default function WalletList({ onFinish, chainType }: { onFinish?: () => v
           open();
         } else {
           // Case: chainType === 'ERC'
-          if (connectorId === EVMConnectorId.WALLET_CONNECT) {
-            document.getElementsByTagName('wcm-modal')?.[0]?.remove();
-          }
+
+          // wagmi don not need to remove wcm-modal
+          // if (connectorId === EVMConnectorId.WALLET_CONNECT) {
+          //   document.getElementsByTagName('wcm-modal')?.[0]?.remove();
+          // }
           await evmConnectWallet(connectorId as EVMConnectorId, typeof chainId === 'number' ? chainId : undefined);
           chainDispatch(setSelectERCWallet(connectorId as EVMConnectorId));
 

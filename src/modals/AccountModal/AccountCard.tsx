@@ -21,7 +21,7 @@ import { TelegramPlatform } from 'utils/telegram/telegram';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useConnect } from 'hooks/useConnect';
 import { useWeb3 } from 'hooks/web3';
-import { EVMConnectorId, TWalletConnectorId } from 'types';
+import { TWalletConnectorId } from 'types';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
@@ -35,8 +35,7 @@ function AccountCard() {
   const { connector, connectorId, account, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
     (k: TWalletConnectorId) => {
-      const isMetaMask = !!window.ethereum?.isMetaMask;
-      return SUPPORTED_WALLETS[k].connectorId === connectorId && isMetaMask === (k === EVMConnectorId.METAMASK);
+      return SUPPORTED_WALLETS[k].connectorId === connectorId;
     },
     [connectorId],
   );
