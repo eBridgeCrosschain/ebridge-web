@@ -9,6 +9,8 @@ import { MaxUint256, REQ_CODE } from 'constants/misc';
 import { isUserDenied } from 'utils/provider';
 import CommonMessage from 'components/CommonMessage';
 import { ChainId } from 'types';
+import { handleErrorMessage } from 'utils/error';
+
 // ethereum
 export const getContract = (provider: provider, address: string) => {
   const web3 = new Web3(provider);
@@ -87,7 +89,7 @@ export const checkErcApprove = async (
   });
   if (typeof approveResult !== 'boolean' && approveResult.error) {
     CommonMessage.error('Check allowance and Approved failed');
-    CommonMessage.error(approveResult.error.details);
+    CommonMessage.error(handleErrorMessage(approveResult));
     if (isUserDenied(approveResult.error.details)) return REQ_CODE.UserDenied;
     return REQ_CODE.Fail;
   }

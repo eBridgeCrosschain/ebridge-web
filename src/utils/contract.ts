@@ -14,12 +14,14 @@ import { TonConnectUI } from '@tonconnect/ui-react';
 import { getTransactionResponseHash } from './ton';
 import { CallTonContract, TonContractCallData } from './tonContractCall';
 import {
+  getGasPriceByWagmi,
   readContractByWagmi,
   TReadContractByWagmiParams,
   TWriteContractByWagmiParams,
   waitForTransactionReceiptByWagmi,
   writeContractByWagmi,
 } from './wagmi';
+import { ZERO } from 'constants/misc';
 
 export interface AbiType {
   internalType?: string;
@@ -172,16 +174,17 @@ export class WB3ContractBasic {
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     try {
-      const { onMethod = 'receipt', gas, value, nonce } = sendOptions || {};
+      const { onMethod = 'receipt', gas, gasPrice, value, nonce } = sendOptions || {};
       const _chainId = this.chainId || ERCChainConstants.chainId;
-      // TODO evm send gasPrice
-      // let gasPriceFromApi = sendOptions?.gasPrice;
-      // try {
-      //   const _gasPrice = (await getGasPriceByWagmi({ chainId: _chainId })) || '10000000000';
-      //   gasPriceFromApi = ZERO.plus(Number(_gasPrice)).times(1.15).toFixed(0);
-      // } catch (error) {
-      //   console.log(error);
-      // }
+
+      // optimize gas fees
+      let gasPriceFromApi = gasPrice;
+      try {
+        const aa = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
+        gasPriceFromApi = ZERO.plus(String(aa)).times(1.15).toFixed(0);
+      } catch (error) {
+        console.log(error);
+      }
 
       const params = {
         abi: this.contractABI,
@@ -192,16 +195,14 @@ export class WB3ContractBasic {
         account,
       } as TWriteContractByWagmiParams;
 
-      // TODO evm send gasPrice
-      // if (gasPriceFromApi) {
-      //   params.gasPrice = BigInt(gasPriceFromApi); // parseGwei(gasPriceFromApi);
-      // }
-
+      if (gasPriceFromApi) {
+        params.gasPrice = BigInt(gasPriceFromApi);
+      }
       if (gas) {
         params.gas = BigInt(gas);
       }
       if (value) {
-        params.value = BigInt(String(value));
+        params.value = BigInt(String(value)); // parseEther('0.01')
       }
       if (nonce) {
         params.nonce = nonce;
@@ -210,7 +211,7 @@ export class WB3ContractBasic {
       const result = await writeContractByWagmi(params);
 
       if (onMethod === 'receipt') {
-        const receiptResult = await waitForTransactionReceiptByWagmi({ hash: result });
+        const receiptResult = await waitForTransactionReceiptByWagmi({ hash: result, chainId: _chainId as number });
         if (receiptResult.status === 'reverted') {
           throw { message: 'Transaction is reverted', ...receiptResult };
         }
@@ -231,7 +232,7 @@ export class WB3ContractBasic {
         abi: this.contractABI,
         functionName,
         address: this.address as string,
-        chainId: _chainId, // TODO
+        chainId: _chainId,
         args: paramsOption,
         account,
       } as TWriteContractByWagmiParams;

@@ -67,10 +67,11 @@ export function useWeb3(): Web3Type {
           contextNetwork.chainId = userERCChainId;
         }
       }
+
+      // Keep the previous logic and delete it if it is useless after observing it for a while
       contextNetwork.getProvider = async (chainId?: SupportedChainId) => {
         const _chainId = typeof chainId !== 'undefined' ? chainId : contextNetwork.chainId;
 
-        // TODO evm delete this branch?
         const provider = getProvider(_chainId);
         return provider;
       };

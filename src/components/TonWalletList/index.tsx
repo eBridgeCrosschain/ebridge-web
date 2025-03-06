@@ -60,10 +60,10 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
       if (loading) return;
       setLoading({ [key]: true });
       try {
-        // TODO await
+        // TODO ton await
         connect(chainType);
 
-        // TODO connect need await?
+        // TODO ton check if connect need await
         onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);

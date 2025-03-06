@@ -55,7 +55,6 @@ function AccountCard() {
       // WEB3
       try {
         await deactivate?.();
-        // await connection?.connector?.resetState?.(); // TODO
       } catch (error) {
         console.log('error: ', error);
       } finally {

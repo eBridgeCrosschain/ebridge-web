@@ -144,16 +144,6 @@ export const switchChain = async (
     console.log('====== ====== ====== 0', connector, chainId);
     if (!isChainAllowed(connector, chainId)) {
       throw new Error(`Chain ${chainId} not supported for connector (${typeof connector})`);
-    } else if (connector.id === WALLET_CONNECT_ID) {
-      console.log('====== ====== ====== 1');
-      // TODO evm delete
-      // if (!getSupportedChainIdsFromWalletConnectSession(connector.provider?.session).includes(chainId as any)) {
-      //   CommonMessage.error(`${chainName} is unsupported by your wallet.`);
-      //   throw `${chainName} is unsupported by your wallet.`;
-      // } else {
-      //   console.log('====== ====== ====== 2', '');
-      //   await connector.connect({ chainId });
-      // }
     } else {
       const addChainParameter = {
         chainId: chainId,

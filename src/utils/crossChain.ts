@@ -15,6 +15,7 @@ import { FormatTokenList } from 'constants/index';
 import { LimitDataProps } from 'page-components/Bridge/useLimitAmountModal/constants';
 import BigNumber from 'bignumber.js';
 import CommonMessage from 'components/CommonMessage';
+import { handleErrorMessage } from './error';
 export async function CrossChainTransfer({
   contract,
   account,
@@ -393,7 +394,7 @@ export async function getReceiptLimit({
     ]);
 
     if (receiptDailyLimit.error || receiptTokenBucket.error) {
-      throw new Error(receiptDailyLimit.error || receiptTokenBucket.error);
+      throw receiptDailyLimit.error || receiptTokenBucket.error;
     }
 
     const isEnable = receiptTokenBucket.isEnable;
@@ -406,8 +407,7 @@ export async function getReceiptLimit({
       isEnable,
     };
   } catch (error: any) {
-    // TODO evm error.details || error.message
-    CommonMessage.error(error.message);
+    CommonMessage.error(handleErrorMessage(error));
     console.log('getReceiptLimit error :', error);
   }
 }
@@ -437,7 +437,7 @@ export async function getSwapLimit({
     ]);
 
     if (swapDailyLimit.error || swapTokenBucket.error) {
-      throw new Error(swapDailyLimit.error || swapTokenBucket.error);
+      throw swapDailyLimit.error || swapTokenBucket.error;
     }
 
     return {
@@ -448,8 +448,7 @@ export async function getSwapLimit({
       isEnable: swapTokenBucket.isEnabled,
     };
   } catch (error: any) {
-    // TODO evm error.details || error.message
-    CommonMessage.error(error.message);
+    CommonMessage.error(handleErrorMessage(error));
     console.log('getSwapLimit error :', error);
   }
 }
