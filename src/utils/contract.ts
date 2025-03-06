@@ -22,6 +22,7 @@ import {
   writeContractByWagmi,
 } from './wagmi';
 import { ZERO } from 'constants/misc';
+import { SupportedChainId } from 'constants/chain';
 
 export interface AbiType {
   internalType?: string;
@@ -179,11 +180,14 @@ export class WB3ContractBasic {
 
       // optimize gas fees
       let gasPriceFromApi = gasPrice;
-      try {
-        const aa = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
-        gasPriceFromApi = ZERO.plus(String(aa)).times(1.15).toFixed(0);
-      } catch (error) {
-        console.log(error);
+      // BSC does not need to actively calculate gas fee
+      if (_chainId !== SupportedChainId.BSC_MAINNET && _chainId !== SupportedChainId.BSC_TESTNET) {
+        try {
+          const _gasPrice = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
+          gasPriceFromApi = ZERO.plus(String(_gasPrice)).times(1.15).toFixed(0);
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       const params = {
