@@ -6,6 +6,7 @@ import { isELFChain } from './aelfUtils';
 import { COINBASE_WALLET_ID, METAMASK_WALLET_ID, NetworkType, WALLET_CONNECT_ID } from 'types';
 import { ChainId } from 'types';
 import { NetworkList } from 'constants/index';
+import { switchChainByWagmi } from './wagmi';
 
 type Info = {
   chainId: number | string;
@@ -128,7 +129,6 @@ export function getSupportedChainIdsFromWalletConnectSession(session?: any): Sup
 export const switchChain = async (
   info: NetworkType['info'] & Info,
   connector?: Connector | string,
-
   isWeb3Active?: boolean,
   web3ChainId?: ChainId,
 ) => {
@@ -149,7 +149,7 @@ export const switchChain = async (
         chainId: chainId,
       };
       console.log('====== ====== ====== 4', addChainParameter);
-      await connector.connect(addChainParameter);
+      await switchChainByWagmi(addChainParameter);
     }
   } else {
     console.log('====== ====== ====== 5', info);

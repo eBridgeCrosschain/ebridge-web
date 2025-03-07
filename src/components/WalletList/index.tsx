@@ -17,6 +17,7 @@ import { ChainType, EVMConnectorId, TWalletConnectorId } from 'types';
 import { useTonConnectModal } from '@tonconnect/ui-react';
 import { useEVMConnectWallet, useTon } from 'hooks/web3';
 import { usePrevious } from 'react-use';
+import { handleErrorMessage } from 'utils/error';
 export default function WalletList({ onFinish, chainType }: { onFinish?: () => void; chainType?: ChainType }) {
   const [{ walletWallet, walletChainType }] = useModal();
   const { chainId, connector: connectedConnector, connectorId, account } = walletWallet || {};
@@ -105,7 +106,7 @@ export default function WalletList({ onFinish, chainType }: { onFinish?: () => v
         }
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
-        CommonMessage.error(`connection error: ${error.message}`);
+        CommonMessage.error(`connection error: ${handleErrorMessage(error)}`);
       }
       setLoading(undefined);
     },

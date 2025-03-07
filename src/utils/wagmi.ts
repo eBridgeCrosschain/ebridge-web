@@ -14,6 +14,8 @@ import {
   waitForTransactionReceipt,
   WaitForTransactionReceiptReturnType,
   getAccount,
+  switchChain,
+  SwitchChainReturnType,
 } from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
 import { sleep } from 'utils';
@@ -98,4 +100,12 @@ export async function waitForTransactionReceiptByWagmi(
   params: TWaitForTransactionReceiptByWagmiParams,
 ): Promise<WaitForTransactionReceiptReturnType> {
   return await waitForTransactionReceipt(EVMProviderConfig, params as any);
+}
+
+export type TSwitchChainByWagmiParams = {
+  chainId: number;
+};
+
+export async function switchChainByWagmi(params: TSwitchChainByWagmiParams): Promise<SwitchChainReturnType> {
+  return await switchChain(EVMProviderConfig, params as any);
 }

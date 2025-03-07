@@ -22,6 +22,7 @@ import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useConnect } from 'hooks/useConnect';
 import { useWeb3 } from 'hooks/web3';
 import { TWalletConnectorId } from 'types';
+import { handleErrorMessage } from 'utils/error';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
@@ -108,7 +109,7 @@ function AccountCard() {
       );
     } catch (error: any) {
       console.debug(`connection error: ${error}`);
-      CommonMessage.error(`connection error: ${error.message}`);
+      CommonMessage.error(`connection error: ${handleErrorMessage(error.message)}`);
     }
   }, [accountChainId, dispatch, onDisconnect, walletType]);
 

@@ -8,6 +8,7 @@ import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { ChainType, TWalletConnectorId } from 'types';
 import { useConnect } from 'hooks/useConnect';
+import { handleErrorMessage } from 'utils/error';
 
 export default function WalletList({ onFinish }: { onFinish?: () => void }) {
   const [{ walletWallet }] = useModal();
@@ -67,7 +68,7 @@ export default function WalletList({ onFinish }: { onFinish?: () => void }) {
         onCancel();
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
-        CommonMessage.error(`connection error: ${error.message}`);
+        CommonMessage.error(`connection error: ${handleErrorMessage(error.message)}`);
       }
       setLoading(undefined);
     },
