@@ -587,11 +587,11 @@ describe('CreateReceipt', () => {
   };
 
   const baseParams = {
-    library: {} as any,
     fromToken: 'ELF',
     account: 'user-account',
     bridgeContract: mockBridgeContract,
     amount: '100',
+    fromChainId: SupportedChainId.BSC_MAINNET,
     toChainId: SupportedELFChainId.AELF,
     to: 'recipient-address',
     tokenContract: {} as ContractBasic,
@@ -622,7 +622,7 @@ describe('CreateReceipt', () => {
 
     // Verify CrossFee approval check
     expect(checkApprove).toHaveBeenCalledWith(
-      params.library,
+      56,
       CrossFeeToken,
       params.account,
       mockBridgeContract.address,
@@ -658,7 +658,7 @@ describe('CreateReceipt', () => {
     // Verify amount calculation
     expect(timesDecimals).toHaveBeenCalledWith('1', 8);
     expect(checkApprove).toHaveBeenCalledWith(
-      {},
+      56,
       CrossFeeToken,
       'user-account',
       '',
@@ -679,7 +679,7 @@ describe('CreateReceipt', () => {
     expect(result.transactionId).toBe('tx123');
     // Verify amount calculation
     expect(timesDecimals).toHaveBeenCalledWith('1', 8);
-    expect(checkApprove).toHaveBeenCalledWith({}, 'USDT', 'user-account', '', '100', undefined, {});
+    expect(checkApprove).toHaveBeenCalledWith(56, 'ELF', 'user-account', '', '1000000000000000000', undefined, {});
   });
 
   test('should throw error if return checkApprove failed', async () => {
@@ -766,7 +766,7 @@ describe('CreateReceipt', () => {
     expect(result.transactionId).toBe('tx123');
 
     expect(checkApprove).toHaveBeenCalledWith(
-      {},
+      56,
       'ELF',
       'user-account',
       'bridge-address',
@@ -801,13 +801,6 @@ describe('LockToken', () => {
   const mockTo = 'AELF9876543210987654321098765432109876543210987654321';
   const mockFormattedAddress = 'formattedAddress';
 
-  const mockProvider: any = {
-    // Add necessary methods and properties for the provider
-    send: vi.fn(),
-    getTransactionReceipt: vi.fn(),
-    // Add other required methods if necessary
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
     (formatAddress as any).mockReturnValue(mockFormattedAddress);
@@ -821,8 +814,6 @@ describe('LockToken', () => {
       amount: mockAmount,
       toChainId: mockToChainId,
       to: mockTo,
-      library: mockProvider,
-      fromToken: 'ELF',
     });
 
     expect(getChainIdToMap).toHaveBeenCalledWith(mockToChainId);
@@ -840,8 +831,6 @@ describe('LockToken', () => {
         amount: mockAmount,
         toChainId: mockToChainId,
         to: mockTo,
-        library: mockProvider,
-        fromToken: 'ELF',
       }),
     ).rejects.toThrow(errorMessage);
   });

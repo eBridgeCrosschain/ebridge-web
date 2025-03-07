@@ -3,7 +3,6 @@ import { addLiquidity, removeLiquidity, getTotalLiquidity, getMyLiquidity } from
 import { ChainId, TokenInfo } from 'types';
 import { ContractBasic } from '../contract';
 import { checkApprove } from 'contracts';
-import { provider } from 'web3-core';
 import { REQ_CODE } from 'constants/misc';
 import { getBalanceByWagmi, readContractByWagmi } from '../wagmi';
 import { POOLS_ABI } from 'constants/abis';
@@ -30,22 +29,12 @@ vi.mock('contracts', () => ({
 }));
 
 vi.mock('../contract');
-// vi.mock('../contract', () => ({
-//   ContractBasic: vi.fn(() => ({
-//     callSendMethod: vi.fn(),
-//     callViewMethod: vi.fn(),
-//     address: '0xPoolContract',
-//     contractType: 'ELF',
-//     chainId: 1,
-//   })),
-// }));
 
 vi.mock('../wagmi', () => ({
   getBalanceByWagmi: vi.fn(),
   readContractByWagmi: vi.fn(),
 }));
 
-const mockProvider = {} as provider;
 const mockTokenInfo: TokenInfo = {
   symbol: 'ELF',
   decimals: 8,
@@ -83,7 +72,6 @@ describe('Liquidity Functions', () => {
         amount: mockAmount,
         chainId: mockChainId,
         poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-        library: mockProvider,
       });
 
       // Verify native token handling
@@ -112,7 +100,6 @@ describe('Liquidity Functions', () => {
         amount: mockAmount,
         chainId: mockChainId,
         poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-        library: mockProvider,
       });
 
       // Verify native token handling
@@ -137,21 +124,12 @@ describe('Liquidity Functions', () => {
         amount: mockAmount,
         chainId: mockChainId,
         poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-        library: mockProvider,
       });
 
       expect(result.status).toBe('success');
       expect(result.transactionHash).toBe('0xTxHash');
       // Verify ERC20 approval check
-      expect(checkApprove).toHaveBeenCalledWith(
-        mockProvider,
-        '0xToken',
-        mockAccount,
-        '',
-        '10000000',
-        undefined,
-        undefined,
-      );
+      expect(checkApprove).toHaveBeenCalledWith(1, '0xToken', mockAccount, '', '10000000', undefined, undefined);
     });
 
     it('should handle EVM chain ERC20 native token flow', async () => {
@@ -167,7 +145,6 @@ describe('Liquidity Functions', () => {
         amount: mockAmount,
         chainId: mockChainId,
         poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-        library: mockProvider,
       });
 
       expect(result.status).toBe('success');
@@ -186,22 +163,13 @@ describe('Liquidity Functions', () => {
         amount: mockAmount,
         chainId: mockChainId,
         poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-        library: mockProvider,
         tokenInfo: {} as any,
       });
 
       expect(result.status).toBe('success');
       expect(result.transactionHash).toBe('0xTxHash');
       // Verify ERC20 approval check
-      expect(checkApprove).toHaveBeenCalledWith(
-        mockProvider,
-        '0xToken',
-        mockAccount,
-        '',
-        '10000000',
-        undefined,
-        undefined,
-      );
+      expect(checkApprove).toHaveBeenCalledWith(1, '0xToken', mockAccount, '', '10000000', undefined, undefined);
       expect(checkApprove).toHaveBeenCalled();
     });
 
@@ -219,7 +187,6 @@ describe('Liquidity Functions', () => {
           amount: mockAmount,
           chainId: mockChainId,
           poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-          library: mockProvider,
         }),
       ).rejects.toThrow('Failed to add liquidity');
     });
@@ -237,7 +204,6 @@ describe('Liquidity Functions', () => {
           amount: mockAmount,
           chainId: mockChainId,
           poolContract: { callSendMethod: mockCallSendMethod } as unknown as ContractBasic,
-          library: mockProvider,
         }),
       ).rejects.toThrow();
     });
