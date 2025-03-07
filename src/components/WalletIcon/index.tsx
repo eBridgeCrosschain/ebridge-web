@@ -20,8 +20,8 @@ export default function WalletIcon({
       const isTelegramPlatformAndNotWeb = TelegramPlatform.isTelegramPlatformAndNotWeb();
       if (
         isTelegramPlatformAndNotWeb &&
-        SUPPORTED_WALLETS[k].connectorId === EVMConnectorId.COINBASE_WALLET &&
-        isTelegramPlatformAndNotWeb
+        (SUPPORTED_WALLETS[k].connectorId === EVMConnectorId.COINBASE_WALLET ||
+          SUPPORTED_WALLETS[k].connectorId === EVMConnectorId.METAMASK)
       ) {
         return false;
       }
