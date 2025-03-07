@@ -17,6 +17,7 @@ import { useHomeContext } from '../../HomeContext';
 import { IS_ONLY_SIDE_CHAIN_LIST } from 'constants/misc';
 import { SupportedELFChainId } from 'constants/chain';
 import { isTonChain } from 'utils';
+import { handleErrorMessage } from 'utils/error';
 
 function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean }) {
   const { dispatch } = useWalletActions();
@@ -58,7 +59,7 @@ function NetworkSelect({ wallet, isFrom }: { wallet?: Web3Type; isFrom?: boolean
           try {
             await switchChain(info, !isELFChain(info.chainId) ? web3Connector : connector, !!web3Account, web3ChainId);
           } catch (error: any) {
-            CommonMessage.error(error.message);
+            CommonMessage.error(handleErrorMessage(error));
           }
         }
       }

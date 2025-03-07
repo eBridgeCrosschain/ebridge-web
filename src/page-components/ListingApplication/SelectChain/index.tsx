@@ -46,8 +46,7 @@ import {
   addApplicationChain,
   getApplicationTokenInfo,
 } from 'utils/api/application';
-import { formatWithCommas } from 'utils/calculate';
-import { formatListWithAnd } from 'utils/format';
+import { formatListWithAnd, formatWithCommas } from 'utils/format';
 import { handleListingErrorMessage } from 'utils/error';
 import { getChainIdByAPI, getChainName, getIconByAPIChainId } from 'utils/chain';
 import { isEVMChain, isTONChain } from 'utils/wallet';

@@ -4,7 +4,6 @@ import { useAElf, useWeb3 } from 'hooks/web3';
 import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { useEffectOnce, useSearchParam } from 'react-use';
 import { isMobileDevices } from 'utils/isMobile';
-import type { provider } from 'web3-core';
 import { Web3Type } from 'types';
 import { breakpointMap } from 'constants/media';
 import { useLanguage } from 'i18n';
@@ -28,15 +27,15 @@ function reducer(state: any, { type, payload }: any) {
 
 export default function Provider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-  const { chainId, library } = useWeb3();
+  const { chainId } = useWeb3();
   const { chainId: aelfChainId, aelfInstances } = useAElf();
   const [mobile, setMobile] = useState<boolean>();
   const { changeLanguage } = useLanguage();
   const language = useSearchParam('language');
   useMemo(() => {
     if (!chainId) return;
-    initialized(chainId, library);
-  }, [chainId, library]);
+    initialized(chainId);
+  }, [chainId]);
   useMemo(() => {
     initializedELF(aelfChainId || '', aelfInstances);
   }, [aelfChainId, aelfInstances]);
@@ -72,8 +71,8 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     </StoreContext.Provider>
   );
 }
-function initialized(chainId: number | string, library?: provider) {
-  new ERCChainConstants(chainId, library);
+function initialized(chainId: number | string) {
+  new ERCChainConstants(chainId);
 }
 
 function initializedELF(chainId: number | string, aelfInstances?: Web3Type['aelfInstances']) {

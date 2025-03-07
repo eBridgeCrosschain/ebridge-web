@@ -1,31 +1,26 @@
 import { Button } from 'antd';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Connector } from '@web3-react/types';
 import { useChain } from 'contexts/useChain';
 import { useModal } from 'contexts/useModal';
 import { setSelectERCWallet } from 'contexts/useChain/actions';
 import IconFont from 'components/IconFont';
 import { SUPPORTED_WALLETS } from 'constants/wallets';
-import { getConnection } from 'walletConnectors/utils';
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
-
 import { DEFAULT_ERC_CHAIN_INFO } from 'constants/index';
 import { getNetworkInfo, switchChain } from 'utils/network';
 import { sleep } from 'utils';
 import { isPortkey, isPortkeyConnector } from 'utils/portkey';
 import { isMobileDevices } from 'utils/isMobile';
-import { MetaMask } from '@web3-react/metamask';
 import CommonMessage from 'components/CommonMessage';
 import styles from './styles.module.less';
 import { TelegramPlatform } from 'utils/telegram/telegram';
-import { WalletConnect } from '@web3-react/walletconnect-v2';
-import { ChainType } from 'types';
+import { ChainType, EVMConnectorId, TWalletConnectorId } from 'types';
 import { useTonConnectModal } from '@tonconnect/ui-react';
-import { useTon } from 'hooks/web3';
+import { useEVMConnectWallet, useTon } from 'hooks/web3';
 import { usePrevious } from 'react-use';
+import { handleErrorMessage } from 'utils/error';
 export default function WalletList({ onFinish, chainType }: { onFinish?: () => void; chainType?: ChainType }) {
   const [{ walletWallet, walletChainType }] = useModal();
-  const { chainId, connector: connectedConnector, account } = walletWallet || {};
+  const { chainId, connector: connectedConnector, connectorId, account } = walletWallet || {};
   const { open } = useTonConnectModal();
   const { isActive } = useTon();
   const prevIsActive = usePrevious(isActive);
@@ -75,33 +70,34 @@ export default function WalletList({ onFinish, chainType }: { onFinish?: () => v
     };
   }, []);
 
+  const evmConnectWallet = useEVMConnectWallet();
   const tryActivation = useCallback(
-    async (connector: Connector | string, key: string) => {
-      if (loading || (typeof connector === 'string' && connector !== 'TON')) return;
+    async (chainType: ChainType, connectorId: TWalletConnectorId, key: string) => {
+      if (loading || chainType === 'ELF') return;
 
       setLoading({ [key]: true });
       try {
-        if (typeof connector === 'string') {
+        if (chainType === 'TON') {
+          // Case: chainType === 'TON'
           open();
         } else {
-          try {
-            delete (connector as any).eagerConnection;
-          } catch (error) {
-            // fix network error
-          }
+          // Case: chainType === 'ERC'
 
-          if (connector instanceof WalletConnect) document.getElementsByTagName('wcm-modal')?.[0]?.remove();
+          // wagmi don not need to remove wcm-modal
+          // if (connectorId === EVMConnectorId.WALLET_CONNECT) {
+          //   document.getElementsByTagName('wcm-modal')?.[0]?.remove();
+          // }
+          await evmConnectWallet(connectorId as EVMConnectorId, typeof chainId === 'number' ? chainId : undefined);
+          chainDispatch(setSelectERCWallet(connectorId as EVMConnectorId));
 
-          await connector.activate();
-          chainDispatch(setSelectERCWallet(getConnection(connector)?.type));
-          if (connector instanceof CoinbaseWallet) {
+          if (connectorId === EVMConnectorId.COINBASE_WALLET) {
             await sleep(500);
-            await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connector, true);
+            await switchChain(DEFAULT_ERC_CHAIN_INFO as any, connectedConnector, true);
           } else if (userERCChainId) {
             try {
               // Whether the switch is successful or not does not affect the link status
               const info = getNetworkInfo(userERCChainId);
-              if (info) await switchChain(info.info, connector, true);
+              if (info) await switchChain(info.info, connectedConnector, true);
             } catch (error) {
               console.debug(error, '====error');
             }
@@ -110,49 +106,58 @@ export default function WalletList({ onFinish, chainType }: { onFinish?: () => v
         }
       } catch (error: any) {
         console.debug(`connection error: ${error}`);
-        CommonMessage.error(`connection error: ${error.message}`);
+        CommonMessage.error(`connection error: ${handleErrorMessage(error)}`);
       }
       setLoading(undefined);
     },
-    [chainDispatch, loading, onCancel, open, userERCChainId],
+    [chainDispatch, chainId, connectedConnector, evmConnectWallet, loading, onCancel, open, userERCChainId],
   );
 
-  const walletList = useMemo(
-    () =>
-      Object.keys(SUPPORTED_WALLETS).filter((key) => {
-        if (chainType) {
-          return SUPPORTED_WALLETS[key].chainType === chainType;
-        } else {
-          const option = SUPPORTED_WALLETS[key];
-          const isStringConnector = typeof option.connector === 'string';
-          const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
-          if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === 'METAMASK') return false;
-          if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
-            if (option.connector instanceof CoinbaseWallet) return false;
-          }
-          if (isPortkey()) {
-            if (option.connector instanceof CoinbaseWallet) return false;
-            if (isStringChain) return isPortkeyConnector(option.connector as string);
-            if (!isStringConnector) return !(option.connector instanceof MetaMask);
-          }
-          return isStringConnector ? isStringChain : !isStringChain;
+  const walletList = useMemo(() => {
+    const keys = Object.keys(SUPPORTED_WALLETS) as TWalletConnectorId[];
+
+    return keys.filter((key) => {
+      if (chainType) {
+        return SUPPORTED_WALLETS[key].chainType === chainType;
+      } else {
+        const option = SUPPORTED_WALLETS[key];
+        const isNotERCWallet = option.chainType !== 'ERC';
+        const isStringChain = typeof chainId === 'string' || walletChainType === 'ELF';
+
+        // Undisplayed metamask entrance in mobile and telegram(not browser)
+        if ((TelegramPlatform.isTelegramPlatformAndNotWeb() || isMobileDevices()) && key === EVMConnectorId.METAMASK)
+          return false;
+
+        // Undisplayed coinbase entrance in telegram(not browser)
+        if (TelegramPlatform.isTelegramPlatformAndNotWeb()) {
+          if (option.connectorId === EVMConnectorId.COINBASE_WALLET) return false;
         }
-      }),
-    [chainId, chainType, walletChainType],
-  );
+
+        // Undisplayed coinbase entrance in Portkey App
+        if (isPortkey()) {
+          if (option.connectorId === EVMConnectorId.COINBASE_WALLET) return false;
+          if (isStringChain) return isPortkeyConnector(option.connectorId);
+
+          // EVM
+          if (!isNotERCWallet) return !(option.connectorId === EVMConnectorId.METAMASK);
+        }
+        return isNotERCWallet ? isStringChain : !isStringChain;
+      }
+    });
+  }, [chainId, chainType, walletChainType]);
 
   return (
     <div className={styles['wallet-list']}>
       {walletList.map((key) => {
         const option = SUPPORTED_WALLETS[key];
-        const disabled = !!(account && option.connector && option.connector === connectedConnector);
+        const disabled = !!(account && option.connectorId && option.connectorId === connectorId);
         return (
           <Button
             disabled={disabled}
             loading={loading?.[option.name]}
             key={option.name}
             onClick={() => {
-              tryActivation(option.connector, option.name);
+              tryActivation(option.chainType, option.connectorId, option.name);
             }}>
             <IconFont className={styles['wallet-icon']} type={option.iconType} />
             <div>

@@ -42,7 +42,7 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
   const totalLiquidity = usePoolTotalLiquidity({ poolContract, tokenContract, tokenInfo });
   const evmSwitchChain = useEVMSwitchChain();
   const { loadingOpen, modal, setLoadingModal, setResultModal } = useLoadingModal();
-  const { account, library } = web3Wallet || {};
+  const { account } = web3Wallet || {};
   const connect = useConnect();
   const [[balance]] = useBalances(
     { ...web3Wallet, chainId },
@@ -67,11 +67,11 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
       if (!tokenInfo || !account || !tokenContract || !poolContract || !amount) return;
       setLoadingModal({ open: true });
       if (poolContract.contractType === 'ERC') await evmSwitchChain(chainId);
+
       const req = await addLiquidity({
         tokenInfo,
         amount: amount,
         account: account,
-        library: library as any,
         poolContract,
         chainId,
         tokenContract,
@@ -97,7 +97,6 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
     setLoadingModal,
     evmSwitchChain,
     chainId,
-    library,
     setResultModal,
     totalLiquidity,
   ]);

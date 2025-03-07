@@ -2,8 +2,7 @@ import { BRIDGE_IN_ABI, BRIDGE_OUT_ABI, ERC20_ABI, CREATE_TOKEN_ABI, LIMIT_ABI, 
 import { useCallback, useEffect, useMemo } from 'react';
 import { AelfInstancesKey, ChainId } from 'types';
 import { getAElf, getNodeByChainId, getWallet, isELFChain } from 'utils/aelfUtils';
-import { provider } from 'web3-core';
-import { useAElf, useWeb3 } from './web3';
+import { useAElf } from './web3';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
 import { isELFAddress, isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
@@ -16,7 +15,6 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { getContractBasic } from '@portkey/contracts';
 import { SupportedTONChain, WEB_LOGIN_CONFIG } from 'constants/index';
 import { IContract } from '@portkey/types';
-
 import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
 import { useGetAccount } from './wallet';
 import { SupportedELFChainId } from 'constants/chain';
@@ -25,11 +23,10 @@ import { getBridgeChainInfo } from 'utils/chain';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
-export function getContract(address: string, ABI: any, library?: provider, chainId?: ChainId) {
+export function getContract(address: string, ABI: any, chainId?: ChainId) {
   return new ContractBasic({
     contractAddress: address,
     contractABI: ABI,
-    provider: library,
     chainId,
   });
 }
@@ -92,18 +89,18 @@ export const getPortkeyContract = async (
     return sdkContractBasic as unknown as ContractBasic;
   }
 };
+
 export function useERCContract(address: string | undefined, ABI: any, chainId?: ChainId) {
-  const { library } = useWeb3();
   return useMemo(() => {
     if (!address || isELFChain(chainId) || isTonChain(chainId)) return undefined;
     try {
-      return getContract(address, ABI, library, chainId);
+      return getContract(address, ABI, chainId);
     } catch (error) {
       console.log(error, '====useERCContract');
       return undefined;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ABI, address, library]);
+  }, [ABI, address]);
 }
 
 export async function getELFContract(

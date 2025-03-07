@@ -59,7 +59,7 @@ export const NAV_LIST = [
 export const LISTING_MENU_CONFIG = [
   {
     label: 'Listing Application',
-    link: getListingUrl(ListingStep.TOKEN_INFORMATION),
+    link: getListingUrl?.(ListingStep.TOKEN_INFORMATION),
   },
   {
     label: 'My Applications',

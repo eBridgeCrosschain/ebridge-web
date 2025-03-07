@@ -5,7 +5,7 @@ import { BRIDGE_TOKEN_MAP } from 'constants/index';
 import { getTokenPrice } from 'utils/api/common';
 import { useTokenDispatch, useTokenPriceByContext } from 'contexts/useToken/hooks';
 import { addTokenPrice } from 'contexts/useToken/actions';
-import { useEVMSwitchChain, useWeb3 } from './web3';
+import { useEVMSwitchChain } from './web3';
 import { CREATE_TOKEN_ABI } from 'constants/abis';
 import { getContract } from './useContract';
 import { getBridgeChainInfo } from 'utils/chain';
@@ -52,7 +52,6 @@ export function useTokenPrice(symbol1?: string) {
 }
 
 export function useCallEVMCreateToken() {
-  const { library } = useWeb3();
   const evmSwitchChain = useEVMSwitchChain();
 
   return useCallback(
@@ -68,15 +67,14 @@ export function useCallEVMCreateToken() {
     }) => {
       await evmSwitchChain(chainId);
       const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
-      const contract = getContract(address, CREATE_TOKEN_ABI, library, chainId);
+      const contract = getContract(address, CREATE_TOKEN_ABI, chainId);
       return createToken({ createTokenContract: contract, ...args });
     },
-    [evmSwitchChain, library],
+    [evmSwitchChain],
   );
 }
 
 export function useCallEVMCreateOfficialToken() {
-  const { library } = useWeb3();
   const evmSwitchChain = useEVMSwitchChain();
 
   return useCallback(
@@ -95,10 +93,10 @@ export function useCallEVMCreateOfficialToken() {
       await evmSwitchChain(chainId);
       console.log('====== useCallEVMCreateOfficialToken', '');
       const address = getBridgeChainInfo(chainId)?.CREATE_TOKEN_CONTRACT;
-      const contract = getContract(address, CREATE_TOKEN_ABI, library, chainId);
+      const contract = getContract(address, CREATE_TOKEN_ABI, chainId);
       console.log('====== useCallEVMCreateOfficialToken address', address, contract);
       return createOfficialToken({ createTokenContract: contract, ...args });
     },
-    [evmSwitchChain, library],
+    [evmSwitchChain],
   );
 }

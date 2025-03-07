@@ -98,9 +98,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   const changeWallet = useThrottleCallback(() => {
     let selectWallet;
-    if (isPortkeyConnector(fromWallet.connector as string) && fromWallet.isActive && !fromWallet.account) {
+    if (isPortkeyConnector(fromWallet.connectorId) && fromWallet.isActive && !fromWallet.account) {
       selectWallet = 'from';
-    } else if (isPortkeyConnector(toWallet.connector as string) && toWallet.isActive && !toWallet.account) {
+    } else if (isPortkeyConnector(toWallet.connectorId) && toWallet.isActive && !toWallet.account) {
       selectWallet = 'to';
     }
 

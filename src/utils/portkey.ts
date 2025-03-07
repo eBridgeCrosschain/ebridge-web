@@ -1,4 +1,4 @@
-import { Connector } from '@web3-react/types';
+import { TWalletConnectorId } from 'types';
 
 export function compareVersions(v1: string, v2: string) {
   const v1Parts = v1.split('.').map(Number);
@@ -30,8 +30,8 @@ export function isPortkeyConnectEagerly() {
   return false;
 }
 
-export function isPortkeyConnector(connector?: string | Connector) {
-  return connector === 'PORTKEY';
+export function isPortkeyConnector(connectorId?: TWalletConnectorId) {
+  return connectorId === 'PORTKEY';
 }
 
 export function isSelectPortkey(type?: string) {

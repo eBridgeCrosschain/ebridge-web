@@ -1,12 +1,18 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+<p>
+  <img alt="UNIT TESTS" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/eBridgeCrosschain/ebridge-web/feature/ut-badge/feature-ut-utils-test-results.json" />
+  <span>&nbsp;&nbsp;</span>
+  <img alt="UNIT TESTS COVERAGE" src="https://codecov.io/gh/eBridgeCrosschain/ebridge-web/branch/master/graph/badge.svg?precision=2" />
+</p>
+
 ## Getting Started
 
 First, setup env files refer to `.env.example`:
 
-* `.env.local` for all local environment
-* `.env.mainnet.local` for mainnet
-* `.env.testnet.local` for testnet
+- `.env.local` for all local environment
+- `.env.mainnet.local` for mainnet
+- `.env.testnet.local` for testnet
 
 Run the development server:
 
