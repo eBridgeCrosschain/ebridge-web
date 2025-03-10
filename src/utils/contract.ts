@@ -14,15 +14,12 @@ import { TonConnectUI } from '@tonconnect/ui-react';
 import { getTransactionResponseHash } from './ton';
 import { CallTonContract, TonContractCallData } from './tonContractCall';
 import {
-  getGasPriceByWagmi,
   readContractByWagmi,
   TReadContractByWagmiParams,
   TWriteContractByWagmiParams,
   waitForTransactionReceiptByWagmi,
   writeContractByWagmi,
 } from './wagmi';
-import { ZERO } from 'constants/misc';
-import { SupportedChainId } from 'constants/chain';
 
 export interface AbiType {
   internalType?: string;
@@ -179,16 +176,16 @@ export class WB3ContractBasic {
       const _chainId = this.chainId || ERCChainConstants.chainId;
 
       // optimize gas fees
-      let gasPriceFromApi = gasPrice;
+      const gasPriceFromApi = gasPrice;
       // BSC does not need to actively calculate gas fee
-      if (_chainId !== SupportedChainId.BSC_MAINNET && _chainId !== SupportedChainId.BSC_TESTNET) {
-        try {
-          const _gasPrice = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
-          gasPriceFromApi = ZERO.plus(String(_gasPrice)).times(1.15).toFixed(0);
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      // if (_chainId !== SupportedChainId.BSC_MAINNET && _chainId !== SupportedChainId.BSC_TESTNET) {
+      //   try {
+      //     const _gasPrice = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
+      //     gasPriceFromApi = ZERO.plus(String(_gasPrice)).times(1.15).toFixed(0);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
 
       const params = {
         abi: this.contractABI,
