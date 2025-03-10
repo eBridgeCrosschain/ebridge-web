@@ -16,22 +16,11 @@
   {
     "constant": false,
     "inputs": [
-      {
-        "name": "guy",
-        "type": "address"
-      },
-      {
-        "name": "wad",
-        "type": "uint256"
-      }
+      { "name": "_spender", "type": "address" },
+      { "name": "_value", "type": "uint256" }
     ],
     "name": "approve",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"

@@ -179,6 +179,7 @@ export class WB3ContractBasic {
       const _chainId = this.chainId || ERCChainConstants.chainId;
 
       // optimize gas fees
+      // TODO evm gas optimization
       let gasPriceFromApi = gasPrice;
       // BSC does not need to actively calculate gas fee
       if (_chainId !== SupportedChainId.BSC_MAINNET && _chainId !== SupportedChainId.BSC_TESTNET) {
