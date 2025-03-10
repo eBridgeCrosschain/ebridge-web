@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ChainId } from 'types';
 import { getContractMethods } from 'utils/aelfUtils';
 import { AElfContractBasic } from 'utils/contract';
@@ -39,9 +39,12 @@ vi.mock('utils/tonContractCall', () => {
   };
 });
 
-vi.mock('utils/provider', () => {
+vi.mock('utils/wagmi', () => {
   return {
-    getDefaultProviderByChainId: vi.fn(),
+    getGasPriceByWagmi: vi.fn(),
+    readContractByWagmi: vi.fn(),
+    waitForTransactionReceiptByWagmi: vi.fn(),
+    writeContractByWagmi: vi.fn(),
   };
 });
 
