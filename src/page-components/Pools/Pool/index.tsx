@@ -50,7 +50,7 @@ export default function Pool() {
     if (!chainIcon || !tokenInfo) push('/pools');
   }, [chainIcon, push, tokenInfo]);
   return (
-    <div className={clsx('page-content', 'main-page-content-wrap')}>
+    <div className={clsx('page-content', 'main-page-content-wrap', styles['pool-page-wrap'])}>
       <Col span={24}>
         <Row
           className={clsx('main-page-component-wrap', styles['back-row'], 'flex-row-center', 'cursor-pointer')}

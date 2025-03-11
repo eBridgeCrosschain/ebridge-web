@@ -48,9 +48,13 @@ export default function AddPool({ chainId, tokenInfo, price }: TAddPoolProps) {
     { ...web3Wallet, chainId },
     useMemo(() => {
       // if (isELFChain(chainId) || tokenInfo?.isNativeToken) return tokenInfo;
-      if (isELFChain(chainId)) return tokenInfo;
-      if (tokenInfo?.isNativeToken) return tokenInfo.symbol;
-      return tokenInfo?.address;
+      // return tokenInfo?.address;
+
+      if (!chainId) return;
+      const { symbol, address, isNativeToken } = tokenInfo || {};
+      if (isELFChain(chainId)) return [symbol];
+      if (isNativeToken) return [symbol];
+      return [address];
     }, [chainId, tokenInfo]),
   );
 
