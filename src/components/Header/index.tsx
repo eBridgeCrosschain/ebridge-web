@@ -36,6 +36,7 @@ import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import { isPortkey } from 'utils/portkey';
 import { useConnect } from 'hooks/useConnect';
+import { isMobileDevices } from 'utils/isMobile';
 
 function SelectLanguage() {
   const { language, changeLanguage } = useLanguage();
@@ -146,7 +147,9 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
             <WalletIcon connectorId={TONConnectorId.TON} className={styles['wallet-icon']} type="ton-wallet-white" />
           ) : (
             <div className="flex-row-center">
-              {!isPortkey() && <WalletIcon connectorId={EVMConnectorId.METAMASK} className={styles['wallet-icon']} />}
+              {!isPortkey() && !isMobileDevices() && (
+                <WalletIcon connectorId={EVMConnectorId.METAMASK} className={styles['wallet-icon']} />
+              )}
               <WalletIcon connectorId={EVMConnectorId.WALLET_CONNECT} className={styles['wallet-icon']} />
               {!isPortkey() && (
                 <WalletIcon connectorId={EVMConnectorId.COINBASE_WALLET} className={styles['wallet-icon']} />
