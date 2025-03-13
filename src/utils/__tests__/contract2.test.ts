@@ -81,7 +81,7 @@ describe('AElfContractBasic Class', () => {
       vi.clearAllMocks();
     });
 
-    it('', async () => {
+    it('should catch 402 error', async () => {
       const contract = new AElfContractBasic({
         ...mockProps,
         aelfContract: {

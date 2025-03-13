@@ -12,7 +12,7 @@ export default defineConfig({
       all: false,
       enabled: true,
       provider: 'v8',
-      include: ['src/utils/**/*.[jt]s?(x)'],
+      include: ['src/utils/**/*.[jt]s?(x)', 'src/contracts/**/*.[jt]s?(x)'],
       exclude: [
         ...configDefaults.exclude,
         '**/dist/*.*',
