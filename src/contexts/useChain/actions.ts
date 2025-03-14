@@ -1,11 +1,10 @@
 import { basicActions } from 'contexts/utils';
-import { WalletType } from 'types';
-import { ConnectionType } from 'walletConnectors';
+import { EVMConnectorId, WalletType } from 'types';
 
 export declare type ChainState = {
   userERCChainId?: number;
   userELFChainId?: string;
-  selectERCWallet?: ConnectionType;
+  selectERCWallet?: EVMConnectorId;
   selectELFWallet?: WalletType;
 };
 
@@ -17,7 +16,7 @@ export enum ChainActions {
 }
 
 export const useChainView = {
-  setSelectERCWallet: (selectERCWallet?: ConnectionType) => basicActions(ChainActions['default'], { selectERCWallet }),
+  setSelectERCWallet: (selectERCWallet?: EVMConnectorId) => basicActions(ChainActions['default'], { selectERCWallet }),
   setUserERCChainId: (userERCChainId: string) => basicActions(ChainActions['default'], { userERCChainId }),
   setUserELFChainId: (userELFChainId: string) => basicActions(ChainActions['default'], { userELFChainId }),
   setSelectELFWallet: (selectELFWallet?: WalletType) =>

@@ -4,6 +4,14 @@ export const handleError = (error: any) => {
 
 export function handleContractError(error?: any, req?: any) {
   if (typeof error === 'string') return { message: error };
+
+  // EVM contract error by wagmi
+  if (error.shortMessage || error.details) {
+    return {
+      message: error.shortMessage || error.details,
+    };
+  }
+
   if (error?.message) return error;
   if (error?.Error) {
     return {

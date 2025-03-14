@@ -1,45 +1,49 @@
-import { WalletInfo } from 'types';
-import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
+import { AElfConnectorId, EVMConnectorId, TONConnectorId, TWalletConnectorId, WalletInfo } from 'types';
 
-export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
-  METAMASK: {
-    connector: injected,
+export const SUPPORTED_WALLETS: Record<TWalletConnectorId, WalletInfo> = {
+  [EVMConnectorId.METAMASK]: {
+    connectorId: EVMConnectorId.METAMASK,
+    chainType: 'ERC',
     name: 'MetaMask',
     iconType: 'MetaMask',
     description: 'Easy-to-use browser extension.',
     href: null,
   },
-  WALLET_CONNECT: {
-    connector: walletConnect,
+  [EVMConnectorId.WALLET_CONNECT]: {
+    connectorId: EVMConnectorId.WALLET_CONNECT,
+    chainType: 'ERC',
     name: 'WalletConnect',
     iconType: 'WalletConnect',
     description: 'Connect to Trust Wallet, Rainbow Wallet and more...',
     href: null,
   },
-  COINBASE_WALLET: {
-    connector: coinbaseWallet,
+  [EVMConnectorId.COINBASE_WALLET]: {
+    connectorId: EVMConnectorId.COINBASE_WALLET,
+    chainType: 'ERC',
     name: 'Coinbase Wallet',
     iconType: 'coinbaseWallet',
     description: 'Connect to Coinbase Wallet',
     href: null,
   },
-  NIGHTELF: {
-    connector: 'NIGHTELF',
+  [AElfConnectorId.NIGHTELF]: {
+    connectorId: AElfConnectorId.NIGHTELF,
+    chainType: 'ELF',
     name: 'NIGHTELF',
     iconType: 'nightElf',
     description: 'NIGHTELF',
     href: null,
   },
-  PORTKEY: {
-    connector: 'PORTKEY',
+  [AElfConnectorId.PORTKEY]: {
+    connectorId: AElfConnectorId.PORTKEY,
+    chainType: 'ELF',
     name: 'Portkey Wallet',
     iconType: 'portkeyV2',
     description: 'Portkey Wallet',
     href: null,
   },
-  TON: {
+  [TONConnectorId.TON]: {
+    connectorId: TONConnectorId.TON,
     chainType: 'TON',
-    connector: 'TON',
     name: 'Ton connect',
     iconType: 'ton-wallet',
     description: 'Ton connect',

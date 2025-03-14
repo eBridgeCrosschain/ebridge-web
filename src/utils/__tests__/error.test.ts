@@ -29,6 +29,18 @@ describe('handleContractError', () => {
     expect(handleContractError(error)).toEqual(error);
   });
 
+  it('should return error if error.shortMessage exists', () => {
+    const error = { shortMessage: 'EVM contract error message' };
+    const result = handleContractError(error);
+    expect(result.message).toEqual(error.shortMessage);
+  });
+
+  it('should return error if error.details exists', () => {
+    const error = { details: 'User rejected request' };
+    const result = handleContractError(error);
+    expect(result.message).toEqual(error.details);
+  });
+
   it('should return detailed message and code if error.Error exists', () => {
     const error = { Error: { Details: 'Detailed error', Message: 'Error message', Code: 500 } };
     expect(handleContractError(error)).toEqual({

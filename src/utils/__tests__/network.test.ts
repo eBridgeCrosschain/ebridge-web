@@ -6,18 +6,12 @@ import {
   switchChain,
   switchNetwork,
 } from 'utils/network';
-import { ChainId } from 'types';
+import { ChainId, COINBASE_WALLET_ID, METAMASK_WALLET_ID, WALLET_CONNECT_ID } from 'types';
 import { eventBus } from 'utils/eBridgeEventBus';
 import { isELFChain } from 'utils/aelfUtils';
-import {
-  walletConnectConnection,
-  networkConnection,
-  injectedConnection,
-  coinbaseWalletConnection,
-} from 'walletConnectors';
 import storages from 'constants/storages';
-import CommonMessage from 'components/CommonMessage';
-import { Connector } from '@web3-react/types';
+import { Connector } from 'wagmi';
+import { switchChainByWagmi } from 'utils/wagmi';
 
 // Mock the NetworkList in the network module
 vi.mock('constants/index', async (importOriginal) => {
@@ -66,52 +60,6 @@ vi.mock('components/CommonMessage', () => ({
   },
 }));
 
-vi.mock('walletConnectors', () => ({
-  injectedConnection: {
-    connector: {
-      activate: vi.fn(),
-      connectEagerly: vi.fn(),
-    },
-  },
-  coinbaseWalletConnection: {
-    connector: 'coinbaseWalletConnector',
-  },
-  walletConnectConnection: {
-    connector: {
-      activate: vi.fn(),
-      provider: {
-        session: {
-          namespaces: {
-            'eip:11155111': {
-              chains: ['eip:11155111'],
-              accounts: ['eip:11155111:0x123'],
-            },
-            'eip155:3': {
-              chains: ['eip155:3'],
-              accounts: ['eip155:3:0x123'],
-            },
-          },
-        },
-      },
-    },
-  },
-  networkConnection: {
-    connector: {
-      activate: vi.fn(),
-      provider: {
-        session: {
-          namespaces: {
-            'eip155:11155111': {
-              chains: ['eip155:11155111'],
-              accounts: ['eip155:11155111:0x123'],
-            },
-          },
-        },
-      },
-    },
-  },
-}));
-
 vi.mock('constants/storages', () => {
   return {
     default: {
@@ -125,6 +73,12 @@ vi.mock('utils/eBridgeEventBus', () => {
     eventBus: {
       emit: vi.fn(),
     },
+  };
+});
+
+vi.mock('utils/wagmi', () => {
+  return {
+    switchChainByWagmi: vi.fn(),
   };
 });
 
@@ -285,56 +239,44 @@ describe('isChainAllowed', () => {
     vi.clearAllMocks();
   });
 
-  it('should return true for supported chainId with injectedConnection.connector', () => {
-    const result = isChainAllowed(injectedConnection.connector, supportedChainId);
+  it('should return true for supported chainId with metamask connector', () => {
+    const result = isChainAllowed({ id: METAMASK_WALLET_ID } as unknown as Connector, supportedChainId);
 
     expect(result).toBe(true);
   });
 
-  it('should return false for unsupported chainId with injectedConnection.connector', () => {
-    const result = isChainAllowed(injectedConnection.connector, unsupportedChainId);
+  it('should return false for unsupported chainId with metamask connector', () => {
+    const result = isChainAllowed({ id: METAMASK_WALLET_ID } as unknown as Connector, unsupportedChainId);
 
     expect(result).toBe(false);
   });
 
-  it('should return true for supported chainId with coinbaseWalletConnection.connector', () => {
-    const result = isChainAllowed(coinbaseWalletConnection.connector, supportedChainId);
+  it('should return true for supported chainId with coinbaseWallet connector', () => {
+    const result = isChainAllowed({ id: COINBASE_WALLET_ID } as unknown as Connector, supportedChainId);
 
     expect(result).toBe(true);
   });
 
-  it('should return false for unsupported chainId with coinbaseWalletConnection.connector', () => {
-    const result = isChainAllowed(coinbaseWalletConnection.connector, unsupportedChainId);
+  it('should return false for unsupported chainId with coinbaseWallet connector', () => {
+    const result = isChainAllowed({ id: COINBASE_WALLET_ID } as unknown as Connector, unsupportedChainId);
 
     expect(result).toBe(false);
   });
 
-  it('should return true for supported chainId with walletConnectConnection.connector', () => {
-    const result = isChainAllowed(walletConnectConnection.connector, supportedChainId);
+  it('should return true for supported chainId with walletConnect connector', () => {
+    const result = isChainAllowed({ id: WALLET_CONNECT_ID } as unknown as Connector, supportedChainId);
 
     expect(result).toBe(true);
   });
 
-  it('should return false for unsupported chainId with walletConnectConnection.connector', () => {
-    const result = isChainAllowed(walletConnectConnection.connector, unsupportedChainId);
-
-    expect(result).toBe(false);
-  });
-
-  it('should return true for supported chainId with networkConnection.connector', () => {
-    const result = isChainAllowed(networkConnection.connector, supportedChainId);
-
-    expect(result).toBe(true);
-  });
-
-  it('should return false for unsupported chainId with networkConnection.connector', () => {
-    const result = isChainAllowed(networkConnection.connector, unsupportedChainId);
+  it('should return false for unsupported chainId with walletConnect connector', () => {
+    const result = isChainAllowed({ id: WALLET_CONNECT_ID } as unknown as Connector, unsupportedChainId);
 
     expect(result).toBe(false);
   });
 
   it('should return false for any chainId with an unknown connector', () => {
-    const result = isChainAllowed('unknownConnector' as any, supportedChainId);
+    const result = isChainAllowed({ id: 'unknownConnectorId' } as unknown as Connector, supportedChainId);
 
     expect(result).toBe(false);
   });
@@ -511,60 +453,53 @@ describe('switchChain', () => {
 
   // Test 6: Handle WalletConnect activation
   it('should activate wallet connector', async () => {
-    await switchChain({ ...mockSepoliaInfo, chainId: 3 as any }, walletConnectConnection.connector, true);
+    await switchChain(
+      { ...mockSepoliaInfo, chainId: 3 as any },
+      { id: METAMASK_WALLET_ID } as unknown as Connector,
+      true,
+    );
 
-    expect(walletConnectConnection.connector.activate).toHaveBeenCalledWith(3);
+    expect(switchChainByWagmi).toHaveBeenCalledWith({ chainId: 3 });
   });
 
   // Test 7: Handle network connection activation
   it('should activate network connector', async () => {
-    await switchChain(mockSepoliaInfo, networkConnection.connector, true);
+    await switchChain(mockSepoliaInfo, { id: COINBASE_WALLET_ID } as unknown as Connector, true);
 
-    expect(networkConnection.connector.activate).toHaveBeenCalledWith(11155111);
+    expect(switchChainByWagmi).toHaveBeenCalledWith({ chainId: 11155111 });
   });
 
-  // Test 7: The network connection activate method is not executed
+  // Test 8: The network connection activate method is not executed
   it('should not execute activate method', async () => {
     // Mock isELFChain return false
     vi.mocked(isELFChain).mockReturnValue(false);
 
-    const result = await switchChain(mockSepoliaInfo, networkConnection.connector, true, 11155111);
+    const result = await switchChain(
+      mockSepoliaInfo,
+      { id: COINBASE_WALLET_ID } as unknown as Connector,
+      true,
+      11155111,
+    );
 
     expect(result).toBeUndefined();
-    expect(networkConnection.connector.activate).not.toHaveBeenCalled();
+    expect(switchChainByWagmi).not.toHaveBeenCalled();
   });
 
-  // Test 8: Handle walletConnectConnection error
-  it('should show error if connector.provider.session not chainId', async () => {
-    await expect(
-      switchChain(mockSepoliaInfo, walletConnectConnection.connector as unknown as Connector, true),
-    ).rejects.toThrow('sepolia is unsupported by your wallet.');
-
-    expect(CommonMessage.error).toHaveBeenCalled();
-  });
-
-  // Test 9: Handle generic connector activation
-  it('should activate generic connector with parameters', async () => {
-    await switchChain(mockSepoliaInfo, injectedConnection.connector, true);
-
-    expect(injectedConnection.connector.activate).toHaveBeenCalled();
-  });
-
-  // Test 10: Handle inactive web3 case
+  // Test 9: Handle inactive web3 case
   it('should switch network when web3 is inactive', async () => {
     const result = await switchChain(mockSepoliaInfo, undefined, false);
 
     expect(result).toBeUndefined();
   });
 
-  // Test 11: Boundary test - minimum valid chainId
+  // Test 10: Boundary test - minimum valid chainId
   it('should handle minimum valid chainId (1)', async () => {
     await switchChain({ ...mockSepoliaInfo, chainId: 1 });
 
     expect(eventBus.emit).toHaveBeenCalledWith(storages.userERCChainId, 1);
   });
 
-  // Test 12: Boundary test - maximum safe integer chainId
+  // Test 11: Boundary test - maximum safe integer chainId
   it('should handle maximum safe chainId (2^53-1)', async () => {
     const maxSafeChainId = Number.MAX_SAFE_INTEGER;
     await switchChain({ ...mockSepoliaInfo, chainId: maxSafeChainId });

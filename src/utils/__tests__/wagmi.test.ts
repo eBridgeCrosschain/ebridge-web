@@ -1,20 +1,47 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getTransactionReceiptAutoRetry, getBalanceByWagmi, readContractByWagmi } from '../wagmi';
-import { getTransactionReceipt, getBalance, readContract } from '@wagmi/core';
+import {
+  getTransactionReceiptAutoRetry,
+  getBalanceByWagmi,
+  readContractByWagmi,
+  writeContractByWagmi,
+  getGasPriceByWagmi,
+  waitForTransactionReceiptByWagmi,
+  switchChainByWagmi,
+} from 'utils/wagmi';
+import {
+  getTransactionReceipt,
+  getBalance,
+  readContract,
+  writeContract,
+  getAccount,
+  getGasPrice,
+  waitForTransactionReceipt,
+  switchChain,
+} from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
+import { METAMASK_WALLET_ID } from 'types';
 
 // Mock external dependencies
+vi.mock('constants/evm', () => ({
+  EVMProviderConfig: {},
+}));
+
 vi.mock('@wagmi/core', () => ({
   getTransactionReceipt: vi.fn(),
   getBalance: vi.fn(),
   readContract: vi.fn(),
+  writeContract: vi.fn(),
+  getGasPrice: vi.fn(),
+  waitForTransactionReceipt: vi.fn(),
+  getAccount: vi.fn(),
+  switchChain: vi.fn(),
 }));
 
 vi.mock('utils', () => ({
   sleep: vi.fn(),
 }));
 
-vi.mock('../error', () => ({
+vi.mock('utils/error', () => ({
   handleErrorMessage: vi.fn((error: Error) => error.message),
 }));
 
@@ -162,6 +189,95 @@ describe('EVM Utils', () => {
 
       expect(result).toEqual(mockResult);
       expect(readContract).toHaveBeenCalledWith(EVMProviderConfig, params);
+    });
+  });
+
+  describe('writeContractByWagmi', () => {
+    it('should call wagmi writeContract with formatted parameters', async () => {
+      const connector = { id: METAMASK_WALLET_ID } as any;
+      vi.mocked(getAccount).mockResolvedValue(connector);
+      const mockResult = '0x123' as `0x${string}`;
+      vi.mocked(writeContract).mockResolvedValue(mockResult);
+
+      const params = {
+        address: '0x123',
+        account: '0x123' as `0x${string}`,
+        abi: ['mockABI'],
+        functionName: 'balanceOf',
+        args: ['0x456'],
+        chainId: sepoliaChainId,
+      };
+      const result = await writeContractByWagmi(params);
+
+      expect(result).toEqual(mockResult);
+      expect(getAccount).toHaveBeenCalledWith(EVMProviderConfig);
+      expect(writeContract).toHaveBeenCalledWith(EVMProviderConfig, params);
+    });
+
+    it('should handle missing optional parameters', async () => {
+      const connector = { id: METAMASK_WALLET_ID } as any;
+      vi.mocked(getAccount).mockResolvedValue(connector);
+      const mockResult = '' as any;
+      vi.mocked(writeContract).mockResolvedValue(mockResult);
+
+      const params = {
+        address: '0x123',
+        functionName: 'totalSupply',
+      };
+      const result = await writeContractByWagmi(params as any);
+
+      expect(result).toEqual(mockResult);
+      expect(writeContract).toHaveBeenCalledWith(EVMProviderConfig, params);
+    });
+  });
+
+  describe('getGasPriceByWagmi', () => {
+    it('should call wagmi getGasPrice with formatted parameters', async () => {
+      const mockResult = BigInt(10000);
+      vi.mocked(getGasPrice).mockResolvedValue(mockResult);
+
+      const params = {
+        chainId: sepoliaChainId,
+      };
+      const result = await getGasPriceByWagmi(params);
+
+      expect(result).toEqual(mockResult);
+      expect(getGasPrice).toHaveBeenCalledWith(EVMProviderConfig, params);
+    });
+  });
+
+  describe('waitForTransactionReceiptByWagmi', () => {
+    it('should call wagmi waitForTransactionReceipt with formatted parameters', async () => {
+      const mockResult = {
+        status: 'success' as TEVMStatus,
+        transactionHash: '0x2c37286' as `0x${string}`,
+        type: 'eip1559',
+        chainId: sepoliaChainId,
+      } as any;
+
+      vi.mocked(waitForTransactionReceipt).mockResolvedValue(mockResult);
+
+      const params = {
+        hash: '0x2c37286' as `0x${string}`,
+        chainId: sepoliaChainId,
+      };
+
+      const result = await waitForTransactionReceiptByWagmi(params);
+
+      expect(result).toEqual(mockResult);
+      expect(waitForTransactionReceipt).toHaveBeenCalledWith(EVMProviderConfig, params);
+    });
+  });
+
+  describe('switchChainByWagmi', () => {
+    it('should call wagmi switchChain with formatted parameters', async () => {
+      const params = {
+        chainId: sepoliaChainId,
+      };
+
+      await switchChainByWagmi(params);
+
+      expect(switchChain).toHaveBeenCalledWith(EVMProviderConfig, params);
     });
   });
 });

@@ -28,15 +28,15 @@ import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS, LIST
 import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
-import { ChainType } from 'types';
+import { AElfConnectorId, ChainType, EVMConnectorId, TONConnectorId } from 'types';
 import { useAelfLogin } from 'hooks/wallet';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
 import { isELFChain } from 'utils/aelfUtils';
 import { formatAddress } from 'utils/chain';
 import { isPortkey } from 'utils/portkey';
-import { coinbaseWallet, injected, walletConnect } from 'walletConnectors';
 import { useConnect } from 'hooks/useConnect';
+import { isMobileDevices } from 'utils/isMobile';
 
 function SelectLanguage() {
   const { language, changeLanguage } = useLanguage();
@@ -115,7 +115,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
 
   const { fromWallet, toWallet, fromOptions } = useWallet();
   const wallet = fromOptions?.chainType === chainType ? fromWallet : toWallet;
-  const { walletType, chainId, account, connector } = wallet || {};
+  const { walletType, chainId, account, connectorId } = wallet || {};
   const isELF = chainType === 'ELF';
   return account ? (
     <Button
@@ -128,7 +128,7 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
           }),
         )
       }>
-      <WalletIcon connector={connector} className={styles['wallet-icon']} />
+      <WalletIcon connectorId={connectorId} className={styles['wallet-icon']} />
       {isMd ? (
         <CommonImage priority className={styles['wallet-arrow-icon']} src={arrowBlueIcon} />
       ) : (
@@ -142,14 +142,18 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
       {isMd ? (
         <div className={clsx(styles['mobile-wallet-button-content'], 'flex-row-center')}>
           {isELF ? (
-            <WalletIcon connector="PORTKEY" className={styles['wallet-icon']} />
+            <WalletIcon connectorId={AElfConnectorId.PORTKEY} className={styles['wallet-icon']} />
           ) : chainType === 'TON' ? (
-            <WalletIcon connector={'TON'} className={styles['wallet-icon']} type="ton-wallet-white" />
+            <WalletIcon connectorId={TONConnectorId.TON} className={styles['wallet-icon']} type="ton-wallet-white" />
           ) : (
             <div className="flex-row-center">
-              {!isPortkey() && <WalletIcon connector={injected} className={styles['wallet-icon']} />}
-              <WalletIcon connector={walletConnect} className={styles['wallet-icon']} />
-              {!isPortkey() && <WalletIcon connector={coinbaseWallet} className={styles['wallet-icon']} />}
+              {!isPortkey() && !isMobileDevices() && (
+                <WalletIcon connectorId={EVMConnectorId.METAMASK} className={styles['wallet-icon']} />
+              )}
+              <WalletIcon connectorId={EVMConnectorId.WALLET_CONNECT} className={styles['wallet-icon']} />
+              {!isPortkey() && (
+                <WalletIcon connectorId={EVMConnectorId.COINBASE_WALLET} className={styles['wallet-icon']} />
+              )}
             </div>
           )}
           <span>{t('Connect')}</span>

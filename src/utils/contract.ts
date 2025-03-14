@@ -1,12 +1,8 @@
 /* eslint-disable react/no-is-mounted */
-import { provider } from 'web3-core';
-import type { Contract } from 'web3-eth-contract';
-import Web3 from 'web3';
 import { SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
-import { ELFChainConstants } from 'constants/ChainConstants';
+import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
 import { getContractMethods, transformArrayToMap, getTxResult, isELFChain, encodedTransfer } from './aelfUtils';
 import { ChainId, ChainType } from 'types';
-import { getDefaultProviderByChainId } from './provider';
 import { isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
@@ -14,10 +10,16 @@ import { IAElfChain } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
 import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
 import { ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
-import { ZERO } from 'constants/misc';
 import { TonConnectUI } from '@tonconnect/ui-react';
 import { getTransactionResponseHash } from './ton';
 import { CallTonContract, TonContractCallData } from './tonContractCall';
+import {
+  readContractByWagmi,
+  TReadContractByWagmiParams,
+  TWriteContractByWagmiParams,
+  waitForTransactionReceiptByWagmi,
+  writeContractByWagmi,
+} from './wagmi';
 
 export interface AbiType {
   internalType?: string;
@@ -45,7 +47,6 @@ export interface AbiItem {
 
 export interface ContractProps {
   contractABI?: AbiItem[];
-  provider?: provider;
   contractAddress: string;
   chainId?: ChainId;
   aelfContract?: any;
@@ -62,10 +63,6 @@ interface ErrorMsg {
     message: string;
   };
 }
-
-type InitContract = (provider: provider, address: string, ABI: AbiItem) => Contract;
-
-type InitViewOnlyContract = (address: string, ABI: AbiItem) => Contract;
 
 type CallViewMethod = (
   functionName: string,
@@ -135,91 +132,94 @@ export class ContractBasic {
 }
 
 export class WB3ContractBasic {
-  public contract: Contract | null;
-  public contractForView: Contract;
   public address?: string;
-  public provider?: provider;
   public chainId?: number;
-  public web3?: Web3;
   contractABI: AbiItem[] | undefined;
   constructor(options: ContractProps) {
-    const { contractABI, provider, contractAddress, chainId } = options;
+    const { contractABI, contractAddress, chainId } = options;
     this.contractABI = contractABI;
-    const contactABITemp = contractABI;
     this.chainId = chainId as number;
-    this.contract =
-      contractAddress && provider ? this.initContract(provider, contractAddress, contactABITemp as AbiItem) : null;
-
-    this.contractForView = this.initViewOnlyContract(contractAddress, contactABITemp as AbiItem);
     this.address = contractAddress;
-    this.provider = provider;
   }
-
-  public initContract: InitContract = (provider, address, ABI) => {
-    this.web3 = new Web3(provider);
-    return new this.web3.eth.Contract(ABI as any, address);
-  };
-  public initViewOnlyContract: InitViewOnlyContract = (address, ABI) => {
-    const defaultProvider = getDefaultProviderByChainId(this.chainId as ChainId);
-    const defaultWeb3 = new Web3(defaultProvider);
-    return new defaultWeb3.eth.Contract(ABI as any, address);
-  };
 
   public callViewMethod: CallViewMethod = async (
     functionName,
     paramsOption,
     callOptions = { defaultBlock: 'latest' },
   ) => {
-    const contract = this.chainId ? this.contractForView : this.contract;
-    if (!contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
-      const { defaultBlock, options } = callOptions;
-      // BlockTag
-      contract.defaultBlock = defaultBlock;
-      return await contract.methods[functionName](...(paramsOption || [])).call(options);
+      const { defaultBlock } = callOptions;
+      const _chainId = this.chainId || ERCChainConstants.chainId;
 
-      // const chainId = this.chainId || ERCChainConstants.chainId;
-      // const { defaultBlock } = callOptions;
+      const params = {
+        abi: this.contractABI,
+        functionName,
+        address: this.address as string,
+        chainId: _chainId,
+        args: paramsOption,
+      } as TReadContractByWagmiParams;
 
-      // const params = {
-      //   abi: this.contractABI,
-      //   functionName,
-      //   address: this.address as string,
-      //   chainId,
-      //   args: paramsOption,
-      // } as TreadContractByWagmiParams;
-      // if (defaultBlock === 'latest') delete params.blockNumber;
-      // return await readContractByWagmi(params);
+      if (defaultBlock === 'latest') delete params.blockNumber;
+
+      const res = await readContractByWagmi(params);
+      return res;
     } catch (e) {
-      console.log(e, '=====e');
+      console.log(e, '===== WB3ContractBasic callViewMethod');
 
       return { error: e };
     }
   };
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    if (!this.contract) return { error: { code: 401, message: 'Contract init error4' } };
     try {
-      console.log(this.provider, '===provider');
+      const { onMethod = 'receipt', gas, gasPrice, value, nonce } = sendOptions || {};
+      const _chainId = this.chainId || ERCChainConstants.chainId;
 
-      const contract = this.contract;
-      const { onMethod = 'receipt', ...options } = sendOptions || {};
+      // optimize gas fees
+      const gasPriceFromApi = gasPrice;
+      // BSC does not need to actively calculate gas fee
+      // if (_chainId !== SupportedChainId.BSC_MAINNET && _chainId !== SupportedChainId.BSC_TESTNET) {
+      //   try {
+      //     const _gasPrice = (await getGasPriceByWagmi({ chainId: _chainId as number })) || '10000000000';
+      //     gasPriceFromApi = ZERO.plus(String(_gasPrice)).times(1.15).toFixed(0);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
 
-      try {
-        const gasPrice = (await this.web3?.eth.getGasPrice()) || '10000000000';
-        (options as any).gasPrice = ZERO.plus(gasPrice).times(1.15).toFixed(0);
-      } catch (error) {
-        console.log(error);
+      const params = {
+        abi: this.contractABI,
+        functionName,
+        address: this.address as string,
+        chainId: _chainId,
+        args: paramsOption,
+        account,
+      } as TWriteContractByWagmiParams;
+
+      if (gasPriceFromApi) {
+        params.gasPrice = BigInt(gasPriceFromApi);
+      }
+      if (gas) {
+        params.gas = BigInt(gas);
+      }
+      if (value) {
+        params.value = BigInt(String(value)); // parseEther('0.01')
+      }
+      if (nonce) {
+        params.nonce = nonce;
       }
 
-      const result: any = await new Promise((resolve, reject) =>
-        contract.methods[functionName](...(paramsOption || []))
-          .send({ from: account, ...options })
-          .on(onMethod, resolve)
-          .on('error', reject),
-      );
+      const result = await writeContractByWagmi(params);
 
-      if (onMethod === 'receipt') return { ...result, TransactionId: result.transactionHash };
+      if (onMethod === 'receipt') {
+        const receiptResult = await waitForTransactionReceiptByWagmi({ hash: result, chainId: _chainId as number });
+        if (receiptResult.status === 'reverted') {
+          throw { message: 'Transaction is reverted', ...receiptResult };
+        }
+
+        return { ...receiptResult, TransactionId: receiptResult.transactionHash };
+      }
+
       return { TransactionId: result };
     } catch (error) {
       return { error };
@@ -227,14 +227,32 @@ export class WB3ContractBasic {
   };
 
   public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    if (!this.contract) return { error: { code: 401, message: 'Contract init error5' } };
     try {
-      const contract = this.contract;
+      const _chainId = this.chainId || ERCChainConstants.chainId;
+      const params = {
+        abi: this.contractABI,
+        functionName,
+        address: this.address as string,
+        chainId: _chainId,
+        args: paramsOption,
+        account,
+      } as TWriteContractByWagmiParams;
 
-      return contract.methods[functionName](...(paramsOption || [])).send({
-        from: account,
-        ...sendOptions,
-      });
+      const { gasPrice, gas, value, nonce } = sendOptions || {};
+      if (gasPrice) {
+        params.gasPrice = BigInt(gasPrice); // parseGwei(gasPrice);
+      }
+      if (gas) {
+        params.gas = BigInt(gas);
+      }
+      if (value) {
+        params.value = BigInt(String(value));
+      }
+      if (nonce) {
+        params.nonce = nonce;
+      }
+
+      return await writeContractByWagmi(params);
     } catch (e) {
       return { error: e };
     }
@@ -365,17 +383,15 @@ export class AElfContractBasic {
 
 export class PortkeyContractBasic {
   public contract?: IContract;
-  public provider?: provider;
   public chainId: ChainId;
   public portkeyChain?: IAElfChain;
   public methods?: any;
   public address: string;
   constructor(options: ContractProps) {
-    const { provider, contractAddress, chainId } = options;
+    const { contractAddress, chainId } = options;
     this.portkeyChain = options.portkeyChain;
     this.contract = this.portkeyChain?.getContract(options.contractAddress);
     this.address = contractAddress;
-    this.provider = provider;
     this.chainId = chainId as ChainId;
     this.getFileDescriptorsSet(this.address);
   }
@@ -436,10 +452,7 @@ export class PortkeyContractBasic {
 }
 
 export class PortkeySDKContractBasic {
-  // public contract?: IContract;
-  // public provider?: provider;
   public chainId: ChainId;
-  // public portkeyChain?: IAElfChain;
   public contractType: string;
   public methods?: any;
   public address: string;
@@ -460,7 +473,6 @@ export class PortkeySDKContractBasic {
     // this.portkeyChain = options.portkeyChain;
     // this.contract = this.portkeyChain?.getContract(options.contractAddress);
     this.address = contractAddress;
-    // this.provider = provider;
     this.sdkContract = sdkContract;
     this.chainId = chainId as ChainId;
     this.viewContract = viewContract;
@@ -557,9 +569,8 @@ export class PortkeySDKContractBasic {
 export class TONContractBasic {
   public tonConnectUI?: TonConnectUI;
   public address?: string;
-  public provider?: provider;
   public chainId?: number;
-  public web3?: Web3;
+
   constructor(options: ContractProps) {
     this.tonConnectUI = options.tonConnectUI;
     const { contractAddress, chainId } = options;

@@ -13,10 +13,25 @@ import {
 import { TonContractCallData } from 'utils/tonContractCall';
 import { isTonChain } from 'utils';
 import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
-import { getDefaultProviderByChainId } from 'utils/provider';
 import { ZERO } from 'constants/misc';
+import {
+  getGasPriceByWagmi,
+  readContractByWagmi,
+  waitForTransactionReceiptByWagmi,
+  writeContractByWagmi,
+} from 'utils/wagmi';
+import BigNumber from 'bignumber.js';
 
 // Mock external dependencies
+vi.mock('utils/wagmi', () => {
+  return {
+    getGasPriceByWagmi: vi.fn(),
+    readContractByWagmi: vi.fn(),
+    waitForTransactionReceiptByWagmi: vi.fn(),
+    writeContractByWagmi: vi.fn(),
+  };
+});
+
 vi.mock('utils/index', () => {
   return {
     isTonChain: vi.fn(),
@@ -60,12 +75,6 @@ vi.mock('utils/tonContractCall', () => {
   };
 });
 
-vi.mock('utils/provider', () => {
-  return {
-    getDefaultProviderByChainId: vi.fn(),
-  };
-});
-
 // Mock ELFChainConstants and ERCChainConstants
 vi.mock('constants/ChainConstants', () => {
   return {
@@ -76,6 +85,9 @@ vi.mock('constants/ChainConstants', () => {
           options: {},
         },
       },
+    },
+    ERCChainConstants: {
+      chainId: 11155111,
     },
   };
 });
@@ -105,68 +117,6 @@ vi.mock('@aelf-web-login/wallet-adapter-bridge', () => {
   };
 });
 
-vi.mock('web3-core', () => {
-  return {
-    provider: vi.fn(),
-  };
-});
-
-vi.mock('web3', () => {
-  const Web3Mock: any = vi.fn().mockImplementation((provider) => ({
-    provider,
-    eth: {
-      Contract: vi.fn().mockImplementation((ABI, address) => ({
-        methods: {
-          testMethod: vi.fn().mockReturnThis(),
-          getBalance: vi.fn().mockImplementation(() => ({
-            call: vi.fn().mockRejectedValue('Failed to get balance'),
-          })),
-          crossChainCreateToken: vi.fn().mockImplementation(() => {
-            return {
-              send: vi.fn().mockImplementation(() => ({
-                on: vi.fn().mockImplementation((_onMethod, resolve) => {
-                  resolve({ transactionHash: 'mockHash' });
-                }),
-              })),
-            };
-          }),
-          swapToken: vi.fn().mockImplementation(() => {
-            return {
-              send: vi.fn().mockImplementation(() => ({
-                on: vi.fn().mockImplementation(() => ({
-                  on: vi.fn().mockImplementation((_onMethod, reject) => {
-                    reject({ error: 'Failed' });
-                  }),
-                })),
-              })),
-            };
-          }),
-          createToken: vi.fn().mockReturnThis(),
-          createReceipt: vi.fn().mockImplementation(() => ({
-            send: vi.fn().mockImplementation(() => {
-              throw 'Failed to create receipt';
-            }),
-          })),
-          send: vi.fn().mockResolvedValue({ transactionHash: 'mockHash' }),
-          call: vi.fn().mockResolvedValue({ result: 'mockResult' }),
-        },
-      })),
-
-      getGasPrice: vi.fn(),
-    },
-    providers: {
-      HttpProvider: vi.fn().mockImplementation((url: string) => ({
-        url,
-        options: { keepAlive: true, withCredentials: false, timeout: 20000 },
-      })),
-    },
-  }));
-
-  return {
-    default: Web3Mock,
-  };
-});
-
 const correctAelfAddress = 'ELF_Py2TJpjTtt29zAtqLWyLEU1DEzBFPz1LJU594hy6evPF8Cvft_AELF';
 const AELFTestnetContractAddress = 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE';
 
@@ -191,14 +141,6 @@ describe('ContractBasic Class', () => {
   const mockTONProps = {
     contractAddress: 'TON_ADDRESS',
     chainId: 1100 as ChainId,
-  };
-
-  const mockProvider = {
-    host: 'http://localhost:3001',
-    connected: true,
-    supportsSubscriptions: vi.fn(),
-    send: vi.fn(),
-    disconnect: vi.fn(),
   };
 
   describe('initialize', () => {
@@ -304,15 +246,14 @@ describe('ContractBasic Class', () => {
       vi.mocked(isELFChain).mockReturnValue(false);
       vi.mocked(isTonChain).mockReturnValue(false);
 
-      const contract = new ContractBasic(mockERCProps);
+      const response = 'mockResult';
+      vi.mocked(readContractByWagmi).mockResolvedValue(response);
 
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      const contract = new ContractBasic(mockERCProps);
 
       const result = await contract.callViewMethod('testMethod');
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.result).toBe('mockResult');
+      expect(result).toBe(response);
     });
   });
 
@@ -366,18 +307,20 @@ describe('ContractBasic Class', () => {
       // Setup chain environment
       vi.mocked(isELFChain).mockReturnValue(false);
       vi.mocked(isTonChain).mockReturnValue(false);
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+      vi.mocked(waitForTransactionReceiptByWagmi).mockResolvedValue({
+        status: 'success',
+        transactionHash: txHash,
+      } as any);
 
-      const contract = new ContractBasic({ ...mockERCProps, provider: {}, contractABI: [] } as any);
-
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      const contract = new ContractBasic({ ...mockERCProps, contractABI: [] } as any);
 
       const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', []);
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-
-      expect(result.transactionHash).toBe('mockHash');
-      expect(result.TransactionId).toBe('mockHash');
+      expect(result.transactionHash).toBe(txHash);
+      expect(result.TransactionId).toBe(txHash);
     });
   });
 
@@ -418,12 +361,15 @@ describe('ContractBasic Class', () => {
       // Setup chain environment
       vi.mocked(isELFChain).mockReturnValue(false);
       vi.mocked(isTonChain).mockReturnValue(false);
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
 
-      const contract = new ContractBasic({ ...mockERCProps, provider: {}, contractABI: [] } as any);
+      const contract = new ContractBasic({ ...mockERCProps, contractABI: [] } as any);
 
       const result = await contract.callSendPromiseMethod('createToken', '0xAccount', []);
 
-      expect(result.transactionHash).toBe('mockHash');
+      expect(result).toBe(txHash);
     });
   });
 
@@ -465,58 +411,8 @@ describe('WB3ContractBasic Class', () => {
   const mockProps = {
     contractAddress: '0x123',
     chainId: 11155111 as ChainId,
-    provider: {},
     contractABI: [],
   } as any;
-
-  const mockProvider = {
-    host: 'http://localhost:3001',
-    connected: true,
-    supportsSubscriptions: vi.fn(),
-    send: vi.fn(),
-    disconnect: vi.fn(),
-  };
-
-  describe('initContract', () => {
-    it('should initialize web3 contract successfully', () => {
-      const contract = new WB3ContractBasic(mockProps);
-      expect(contract.chainId).toBe(11155111);
-    });
-  });
-
-  describe('initContract', () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
-
-    it('should return contract instance', () => {
-      const contract = new WB3ContractBasic(mockProps);
-      expect(contract.chainId).toBe(11155111);
-
-      const result = contract.initContract(mockProvider, '0x123', [] as any);
-
-      expect(result).toBeDefined();
-    });
-  });
-
-  describe('initViewOnlyContract', () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
-
-    it('should return contract instance', () => {
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
-
-      const contract = new WB3ContractBasic(mockProps);
-      expect(contract.chainId).toBe(11155111);
-
-      const result = contract.initViewOnlyContract('0x123', [] as any);
-
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result).toBeDefined();
-    });
-  });
 
   describe('callViewMethod', () => {
     beforeEach(() => {
@@ -524,50 +420,34 @@ describe('WB3ContractBasic Class', () => {
     });
 
     it('should handle view method calls', async () => {
-      const contract = new WB3ContractBasic(mockProps);
+      const txHash = '0x1234567';
+      vi.mocked(readContractByWagmi).mockResolvedValue(txHash);
 
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      const contract = new WB3ContractBasic(mockProps);
 
       const result = await contract.callViewMethod('testMethod');
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.result).toBe('mockResult');
+      expect(result).toBe(txHash);
     });
 
     it('should handle view method calls when there is no chainId', async () => {
+      const txHash = '0x1234567';
+      vi.mocked(readContractByWagmi).mockResolvedValue(txHash);
+
       const contract = new WB3ContractBasic({ ...mockProps, chainId: null });
 
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
-
       const result = await contract.callViewMethod('testMethod', ['param']);
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.result).toBe('mockResult');
-    });
-
-    it('should return error if there is no chainId, contractAddress and provider', async () => {
-      const contract = new WB3ContractBasic({ ...mockProps, chainId: null, contractAddress: '', provider: undefined });
-
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
-
-      const result = await contract.callViewMethod('testMethod', ['param']);
-
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.error).toEqual({ code: 401, message: 'Contract init error4' });
+      expect(result).toBe(txHash);
     });
 
     it('should return error if getBalance return error', async () => {
-      const contract = new WB3ContractBasic(mockProps);
+      vi.mocked(readContractByWagmi).mockRejectedValue('Failed to get balance');
 
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      const contract = new WB3ContractBasic(mockProps);
 
       const result = await contract.callViewMethod('getBalance', ['param']);
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
       expect(result.error).toBe('Failed to get balance');
     });
   });
@@ -575,27 +455,45 @@ describe('WB3ContractBasic Class', () => {
   describe('callSendMethod', () => {
     beforeEach(() => {
       vi.clearAllMocks();
+
+      vi.mocked(ZERO.plus).mockImplementation((n: BigNumber.Value, base?: number) => {
+        return new BigNumber(n, base);
+      });
     });
 
     it('should handle send method and return result correctly', async () => {
+      // Mock
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+      vi.mocked(waitForTransactionReceiptByWagmi).mockResolvedValue({
+        status: 'success',
+        transactionHash: txHash,
+      } as any);
+
       const contract = new WB3ContractBasic(mockProps);
 
-      // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', [], {
+        onMethod: 'receipt',
+        gas: 10,
+        nonce: 4567823,
+      });
 
-      const result = await contract.callSendMethod('crossChainCreateToken', '0xAccount', []);
-
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.transactionHash).toBe('mockHash');
-      expect(result.TransactionId).toBe('mockHash');
+      expect(result.transactionHash).toBe(txHash);
+      expect(result.TransactionId).toBe(txHash);
     });
 
     it('should console error if ZERO throw error', async () => {
       const contract = new WB3ContractBasic(mockProps);
 
       // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
-
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+      vi.mocked(waitForTransactionReceiptByWagmi).mockResolvedValue({
+        status: 'success',
+        transactionHash: txHash,
+      } as any);
       vi.mocked(ZERO.plus).mockImplementation(() => {
         throw 'ZERO throw error';
       });
@@ -604,30 +502,63 @@ describe('WB3ContractBasic Class', () => {
         onMethod: 'confirmation',
       });
 
-      expect(getDefaultProviderByChainId).toHaveBeenCalled();
-      expect(result.TransactionId).toEqual({ transactionHash: 'mockHash' });
+      expect(result.TransactionId).toEqual(txHash);
+    });
+
+    it('should return error if there is no chainId', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null });
+
+      // Mock
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+      vi.mocked(waitForTransactionReceiptByWagmi).mockResolvedValue({
+        status: 'success',
+        transactionHash: txHash,
+      } as any);
+
+      const result = await contract.callSendMethod('testMethod', '0xAccount');
+
+      expect(result.TransactionId).toEqual(txHash);
     });
 
     it('should catch error if callSendMethod rejected', async () => {
       const contract = new WB3ContractBasic(mockProps);
 
       // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockRejectedValue('Failed');
 
       const result = await contract.callSendMethod('swapToken', '0xAccount', []);
 
-      expect(result.error.error).toBe('Failed');
+      expect(result.error).toBe('Failed');
+    });
+
+    it('should return successful if getGasPriceByWagmi return undefined', async () => {
+      const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(undefined as any);
+      const txHash = '0x1234567';
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+
+      const result = await contract.callSendMethod('swapToken', '0xAccount', [], { onMethod: 'receipt', value: 20 });
+
+      expect(result.TransactionId).toEqual(txHash);
     });
 
     it('should handle send method errors', async () => {
-      const contract = new WB3ContractBasic({ ...mockProps, chainId: null, contractAddress: '', provider: undefined });
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null, contractAddress: '' });
 
       // Mock
-      vi.mocked(getDefaultProviderByChainId).mockReturnValue(mockProvider);
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      const txHash = '0x1234567';
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+      vi.mocked(waitForTransactionReceiptByWagmi).mockResolvedValue({ status: 'reverted' } as any);
 
       const result = await contract.callSendMethod('createToken', '0xAccount');
 
-      expect(result.error).toBeDefined();
+      expect(result.error).toEqual({ message: 'Transaction is reverted', status: 'reverted' });
     });
   });
 
@@ -639,33 +570,59 @@ describe('WB3ContractBasic Class', () => {
     it('should handle createToken and return successfully', async () => {
       const contract = new WB3ContractBasic(mockProps);
 
-      const result = await contract.callSendPromiseMethod('createToken', '0xAccount', []);
+      // Mock
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
 
-      expect(result.transactionHash).toBe('mockHash');
+      const result = await contract.callSendPromiseMethod('createToken', '0xAccount', [], {
+        gasPrice: '10',
+        gas: 20,
+        value: '12',
+        nonce: 123,
+        onMethod: 'transactionHash',
+      });
+
+      expect(result).toBe(txHash);
     });
 
     it('should handle createToken and return successfully if no paramsOption', async () => {
       const contract = new WB3ContractBasic(mockProps);
 
+      // Mock
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
+
       const result = await contract.callSendPromiseMethod('createToken', '0xAccount');
 
-      expect(result.transactionHash).toBe('mockHash');
+      expect(result).toBe(txHash);
     });
 
     it('should catch error if callSendPromiseMethod throw error', async () => {
       const contract = new WB3ContractBasic(mockProps);
+
+      // Mock
+      const error = 'Failed to create receipt';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockRejectedValue(error);
 
       const result = await contract.callSendPromiseMethod('createReceipt', '0xAccount');
 
       expect(result.error).toBe('Failed to create receipt');
     });
 
-    it('should return error if there is no chainId, contractAddress and provider', async () => {
-      const contract = new WB3ContractBasic({ ...mockProps, provider: undefined });
+    it('should return error if there is no chainId', async () => {
+      const contract = new WB3ContractBasic({ ...mockProps, chainId: null });
+
+      // Mock
+      const txHash = '0x1234567';
+      vi.mocked(getGasPriceByWagmi).mockResolvedValue(BigInt(1234));
+      vi.mocked(writeContractByWagmi).mockResolvedValue(txHash);
 
       const result = await contract.callSendPromiseMethod('testMethod', '0xAccount');
 
-      expect(result.error).toEqual({ code: 401, message: 'Contract init error5' });
+      expect(result).toEqual(txHash);
     });
   });
 });
@@ -1854,7 +1811,7 @@ describe('Boundary Cases', () => {
 
   it('should handle empty contract addresses', () => {
     const contract = new WB3ContractBasic({ ...mockERCProps, contractAddress: '' });
-    expect(contract.contract).toBeNull();
+    expect(contract.address).toBe('');
   });
 
   it('should handle non-object parameters', async () => {

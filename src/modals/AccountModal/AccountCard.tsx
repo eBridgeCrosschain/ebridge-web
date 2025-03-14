@@ -1,6 +1,5 @@
 import { Button, Card, Col, Row } from 'antd';
 import { useCallback, useMemo } from 'react';
-import { injected } from '../../walletConnectors';
 import { getExploreLink, shortenString } from '../../utils';
 import Copy from '../../components/Copy';
 import CommonLink from '../../components/CommonLink';
@@ -9,7 +8,6 @@ import { basicModalView } from 'contexts/useModal/actions';
 import { isELFChain } from 'utils/aelfUtils';
 import WalletIcon from 'components/WalletIcon';
 import { SUPPORTED_WALLETS } from 'constants/wallets';
-import { getConnection } from 'walletConnectors/utils';
 import { useChainDispatch } from 'contexts/useChain';
 import { setSelectERCWallet } from 'contexts/useChain/actions';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
@@ -22,6 +20,9 @@ import { useAelfLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useConnect } from 'hooks/useConnect';
+import { useWeb3 } from 'hooks/web3';
+import { TWalletConnectorId } from 'types';
+import { handleErrorMessage } from 'utils/error';
 
 function AccountCard() {
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
@@ -30,25 +31,19 @@ function AccountCard() {
   const logoutWebLogin = useAelfLogout();
   const connect = useConnect();
   const [tonConnectUI] = useTonConnectUI();
+  const { deactivate } = useWeb3();
 
-  const { connector, account, aelfInstance, walletType, loginWalletType } = accountWallet || {};
+  const { connector, connectorId, account, aelfInstance, walletType, loginWalletType } = accountWallet || {};
   const filter = useCallback(
-    (k: string) => {
-      const isMetaMask = !!window.ethereum?.isMetaMask;
-      return (
-        SUPPORTED_WALLETS[k].connector === connector && (connector !== injected || isMetaMask === (k === 'METAMASK'))
-      );
+    (k: TWalletConnectorId) => {
+      return SUPPORTED_WALLETS[k].connectorId === connectorId;
     },
-    [connector],
+    [connectorId],
   );
-  const connection = useMemo(() => {
-    if (!connector || typeof connector === 'string') return;
-    return getConnection(connector);
-  }, [connector]);
+
   const formatConnectorName = useMemo(() => {
-    const name = Object.keys(SUPPORTED_WALLETS)
-      .filter((k) => filter(k))
-      .map((k) => SUPPORTED_WALLETS[k].name)[0];
+    const keys = Object.keys(SUPPORTED_WALLETS) as TWalletConnectorId[];
+    const name = keys.filter((k) => filter(k)).map((k) => SUPPORTED_WALLETS[k].name)[0];
     return `Connected with ${name}`;
   }, [filter]);
 
@@ -60,8 +55,7 @@ function AccountCard() {
     if (typeof connector !== 'string') {
       // WEB3
       try {
-        await connection?.connector?.deactivate?.();
-        await connection?.connector?.resetState?.();
+        await deactivate?.();
       } catch (error) {
         console.log('error: ', error);
       } finally {
@@ -92,7 +86,7 @@ function AccountCard() {
     walletType,
     dispatch,
     accountChainId,
-    connection?.connector,
+    deactivate,
     chainDispatch,
     tonConnectUI,
     connect,
@@ -115,7 +109,7 @@ function AccountCard() {
       );
     } catch (error: any) {
       console.debug(`connection error: ${error}`);
-      CommonMessage.error(`connection error: ${error.message}`);
+      CommonMessage.error(`connection error: ${handleErrorMessage(error.message)}`);
     }
   }, [accountChainId, dispatch, onDisconnect, walletType]);
 
@@ -139,7 +133,7 @@ function AccountCard() {
 
       <Card className="account-modal-card">
         <div className="account-modal-card-box">
-          {account && <WalletIcon className="account-modal-card-box-icon" connector={connector} />}
+          {account && <WalletIcon className="account-modal-card-box-icon" connectorId={connectorId} />}
           <div>
             <Row>
               <Col span={24}>

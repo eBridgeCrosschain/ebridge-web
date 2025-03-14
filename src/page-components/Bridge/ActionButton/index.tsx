@@ -39,7 +39,7 @@ export default function ActionButton() {
     { selectToken, fromInput, fromBalance, actionLoading, crossMin, toChecked, toAddress, crossFee },
     { dispatch },
   ] = useHomeContext();
-  const { chainId: fromChainId, account: fromAccount, library } = fromWallet || {};
+  const { chainId: fromChainId, account: fromAccount } = fromWallet || {};
   const { chainId: toChainId, account: toAccount } = toWallet || {};
   const fromTokenInfo = useMemo(() => {
     if (!fromChainId) return;
@@ -144,8 +144,9 @@ export default function ActionButton() {
       return;
     dispatch(setActionLoading(true));
     setIsBridgeButtonLoading(true);
+
     const params: any = {
-      library,
+      fromChainId,
       fromToken: isELFChain(fromChainId) ? fromTokenInfo?.symbol : fromTokenInfo?.address,
       account: fromAccount,
       bridgeContract,
@@ -197,7 +198,6 @@ export default function ActionButton() {
     toAccount,
     toAddress,
     dispatch,
-    library,
     fromInput,
     crossFee,
     checkPortkeyConnect,

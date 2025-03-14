@@ -1,11 +1,10 @@
-import { useWeb3React } from '@web3-react/core';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { ZERO } from 'constants/misc';
 import { useCallback, useMemo } from 'react';
 import { getProvider } from 'utils/provider';
-import { ChainId, Web3Type } from 'types';
+import { AElfConnectorId, ChainId, EVMConnectorId, TONConnectorId, Web3Type } from 'types';
 import { useChain, useChainDispatch } from 'contexts/useChain';
 import { ACTIVE_CHAIN, DEFAULT_ERC_CHAIN, IS_MAINNET } from 'constants/index';
-import { Accounts } from '@portkey/provider-types';
 import { setSelectELFWallet } from 'contexts/useChain/actions';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ExtraInfoForDiscover, ExtraInfoForNightElf, ExtraInfoForPortkeyAA } from 'types/wallet';
@@ -14,7 +13,7 @@ import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { getPortkeySDKAccount } from 'utils/wallet';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { toUserFriendlyAddress } from '@tonconnect/sdk';
-import { SupportedTONChainId } from 'constants/chain';
+import { SupportedChainId, SupportedTONChainId } from 'constants/chain';
 import { isELFChain } from 'utils/aelfUtils';
 import { isTonChain } from 'utils';
 import { getNetworkInfo, switchChain } from 'utils/network';
@@ -40,11 +39,25 @@ export function usePortkeyConnect() {
 }
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useWeb3(): Web3Type {
-  const web3React = useWeb3React();
+  const accountInfo = useAccount();
+  const { disconnectAsync } = useDisconnect();
   const [{ userERCChainId }] = useChain();
+
   const tmpContext = useMemo(() => {
-    const contextNetwork: Web3Type = { ...web3React, accounts: web3React?.accounts as Accounts };
-    if (!web3React.account) {
+    const contextNetwork: Web3Type = {
+      ...accountInfo,
+      connector: accountInfo.connector,
+      connectorId: accountInfo.connector?.id as EVMConnectorId,
+      chainId: accountInfo.chainId,
+      isActive: accountInfo.isConnected,
+      isPortkey: false,
+      walletType: 'ERC',
+      loginWalletType: WalletTypeEnum.unknown,
+      account: accountInfo.address,
+      accounts: accountInfo.addresses,
+      deactivate: disconnectAsync,
+    };
+    if (!accountInfo.address) {
       if (typeof window === 'object') {
         contextNetwork.chainId = DEFAULT_ERC_CHAIN;
         const chainId = ZERO.plus(window.ethereum?.chainId ?? '');
@@ -54,18 +67,27 @@ export function useWeb3(): Web3Type {
           contextNetwork.chainId = userERCChainId;
         }
       }
-      const provider = getProvider(contextNetwork.chainId);
-      if (provider) {
-        contextNetwork.library = provider;
-        contextNetwork.provider = { provider } as any;
-      }
+
+      // Keep the previous logic and delete it if it is useless after observing it for a while
+      contextNetwork.getProvider = async (chainId?: SupportedChainId) => {
+        const _chainId = typeof chainId !== 'undefined' ? chainId : contextNetwork.chainId;
+
+        const provider = getProvider(_chainId);
+        return provider;
+      };
       return contextNetwork;
     } else {
-      contextNetwork.walletType = 'ERC';
-      contextNetwork.library = contextNetwork.provider?.provider;
+      contextNetwork.getProvider = async (chainId?: SupportedChainId) => {
+        const _chainId = typeof chainId !== 'undefined' ? chainId : accountInfo.chainId;
+
+        const provider = await accountInfo.connector?.getProvider?.({ chainId: _chainId });
+        return provider;
+      };
     }
+
     return contextNetwork;
-  }, [web3React, userERCChainId]);
+  }, [accountInfo, disconnectAsync, userERCChainId]);
+
   return tmpContext;
 }
 
@@ -95,11 +117,10 @@ export function useAElf(): Web3Type {
       account: walletInfo?.address,
       isActive: isConnected && !!walletInfo,
       chainId,
-      library: undefined,
-      provider: undefined,
       loginWalletType: walletType,
       walletType: _walletType,
       connector: walletInfo?.address ? _walletType : undefined,
+      connectorId: isPortkey ? AElfConnectorId.PORTKEY : AElfConnectorId.NIGHTELF,
       isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
@@ -134,11 +155,10 @@ export function usePortkey(): Web3Type {
       accounts: _accounts,
       wallet: { ...contextNetwork },
       isActive: isConnected && !!walletInfo,
-      library: undefined,
-      provider: walletInfo?.extraInfo?.provider,
       loginWalletType: walletType,
       walletType: 'PORTKEY',
       connector: 'PORTKEY',
+      connectorId: AElfConnectorId.PORTKEY,
       isPortkey: true,
     };
   }, [isConnected, walletInfo, walletType]);
@@ -154,11 +174,10 @@ export function useTon(): Web3Type {
       account: wallet?.account.address ? toUserFriendlyAddress(wallet?.account.address, !IS_MAINNET) : undefined,
       wallet: { ...wallet },
       isActive: !!wallet?.account,
-      library: undefined,
-      provider: undefined,
       loginWalletType: undefined,
       walletType: 'TON',
       connector: 'TON',
+      connectorId: TONConnectorId.TON,
       isTON: true,
       chainId: IS_MAINNET ? SupportedTONChainId.MAINNET : SupportedTONChainId.TESTNET,
       baseAccount: wallet?.account,
@@ -199,4 +218,18 @@ export function useActiveAddresses() {
   return useMemo(() => {
     return [evmAccount, aelfAccount].filter(Boolean).join(',');
   }, [aelfAccount, evmAccount]);
+}
+
+export function useEVMConnectWallet() {
+  const { connectAsync, connectors } = useConnect();
+
+  return useCallback(
+    async (connectorId: EVMConnectorId, chainId?: number) => {
+      const connector = connectors.find((item) => item.id === connectorId);
+      if (!connector) return;
+
+      await connectAsync({ connector: connector, chainId });
+    },
+    [connectAsync, connectors],
+  );
 }
