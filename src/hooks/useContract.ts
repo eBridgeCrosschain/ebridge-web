@@ -147,7 +147,7 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
         if (reCount < 20) {
           getContract(reCount);
         } else {
-          console.error(error, reCount, '====getContract', contractAddress);
+          console.warn(error, reCount, '====getContract', contractAddress);
         }
       }
     },
@@ -198,7 +198,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
         if (reCount < 5) {
           getContract(reCount);
         } else {
-          console.error(error, reCount, '====getContract', contractAddress);
+          console.warn(error, reCount, '====getContract', contractAddress);
         }
       }
     },
