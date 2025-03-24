@@ -10,6 +10,7 @@ import useInterval from './useInterval';
 import { getTonChainBalance } from 'utils/ton';
 import { getBalanceByWagmi } from 'utils/wagmi';
 import { useGetTokenInfoByWhitelist } from './token';
+// import useSolana from './wallet/useSolana';
 
 export const useBalances = (
   wallet?: Web3Type,
@@ -23,6 +24,8 @@ export const useBalances = (
   const tokenContract = useTokenContract(chainId, undefined, wallet?.isPortkey);
   const tokensList = useMemo(() => (Array.isArray(tokens) ? tokens : [tokens]), [tokens]);
   const getTokenInfoByWhitelist = useGetTokenInfoByWhitelist();
+  // TODO solana
+  // const { getBalance: getSolanaBalance } = useSolana();
   const onGetBalance = useCallback(async () => {
     if (!account) return setBalanceMap(undefined);
     let promise;
@@ -45,7 +48,12 @@ export const useBalances = (
           if (!address || !account) return;
           return getTonChainBalance(address, account);
         });
-      } else {
+      }
+      // TODO solana
+      // else if (isSolanaChain()) {
+      //   return getSolanaBalance({ tokenContractAddress: '' });
+      // }
+      else {
         // erc20 chain
         promise = tokensList.map(async (info) => {
           const isAddress = typeof info === 'string';

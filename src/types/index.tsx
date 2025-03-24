@@ -10,7 +10,7 @@ import { Connector } from 'wagmi';
 import { SupportedChainId } from 'constants/chain';
 
 export type ChainId = keyof typeof CHAIN_NAME;
-export type ChainType = 'ERC' | 'ELF' | 'TON';
+export type ChainType = 'ERC' | 'ELF' | 'TON' | 'Solana';
 
 export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC' | 'TON';
 
@@ -44,7 +44,11 @@ export enum TONConnectorId {
   TON = 'TON',
 }
 
-export type TWalletConnectorId = EVMConnectorId | AElfConnectorId | TONConnectorId;
+export enum SolanaConnectorId {
+  Phantom = 'Phantom',
+}
+
+export type TWalletConnectorId = EVMConnectorId | AElfConnectorId | TONConnectorId | SolanaConnectorId;
 
 export type Web3Type = {
   chainId?: ChainId;

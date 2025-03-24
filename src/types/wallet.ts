@@ -59,3 +59,19 @@ export enum WalletTypeEnum {
   TRON = 'TRON',
   AELF = 'Aelf',
 }
+
+export interface SendSolanaTransactionParams {
+  tokenContractAddress: string;
+  toAddress: string;
+  amount: string;
+  decimals: number;
+}
+
+export interface IGetSolanaBalanceRequest {
+  tokenContractAddress: string;
+}
+
+export interface IGetSolanaBalanceResult {
+  value: string | string;
+  decimals?: number | string;
+}

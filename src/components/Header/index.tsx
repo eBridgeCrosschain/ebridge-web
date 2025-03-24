@@ -28,7 +28,7 @@ import { NAV_LIST, HEADER_COMMUNITY_CONFIG, LEGAL_MENU_CONFIG, ROUTE_PATHS, LIST
 import { setAccountModal, setWalletsModal } from 'contexts/useModal/actions';
 import { useModalDispatch } from 'contexts/useModal/hooks';
 import { useWallet } from 'contexts/useWallet/hooks';
-import { AElfConnectorId, ChainType, EVMConnectorId, TONConnectorId } from 'types';
+import { AElfConnectorId, ChainType, EVMConnectorId, SolanaConnectorId, TONConnectorId } from 'types';
 import { useAelfLogin } from 'hooks/wallet';
 import WalletIcon from 'components/WalletIcon';
 import { shortenString } from 'utils';
@@ -145,6 +145,8 @@ function WalletButton({ chainType }: { chainType?: ChainType }) {
             <WalletIcon connectorId={AElfConnectorId.PORTKEY} className={styles['wallet-icon']} />
           ) : chainType === 'TON' ? (
             <WalletIcon connectorId={TONConnectorId.TON} className={styles['wallet-icon']} type="ton-wallet-white" />
+          ) : chainType === 'Solana' ? (
+            <WalletIcon connectorId={SolanaConnectorId.Phantom} className={styles['wallet-icon']} type="phantom" />
           ) : (
             <div className="flex-row-center">
               {!isPortkey() && !isMobileDevices() && (

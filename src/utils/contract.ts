@@ -20,6 +20,9 @@ import {
   waitForTransactionReceiptByWagmi,
   writeContractByWagmi,
 } from './wagmi';
+import { Connection as solanaConnection } from '@solana/web3.js';
+import { SendSolanaContract, ViewSolanaContract } from './wallet/solanaContractCall';
+import { WalletContextState } from '@solana/wallet-adapter-react';
 
 export interface AbiType {
   internalType?: string;
@@ -54,6 +57,8 @@ export interface ContractProps {
   viewContract?: any;
   portkeyChain?: IAElfChain;
   tonConnectUI?: TonConnectUI;
+  connection?: solanaConnection;
+  signTransaction?: WalletContextState['signTransaction'];
 }
 
 interface ErrorMsg {
@@ -597,6 +602,53 @@ export class TONContractBasic {
       const result = await this.tonConnectUI?.sendTransaction(callData);
       const hashBase64 = await getTransactionResponseHash(result);
       return { TransactionId: hashBase64 };
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public callSendPromiseMethod: CallSendMethod = async (_functionName, account, paramsOption, sendOptions) => {};
+}
+
+export class SolanaContractBasic {
+  public connection?: solanaConnection;
+  public address?: string;
+  public chainId?: number;
+  public signTransaction?: WalletContextState['signTransaction'];
+
+  constructor(options: ContractProps) {
+    const { contractAddress, chainId, connection, signTransaction } = options;
+    this.connection = connection;
+    this.chainId = chainId as number;
+    this.address = contractAddress;
+    this.signTransaction = signTransaction;
+  }
+
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    try {
+      return (ViewSolanaContract as any)[functionName](this.address, paramsOption);
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, _sendOptions) => {
+    if (!this.address || !account || !this.connection) {
+      return { error: { code: 401, message: 'Contract init error' } };
+    }
+    try {
+      const result = await (SendSolanaContract as any)[functionName](
+        this.address,
+        account,
+        paramsOption,
+        this.connection,
+        this.signTransaction,
+      );
+      // TODO solana check result
+      return { TransactionId: result };
     } catch (error: any) {
       if (error.message) return { error };
       return { error: { message: error.Error || error.Status } };

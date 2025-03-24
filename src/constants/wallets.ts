@@ -1,4 +1,11 @@
-import { AElfConnectorId, EVMConnectorId, TONConnectorId, TWalletConnectorId, WalletInfo } from 'types';
+import {
+  AElfConnectorId,
+  EVMConnectorId,
+  SolanaConnectorId,
+  TONConnectorId,
+  TWalletConnectorId,
+  WalletInfo,
+} from 'types';
 
 export const SUPPORTED_WALLETS: Record<TWalletConnectorId, WalletInfo> = {
   [EVMConnectorId.METAMASK]: {
@@ -49,4 +56,18 @@ export const SUPPORTED_WALLETS: Record<TWalletConnectorId, WalletInfo> = {
     description: 'Ton connect',
     href: null,
   },
+  [SolanaConnectorId.Phantom]: {
+    connectorId: SolanaConnectorId.Phantom,
+    chainType: 'Solana',
+    name: 'Solana connect',
+    iconType: 'phantom',
+    description: 'Solana connect',
+    href: null,
+  },
 };
+
+export const USER_REJECT_CONNECT_WALLET_TIP = 'User rejected the request';
+
+export const SOLANA_STORAGE_CONNECTED_KEY = 'walletName';
+
+export const SOLANA_WALLET_NAME = 'Phantom';
