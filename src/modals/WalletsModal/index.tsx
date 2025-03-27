@@ -11,7 +11,7 @@ import CommonModal from '../../components/CommonModal';
 import CommonImage from 'components/CommonImage';
 import WalletList from '../../components/WalletList';
 import { ethereumLogo, groupIcon, aelfChainLogo, checkFilledIcon, tonLogo } from 'assets/images';
-import { ROUTE_PATHS } from 'constants/link';
+import { TERMS_OF_SERVICE_URL } from 'constants/link';
 import styles from './styles.module.less';
 import { ChainType } from 'types';
 
@@ -167,7 +167,7 @@ export default function WalletsModal() {
         {walletStep === WALLET_STEP.FROM && (
           <p className={styles.tip}>
             {t('By connecting a wallet, you agree to our')}
-            <Link href={ROUTE_PATHS.TERMS_OF_SERVICE}>
+            <Link href={TERMS_OF_SERVICE_URL}>
               <a onClick={handleCloseModal}>{t('Terms of Service')}</a>
             </Link>
             .

@@ -3,7 +3,7 @@ import { BaseConfig, RequestConfig } from './types';
 import { BASE_URL } from 'constants/index';
 import eBridgeEventBus from 'utils/eBridgeEventBus';
 
-const isDeniedRequest = (error: { message: string }) => {
+export const isDeniedRequest = (error: { message: string }) => {
   try {
     const message: string = error.message;
     if (message?.includes('401')) return true;
@@ -56,10 +56,10 @@ export function getRequestConfig(base: BaseConfig, config?: RequestConfig) {
     return {
       ...config,
       ...baseConfig,
-      query: (baseConfig.query || '') + (query || ''),
-      method: method ? method : baseConfig.method,
-      params: Object.assign({}, baseConfig.params, params),
-      data: Object.assign({}, baseConfig.data, data),
+      query: (baseConfig?.query || '') + (query || ''),
+      method: method ? method : baseConfig?.method,
+      params: Object.assign({}, baseConfig?.params, params),
+      data: Object.assign({}, baseConfig?.data, data),
     };
   }
 }

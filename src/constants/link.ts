@@ -17,8 +17,6 @@ export const ROUTE_PATHS = {
   HOME: '/',
   BRIDGE: '/bridge',
   TRANSACTIONS: '/transactions',
-  TERMS_OF_SERVICE: '/terms-of-service',
-  PRIVACY_POLICY: '/privacy-policy',
   LISTING_APPLICATION: '/listing-application',
   MY_APPLICATIONS: '/my-applications',
   POOLS: '/pools',
@@ -67,14 +65,17 @@ export const LISTING_MENU_CONFIG = [
   },
 ];
 
+export const TERMS_OF_SERVICE_URL = 'https://ebridge-exchange.gitbook.io/docs/more-information/terms-of-service';
+export const PRIVACY_POLICY_URL = 'https://ebridge-exchange.gitbook.io/docs/more-information/privacy-policy';
+
 export const LEGAL_MENU_CONFIG = [
   {
     label: 'Terms of Service',
-    link: ROUTE_PATHS.TERMS_OF_SERVICE,
+    link: TERMS_OF_SERVICE_URL,
   },
   {
     label: 'Privacy Policy',
-    link: ROUTE_PATHS.PRIVACY_POLICY,
+    link: PRIVACY_POLICY_URL,
   },
 ];
 
