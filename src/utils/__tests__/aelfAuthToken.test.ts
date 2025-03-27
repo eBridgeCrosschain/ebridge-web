@@ -169,8 +169,12 @@ describe('getAuthPlainText', () => {
     // Verify plainTextOrigin content
     expect(result.plainTextOrigin).toContain('Welcome to eBridge!');
     expect(result.plainTextOrigin).toContain('Click to sign in and accept the eBridge Terms of Service');
-    expect(result.plainTextOrigin).toContain('https://ebridge.exchange/terms-of-service');
-    expect(result.plainTextOrigin).toContain('https://ebridge.exchange/privacy-policy');
+    expect(result.plainTextOrigin).toContain(
+      'https://ebridge-exchange.gitbook.io/docs/more-information/terms-of-service',
+    );
+    expect(result.plainTextOrigin).toContain(
+      'https://ebridge-exchange.gitbook.io/docs/more-information/privacy-policy',
+    );
     expect(result.plainTextOrigin).toContain(
       'This request will not trigger a blockchain transaction or cost any gas fees.',
     );
