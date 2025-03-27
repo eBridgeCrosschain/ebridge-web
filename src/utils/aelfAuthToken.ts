@@ -73,7 +73,7 @@ export const setLocalJWT = (key: string, data: LocalJWTData) => {
 export function getAuthPlainText() {
   const plainText = `Welcome to eBridge!
   
-Click to sign in and accept the eBridge Terms of Service (https://ebridge.exchange/terms-of-service) and Privacy Policy (https://ebridge.exchange/privacy-policy).
+Click to sign in and accept the eBridge Terms of Service (https://ebridge-exchange.gitbook.io/docs/more-information/terms-of-service) and Privacy Policy (https://ebridge-exchange.gitbook.io/docs/more-information/privacy-policy).
   
 This request will not trigger a blockchain transaction or cost any gas fees.
   
