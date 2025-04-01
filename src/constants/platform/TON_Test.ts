@@ -16,5 +16,7 @@ export const CHAIN_INFO = {
   blockExplorerUrls: ['https://testnet.tonviewer.com/'],
 };
 
-export const BRIDGE_CONTRACT = 'EQDZV48b9MC5w1DQsUPTZcmKpGzt13sbMvHrWqcQqTQUVdrR';
-export const LIMIT_CONTRACT = 'EQAOWkc0ArTeXP6MkgVx1-Zelk21uRq5flcjwBmw2Tjt5yey';
+export const BRIDGE_CONTRACT = 'kQDS511tzowt2x1xyIDgpglhaz6wG9uVP2t4BixFTViYQoM_';
+export const LIMIT_CONTRACT = 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9';
+// TODO:TOKEN_POOL
+export const TOKEN_POOL = 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9';

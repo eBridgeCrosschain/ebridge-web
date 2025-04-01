@@ -208,6 +208,7 @@ export default function useLimitAmountModal() {
         : getLimitDataByContract(type, crossInfo, crossInfo?.fromDecimals));
 
       const limitAndRateData = calculateMinValue(result);
+
       if (!limitAndRateData) return true;
 
       if (

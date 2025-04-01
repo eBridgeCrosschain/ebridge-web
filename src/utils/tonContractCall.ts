@@ -9,7 +9,7 @@ import { getTONJettonMinter, packCreateReceiptBody, tonWeb } from './ton';
 export class TonContractCallData {
   static async createReceipt(contractAddress: string, account: string, paramsOption: any[]) {
     const forwardTonAmount = '0.15';
-    const feeAmount = '0.2';
+    const feeAmount = '0.3';
     const tokenJettonAddress = paramsOption[0];
 
     const jettonMinter = getTONJettonMinter(tokenJettonAddress);
@@ -60,6 +60,13 @@ export class CallTonContract {
       tokenAmount: ZERO.plus(req.stack[0][1]),
       refreshTime: ZERO.plus(req.stack[1][1]),
       dailyLimit: ZERO.plus(req.stack[2][1]),
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static async GetTokenPoolInfo(contractAddress: string, _paramsOption: any[]) {
+    const req = await tonWeb.provider.call(contractAddress, 'get_pool_liquidity', []);
+    return {
+      liquidity: ZERO.plus(req.stack[0][1]).toFixed(),
     };
   }
   static async getCurrentReceiptTokenBucketState(contractAddress: string, paramsOption: any[]) {

@@ -222,6 +222,8 @@ export async function CreateReceipt({
 }) {
   let toAddress = to;
   if (bridgeContract.contractType !== 'ELF') toAddress = formatAddress(to);
+  if (bridgeContract.contractType === 'ERC')
+    toAddress = '0x' + Buffer.from(AElf.utils.base58.decode(toAddress)).toString('hex');
   const fromTonChain = bridgeContract.contractType === 'TON';
   const fromELFChain = bridgeContract.contractType === 'ELF';
   if (fromELFChain && fromToken !== CrossFeeToken) {
@@ -297,7 +299,7 @@ export async function LockToken({
   toChainId: ChainId;
   to: string;
 }) {
-  const toAddress = formatAddress(to);
+  const toAddress = '0x' + Buffer.from(AElf.utils.base58.decode(formatAddress(to))).toString('hex');
   return bridgeContract.callSendMethod('createNativeTokenReceipt', account, [getChainIdToMap(toChainId), toAddress], {
     onMethod: 'transactionHash',
     value: amount,

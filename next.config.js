@@ -53,9 +53,9 @@ const productionConfig = {
   ...nextConfig,
   swcMinify: false,
   compiler: {
-    removeConsole: {
-      exclude: ['error'],
-    },
+    // removeConsole: {
+    //   exclude: ['error'],
+    // },
   },
   experimental: {
     'react-use': {
