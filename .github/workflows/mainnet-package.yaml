@@ -27,6 +27,7 @@ jobs:
           NEXT_PUBLIC_ANALYTICS_ID: ${{ secrets.MAINNET_NEXT_NEXT_PUBLIC_ANALYTICS_ID }}
           NEXT_PUBLIC_APP_ENV: mainnet             
           NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ${{ secrets.MAINNET_NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_TON_API_KEY: ${{ secrets.MAINNET_NEXT_PUBLIC_TON_API_KEY }}
         with:
           context: .
           push: true
@@ -40,4 +41,5 @@ jobs:
             NEXT_PUBLIC_ANALYTICS_ID=${{ secrets.MAINNET_NEXT_NEXT_PUBLIC_ANALYTICS_ID }}
             NEXT_PUBLIC_APP_ENV=mainnet
             NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=${{ secrets.MAINNET_NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}
+            NEXT_PUBLIC_TON_API_KEY=${{ secrets.MAINNET_NEXT_PUBLIC_TON_API_KEY }}
             ENV_NAME=mainnet
