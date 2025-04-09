@@ -192,7 +192,21 @@ function fileDescriptorSetFormatter(result: any) {
   const buffer = Buffer.from(result, 'base64');
   return descriptor.FileDescriptorSet.decode(buffer as any);
 }
+
+export function deleteLocalContractFileDescriptor() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (
+      key &&
+      key.includes(storages.contractsFileDescriptorBase64.slice(0, 32)) &&
+      !key.includes(storages.contractsFileDescriptorBase64)
+    ) {
+      localStorage.removeItem(key);
+    }
+  }
+}
 export async function getContractFileDescriptorSet(chainId: ChainId, address: string): Promise<any> {
+  deleteLocalContractFileDescriptor();
   const key = storages.contractsFileDescriptorBase64 + chainId;
   let base64s: any = localStorage.getItem(key);
   const node = getNodeByChainId(chainId);
