@@ -4,7 +4,7 @@ const storages = {
   useWhitelist: 'use-white-list',
   userERCChainId: 'user-erc-chain-id',
   userELFChainId: 'user-elf-chain-id',
-  contractsFileDescriptorBase64: 'contracts-file-descriptor-base64-10',
+  contractsFileDescriptorBase64: 'contracts-file-descriptor-base64-250409',
   crossChainReceived: 'cross-chain-received',
   portkeyCAAddresses: 'portkey-ca-addresses',
 };
