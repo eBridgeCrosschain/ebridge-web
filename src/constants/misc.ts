@@ -6,15 +6,10 @@ export enum REQ_CODE {
   Success = 1,
 }
 
-export const LANG_MAX = new BigNumber('9223372036854775807');
+export const LONG_MAX = new BigNumber('9000000000000000000');
 
 export const ZERO = new BigNumber(0);
 export const ONE = new BigNumber(1);
-
-export const isEffectiveNumber = (v: any) => {
-  const val = new BigNumber(v);
-  return !val.isNaN() && !val.lte(0);
-};
 
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'AppName';
 export const prefixCls = process.env.NEXT_PUBLIC_PREFIX;

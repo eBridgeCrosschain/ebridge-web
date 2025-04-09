@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { isEffectiveNumber, ZERO } from 'constants/misc';
+import { ZERO } from 'constants/misc';
+import { isEffectiveNumber } from 'utils';
 export function timesDecimals(a?: BigNumber.Value, decimals: string | number = 18) {
   if (!a) return ZERO;
   const bigA = ZERO.plus(a);

@@ -6,6 +6,7 @@ import { getAddress } from '@ethersproject/address';
 import AElf from 'aelf-sdk';
 import { BRIDGE_TOKEN_MAP, NATIVE_TOKEN_LIST, SupportedExternalChain } from 'constants/index';
 import { isTonAddress } from './ton';
+import BigNumber from 'bignumber.js';
 
 export const sleep = (time: number) => {
   return new Promise<string>((resolve) => {
@@ -195,4 +196,9 @@ export const isBase64 = (str: string) => {
 export const base64ToHexStr = (str?: string) => {
   if (!str) return;
   return Buffer.from(str, 'base64').toString('hex');
+};
+
+export const isEffectiveNumber = (v: any) => {
+  const val = new BigNumber(v);
+  return !val.isNaN() && !val.lte(0);
 };

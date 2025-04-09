@@ -1,5 +1,7 @@
-import { IS_MAINNET } from 'constants/index';
 import { IconInfo } from 'types/misc';
+
+const IS_MAINNET = process.env.NEXT_PUBLIC_APP_ENV === 'mainnet';
+
 export enum SupportedChainId {
   MAINNET = 1,
   GORELI = 5,
