@@ -207,9 +207,9 @@
         "type": "string"
       },
       {
-        "internalType": "bytes32",
+        "internalType": "string",
         "name": "targetAddress",
-        "type": "bytes32"
+        "type": "string"
       }
     ],
     "name": "createNativeTokenReceipt",
