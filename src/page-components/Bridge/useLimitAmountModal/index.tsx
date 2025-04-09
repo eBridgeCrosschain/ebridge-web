@@ -31,10 +31,7 @@ export default function useLimitAmountModal() {
 
   const [{ selectToken }] = useHomeContext();
 
-  const limitContract = useLimitContract(fromChainId, toChainId);
   const bridgeOutContract = useBridgeOutContract(toChainId, toWallet?.isPortkey);
-
-  const poolContract = usePoolContract(toChainId, undefined, toWallet?.isPortkey);
 
   const getTokenInfo = useCallback(
     (chainId?: ChainId) => {
@@ -43,6 +40,9 @@ export default function useLimitAmountModal() {
     },
     [selectToken],
   );
+  const limitContract = useLimitContract(fromChainId, toChainId, getTokenInfo(fromChainId)?.symbol);
+
+  const poolContract = usePoolContract(toChainId, undefined, toWallet?.isPortkey, getTokenInfo(fromChainId)?.symbol);
 
   const getLimitDataByContract = useCallback(
     async function (
@@ -208,6 +208,7 @@ export default function useLimitAmountModal() {
         : getLimitDataByContract(type, crossInfo, crossInfo?.fromDecimals));
 
       const limitAndRateData = calculateMinValue(result);
+
       if (!limitAndRateData) return true;
 
       if (

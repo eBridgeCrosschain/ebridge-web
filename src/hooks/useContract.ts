@@ -147,7 +147,7 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
         if (reCount < 20) {
           getContract(reCount);
         } else {
-          console.error(error, reCount, '====getContract', contractAddress);
+          console.warn(error, reCount, '====getContract', contractAddress);
         }
       }
     },
@@ -198,7 +198,7 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
         if (reCount < 5) {
           getContract(reCount);
         } else {
-          console.error(error, reCount, '====getContract', contractAddress);
+          console.warn(error, reCount, '====getContract', contractAddress);
         }
       }
     },
@@ -258,11 +258,15 @@ export function useBridgeOutContract(chainId?: ChainId, isPortkey?: boolean) {
   return useContract(contractAddress || '', BRIDGE_OUT_ABI, chainId, isPortkey);
 }
 
-export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId) {
+export function useLimitContract(fromChainId?: ChainId, toChainId?: ChainId, symbol?: string) {
   const contractAddress = useMemo(() => {
-    if (fromChainId && isTonChain(fromChainId)) return (SupportedTONChain[fromChainId] as any).LIMIT_CONTRACT;
+    // TON chain limit contract is equal to token pool contract
+    if (fromChainId && isTonChain(fromChainId) && symbol) {
+      const fromChainInfo = getBridgeChainInfo(fromChainId);
+      return fromChainInfo?.TOKEN_POOL_MAP[symbol];
+    }
     return ERCChainConstants?.constants?.LIMIT_CONTRACT || '';
-  }, [fromChainId]);
+  }, [fromChainId, symbol]);
 
   return useContract(contractAddress, LIMIT_ABI, isELFChain(fromChainId) ? toChainId : fromChainId);
 }
@@ -275,9 +279,12 @@ export function useCreateTokenContract(chainId?: ChainId) {
   return useContract(contractAddress, CREATE_TOKEN_ABI, chainId, false);
 }
 
-export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {
+export function usePoolContract(chainId?: ChainId, address?: string, isPortkey?: boolean, symbol?: string) {
   const contractAddress = useMemo(() => {
-    return getBridgeChainInfo(chainId)?.TOKEN_POOL || '';
-  }, [chainId]);
+    const chainInfo = getBridgeChainInfo(chainId);
+    // TON chain one token corresponds to one fund pool address
+    if (isTonChain(chainId) && symbol) return chainInfo?.TOKEN_POOL_MAP[symbol];
+    return chainInfo?.TOKEN_POOL || '';
+  }, [chainId, symbol]);
   return useContract(address || contractAddress, POOLS_ABI, chainId, isPortkey);
 }

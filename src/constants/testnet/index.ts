@@ -62,7 +62,6 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
 };
 
 export const SupportedTONChain: { [k: string | number]: ChainConstantsType } = {
-  // TODO: TON
   [SupportedTONChainId.TESTNET]: TON_TESTNET,
 };
 
@@ -122,6 +121,11 @@ export const NetworkList = [
     title: CHAIN_NAME[SupportedChainId.BSC_TESTNET],
     icon: CHAIN_ICON[SupportedChainId.BSC_TESTNET],
     info: BSC_TESTNET.CHAIN_INFO,
+  },
+  {
+    title: CHAIN_NAME[SupportedTONChainId.TESTNET],
+    icon: CHAIN_ICON[SupportedChainId.BSC_TESTNET],
+    info: TON_TESTNET.CHAIN_INFO,
   },
 ] as unknown as NetworkType[];
 
@@ -201,7 +205,7 @@ export const WEBSITE_ICON = 'https://test.ebridge.exchange/favicon.ico';
 
 export const SupportedELFChainList = Object.values(SupportedELFChain);
 
-export const INDEXER_URL = 'https://test-indexer-api.aefinder.io/api/app/graphql/ebridge_server';
+export const INDEXER_URL = 'https://test-indexer-api.aefinder.io/api/app/graphql/ebridgeindexer';
 
 export const BASE_URL = 'https://test.ebridge.exchange';
 

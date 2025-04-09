@@ -3,6 +3,7 @@ import * as AELF from '../platform/AELF';
 import * as tDVV from '../platform/tDVV';
 import * as BSC from '../platform/BSC';
 import * as BASE from '../platform/base';
+import * as TON_MAINNET from '../platform/TON';
 import * as TON_TESTNET from '../platform/TON_Test';
 import DefaultWhitelistMap from './tokenWhitelist.json';
 
@@ -30,7 +31,9 @@ export type ChainConstantsType =
   | typeof tDVV
   | typeof BSC
   | typeof BASE
-  | typeof TON_TESTNET;
+  | typeof TON_TESTNET
+  | typeof TON_MAINNET;
+
 export type ERC_CHAIN_TYPE = keyof typeof SupportedERCChain;
 export type ELF_CHAIN_TYPE = keyof typeof SupportedELFChain;
 
@@ -51,8 +54,7 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
 };
 
 export const SupportedTONChain: { [k: string | number]: ChainConstantsType } = {
-  // TODO: fix TON
-  [SupportedTONChainId.TESTNET]: TON_TESTNET,
+  [SupportedTONChainId.MAINNET]: TON_MAINNET,
 };
 
 export const SupportedExternalChain: { [k: string | number]: ChainConstantsType } = {
@@ -74,6 +76,7 @@ export const ACTIVE_CHAIN: any = {
   [SupportedChainId.BSC_MAINNET]: true,
   [SupportedChainId.MAINNET]: true,
   [SupportedChainId.BASE]: true,
+  [SupportedTONChainId.MAINNET]: true,
 };
 export const NATIVE_TOKEN_LIST = ['WETH', 'WBNB'];
 
@@ -102,6 +105,11 @@ export const NetworkList = [
     title: CHAIN_NAME[SupportedChainId.BASE],
     icon: CHAIN_ICON[SupportedChainId.BASE],
     info: BASE.CHAIN_INFO,
+  },
+  {
+    title: CHAIN_NAME[SupportedTONChainId.MAINNET],
+    icon: CHAIN_ICON[SupportedTONChainId.MAINNET],
+    info: TON_MAINNET.CHAIN_INFO,
   },
 ] as unknown as NetworkType[];
 

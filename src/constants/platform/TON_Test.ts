@@ -16,5 +16,8 @@ export const CHAIN_INFO = {
   blockExplorerUrls: ['https://testnet.tonviewer.com/'],
 };
 
-export const BRIDGE_CONTRACT = 'EQDZV48b9MC5w1DQsUPTZcmKpGzt13sbMvHrWqcQqTQUVdrR';
-export const LIMIT_CONTRACT = 'EQAOWkc0ArTeXP6MkgVx1-Zelk21uRq5flcjwBmw2Tjt5yey';
+export const BRIDGE_CONTRACT = 'kQDS511tzowt2x1xyIDgpglhaz6wG9uVP2t4BixFTViYQoM_';
+// TON chain one token corresponds to one fund pool address
+export const TOKEN_POOL_MAP = {
+  USDT: 'kQCOgvqpldcUabiUJdgtHffTy9_-IfvIoZ9Rk26D8q5uVDf9',
+};

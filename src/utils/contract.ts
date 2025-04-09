@@ -161,10 +161,11 @@ export class WB3ContractBasic {
 
       if (defaultBlock === 'latest') delete params.blockNumber;
 
+      console.log(params, '===== WB3ContractBasic callViewMethod readContractByWagmi params');
       const res = await readContractByWagmi(params);
       return res;
     } catch (e) {
-      console.log(e, '===== WB3ContractBasic callViewMethod');
+      console.log(e, '===== WB3ContractBasic callViewMethod error');
 
       return { error: e };
     }
@@ -209,6 +210,7 @@ export class WB3ContractBasic {
         params.nonce = nonce;
       }
 
+      console.log('params', '===== WB3ContractBasic callSendMethod writeContractByWagmi params');
       const result = await writeContractByWagmi(params);
 
       if (onMethod === 'receipt') {
@@ -222,6 +224,7 @@ export class WB3ContractBasic {
 
       return { TransactionId: result };
     } catch (error) {
+      console.log(error, '===== WB3ContractBasic callSendMethod error');
       return { error };
     }
   };

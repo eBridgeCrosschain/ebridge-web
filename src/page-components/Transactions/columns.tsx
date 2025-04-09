@@ -8,7 +8,7 @@ import { useHover } from 'react-use';
 import { ChainId, TokenInfo } from 'types';
 import { CrossChainItem } from 'types/api';
 import { CrossChainStatus } from 'types/misc';
-import { formatNativeToken, getExploreLink, shortenString } from 'utils';
+import { base64ToHexStr, formatNativeToken, getExploreLink, isTonChain, shortenString } from 'utils';
 import { shortenAddressByAPI, getIconByChainId } from 'utils/chain';
 import { unitConverter } from 'utils/converter';
 import { formatTime } from 'utils/time';
@@ -30,6 +30,8 @@ function Info({
 }) {
   const iconProps = getIconByChainId(chainId);
 
+  const hexId = isTonChain(chainId) ? base64ToHexStr(transactionId) : transactionId;
+
   return (
     <div className={clsx(styles['info-wrap'], 'flex-row-center', 'flex-row-between')}>
       <div className={clsx(styles['info-content'], 'flex-column')}>
@@ -42,11 +44,11 @@ function Info({
             {shortenAddressByAPI(address || '', chainId)}
           </CommonLink>
         </div>
-        {transactionId && (
+        {!!hexId && (
           <div className={clsx(styles['info-txid'])}>
             <span>TXID: </span>
-            <CommonLink isTagA href={getExploreLink(transactionId, 'transaction', chainId)}>
-              {shortenString(transactionId, 6)}
+            <CommonLink isTagA href={getExploreLink(hexId, 'transaction', chainId)}>
+              {shortenString(hexId, 6)}
             </CommonLink>
           </div>
         )}

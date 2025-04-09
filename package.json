@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "PORT=3000 next dev",
-    "dev:mainnet": "ENV_NAME=mainnet next dev",
+    "dev:mainnet": "PORT=4200 ENV_NAME=mainnet next dev",
     "dev:test1": "ENV_NAME=test1 next dev",
     "build": "next build",
     "build:mainnet": "ENV_NAME=mainnet next build",
