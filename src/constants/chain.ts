@@ -1,3 +1,4 @@
+import { IS_MAINNET } from 'constants/index';
 import { IconInfo } from 'types/misc';
 export enum SupportedChainId {
   MAINNET = 1,
@@ -17,8 +18,8 @@ export enum SupportedChainId {
 }
 
 export enum SupportedTONChainId {
-  TESTNET = 1101, // fix testnet
-  MAINNET = 1100,
+  TESTNET = IS_MAINNET ? 1101 : 1100,
+  MAINNET = IS_MAINNET ? 1100 : 1101,
 }
 
 export enum SupportedELFChainId {
