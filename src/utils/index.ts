@@ -30,7 +30,7 @@ export function getExploreLink(
   const isTON = isTonChain(chainId);
   switch (type) {
     case 'transaction': {
-      if (isTON) return `${prefix}transaction/${Buffer.from(data, 'base64').toString('hex')}`;
+      if (isTON) return `${prefix}transaction/${data}`;
       return `${prefix}tx/${data}`;
     }
     case 'token': {
@@ -179,5 +179,20 @@ export function isIncludesChainId(list: ChainId[] | ChainId, chainId?: ChainId) 
 }
 
 export const isTonChain = (chainId?: ChainId) => {
-  return typeof chainId === 'number' && chainId === SupportedTONChainId.TESTNET;
+  return (
+    (typeof chainId === 'number' && chainId === SupportedTONChainId.TESTNET) || chainId === SupportedTONChainId.MAINNET
+  );
+};
+
+export const isBase64 = (str: string) => {
+  try {
+    return Buffer.from(str, 'base64').toString('base64') === str;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const base64ToHexStr = (str?: string) => {
+  if (!str) return;
+  return Buffer.from(str, 'base64').toString('hex');
 };

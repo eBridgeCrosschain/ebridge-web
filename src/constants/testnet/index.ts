@@ -62,7 +62,6 @@ export const SupportedERCChain: { [k: string | number]: ChainConstantsType } = {
 };
 
 export const SupportedTONChain: { [k: string | number]: ChainConstantsType } = {
-  // TODO: TON
   [SupportedTONChainId.TESTNET]: TON_TESTNET,
 };
 

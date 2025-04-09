@@ -157,9 +157,7 @@ export const checkElfAllowanceAndApprove = async (
   }
   const bigA = timesDecimals(amount, tokenInfo?.decimals ?? 8);
   const allowanceBN = new BigNumber(allowance?.allowance);
-  if (allowanceBN.lt(bigA)) {
-    return await approveELF(approveTargetAddress, tokenContract, symbol, bigA, chainId);
-  }
+  if (allowanceBN.lt(bigA)) return approveELF(approveTargetAddress, tokenContract, symbol, bigA, chainId);
   return true;
 };
 
@@ -192,7 +190,7 @@ function setContractsFileDescriptorBase64(key: string, contracts: any) {
 }
 function fileDescriptorSetFormatter(result: any) {
   const buffer = Buffer.from(result, 'base64');
-  return descriptor.FileDescriptorSet.decode(buffer);
+  return descriptor.FileDescriptorSet.decode(buffer as any);
 }
 export async function getContractFileDescriptorSet(chainId: ChainId, address: string): Promise<any> {
   const key = storages.contractsFileDescriptorBase64 + chainId;

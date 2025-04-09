@@ -1,24 +1,24 @@
 import { IS_MAINNET } from 'constants/index';
 import TonWeb from 'tonweb';
 import * as TON_TESTNET from 'constants/platform/TON_Test';
+import * as TON_MAINNET from 'constants/platform/TON';
 import { Address, beginCell } from '@ton/core';
 import { SendTransactionResponse } from '@tonconnect/ui-react';
-export const mainnetTonWeb = new TonWeb();
+const mainnetTonWeb = new TonWeb(new TonWeb.HttpProvider(TON_MAINNET.CHAIN_INFO.rpcUrl));
+const testnetTonWeb = new TonWeb(new TonWeb.HttpProvider(TON_TESTNET.CHAIN_INFO.rpcUrl));
+const defaultGetBalanceTonWeb = IS_MAINNET ? new TonWeb() : testnetTonWeb;
 
-export const testnetTonWeb = new TonWeb(new TonWeb.HttpProvider(TON_TESTNET.CHAIN_INFO.rpcUrl));
-
-export const tonWeb = IS_MAINNET ? mainnetTonWeb : testnetTonWeb;
-export const getTONJettonMinter = (tokenContractAddress: string) => {
-  const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonWeb.provider, {
+export const TON_WEB = IS_MAINNET ? mainnetTonWeb : testnetTonWeb;
+export const getTONJettonMinter = (tokenContractAddress: string, inlineTonWeb?: TonWeb) => {
+  const jettonMinter = new TonWeb.token.jetton.JettonMinter((inlineTonWeb || TON_WEB).provider, {
     address: tokenContractAddress,
   } as any);
   return jettonMinter;
 };
 
 export const getTonChainBalance = async (contractAddress: string, address: string) => {
-  const jettonMinter = getTONJettonMinter(contractAddress);
-  const jettonWalletAddress = await jettonMinter.getJettonWalletAddress(new TonWeb.utils.Address(address));
-  const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonWeb.provider, {
+  const jettonWalletAddress = await getJettonWalletAddress(contractAddress, address, defaultGetBalanceTonWeb);
+  const jettonWallet = new TonWeb.token.jetton.JettonWallet(defaultGetBalanceTonWeb.provider, {
     address: jettonWalletAddress,
   });
   const res = await jettonWallet.getData();
@@ -42,4 +42,16 @@ export async function getTransactionResponseHash(result: SendTransactionResponse
 
 export function isTonAddress(addr: string) {
   return Address.isFriendly(addr) || Address.isAddress(addr);
+}
+
+const JettonWalletAddressMap: any = {};
+
+export async function getJettonWalletAddress(tokenContractAddress: string, account: string, inlineTonWeb?: TonWeb) {
+  const key = (inlineTonWeb || TON_WEB).provider.host + tokenContractAddress + account;
+
+  if (!JettonWalletAddressMap[key]) {
+    const jettonMinter = getTONJettonMinter(tokenContractAddress, inlineTonWeb);
+    JettonWalletAddressMap[key] = (await jettonMinter.getJettonWalletAddress(new TonWeb.utils.Address(account))) as any;
+  }
+  return JettonWalletAddressMap[key];
 }

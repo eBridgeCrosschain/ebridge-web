@@ -5,7 +5,7 @@ import { ChainId } from 'types';
 import AElf from 'aelf-sdk';
 import { ZERO } from 'constants/misc';
 import { CHAIN, SendTransactionRequest } from '@tonconnect/ui-react';
-import { getTONJettonMinter, packCreateReceiptBody, tonWeb } from './ton';
+import { getTONJettonMinter, packCreateReceiptBody, TON_WEB } from './ton';
 export class TonContractCallData {
   static async createReceipt(contractAddress: string, account: string, paramsOption: any[]) {
     const forwardTonAmount = '0.15';
@@ -53,7 +53,7 @@ export class TonContractCallData {
 
 export class CallTonContract {
   static async getReceiptDailyLimit(contractAddress: string, paramsOption: any[]) {
-    const req = await tonWeb.provider.call(contractAddress, 'get_receipt_daily_limit', [
+    const req = await TON_WEB.provider.call(contractAddress, 'get_receipt_daily_limit', [
       ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],
     ]);
     return {
@@ -64,13 +64,13 @@ export class CallTonContract {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static async GetTokenPoolInfo(contractAddress: string, _paramsOption: any[]) {
-    const req = await tonWeb.provider.call(contractAddress, 'get_pool_liquidity', []);
+    const req = await TON_WEB.provider.call(contractAddress, 'get_pool_liquidity', []);
     return {
       liquidity: ZERO.plus(req.stack[0][1]).toFixed(),
     };
   }
   static async getCurrentReceiptTokenBucketState(contractAddress: string, paramsOption: any[]) {
-    const req = await tonWeb.provider.call(contractAddress, 'get_receipt_rate_limit_state', [
+    const req = await TON_WEB.provider.call(contractAddress, 'get_receipt_rate_limit_state', [
       ['num', base58ToChainId(paramsOption[1].slice(-4) as ChainId)],
     ]);
 

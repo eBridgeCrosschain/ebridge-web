@@ -30,7 +30,7 @@ export const isEVMChain = (network: string) => {
 };
 
 export const isTONChain = (network: string) => {
-  const tonChainIds = [SupportedTONChainId.TESTNET] as const;
+  const tonChainIds = [SupportedTONChainId.TESTNET, SupportedTONChainId.MAINNET] as const;
 
   return tonChainIds.some((chainId) => CHAIN_ID_MAP[chainId] === network);
 };

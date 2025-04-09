@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { CallTonContract, TonContractCallData } from 'utils/tonContractCall';
 import { ZERO } from 'constants/misc';
-import { getTONJettonMinter, packCreateReceiptBody, tonWeb } from '../ton';
+import { getTONJettonMinter, packCreateReceiptBody, TON_WEB } from '../ton';
 
 // Mock external dependencies
 vi.mock('tonweb', async () => {
@@ -44,7 +44,7 @@ vi.mock('../ton', () => {
   return {
     getTONJettonMinter: vi.fn(),
     packCreateReceiptBody: vi.fn(),
-    tonWeb: {
+    TON_WEB: {
       provider: {
         call: vi.fn(),
       },
@@ -128,7 +128,7 @@ describe('CallTonContract', () => {
 
     it('should get receipt daily limit correctly', async () => {
       // Mock provider call response
-      (tonWeb.provider.call as any).mockResolvedValue({
+      (TON_WEB.provider.call as any).mockResolvedValue({
         stack: [
           [null, '100'],
           [null, '1633072800'],
@@ -143,7 +143,7 @@ describe('CallTonContract', () => {
     });
 
     it('should handle empty response from provider', async () => {
-      (tonWeb.provider.call as any).mockResolvedValue({ stack: [] });
+      (TON_WEB.provider.call as any).mockResolvedValue({ stack: [] });
 
       await expect(CallTonContract.getReceiptDailyLimit(mockContractAddress, ['', ''])).rejects.toThrow();
     });
@@ -156,7 +156,7 @@ describe('CallTonContract', () => {
     });
 
     it('should get current receipt token bucket state correctly', async () => {
-      (tonWeb.provider.call as any).mockResolvedValue({
+      (TON_WEB.provider.call as any).mockResolvedValue({
         stack: [
           [null, '100'],
           [null, '1633072800'],
@@ -176,7 +176,7 @@ describe('CallTonContract', () => {
     });
 
     it('should handle empty response from provider', async () => {
-      (tonWeb.provider.call as any).mockResolvedValue({ stack: [] });
+      (TON_WEB.provider.call as any).mockResolvedValue({ stack: [] });
 
       await expect(CallTonContract.getReceiptDailyLimit(mockContractAddress, ['', ''])).rejects.toThrow();
     });

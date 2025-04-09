@@ -317,7 +317,6 @@ export default function ActionButton() {
       balance: fromBalance?.show,
       crossFee,
     });
-    console.log(max, max.toFixed(), '=====max');
 
     if (max.lt(fromInput)) {
       children = 'Insufficient balance';

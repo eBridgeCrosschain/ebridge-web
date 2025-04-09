@@ -17,8 +17,8 @@ export enum SupportedChainId {
 }
 
 export enum SupportedTONChainId {
-  TESTNET = 1100,
-  MAINNET = -239,
+  TESTNET = 1101, // fix testnet
+  MAINNET = 1100,
 }
 
 export enum SupportedELFChainId {
@@ -42,6 +42,7 @@ export const CHAIN_ID_MAP = {
   [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
   [SupportedChainId.BASE]: 'Base',
   [SupportedTONChainId.TESTNET]: 'TonTest',
+  [SupportedTONChainId.MAINNET]: 'TON',
 };
 
 /**
@@ -107,13 +108,9 @@ export const DEFAULT_CHAIN_ICON: { [chainId in TBridgeChainId]: IconInfo } = {
     type: 'BASE-CHAIN',
   },
   [SupportedTONChainId.TESTNET]: {
-    // type: 'BASE_SEPOLIA',
-    // TODO: icon
     type: 'TON-CHAIN',
   },
   [SupportedTONChainId.MAINNET]: {
-    // type: 'BASE_SEPOLIA',
-    // TODO: icon
     type: 'TON-CHAIN',
   },
 };
@@ -136,8 +133,8 @@ export const DEFAULT_CHAIN_NAME: { [chainId in TBridgeChainId]: string } = {
   [SupportedChainId.SEPOLIA]: 'Sepolia Testnet',
   [SupportedChainId.BASE_SEPOLIA]: 'Base Sepolia',
   [SupportedChainId.BASE]: 'Base',
-  [SupportedTONChainId.MAINNET]: 'Ton',
-  [SupportedTONChainId.TESTNET]: 'Ton Testnet',
+  [SupportedTONChainId.MAINNET]: 'TON',
+  [SupportedTONChainId.TESTNET]: 'TON Testnet',
 };
 
 export const CHAIN_SHORT_NAME = {
@@ -152,7 +149,6 @@ export const CHAIN_SHORT_NAME = {
   [SupportedChainId.SEPOLIA]: 'Sepolia',
   [SupportedChainId.BASE_SEPOLIA]: 'BaseSepolia',
   [SupportedChainId.BASE]: 'Base',
-  // TODO
-  [SupportedTONChainId.MAINNET]: 'Ton',
-  [SupportedTONChainId.TESTNET]: 'Ton Testnet',
+  [SupportedTONChainId.MAINNET]: 'TON',
+  [SupportedTONChainId.TESTNET]: 'TON Testnet',
 };

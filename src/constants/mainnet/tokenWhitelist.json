@@ -116,6 +116,12 @@
       "decimals": 18,
       "symbol": "USDT",
       "address": "0x55d398326f99059ff775485246999027b3197955"
+    },
+    "1100": {
+      "name": "USDT Token",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
     }
   },
   "DAI": {
