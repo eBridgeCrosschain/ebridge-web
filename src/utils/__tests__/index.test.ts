@@ -175,8 +175,8 @@ describe('Index Utils Functions', () => {
       // Mock the isELFChain function return false
       vi.mocked(isELFChain).mockReturnValueOnce(false);
 
-      const link = getExploreLink('TON_address', 'transaction', SupportedTONChainId.TESTNET);
-      expect(link).toBe(`${mockTestnetTonViewerUrl}transaction/4ce37f69d76b7acb`);
+      const link = getExploreLink('txid', 'transaction', SupportedTONChainId.TESTNET);
+      expect(link).toBe(`${mockTestnetTonViewerUrl}transaction/txid`);
     });
 
     it('should return block link for default chain', () => {

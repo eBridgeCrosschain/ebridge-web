@@ -101,7 +101,7 @@ describe('TonContractCallData', () => {
 
       // Verify transaction structure
       expect(transaction.messages[0].address).toBeUndefined();
-      expect(transaction.messages[0].amount).toBe((0.2 * 1e9).toString());
+      expect(transaction.messages[0].amount).toBe((0.3 * 1e9).toString());
       expect(transaction.validUntil).toBeDefined();
     });
 
