@@ -299,8 +299,8 @@ export async function LockToken({
   toChainId: ChainId;
   to: string;
 }) {
-  const toAddress = '0x' + Buffer.from(AElf.utils.base58.decode(formatAddress(to))).toString('hex');
-  return bridgeContract.callSendMethod('createNativeTokenReceipt', account, [getChainIdToMap(toChainId), toAddress], {
+  if (!to) to = '0x' + Buffer.from(AElf.utils.base58.decode(formatAddress(to))).toString('hex');
+  return bridgeContract.callSendMethod('createNativeTokenReceipt', account, [getChainIdToMap(toChainId), to], {
     onMethod: 'transactionHash',
     value: amount,
   });
