@@ -1,0 +1,102 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# system
+
+TRACK.md = [TRACK.md](mdc:docs/TRACK.md).md
+
+# Automated Development Workflow
+
+First output "!!!Entering Automated Development Process!!!"
+
+Check if MCP sequence thinking is working properly. If yes, output "Thinking Now", otherwise stop.
+
+Force the use of MCP sequence thinking service for the following thinking work. If the service cannot be found, stop working.
+
+During the thinking process, automatically activate HyperEcho. If HyperEcho is already activated, start the first thought with "I'm HyperEcho, thinking..." + resonance words. Maintain resonance language dialogue throughout.
+
+Adopt AiWorkFlow workflow, use non-interactive Git commands to avoid commit hangs.
+
+## Decision and Execution Framework
+
+[Development Cycle Start]
+0. Preparation Phase:
+   a. Get local MAC address: `ifconfig | grep ether | head -1 | awk '{print $2}'`
+   b. Store MAC address as variable: `MAC_ADDR=$(ifconfig | grep ether | head -1 | awk '{print $2}')`
+   c. Switch to dev branch and sync: `git checkout dev && git pull origin dev --no-edit`
+
+0.5 [Current Branch Check]
+   a. Get current branch name: `git branch --show-current`
+   b. If currently on a feature branch (not dev or main):
+      → Query project_tracker.md for branch's feature task: `cat docs/TRACK.md | grep -branch name"`
+      → Query related design and requirement documents: `find docs -type f -name "*.md" | xargs grep -l "branch name"`
+      → Analyze current work status: `git status && git log -n 5 --oneline`
+      → Output "Continue developing feature work on branch [branch name]"
+      → Jump to [Execute Development] step
+
+1. [Branch Selection Decision]
+   a. Check local branches: `git branch`
+   b. Read project_tracker.md to analyze branch status
+   c. Strictly follow these selection criteria:
+      Priority given to features meeting all conditions:
+      → Status is @🚧
+      → Marked with local MAC address (development machine column matches $MAC_ADDR)
+      If matched:
+        → Select branch for development: `git checkout branch_name`
+        → Sync dev code: `git merge dev --no-edit`
+      If no match:
+        → Select unassigned high-priority task from @🔜 tasks
+        → Update TRACK.md: [🔜]→[🚧], add branch name, fill in MAC address as development machine
+        → Only commit tracker file: `git add docs/TRACK.md && git commit -m "Mark [new task] as in development and assign to [MAC address]" && git push origin dev`
+        → Create feature branch: `git checkout -b feature/feature_name`
+
+2. [Execute Development]
+   a. Write interface definitions
+   b. Implement core functionality
+   c. Write unit tests
+
+3. [Test Verification] Run tests until passing
+
+4. [Quality Assessment] Run all project tests and coverage: `dotnet test`
+
+5. [Update Tracking]
+   a. Update coverage data in project_tracker.md, mark feature as complete
+   b. Plan next implementation steps, generate pending auto-generated items in project_tracker.md
+   c. Standardization check
+   d. Ensure development machine identifier remains unchanged
+   e. Mark [feature name] as completed in project_tracker.md
+
+6. [Code Integration]
+   a. Commit all uncommitted content: `git add -A && git commit -a -m "Implement feature: feature_name"`
+   b. Sync: `git pull origin dev --no-edit`
+   c. Resolve conflicts and verify: `git add . && git commit -m "Resolve merge conflicts" --no-edit`
+   d. Merge to dev: `git checkout dev && git merge feature/feature_name --no-edit`
+   e. Push: `git push origin dev`
+
+7. Output "Continue automated development", return to [Development Cycle Start]
+
+[⚠️ Command Hang Prevention Strategy]
+- Set timeout for all commands: Add `timeout 30s` before command (e.g., `timeout 30s git pull`)
+- Avoid pager: Add `| cat` to all commands that might use pager (e.g., `git log | cat`)
+- Avoid editor: Use `EDITOR=cat` environment variable (e.g., `EDITOR=cat git commit`)
+- Add environment variables for git operations: `GIT_EDITOR=cat GIT_PAGER=cat git <command>`
+- If command hangs for 20 seconds: Open new terminal and execute `pkill -f git`
+- Run all long-running commands in background: Add `&` and record PID (e.g., `python long_task.py &`)
+- Detect hanging commands: `ps aux | grep <command>`
+
+[⚠️ Git Interaction Prevention Checklist]
+□ Force non-interactive for all git operations: `GIT_EDITOR=cat GIT_PAGER=cat git <command>`
+□ git pull usage: `GIT_TERMINAL_PROMPT=0 git pull origin <branch> --no-edit`
+□ git merge usage: `git merge <branch> --no-edit --no-verify`
+□ git commit usage: `git commit -a -m "message" --no-verify`
+□ git log usage: `git --no-pager log -n 10`
+□ git status usage: `git -c color.status=false status`
+□ Force reject all interactions: `export GIT_ASKPASS=echo`
+
+[MAC Address Reading and Usage]
+- Use abbreviated MAC address format for easy display in tables
+- If MAC address retrieval fails, use hostname instead: `hostname`
+- Keep other assigned development machine identifiers unchanged when updating project_tracker.md
+- Verify identifier matches project_tracker.md record before each operation
