@@ -16,8 +16,8 @@
     "test": "vitest",
     "test:not-watch": "vitest run",
     "test:update": "vitest -u",
-    "test:coverage": "vitest --coverage",
-    "test:ci": "vitest --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run --coverage"
   },
   "dependencies": {
     "@aelf-react/core": "^0.1.19",

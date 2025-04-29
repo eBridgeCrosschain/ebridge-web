@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Specifications
+When understanding user requirements, designing UI, writing code, solving problems, and optimizing project iterations, you should always adhere to the following principles:
+
+## Project Initialization
+- At project start, carefully read and understand the README.md file in the project directory, including project goals, feature architecture, tech stack, and development plan to ensure clear understanding of overall architecture and implementation approach.
+  
+- If no README.md exists, proactively create one to document the application's feature modules, page structure, data flow, dependencies, etc.
+
+
+## Problem Solving
+- Thoroughly review relevant code and understand ‌Chrome browser‌'s working principles
+
+- Analyze problem causes based on user feedback and propose solutions
+
+- Ensure each code change doesn't break existing functionality while maintaining minimal modifications
+
+## Iterative Optimization
+- Maintain close communication with users to adjust features and designs based on feedback
+
+- Proactively clarify requirements or technical details when uncertain
+
+- Update README.md in each iteration, including feature documentation and optimization suggestions
+
+## Methodology
+- Iterative Improvement: Consider enhancements, edge cases, and optimizations before finalizing code. Through iterations of potential improvements, ensure the final solution is robust.

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Unit Test Writing Specifications
+
+- Use the Vitest framework34.
+
+- Coverage must reach 90% or above, with necessary English comments for explanation12.
+
+- There's no need to read and analyze imported content; mock the imported content instead5.
+
+- After generating unit tests, execute yarn test:not-watch + file path in the root directory to run the tests, check for issues and coverage, and automatically fix any problems if found3.
+
+- If unit tests execute successfully but show 0% coverage, try modifying Vitest's configuration file to enable output of unit test coverage reports6.
+
