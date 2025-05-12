@@ -108,9 +108,9 @@
     "Upgrade Notice": {
       "section 1": "Dear eBridge User,",
       "section 2": "We are currently upgrading our system to serve you better. During this period, the eBridge service is temporarily unavailable. We kindly advise you to refrain from using the service at this moment to avoid any potential inconveniences or losses.",
-      "section 3": "We appreciate your understanding and patience and look forward to providing you with an improved eBridge experience soon.",
-      "section 4": ["Thank you for your support!", "The eBridge Team"],
-      "section 5": "For any issues, join our Telegram group for support: "
+      "section 3":"The service is expected to resume by May 13, 2025, at 12:00 PM (UTC).",
+      "section 4": "We appreciate your understanding and patience and look forward to providing you with an improved eBridge experience soon.",
+      "section 5": ["Thank you for your support!", "The eBridge Team"]
     },
     "Please Notice": "請注意",
     "have reached the daily limit": "{{fromChain}}-->{{toChain}}方向的{{tokenSymbol}}每日跨鏈額度已達到上限。額度將在00:00 (UTC)刷新，請在刷新後重試。",

@@ -16,6 +16,9 @@ import clsx from 'clsx';
 import { HIDE_BACKGROUND_IMAGE_PATH_LIST, HIDE_MAIN_PAGE_LIST, NAV_LIST } from 'constants/link';
 import useMediaQueries from 'hooks/useMediaQueries';
 import { useIsTelegramPlatform } from 'hooks/telegram';
+import Mask from 'components/Mask';
+
+const IS_MASK = true;
 const Provider = dynamic(import('components/Provider'), { ssr: false });
 const Header = dynamic(import('components/Header'), { ssr: false });
 
@@ -45,20 +48,16 @@ export default function APP({ Component, pageProps }: AppProps) {
   }, [isTelegramPlatform, hideBackgroundImage]);
 
   const renderPageBody = () => {
+    const comp = IS_MASK ? <Mask /> : <Component {...pageProps} />;
+
     if (isFull) {
-      return <Component {...pageProps} />;
+      return comp;
     } else if (isMainPage) {
       return (
         <div className={pageBodyClassName}>
           <div className={clsx('page-content', 'main-page-content-wrap', isTelegramPlatform && 'tg-page-content')}>
-            {!isMd && <Nav />}
-            {hideMainPageStyles ? (
-              <Component {...pageProps} />
-            ) : (
-              <div className="main-page-component-wrap">
-                <Component {...pageProps} />
-              </div>
-            )}
+            {!IS_MASK && !isMd && <Nav />}
+            {hideMainPageStyles ? comp : <div className="main-page-component-wrap">{comp}</div>}
           </div>
           <Footer />
           <Loading />
@@ -67,9 +66,7 @@ export default function APP({ Component, pageProps }: AppProps) {
     } else {
       return (
         <div className={pageBodyClassName}>
-          <div className="flex-1">
-            <Component {...pageProps} />
-          </div>
+          <div className="flex-1">{comp}</div>
           <Footer />
           <Loading />
         </div>
