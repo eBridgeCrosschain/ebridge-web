@@ -40,8 +40,6 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             NEXT_PUBLIC_SENTRY_DNS=${{ secrets.TESTNET_NEXT_PUBLIC_SENTRY_DNS }}
             NEXT_PUBLIC_ANALYTICS_ID=${{ secrets.TESTNET_NEXT_NEXT_PUBLIC_ANALYTICS_ID }}
