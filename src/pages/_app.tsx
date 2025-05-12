@@ -18,7 +18,7 @@ import useMediaQueries from 'hooks/useMediaQueries';
 import { useIsTelegramPlatform } from 'hooks/telegram';
 import Mask from 'components/Mask';
 
-const IS_MASK = true;
+const IS_MASK = false;
 const Provider = dynamic(import('components/Provider'), { ssr: false });
 const Header = dynamic(import('components/Header'), { ssr: false });
 

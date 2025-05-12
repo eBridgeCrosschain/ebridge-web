@@ -7,12 +7,6 @@
       "decimals": 18,
       "symbol": "ELF",
       "address": "0xbf2179859fc6D5BEE9Bf9158632Dc51678a4100e"
-    },
-    "56": {
-      "name": "ELF Token",
-      "decimals": 18,
-      "symbol": "ELF",
-      "address": "0xa3f020a5c92e15be13caf0ee5c95cf79585eecc9"
     }
   },
   "ETH": {
