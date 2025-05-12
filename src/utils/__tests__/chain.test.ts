@@ -18,7 +18,7 @@ import {
   getChainType,
   formatAddress,
 } from 'utils/chain';
-import { CHAIN_ICON, CHAIN_NAME } from 'constants/index';
+import { CHAIN_ICON, CHAIN_NAME, IS_MAINNET } from 'constants/index';
 import { isELFChain } from '../aelfUtils';
 import { isTonChain, shortenAddress } from 'utils';
 
@@ -303,7 +303,7 @@ describe('Chain Utils', () => {
       (isELFChain as Mock).mockReturnValue(false);
       (isTonChain as unknown as Mock).mockReturnValue(true);
 
-      const result = getBridgeChainInfo(1100 as any);
+      const result = getBridgeChainInfo((IS_MAINNET ? 1101 : 1100) as any);
 
       expect(result).toBeDefined();
     });

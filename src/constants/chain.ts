@@ -1,4 +1,7 @@
 import { IconInfo } from 'types/misc';
+
+const IS_MAINNET = process.env.NEXT_PUBLIC_APP_ENV === 'mainnet';
+
 export enum SupportedChainId {
   MAINNET = 1,
   GORELI = 5,
@@ -17,8 +20,8 @@ export enum SupportedChainId {
 }
 
 export enum SupportedTONChainId {
-  TESTNET = 1101, // fix testnet
-  MAINNET = 1100,
+  TESTNET = IS_MAINNET ? 1101 : 1100,
+  MAINNET = IS_MAINNET ? 1100 : 1101,
 }
 
 export enum SupportedELFChainId {
