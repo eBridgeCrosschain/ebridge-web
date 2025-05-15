@@ -65,7 +65,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-use": "^17.4.0",
     "tonweb": "^0.0.66",
-    "viem": "2.x",
+    "viem": "2.29.x",
     "wagmi": "2.11.2",
     "web3": "^1.7.4",
     "web3-core": "^1.7.4"
@@ -120,6 +120,7 @@
     "@types/react": "18.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "viem": "2.29.x",
     "@walletconnect/modal-ui": "git+https://github.com/kled-bridge/modal-ui#37b7aedc0aa659d44f8abb72e56f75108940732f"
   }
 }

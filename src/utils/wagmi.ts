@@ -16,6 +16,8 @@ import {
   getAccount,
   switchChain,
   SwitchChainReturnType,
+  getClient,
+  GetClientReturnType,
 } from '@wagmi/core';
 import { EVMProviderConfig } from 'constants/evm';
 import { sleep } from 'utils';
@@ -80,7 +82,7 @@ export type TWriteContractByWagmiParams = {
 
 export async function writeContractByWagmi(params: TWriteContractByWagmiParams): Promise<WriteContractReturnType> {
   const { connector } = getAccount(EVMProviderConfig);
-  return await writeContract(EVMProviderConfig, { ...params, connector } as any);
+  return await writeContract(EVMProviderConfig, { ...params, connector, __mode: 'prepared' } as any);
 }
 
 export type TGetGasPriceByWagmiParams = {
@@ -108,4 +110,8 @@ export type TSwitchChainByWagmiParams = {
 
 export async function switchChainByWagmi(params: TSwitchChainByWagmiParams): Promise<SwitchChainReturnType> {
   return await switchChain(EVMProviderConfig, params as any);
+}
+
+export async function getClientByWagmi(chainId: any): Promise<GetClientReturnType> {
+  return getClient(EVMProviderConfig, chainId as any);
 }
