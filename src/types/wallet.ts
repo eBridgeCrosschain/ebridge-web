@@ -1,5 +1,4 @@
 import type { Accounts, IPortkeyProvider } from '@portkey/provider-types';
-import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
 import { AElfDappBridge } from '@aelf-react/types';
 
 export enum PortkeyVersion {
@@ -27,7 +26,7 @@ export interface ExtraInfoForDiscover {
 
 export interface ExtraInfoForPortkeyAA {
   publicKey: string;
-  portkeyInfo: PortkeyDid.DIDWalletInfo & {
+  portkeyInfo: {
     accounts: TAelfAccounts;
     nickName: string;
   };

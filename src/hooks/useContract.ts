@@ -15,11 +15,13 @@ import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { getContractBasic } from '@portkey/contracts';
 import { SupportedTONChain, WEB_LOGIN_CONFIG } from 'constants/index';
 import { IContract } from '@portkey/types';
-import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
+import { ExtraInfoForDiscover, WebLoginWalletInfo } from 'types/wallet';
 import { useGetAccount } from './wallet';
 import { SupportedELFChainId } from 'constants/chain';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { getBridgeChainInfo } from 'utils/chain';
+import { getPortkeyWebWalletInfo } from 'utils/portkey';
+import detectProvider from '@portkey/detect-provider';
 
 const ContractMap: { [key: string]: ContractBasic } = {};
 
@@ -52,24 +54,23 @@ export const getPortkeyContract = async (
     }
     return ContractMap[key];
   } else {
-    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
-    const account = portkeyAAInfo?.portkeyInfo?.walletInfo;
+    const portkeyAAInfo = getPortkeyWebWalletInfo();
     let sdkContract: undefined | IContract;
     let caContract: undefined | IContract;
-    if (account) {
+    if (portkeyAAInfo) {
       const portkeyConfig = WEB_LOGIN_CONFIG.portkeyV2;
       sdkContract = await getContractBasic({
         chainType: 'aelf',
-        account,
+        account: { address: portkeyAAInfo?.caAddress },
         contractAddress: contractAddress,
         caContractAddress: portkeyConfig.caContractAddress[chainId as keyof typeof portkeyConfig.caContractAddress],
         callType: 'ca',
-        caHash: portkeyAAInfo?.portkeyInfo?.caInfo.caHash || '',
+        caHash: portkeyAAInfo?.caHash || '',
         rpcUrl: getNodeByChainId(chainId).rpcUrl,
       });
       caContract = await getContractBasic({
         chainType: 'aelf',
-        account,
+        account: { address: portkeyAAInfo?.caAddress },
         contractAddress: portkeyConfig.caContractAddress[chainId as keyof typeof portkeyConfig.caContractAddress],
         callType: 'eoa',
         rpcUrl: getNodeByChainId(chainId).rpcUrl,
@@ -88,6 +89,26 @@ export const getPortkeyContract = async (
     });
     return sdkContractBasic as unknown as ContractBasic;
   }
+};
+
+export const getFairyVaultContract = async (
+  contractAddress: string,
+  chainId: ChainId,
+  walletInfo: WebLoginWalletInfo,
+  walletType: WalletTypeEnum,
+) => {
+  const key = `${contractAddress}_${chainId}_${walletInfo?.address}_${walletInfo}_${walletType}`;
+  if (!ContractMap[key]) {
+    const provider = await detectProvider({ providerName: 'FairyVault' });
+    const fairyVaultChain = await provider?.getChain(chainId as any);
+    const contract = new ContractBasic({
+      contractAddress,
+      chainId,
+      fairyVaultChain,
+    });
+    ContractMap[key] = contract;
+  }
+  return ContractMap[key];
 };
 
 export function useERCContract(address: string | undefined, ABI: any, chainId?: ChainId) {
@@ -214,16 +235,68 @@ export function usePortkeyContract(contractAddress: string, chainId?: SupportedE
   }, [contracts, key]);
 }
 
+export function useFairyVaultContract(contractAddress: string, chainId?: SupportedELFChainId) {
+  const { walletType, walletInfo } = useConnectWallet();
+  const accounts = useGetAccount();
+  const account: string = useMemo(() => {
+    if (!chainId) return '';
+    return accounts?.[chainId] || '';
+  }, [accounts, chainId]);
+  const [contracts, { dispatch }] = useAElfContractContext();
+  const key = useMemo(() => `${contractAddress}_${chainId}_${account}_FairyVault`, [account, chainId, contractAddress]);
+  const getContract = useCallback(
+    async (reCount = 0) => {
+      if (
+        !chainId ||
+        !isELFChain(chainId) ||
+        !isELFAddress(contractAddress) ||
+        !walletInfo ||
+        walletType !== WalletTypeEnum.fairyVault
+      )
+        return;
+      try {
+        dispatch(
+          setContract({
+            [key]: await getFairyVaultContract(contractAddress, chainId, walletInfo as WebLoginWalletInfo, walletType),
+          }),
+        );
+      } catch (error) {
+        console.log(error, '====error-getContract-useFairyVaultContract');
+        await sleep(1000);
+        reCount++;
+        if (reCount < 5) {
+          getContract(reCount);
+        } else {
+          console.warn(error, reCount, '====getContract-useFairyVaultContract', contractAddress);
+        }
+      }
+    },
+    [chainId, contractAddress, dispatch, key, walletInfo, walletType],
+  );
+
+  useEffect(() => {
+    getContract();
+  }, [getContract]);
+
+  return useMemo(() => {
+    return contracts?.[key];
+  }, [contracts, key]);
+}
+
 function useContract(address: string, ABI: any, chainId?: ChainId, isPortkey?: boolean): ContractBasic | undefined {
   const ercContract = useERCContract(address, ABI, chainId);
   const elfContract = useAElfContract(address, chainId);
   const tonContract = useTonContract(address, chainId);
   const portkeyContract = usePortkeyContract(address, chainId as SupportedELFChainId);
+  const fairyVaultContract = useFairyVaultContract(address, chainId as SupportedELFChainId);
+
+  const { walletType } = useConnectWallet();
   return useMemo(() => {
+    const isFairyVault = walletType === WalletTypeEnum.fairyVault;
     if (isPortkey) return portkeyContract;
     if (isTonChain(chainId)) return tonContract;
-    return isELFChain(chainId) ? elfContract : ercContract;
-  }, [chainId, elfContract, ercContract, isPortkey, portkeyContract, tonContract]);
+    return isELFChain(chainId) ? (isFairyVault ? fairyVaultContract : elfContract) : ercContract;
+  }, [chainId, elfContract, ercContract, fairyVaultContract, isPortkey, portkeyContract, tonContract, walletType]);
 }
 
 export function useTokenContract(chainId?: ChainId, address?: string, isPortkey?: boolean) {

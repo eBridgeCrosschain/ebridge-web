@@ -1,3 +1,5 @@
+import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { PORTKEY_WEB_WALLET_INFO_KEY } from 'constants/misc';
 import { TWalletConnectorId } from 'types';
 
 export function compareVersions(v1: string, v2: string) {
@@ -36,4 +38,28 @@ export function isPortkeyConnector(connectorId?: TWalletConnectorId) {
 
 export function isSelectPortkey(type?: string) {
   return type?.includes('PORTKEY');
+}
+export type TPortkeyWebWalletWalletInfo = {
+  caAddress: string;
+  caHash: string;
+  managerAddress: string;
+  managerPubkey: string;
+  originChainId: string;
+};
+export function getPortkeyWebWalletInfo() {
+  const portkeyWebWalletInfo = localStorage.getItem(PORTKEY_WEB_WALLET_INFO_KEY);
+  if (!portkeyWebWalletInfo) return;
+  try {
+    return JSON.parse(portkeyWebWalletInfo) as TPortkeyWebWalletWalletInfo;
+  } catch (error) {
+    return;
+  }
+}
+
+export function checkConnectedWallet() {
+  try {
+    if (localStorage.getItem('connectedWallet') === WalletTypeEnum.aa) localStorage.removeItem('connectedWallet');
+  } catch (error) {
+    console.log(error, '====checkConnectedWallet');
+  }
 }

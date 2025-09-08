@@ -53,3 +53,5 @@ export const BUTTON_TEXT_SUBMIT = 'Submit';
 export const BUTTON_TEXT_BACK = 'Back';
 
 export const SELECT_CHAIN = 'Select Chain';
+
+export const PORTKEY_WEB_WALLET_INFO_KEY = 'PortkeyWebWalletWalletInfo';

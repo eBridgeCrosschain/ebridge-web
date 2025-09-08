@@ -14,7 +14,6 @@ import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { formatAddress } from 'utils/chain';
 import CommonMessage from 'components/CommonMessage';
 import { WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
-import { useRouter } from 'next/router';
 import IconFont from 'components/IconFont';
 import { useAelfLogout } from 'hooks/wallet';
 import { TelegramPlatform } from 'utils/telegram/telegram';
@@ -23,11 +22,12 @@ import { useConnect } from 'hooks/useConnect';
 import { useWeb3 } from 'hooks/web3';
 import { TWalletConnectorId } from 'types';
 import { handleErrorMessage } from 'utils/error';
+import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 
 function AccountCard() {
+  const { goAssets } = useConnectWallet();
   const [{ accountWallet, accountChainId }, { dispatch }] = useModal();
   const chainDispatch = useChainDispatch();
-  const router = useRouter();
   const logoutWebLogin = useAelfLogout();
   const connect = useConnect();
   const [tonConnectUI] = useTonConnectUI();
@@ -67,7 +67,7 @@ function AccountCard() {
       connect('TON');
     } else {
       // Aelf
-      logoutWebLogin?.();
+      await logoutWebLogin?.();
     }
     if (walletType !== 'ERC') {
       dispatch(basicModalView.modalDestroy());
@@ -117,13 +117,13 @@ function AccountCard() {
 
   const jumpAssets = useCallback(() => {
     dispatch(basicModalView.modalDestroy());
-    router.push('/assets');
-  }, [dispatch, router]);
+    goAssets();
+  }, [dispatch, goAssets]);
   return (
     <>
       <div className="account-modal-info-wrap">
         <div className="account-modal-info-label">{formatConnectorName}</div>
-        {loginWalletType === WalletTypeEnum.aa && (
+        {loginWalletType === WalletTypeEnum.web && (
           <div onClick={jumpAssets} className="account-modal-info-assets">
             View Assets
             <IconFont className="account-modal-info-assets-arrow" type="Search" />
