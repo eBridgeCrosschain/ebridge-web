@@ -49,6 +49,18 @@ export function getConfig() {
     chainId: defaultChainId,
     disconnectConfirm: true,
   });
+  const fairyVaultDiscoverWallet = new FairyVaultDiscoverWallet({
+    networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
+    chainId: defaultChainId,
+    autoRequestAccount: true, // If set to true, please contact Portkey to add whitelist
+    autoLogoutOnDisconnected: true,
+    autoLogoutOnNetworkMismatch: true,
+    autoLogoutOnAccountMismatch: true,
+    autoLogoutOnChainMismatch: true,
+  });
+  setTimeout(() => {
+    (fairyVaultDiscoverWallet as any).detect();
+  }, 100);
   const isMobileDevices = devices.isMobileDevices();
   const config: IConfigProps = {
     baseConfig,
@@ -57,15 +69,7 @@ export function getConfig() {
       : isMobileDevices
       ? [
           portkeyInnerWallet,
-          new FairyVaultDiscoverWallet({
-            networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-            chainId: defaultChainId,
-            autoRequestAccount: true, // If set to true, please contact Portkey to add whitelist
-            autoLogoutOnDisconnected: true,
-            autoLogoutOnNetworkMismatch: true,
-            autoLogoutOnAccountMismatch: true,
-            autoLogoutOnChainMismatch: true,
-          }),
+          fairyVaultDiscoverWallet,
           new PortkeyDiscoverWallet({
             networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
             chainId: defaultChainId,
@@ -81,15 +85,7 @@ export function getConfig() {
         ]
       : [
           portkeyInnerWallet,
-          new FairyVaultDiscoverWallet({
-            networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-            chainId: defaultChainId,
-            autoRequestAccount: true, // If set to true, please contact Portkey to add whitelist
-            autoLogoutOnDisconnected: true,
-            autoLogoutOnNetworkMismatch: true,
-            autoLogoutOnAccountMismatch: true,
-            autoLogoutOnChainMismatch: true,
-          }),
+          fairyVaultDiscoverWallet,
           new PortkeyDiscoverWallet({
             networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
             chainId: defaultChainId,
