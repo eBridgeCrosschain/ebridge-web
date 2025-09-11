@@ -46,6 +46,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
         accountWallet = formatPortkeyWallet(portkeyWallet, accountChainId as any);
         break;
       case 'NIGHTELF':
+      case 'FAIRY_VAULT':
         accountWallet = aelfWallet;
         break;
       case 'TON':

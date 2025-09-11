@@ -12,7 +12,7 @@ import { SupportedChainId } from 'constants/chain';
 export type ChainId = keyof typeof CHAIN_NAME;
 export type ChainType = 'ERC' | 'ELF' | 'TON';
 
-export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC' | 'TON';
+export type WalletType = 'PORTKEY' | 'NIGHTELF' | 'ERC' | 'TON' | 'FAIRY_VAULT';
 
 export type NetworkType = {
   title: string;
@@ -38,6 +38,7 @@ export enum EVMConnectorId {
 export enum AElfConnectorId {
   NIGHTELF = 'NIGHTELF',
   PORTKEY = 'PORTKEY',
+  FAIRY_VAULT = 'FAIRY_VAULT',
 }
 
 export enum TONConnectorId {

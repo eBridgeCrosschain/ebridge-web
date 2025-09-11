@@ -41,6 +41,14 @@ export const SUPPORTED_WALLETS: Record<TWalletConnectorId, WalletInfo> = {
     description: 'Portkey Wallet',
     href: null,
   },
+  [AElfConnectorId.FAIRY_VAULT]: {
+    connectorId: AElfConnectorId.FAIRY_VAULT,
+    chainType: 'ELF',
+    name: 'FairyVault Wallet',
+    iconType: 'fairyVault',
+    description: 'FairyVault Wallet',
+    href: null,
+  },
   [TONConnectorId.TON]: {
     connectorId: TONConnectorId.TON,
     chainType: 'TON',

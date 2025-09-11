@@ -4,6 +4,8 @@
 @import '/src/assets/theme/constants.less';
 @import '/src/assets/theme/color.less';
 @import '/src/assets/theme/font.less';
+@import '@portkey/connect-web-wallet/dist/assets/index.css';
+
 html,
 body.pc-site,
 body.mobile-site {
@@ -102,10 +104,16 @@ div#__next {
   }
 }
 
-#tc-widget-root{
-  tc-root{
-    div{
+#tc-widget-root {
+  tc-root {
+    div {
       z-index: 99999;
     }
   }
+}
+
+.web-login-disconnect-modal-root,
+.portkey-connect-modal-root {
+  z-index: 99999;
+  position: relative;
 }

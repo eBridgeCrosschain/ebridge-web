@@ -91,7 +91,7 @@ export function useWeb3(): Web3Type {
   return tmpContext;
 }
 
-const PORTKEY_TYPE = ['PortkeyDiscover', 'PortkeyAA'];
+const PORTKEY_TYPE = ['PortkeyDiscover', 'PortkeyAA', 'PortkeyWebWallet'];
 
 // useActiveWeb3React contains all attributes of useWeb3React and aelf combination
 export function useAElf(): Web3Type {
@@ -111,7 +111,9 @@ export function useAElf(): Web3Type {
       contextNetwork.aelfInstance = aelfBridges[chainId as keyof typeof aelfBridges];
     }
     const isPortkey = PORTKEY_TYPE.includes(walletType) ? true : false;
-    const _walletType = isPortkey ? 'PORTKEY' : 'NIGHTELF';
+    const isFairyVault = walletType === WalletTypeEnum.fairyVault;
+
+    const _walletType = isPortkey ? 'PORTKEY' : isFairyVault ? 'FAIRY_VAULT' : 'NIGHTELF';
     return {
       ...contextNetwork,
       account: walletInfo?.address,
@@ -120,7 +122,11 @@ export function useAElf(): Web3Type {
       loginWalletType: walletType,
       walletType: _walletType,
       connector: walletInfo?.address ? _walletType : undefined,
-      connectorId: isPortkey ? AElfConnectorId.PORTKEY : AElfConnectorId.NIGHTELF,
+      connectorId: isPortkey
+        ? AElfConnectorId.PORTKEY
+        : isFairyVault
+        ? AElfConnectorId.FAIRY_VAULT
+        : AElfConnectorId.NIGHTELF,
       isPortkey,
     };
   }, [chainId, isConnected, walletInfo, walletType]);
@@ -133,17 +139,17 @@ export function usePortkey(): Web3Type {
     const contextNetwork: any = {
       ...walletInfo,
     };
+
     const _walletAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
     const _walletDiscoverInfo = walletInfo?.extraInfo as ExtraInfoForDiscover;
 
     let _accounts;
 
     switch (walletType) {
-      case WalletTypeEnum.aa:
+      case WalletTypeEnum.web:
         // sdk login
-        _accounts = getPortkeySDKAccount(_walletAAInfo.portkeyInfo.accounts);
+        _accounts = (_walletAAInfo as any)?.accounts;
         break;
-
       case WalletTypeEnum.discover:
         _accounts = _walletDiscoverInfo.accounts;
         break;
