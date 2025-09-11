@@ -158,7 +158,7 @@ export function useAElfContract(contractAddress: string, chainId?: ChainId) {
   const key = useMemo(() => contractAddress + '_' + chainId + '_' + account, [account, chainId, contractAddress]);
   const getContract = useCallback(
     async (reCount = 0) => {
-      if (!chainId || !contractAddress) return;
+      if (!chainId || !contractAddress || !isELFAddress(contractAddress)) return;
       try {
         const contract = await getELFContract(contractAddress, aelfInstance, account, chainId);
         dispatch(setContract({ [key]: contract }));
