@@ -1,4 +1,4 @@
-import { WalletTypeEnum as AelfWalletTypeEnum, TChainId, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { WalletTypeEnum as AelfWalletTypeEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
