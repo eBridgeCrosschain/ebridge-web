@@ -37,4 +37,5 @@ yarn-error.log*
 
 # shell
 *.sh
+!postinstall.sh
 .eslintcache
