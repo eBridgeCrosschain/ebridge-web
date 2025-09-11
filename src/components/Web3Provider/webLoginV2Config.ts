@@ -42,63 +42,64 @@ const baseConfig: IConfigProps['baseConfig'] = {
   theme: 'light',
 };
 
-const isTelegramPlatform = TelegramPlatform.isTelegramPlatform();
-const portkeyInnerWallet = new PortkeyInnerWallet({
-  networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-  chainId: defaultChainId,
-  disconnectConfirm: true,
-});
-
-const fairyVaultDiscoverWallet = new FairyVaultDiscoverWallet({
-  networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-  chainId: defaultChainId,
-  autoRequestAccount: true, // If set to true, please contact Portkey to add whitelist
-  autoLogoutOnDisconnected: true,
-  autoLogoutOnNetworkMismatch: true,
-  autoLogoutOnAccountMismatch: true,
-  autoLogoutOnChainMismatch: true,
-});
-const isMobileDevices = devices.isMobileDevices();
-
-export const config: IConfigProps = {
-  baseConfig,
-  wallets: isTelegramPlatform
-    ? [portkeyInnerWallet]
-    : isMobileDevices
-    ? [
-        portkeyInnerWallet,
-        fairyVaultDiscoverWallet,
-        new PortkeyDiscoverWallet({
-          networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-          chainId: defaultChainId,
-          autoRequestAccount: true,
-          autoLogoutOnDisconnected: true,
-          autoLogoutOnNetworkMismatch: true,
-          autoLogoutOnAccountMismatch: true,
-          autoLogoutOnChainMismatch: true,
-          onPluginNotFound: (openStore) => {
-            openStore();
-          },
-        }),
-      ]
-    : [
-        portkeyInnerWallet,
-        fairyVaultDiscoverWallet,
-        new PortkeyDiscoverWallet({
-          networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
-          chainId: defaultChainId,
-          autoRequestAccount: true,
-          autoLogoutOnDisconnected: true,
-          autoLogoutOnNetworkMismatch: true,
-          autoLogoutOnAccountMismatch: true,
-          autoLogoutOnChainMismatch: true,
-        }),
-        new NightElfWallet({
-          chainId: defaultChainId,
-          appName: APP_NAME,
-          connectEagerly: true,
-          defaultRpcUrl: SupportedELFChain[defaultChainId].CHAIN_INFO.rpcUrl,
-          nodes: AELF_NODES,
-        }),
-      ],
-};
+export function getConfig() {
+  const isTelegramPlatform = TelegramPlatform.isTelegramPlatform();
+  const portkeyInnerWallet = new PortkeyInnerWallet({
+    networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
+    chainId: defaultChainId,
+    disconnectConfirm: true,
+  });
+  const fairyVaultDiscoverWallet = new FairyVaultDiscoverWallet({
+    networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
+    chainId: defaultChainId,
+    autoRequestAccount: true, // If set to true, please contact Portkey to add whitelist
+    autoLogoutOnDisconnected: true,
+    autoLogoutOnNetworkMismatch: true,
+    autoLogoutOnAccountMismatch: true,
+    autoLogoutOnChainMismatch: true,
+  });
+  const isMobileDevices = devices.isMobileDevices();
+  const config: IConfigProps = {
+    baseConfig,
+    wallets: isTelegramPlatform
+      ? [portkeyInnerWallet]
+      : isMobileDevices
+      ? [
+          portkeyInnerWallet,
+          fairyVaultDiscoverWallet,
+          new PortkeyDiscoverWallet({
+            networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
+            chainId: defaultChainId,
+            autoRequestAccount: true,
+            autoLogoutOnDisconnected: true,
+            autoLogoutOnNetworkMismatch: true,
+            autoLogoutOnAccountMismatch: true,
+            autoLogoutOnChainMismatch: true,
+            onPluginNotFound: (openStore) => {
+              openStore();
+            },
+          }),
+        ]
+      : [
+          portkeyInnerWallet,
+          fairyVaultDiscoverWallet,
+          new PortkeyDiscoverWallet({
+            networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType,
+            chainId: defaultChainId,
+            autoRequestAccount: true,
+            autoLogoutOnDisconnected: true,
+            autoLogoutOnNetworkMismatch: true,
+            autoLogoutOnAccountMismatch: true,
+            autoLogoutOnChainMismatch: true,
+          }),
+          new NightElfWallet({
+            chainId: defaultChainId,
+            appName: APP_NAME,
+            connectEagerly: true,
+            defaultRpcUrl: SupportedELFChain[defaultChainId].CHAIN_INFO.rpcUrl,
+            nodes: AELF_NODES,
+          }),
+        ],
+  };
+  return config;
+}
