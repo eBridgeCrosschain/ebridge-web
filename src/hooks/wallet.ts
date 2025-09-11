@@ -1,4 +1,4 @@
-import { WalletTypeEnum as AelfWalletTypeEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
+import { WalletTypeEnum as AelfWalletTypeEnum, TChainId, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
@@ -20,6 +20,7 @@ import useGlobalLoading from 'hooks/useGlobalLoading';
 import { ROUTE_PATHS } from 'constants/link';
 import { useRouter } from 'next/router';
 import { getPortkeyWebWalletInfo } from 'utils/portkey';
+import { AElfConnectorId } from 'types';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
@@ -29,12 +30,20 @@ export function useInitWallet() {
   const isLogin = useIsAelfLogin();
 
   const init = useCallback(async () => {
-    if (walletType === AelfWalletTypeEnum.elf) {
-      chainDispatch(setSelectELFWallet('NIGHTELF'));
-    } else if (walletType === AelfWalletTypeEnum.web || walletType === AelfWalletTypeEnum.discover) {
-      chainDispatch(setSelectELFWallet('PORTKEY'));
-    } else if (walletType === AelfWalletTypeEnum.unknown) {
-      chainDispatch(setSelectELFWallet(undefined));
+    switch (walletType) {
+      case AelfWalletTypeEnum.elf:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.NIGHTELF));
+        break;
+      case AelfWalletTypeEnum.web:
+      case AelfWalletTypeEnum.discover:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.PORTKEY));
+        break;
+      case AelfWalletTypeEnum.fairyVault:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.FAIRY_VAULT));
+        break;
+      default:
+        chainDispatch(setSelectELFWallet(undefined));
+        break;
     }
   }, [chainDispatch, walletType]);
 
