@@ -58,6 +58,7 @@ export function getConfig() {
     autoLogoutOnAccountMismatch: true,
     autoLogoutOnChainMismatch: true,
   });
+  (fairyVaultDiscoverWallet as any).detect();
   const isMobileDevices = devices.isMobileDevices();
   const config: IConfigProps = {
     baseConfig,
