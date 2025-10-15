@@ -1,4 +1,4 @@
-import { WalletTypeEnum as AelfWalletTypeEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
+import { WalletTypeEnum as AelfWalletTypeEnum, TChainId, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
 import { did } from '@portkey/did';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
@@ -178,11 +178,11 @@ export function useGetAccount() {
 
 export function useAelfLogout() {
   const chainDispatch = useChainDispatch();
-  const { disConnectWallet } = useConnectWallet();
+  const { disConnectWallet, walletType } = useConnectWallet();
   return useCallback(async () => {
     try {
       const req = await disConnectWallet();
-      if (!req) return;
+      if (walletType === WalletTypeEnum.web && !req) return;
       eBridgeEventBus.AelfLogoutSuccess.emit();
       chainDispatch(setSelectERCWallet(undefined));
       clearWCStorageByDisconnect();
@@ -190,7 +190,7 @@ export function useAelfLogout() {
     } catch (error) {
       console.log(error, '====error-disConnectWallet');
     }
-  }, [chainDispatch, disConnectWallet]);
+  }, [chainDispatch, disConnectWallet, walletType]);
 }
 
 export function useGetWalletManagerStatus() {
