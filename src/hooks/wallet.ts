@@ -1,5 +1,5 @@
-import { WalletTypeEnum as AelfWalletTypeEnum, TChainId } from '@aelf-web-login/wallet-adapter-base';
-import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
+import { WalletTypeEnum as AelfWalletTypeEnum, TChainId, WalletTypeEnum } from '@aelf-web-login/wallet-adapter-base';
+import { did } from '@portkey/did';
 import { useConnectWallet } from '@aelf-web-login/wallet-adapter-react';
 import { ChainId, MethodsWallet } from '@portkey/provider-types';
 import { GetCAHolderByManagerParams } from '@portkey/services';
@@ -8,8 +8,7 @@ import { MAIN_SIDE_CHAIN_ID } from 'constants/index';
 import { useChainDispatch } from 'contexts/useChain';
 import { setSelectELFWallet, setSelectERCWallet } from 'contexts/useChain/actions';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ExtraInfoForDiscover, ExtraInfoForPortkeyAA, TAelfAccounts, WebLoginWalletInfo } from 'types/wallet';
-import { sleep } from 'utils';
+import { ExtraInfoForDiscover, TAelfAccounts, WebLoginWalletInfo } from 'types/wallet';
 import { handleWebLoginErrorMessage } from 'utils/error';
 import { clearWCStorageByDisconnect } from 'utils/localStorage';
 import { useAelfAuthToken } from './aelfAuthToken';
@@ -20,6 +19,8 @@ import { eBridgeInstance } from 'utils/eBridgeInstance';
 import useGlobalLoading from 'hooks/useGlobalLoading';
 import { ROUTE_PATHS } from 'constants/link';
 import { useRouter } from 'next/router';
+import { getPortkeyWebWalletInfo } from 'utils/portkey';
+import { AElfConnectorId } from 'types';
 
 export function useInitWallet() {
   const chainDispatch = useChainDispatch();
@@ -29,12 +30,20 @@ export function useInitWallet() {
   const isLogin = useIsAelfLogin();
 
   const init = useCallback(async () => {
-    if (walletType === AelfWalletTypeEnum.elf) {
-      chainDispatch(setSelectELFWallet('NIGHTELF'));
-    } else if (walletType === AelfWalletTypeEnum.aa || walletType === AelfWalletTypeEnum.discover) {
-      chainDispatch(setSelectELFWallet('PORTKEY'));
-    } else if (walletType === AelfWalletTypeEnum.unknown) {
-      chainDispatch(setSelectELFWallet(undefined));
+    switch (walletType) {
+      case AelfWalletTypeEnum.elf:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.NIGHTELF));
+        break;
+      case AelfWalletTypeEnum.web:
+      case AelfWalletTypeEnum.discover:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.PORTKEY));
+        break;
+      case AelfWalletTypeEnum.fairyVault:
+        chainDispatch(setSelectELFWallet(AElfConnectorId.FAIRY_VAULT));
+        break;
+      default:
+        chainDispatch(setSelectELFWallet(undefined));
+        break;
     }
   }, [chainDispatch, walletType]);
 
@@ -47,7 +56,7 @@ export function useInitWallet() {
 
   useEffect(() => {
     if (!isLogin) {
-      if (localStorage.getItem('connectedWallet') !== AelfWalletTypeEnum.aa) {
+      if (localStorage.getItem('connectedWallet') !== AelfWalletTypeEnum.web) {
         onLogoutClearData();
       }
     } else {
@@ -168,31 +177,20 @@ export function useGetAccount() {
 }
 
 export function useAelfLogout() {
-  const router = useRouter();
   const chainDispatch = useChainDispatch();
-  const { disConnectWallet } = useConnectWallet();
-  const handleAelfLogin = useAelfLogin();
-  const handleAelfLoginRef = useRef(handleAelfLogin);
-  handleAelfLoginRef.current = handleAelfLogin;
-
+  const { disConnectWallet, walletType } = useConnectWallet();
   return useCallback(async () => {
-    Promise.resolve(disConnectWallet()).then(async () => {
-      console.log('onLogout');
+    try {
+      const req = await disConnectWallet();
+      if (walletType === WalletTypeEnum.web && !req) return;
       eBridgeEventBus.AelfLogoutSuccess.emit();
       chainDispatch(setSelectERCWallet(undefined));
       clearWCStorageByDisconnect();
       resetLocalJWT(); // only remove aelf token
-
-      const _isNotNeedReLogin =
-        router.asPath?.includes(ROUTE_PATHS.LISTING_APPLICATION) ||
-        router.asPath?.includes(ROUTE_PATHS.MY_APPLICATIONS);
-
-      if (!_isNotNeedReLogin) {
-        await sleep(500);
-        handleAelfLoginRef.current();
-      }
-    });
-  }, [chainDispatch, disConnectWallet, router.asPath]);
+    } catch (error) {
+      console.log(error, '====error-disConnectWallet');
+    }
+  }, [chainDispatch, disConnectWallet, walletType]);
 }
 
 export function useGetWalletManagerStatus() {
@@ -213,11 +211,12 @@ export function useGetWalletManagerStatus() {
         });
       }
       // portkey sdk
-      const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
-      return PortkeyDid.did.checkManagerIsExist({
+      const portkeyWebWalletInfo = getPortkeyWebWalletInfo();
+
+      return did.checkManagerIsExist({
         chainId,
-        caHash: portkeyAAInfo.portkeyInfo?.caInfo?.caHash || '',
-        managementAddress: portkeyAAInfo.portkeyInfo?.walletInfo?.address || '',
+        caHash: portkeyWebWalletInfo?.caHash || '',
+        managementAddress: portkeyWebWalletInfo?.managerAddress || '',
       });
     },
     [walletInfo?.extraInfo, walletType],
@@ -237,9 +236,9 @@ export const getManagerAddressByWallet = async (
     managerAddress = await discoverInfo?.provider?.request({
       method: 'wallet_getCurrentManagerAddress',
     });
-  } else if (walletType === AelfWalletTypeEnum.aa) {
-    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
-    managerAddress = portkeyAAInfo.portkeyInfo.walletInfo.address;
+  } else if (walletType === AelfWalletTypeEnum.web) {
+    const portkeyWebWalletInfo = getPortkeyWebWalletInfo();
+    managerAddress = portkeyWebWalletInfo?.managerAddress;
   } else {
     // AelfWalletTypeEnum.elf
     managerAddress = walletInfo.address;
@@ -264,16 +263,16 @@ export const getCaHashAndOriginChainIdByWallet = async (
 
   let caHash, originChainId;
   if (walletType === AelfWalletTypeEnum.discover) {
-    const res = await PortkeyDid.did.services.getHolderInfoByManager({
+    const res = await did.services.getHolderInfoByManager({
       caAddresses: [walletInfo?.address],
     } as unknown as GetCAHolderByManagerParams);
     const caInfo = res[0];
     caHash = caInfo?.caHash;
     originChainId = caInfo?.chainId as TChainId;
-  } else if (walletType === AelfWalletTypeEnum.aa) {
-    const portkeyAAInfo = walletInfo?.extraInfo as ExtraInfoForPortkeyAA;
-    caHash = portkeyAAInfo.portkeyInfo.caInfo.caHash;
-    originChainId = portkeyAAInfo.portkeyInfo.chainId;
+  } else if (walletType === AelfWalletTypeEnum.web) {
+    const portkeyWebWalletInfo = getPortkeyWebWalletInfo();
+    caHash = portkeyWebWalletInfo?.caHash;
+    originChainId = portkeyWebWalletInfo?.originChainId as TChainId;
   }
 
   return {

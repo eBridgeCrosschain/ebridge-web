@@ -339,8 +339,6 @@ export default function ActionButton() {
           onClick = onCrossChainTransfer;
           return { children, onClick, disabled };
         } else {
-          console.log(needConfirm, '===needConfirm');
-
           if (needConfirm) {
             onClick = () => setToConfirmModal(true);
             return { children, onClick, disabled };

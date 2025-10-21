@@ -1,12 +1,17 @@
 'use client';
-
 // import '../../utils/telegram/telegram-web-app';
-import { WebLoginProvider, init } from '@aelf-web-login/wallet-adapter-react';
-import { config } from './webLoginV2Config';
+import { useMemo } from 'react';
+import { WebLoginProvider } from '@aelf-web-login/wallet-adapter-react';
+import { getConfig, didConfig } from './webLoginV2Config';
 import { useEffect, useState } from 'react';
+import { did } from '@portkey/did';
+import { checkConnectedWallet } from 'utils/portkey';
 
 export default function WebLoginV2Providers({ children }: { children: React.ReactNode }) {
-  const bridgeAPI = init(config); // upper config
+  useMemo(() => {
+    did.setConfig(didConfig);
+    checkConnectedWallet();
+  }, []);
 
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
@@ -27,5 +32,7 @@ export default function WebLoginV2Providers({ children }: { children: React.Reac
     });
   }, []);
 
-  return isLoaded ? <WebLoginProvider bridgeAPI={bridgeAPI}>{children}</WebLoginProvider> : null;
+  const config = useMemo(() => getConfig(), []);
+
+  return isLoaded ? <WebLoginProvider config={config}>{children}</WebLoginProvider> : null;
 }

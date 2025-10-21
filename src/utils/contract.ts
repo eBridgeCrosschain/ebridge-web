@@ -1,15 +1,13 @@
 /* eslint-disable react/no-is-mounted */
-import { SupportedELFChain, WEB_LOGIN_CONFIG } from '../constants';
 import { ELFChainConstants, ERCChainConstants } from 'constants/ChainConstants';
 import { getContractMethods, transformArrayToMap, getTxResult, isELFChain, encodedTransfer } from './aelfUtils';
 import { ChainId, ChainType } from 'types';
 import { isTonChain, sleep } from 'utils';
 import { AElfDappBridge } from '@aelf-react/types';
 import { checkAElfBridge } from './checkAElfBridge';
-import { IAElfChain } from '@portkey/provider-types';
+import { IAElfChain, IChain, IPortkeyProvider } from '@portkey/provider-types';
 import { IContract } from '@portkey/types';
-import { PortkeyDid } from '@aelf-web-login/wallet-adapter-bridge';
-import { ExtraInfoForPortkeyAA, WebLoginWalletInfo } from 'types/wallet';
+import { WebLoginWalletInfo } from 'types/wallet';
 import { TonConnectUI } from '@tonconnect/ui-react';
 import { getTransactionResponseHash } from './ton';
 import { CallTonContract, TonContractCallData } from './tonContractCall';
@@ -20,6 +18,7 @@ import {
   waitForTransactionReceiptByWagmi,
   writeContractByWagmi,
 } from './wagmi';
+import detectProvider from '@portkey/detect-provider';
 
 export interface AbiType {
   internalType?: string;
@@ -54,6 +53,7 @@ export interface ContractProps {
   viewContract?: any;
   portkeyChain?: IAElfChain;
   tonConnectUI?: TonConnectUI;
+  fairyVaultChain?: IAElfChain;
 }
 
 interface ErrorMsg {
@@ -84,7 +84,12 @@ type CallSendMethod = (
 export type ContractBasicErrorMsg = ErrorMsg;
 export class ContractBasic {
   public address?: string;
-  public callContract: WB3ContractBasic | AElfContractBasic | PortkeyContractBasic | TONContractBasic;
+  public callContract:
+    | WB3ContractBasic
+    | AElfContractBasic
+    | PortkeyContractBasic
+    | TONContractBasic
+    | FairyVaultContractBasic;
   public contractType: ChainType;
   public chainId?: ChainId;
   // public isPortkey?: boolean;
@@ -93,7 +98,9 @@ export class ContractBasic {
     this.chainId = options.chainId;
     const isELF = isELFChain(options.chainId);
     const isTON = isTonChain(options.chainId);
-    this.callContract = options.portkeyChain
+    this.callContract = options.fairyVaultChain
+      ? new FairyVaultContractBasic(options)
+      : options.portkeyChain
       ? new PortkeyContractBasic(options)
       : isELF
       ? new AElfContractBasic(options)
@@ -103,26 +110,31 @@ export class ContractBasic {
     this.contractType = isELF ? 'ELF' : isTON ? 'TON' : 'ERC';
   }
 
+  public checkContractParams() {
+    return (
+      this.callContract instanceof AElfContractBasic ||
+      this.callContract instanceof PortkeyContractBasic ||
+      this.callContract instanceof FairyVaultContractBasic
+    );
+  }
+
   public callViewMethod: CallViewMethod = async (
     functionName,
     paramsOption,
     callOptions = { defaultBlock: 'latest' },
   ) => {
-    if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
-      return this.callContract.callViewMethod(functionName, paramsOption);
+    if (this.checkContractParams()) return this.callContract.callViewMethod(functionName, paramsOption);
 
     return this.callContract.callViewMethod(functionName, paramsOption, callOptions);
   };
 
   public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
     console.log(functionName, paramsOption, '++++paramsOption');
-    if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
-      return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
+    if (this.checkContractParams()) return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
     return this.callContract.callSendMethod(functionName, account, paramsOption, sendOptions);
   };
   public callSendPromiseMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
-    if (this.callContract instanceof AElfContractBasic || this.callContract instanceof PortkeyContractBasic)
-      return this.callContract.callSendPromiseMethod(functionName, paramsOption);
+    if (this.checkContractParams()) return this.callContract.callSendPromiseMethod(functionName, paramsOption);
 
     return this.callContract.callSendPromiseMethod(functionName, account, paramsOption, sendOptions);
   };
@@ -463,7 +475,9 @@ export class PortkeySDKContractBasic {
   public viewContract: any;
   public portkeyWallet?: WebLoginWalletInfo;
   public caContract?: IContract;
-
+  public contract?: IContract;
+  public provider?: IPortkeyProvider | null;
+  public chain?: IChain;
   constructor(
     options: {
       sdkContract?: IContract;
@@ -510,59 +524,42 @@ export class PortkeySDKContractBasic {
     }
   };
 
+  public getProvider = async () => {
+    if (!this.provider) this.provider = await detectProvider({ providerName: 'PortkeyWebWallet' });
+    return this.provider;
+  };
+
+  public getChain = async (chainId: ChainId) => {
+    const provider = await this.getProvider();
+    if (!this.chain) this.chain = await provider?.getChain(chainId as any);
+    return this.chain;
+  };
+  public getContract = async () => {
+    const chain = await this.getChain(this.chainId);
+    if (!this.contract) this.contract = chain?.getContract(this.address);
+    return this.contract;
+  };
+
   public callSendMethod: CallSendMethod = async (functionName, _account, paramsOption, sendOptions) => {
     const { onMethod = 'receipt', ...options } = sendOptions || {};
-    const { TOKEN_CONTRACT } = SupportedELFChain[this.chainId];
-
-    if (this.address === TOKEN_CONTRACT && functionName === 'approve') {
-      const contract = this.caContract;
-      if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
-
-      const walletInfo = this.portkeyWallet?.extraInfo as ExtraInfoForPortkeyAA;
-      const caHash = walletInfo?.portkeyInfo?.caInfo.caHash || '';
-      const originChainId = walletInfo?.portkeyInfo?.chainId as any;
-      const managerApprove = PortkeyDid.managerApprove;
-
-      const { amount, guardiansApproved } = await managerApprove({
-        originChainId,
-        targetChainId: this.chainId as any,
-        caHash,
-        symbol: paramsOption[1],
-        amount: paramsOption[2],
-        networkType: WEB_LOGIN_CONFIG.portkeyV2.networkType as any,
-      });
-      const managerApproveProps = {
-        caHash,
-        spender: paramsOption[0],
-        guardiansApproved,
-        symbol: paramsOption[1],
-        amount,
-      };
-      const req = await contract.callSendMethod('ManagerApprove', '', managerApproveProps, {
-        onMethod,
-        ...options,
-      });
-      if (req.error) return req;
-      return req?.data || req;
-    }
-
-    const contract = this.sdkContract;
-    if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
 
     try {
+      const contract = await this.getContract();
+      if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
       await this.checkMethods();
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const inputType = this.methods[functionNameUpper];
 
-      const paramsOptionMap = transformArrayToMap(inputType, paramsOption);
-
-      const req = await contract.callSendMethod(functionNameUpper, '', paramsOptionMap, {
+      const req = await contract.callSendMethod(functionNameUpper, '', transformArrayToMap(inputType, paramsOption), {
         onMethod,
         ...options,
       });
+      console.log(req, '======PortkeySDKContractBasic-callSendMethod-req');
       if (req.error) return req;
       return req?.data || req;
     } catch (error: any) {
+      console.log(error, '======PortkeySDKContractBasic-callSendMethod-error');
+
       if (error.message) return { error };
       return { error: { message: error.Error || error.Status } };
     }
@@ -607,4 +604,75 @@ export class TONContractBasic {
   };
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   public callSendPromiseMethod: CallSendMethod = async (_functionName, account, paramsOption, sendOptions) => {};
+}
+
+export class FairyVaultContractBasic {
+  public contract?: IContract;
+  public chainId: ChainId;
+  public fairyVaultChain?: IAElfChain;
+  public methods?: any;
+  public address: string;
+  constructor(options: ContractProps) {
+    const { contractAddress, chainId } = options;
+    this.fairyVaultChain = options.fairyVaultChain;
+    this.contract = this.fairyVaultChain?.getContract(options.contractAddress);
+    this.address = contractAddress;
+    this.chainId = chainId as ChainId;
+    this.getFileDescriptorsSet(this.address);
+  }
+
+  getFileDescriptorsSet = async (address: string) => {
+    try {
+      this.methods = await getContractMethods(this.chainId, address);
+    } catch (error) {
+      throw new Error(JSON.stringify(error) + 'address:' + address + 'Contract:' + 'getContractMethods');
+    }
+  };
+  checkMethods = async () => {
+    if (!this.methods) await this.getFileDescriptorsSet(this.address);
+  };
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    const contract = this.contract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error1' } };
+    try {
+      await this.checkMethods();
+      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
+      const inputType = this.methods[functionNameUpper];
+
+      const req = await contract.callViewMethod(functionNameUpper, transformArrayToMap(inputType, paramsOption));
+      console.log(req, transformArrayToMap(inputType, paramsOption), functionNameUpper, '=======callViewMethod');
+
+      if (req.error) return req;
+
+      return req?.data || req;
+    } catch (e) {
+      return { error: e };
+    }
+  };
+
+  public callSendMethod: AElfCallSendMethod = async (functionName, paramsOption, sendOptions) => {
+    const contract = this.contract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error2' } };
+    const { onMethod = 'receipt', ...options } = sendOptions || {};
+    try {
+      await this.checkMethods();
+      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
+      const inputType = this.methods[functionNameUpper];
+
+      console.log(transformArrayToMap(inputType, paramsOption), paramsOption, functionNameUpper, '=callSendMethod');
+      const req = await contract.callSendMethod(functionNameUpper, '', transformArrayToMap(inputType, paramsOption), {
+        onMethod,
+        ...options,
+      });
+      if (req.error) return req;
+      return req?.data || req;
+    } catch (error: any) {
+      if (error.message) return { error };
+      return { error: { message: error.Error || error.Status } };
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public callSendPromiseMethod: CallSendMethod = async (_functionName, _account, _paramsOption, _sendOptions) => {
+    throw new Error('Method not implemented.');
+  };
 }
