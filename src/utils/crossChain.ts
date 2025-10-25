@@ -399,7 +399,7 @@ export async function getReceiptLimit({
       throw receiptDailyLimit.error || receiptTokenBucket.error;
     }
 
-    const isEnable = receiptTokenBucket.isEnable;
+    const isEnable = receiptTokenBucket.isEnabled;
 
     return {
       remain: new BigNumber(receiptDailyLimit.tokenAmount),
