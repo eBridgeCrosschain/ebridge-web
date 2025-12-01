@@ -1,0 +1,30 @@
+@import '/src/assets/theme/color.less';
+.select-btn {
+  background: @bg-1;
+  border: 1px solid @border-1;
+  color: @font-5;
+  :global {
+    .anticon {
+      font-size: 12px;
+    }
+  }
+  &:hover {
+    background: @bg-4;
+    border-color: @border-1;
+    color: @font-5;
+  }
+  &:checked {
+    background: @bg-5;
+    border-color: @border-1;
+  }
+  &:disabled {
+    background: @bg-4;
+    border-color: @border-1;
+    color: @font-3;
+  }
+  &:focus {
+    background: @bg-1;
+    border-color: @border-1;
+    color: @font-5;
+  }
+}

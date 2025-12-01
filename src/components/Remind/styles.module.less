@@ -1,0 +1,64 @@
+@import '/src/assets/theme/color.less';
+
+.remind-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 22px;
+
+  .icon {
+    margin: 3px 0;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.remind-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: @font-2;
+}
+
+.remind-border {
+  border: 1px solid @border-6;
+}
+
+.text {
+  margin-left: 8px;
+  color: @font-13;
+}
+
+.remind-brand {
+  background-color: @bg-11;
+  border-color: @border-3;
+
+  .text {
+    color: @font-2;
+  }
+}
+
+.remind-info {
+  background-color: @bg-15;
+}
+
+.remind-warning {
+  background-color: @bg-10;
+  border-color:  @font-7;
+
+  .text {
+    color: @font-2;
+  }
+}
+
+.remind-error {
+  background-color: @bg-22;
+  border: none;
+
+  .text {
+    color: @font-15;
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "App prefix": {
+    "scope": "less",
+    "prefix": "v",
+    "body": ["~'var(--@{app-prefix}-$1)'"],
+    "description": "less prefix"
+  },
+  "Class prefix": {
+    "scope": "less",
+    "prefix": "c",
+    "body": [".@{app-prefix}-$1"],
+    "description": "less class prefix"
+  },
+  "Css Module Global": {
+    "scope": "less",
+    "prefix": "g",
+    "body": [":global {$1}"],
+    "description": "css module global"
+  },
+  "import styles": {
+    "scope": "javascriptreact, typescriptreact",
+    "prefix": "styles",
+    "body": ["import styles from './styles.module.less';"],
+    "description": "import styles"
+  },
+  "xs media": {
+    "scope": "less",
+    "prefix": "xs",
+    "body": ["@media screen and (max-width: @xs-width) {$1}"],
+    "description": "xs media"
+  },
+  "md media": {
+    "scope": "less",
+    "prefix": "md",
+    "body": ["@media screen and (max-width: @md-width) {$1}"],
+    "description": "md media"
+  },
+  "xl media": {
+    "scope": "less",
+    "prefix": "xl",
+    "body": ["@media screen and (max-width: @xl-width) {$1}"],
+    "description": "xl media"
+  },
+  "xxl media": {
+    "scope": "less",
+    "prefix": "xl",
+    "body": ["@media screen and (max-width: @xxl-width) {$1}"],
+    "description": "xl media"
+  },
+  "font medium": {
+    "scope": "less",
+    "prefix": "medium",
+    "body": [".font-family-medium();"],
+    "description": "font medium"
+  },
+  "font regular": {
+    "scope": "less",
+    "prefix": "regular",
+    "body": [".font-family-regular();"],
+    "description": "font regular"
+  }
+}

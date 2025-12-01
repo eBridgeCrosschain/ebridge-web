@@ -1,0 +1,196 @@
+@import 'src/assets/theme/color.less';
+@import 'src/assets/theme/constants.less';
+@import 'src/assets/theme/font.less';
+
+.common-steps.common-steps-weight {
+  :global {
+    .@{app-prefix}-steps-item {
+      .@{app-prefix}-steps-item-content {
+        min-width: 72px;
+
+        .@{app-prefix}-steps-item-title {
+          .font-family-medium();
+
+          font-size: 12px;
+          height: 20px;
+          line-height: 20px;
+        }
+        .@{app-prefix}-steps-item-description {
+          .font-family-medium();
+
+          color: @font-13;
+          font-size: 12px;
+          line-height: 20px;
+        }
+      }
+
+      &:not(.@{app-prefix}-steps-item-active) > .@{app-prefix}-steps-item-container[role='button']:hover {
+        .@{app-prefix}-steps-item-icon {
+          border-color: @bg-17;
+          .@{app-prefix}-steps-icon {
+            color: @bg-17;
+          }
+        }
+        .@{app-prefix}-steps-item-title {
+          color: @bg-17;
+        }
+      }
+
+      &.@{app-prefix}-steps-item-process {
+        .@{app-prefix}-steps-item-icon {
+          border: none;
+          border-radius: 50%;
+          background-color: @bg-17;
+          .@{app-prefix}-steps-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: @bg-2;
+            path {
+              stroke: @bg-2;
+            }
+          }
+        }
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: @border-5;
+          }
+        }
+      }
+
+      &.@{app-prefix}-steps-item-wait {
+        .@{app-prefix}-steps-item-icon {
+          border-color: @font-13;
+          .@{app-prefix}-steps-icon {
+            color: @font-13;
+          }
+        }
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: @border-5;
+          }
+        }
+      }
+
+      &.@{app-prefix}-steps-item-finish {
+        .@{app-prefix}-steps-item-icon {
+          border-color: @bg-17;
+          .@{app-prefix}-steps-finish-icon {
+            color: @bg-17;
+          }
+        }
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: @bg-17;
+          }
+        }
+      }
+
+      &.@{app-prefix}-steps-item-error {
+        .@{app-prefix}-steps-item-title {
+          color: @font-15;
+        }
+      }
+
+      &:has(+ .@{app-prefix}-steps-item-error) {
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: @font-6;
+          }
+        }
+      }
+
+      &:has(+ .@{app-prefix}-steps-item-finish),
+      &:has(+ .@{app-prefix}-steps-item-process) {
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: @bg-17;
+          }
+        }
+      }
+    }
+  }
+
+  &.common-steps-hide-line {
+    :global {
+      .@{app-prefix}-steps-item {
+        .@{app-prefix}-steps-item-tail {
+          &::after {
+            background-color: transparent !important;
+          }
+        }
+      }
+    }
+  }
+
+  &.common-steps-horizontal {
+    :global {
+      .@{app-prefix}-steps-item {
+        .@{app-prefix}-steps-item-tail {
+          margin-left: 12px;
+          padding: 3.5px 24px;
+        }
+        .@{app-prefix}-steps-item-icon {
+          margin-left: 0;
+          margin-right: 12px;
+        }
+
+        .@{app-prefix}-steps-item-content {
+          width: 100%;
+          // margin-right: 24px;
+          text-align: left;
+        }
+        &.@{app-prefix}-steps-item-process {
+          .@{app-prefix}-steps-item-icon {
+            .@{app-prefix}-steps-icon {
+              width: 24px;
+              height: 24px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.common-steps-vertical {
+    .common-steps-loading {
+      width: 10px;
+      height: 10px;
+    }
+
+    :global {
+      .@{app-prefix}-steps-item {
+        &:last-child {
+          flex: none;
+          .@{app-prefix}-steps-item-content {
+            min-height: auto;
+          }
+        }
+        &:not(:last-child) {
+          .@{app-prefix}-steps-item-content {
+            min-height: 52px;
+          }
+        }
+        .@{app-prefix}-steps-item-tail {
+          left: 10px;
+          padding-top: 28px;
+        }
+        .@{app-prefix}-steps-item-icon {
+          width: 20px;
+          height: 20px;
+          margin-right: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .@{app-prefix}-steps-icon {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    @media screen and (max-width: @md-width) {
+      width: auto;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.unsaved-changes-warning-modal {
+  :global {
+    .@{app-prefix}-modal-content {
+      height: 100%;
+      .@{app-prefix}-modal-close {
+        .@{app-prefix}-modal-close-x {
+          height: 68px;
+          padding-top: 8px;
+          svg path {
+            fill: @font-15;
+          }
+        }
+      }
+      .@{app-prefix}-modal-header {
+        height: 68px;
+        padding-top: 24px;
+        padding-bottom: 16px;
+
+        .@{app-prefix}-modal-title {
+          .font-family-semibold();
+
+          font-size: 16px;
+          line-height: 24px;
+          text-align: left;
+        }
+      }
+      .@{app-prefix}-modal-body {
+        width: 100%;
+        min-width: auto;
+        padding-top: 0;
+      }
+    }
+  }
+
+  .unsaved-changes-warning-modal-text {
+    line-height: 20px;
+    color: @font-13;
+  }
+
+  .unsaved-changes-warning-modal-footer {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .unsaved-changes-warning-modal-footer-button {
+    flex: 1;
+    height: 48px;
+  }
+}

@@ -1,0 +1,42 @@
+@import '/src/assets/theme/color.less';
+
+.confirm-modal {
+  :global {
+    .@{app-prefix}-modal-header {
+      .@{app-prefix}-modal-title .@{app-prefix}-col {
+        text-align: left !important;
+      }
+    }
+  }
+
+  .confirm-modal-content {
+    width: 100%;
+    height: 144px;
+    border-radius: 8px;
+    background-color: #f6f7fa;
+    margin-bottom: 32px;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+
+  .confirm-modal-address {
+    width: 100%;
+    height: 44px;
+    line-height: 22px;
+    color: #364153;
+    font-size: 14px;
+    text-align: left;
+    margin-top: 24px;
+  }
+
+  .confirm-modal-button {
+    :global{
+      .@{app-prefix}-btn{
+        width: calc(49% - 8px);
+        height: 40px;
+        font-size: 14px;
+        line-height: 22px;
+      }
+    }
+  }
+}

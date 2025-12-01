@@ -1,0 +1,26 @@
+.modals {
+  max-width: calc(calc(100vw - 40px));
+  .@{app-prefix}-modal-body {
+    min-width: 448px;
+    max-width: 448px;
+  }
+}
+.mobile-site {
+  .modals {
+    max-width: calc(calc(100vw - 48px));
+    .@{app-prefix}-modal-content {
+      padding: 0 24px 24px;
+    }
+    .@{app-prefix}-modal-header {
+      padding: 24px 0 21px;
+      .@{app-prefix}-modal-title {
+        line-height: 16px;
+      }
+    }
+    .@{app-prefix}-modal-body {
+      min-width: 90%;
+      padding: 24px 0 0;
+      margin: auto;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.token-row {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.token-logo {
+  margin-right: 0;
+  line-height: 1;
+}
+
+.token-symbol,
+.token-name {
+  flex-shrink: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.token-symbol {
+  .font-family-medium();
+}
+
+.token-name {
+  color: @font-13;
+  font-size: 12px;
+  line-height: 20px;
+}

@@ -1,0 +1,146 @@
+@import '../../assets/theme/color.less';
+@import '../../assets/theme/font.less';
+
+.common-modals {
+  .@{app-prefix}-modal-content {
+    border-radius: 8px;
+    overflow: auto;
+    padding: 0;
+  }
+  .@{app-prefix}-modal-header {
+    height: 52px;
+    padding: 24px 24px 0;
+    border-bottom: none;
+  }
+  .@{app-prefix}-modal-title {
+    .font-family-semibold();
+
+    color: @font-15;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    & > .@{app-prefix}-row > .@{app-prefix}-col {
+      text-align: left !important;
+    }
+  }
+  .@{app-prefix}-modal-close-x {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+  }
+  .common-modal-close-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .common-modal-left-icon {
+    cursor: pointer;
+    font-size: 18px;
+    text-align: left;
+    color: var(--ant-text4-color);
+  }
+  .common-button {
+    font-size: 18px;
+    margin-top: 15px;
+    width: 100%;
+    height: 56px;
+  }
+
+  .@{app-prefix}-modal-body {
+    display: flex;
+    flex: 1;
+    padding: 16px 24px 24px;
+    width: 35vw;
+    min-width: 500px;
+    max-width: 500px;
+    max-height: 800px;
+    flex-direction: column;
+  }
+}
+
+.mobile-site {
+  .@{app-prefix}-modal-wrap {
+    overflow: auto;
+    overflow-y: hidden;
+  }
+  .common-modals {
+    top: 0;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    padding-bottom: 30px;
+    justify-content: center;
+    margin-top: 0;
+    max-width: calc(calc(100vw - 48px));
+
+    .common-button {
+      border-radius: 2px;
+      width: 100%;
+      height: 2.86rem;
+      font-size: 1rem;
+      line-height: 1.28rem;
+    }
+    .@{app-prefix}-btn-primary {
+      border: 0;
+    }
+    .@{app-prefix}-modal-body {
+      max-height: 65vh;
+      width: auto;
+      min-width: auto;
+      max-width: unset;
+      padding: 16px 16px 24px;
+      overflow: auto;
+    }
+  }
+  .tg-common-modals {
+    min-height: unset !important;
+    height: 100%;
+  }
+  .common-modals.common-bottom-modals {
+    top: 0;
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    min-width: 100% !important;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    .common-modal-close-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .@{app-prefix}-modal-header {
+      height: 56px;
+      padding: 16px 0;
+      .@{app-prefix}-modal-title {
+        font-weight: 500;
+        line-height: 24px;
+        & > .@{app-prefix}-row > .@{app-prefix}-col {
+          text-align: center !important;
+        }
+      }
+    }
+    .@{app-prefix}-modal-close-x {
+      padding-top: 1px;
+    }
+    .@{app-prefix}-modal-body {
+      max-width: 100%;
+      padding: 0;
+    }
+    .@{app-prefix}-modal-content {
+      padding: 0 16px 16px;
+      border-radius: 0;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+  }
+  .common-modals.tg-common-bottom-modals {
+    min-height: unset !important;
+    height: 100%;
+  }
+
+  .common-modals.tg-view-progress-modal {
+    min-height: fill-available !important;
+    height: unset;
+  }
+}
