@@ -1,0 +1,105 @@
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+
+.common-title-wrap{
+  .title-wrap{
+    display: flex;
+    align-items: center;
+    .warn-icon{
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+    }
+  }
+  .section2{
+    margin-top: 8px;
+  }
+  .link{
+    font-weight: 600;
+    color: rgb(77 106 236 / 100%);
+  }
+  .close-icon{
+    width: 16px;
+    height: 16px;
+  }
+}
+.common-bg{
+  background-image: url('./images/eBridge_logo.svg');
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 144px 144px;
+  background-color: rgb(237 240 253 / 100%);
+}
+
+.notification-wrap {
+  width: 480px;
+  height: 198px;
+  color: @font-5;
+  border-radius: 8px;
+  box-shadow: 0 5px 12px 4px rgb(0 0 0 / 15%);
+  padding: 0 0 0 80px;
+  line-height: 22px;
+  .common-bg();
+  .font-family-regular();
+  .common-title-wrap();
+  
+  :global {
+    .@{app-prefix}-notification-notice-content{
+      background-color: rgb(255 255 255 / 100%);
+      height: 100%;
+    }
+    .@{app-prefix}-notification-notice-message{
+      .font-family-medium();
+
+      color: @font-2;
+      font-size: 18px;
+      padding: 16px 24px 14px 16px;
+      margin-bottom: 0;
+    }
+    .@{app-prefix}-notification-notice-description{
+      padding-left: 16px;
+      padding-right: 54px;
+    }
+  }
+}
+
+@media screen and (max-width: @md-width) {
+
+  .notification-phone-wrap {
+    color: @font-5;
+    margin: 0;
+    max-width: @md-width;
+    .common-title-wrap();
+    :global{
+      .@{app-prefix}-drawer-content-wrapper{
+        .common-bg();
+
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding-left: 80px;
+        overflow: hidden;
+        height: 260px;
+      }
+      .@{app-prefix}-drawer-header{
+        padding: 14px 16px;
+        padding-right: 12px;
+        border: none;
+      }
+      .@{app-prefix}-drawer-body{
+        padding: 0 54px 0 16px;
+        border: none;
+      }
+      .@{app-prefix}-drawer-header-title{
+        flex-direction: row-reverse;
+      }
+      .@{app-prefix}-drawer-title{
+        .font-family-medium();
+
+        line-height: 28px;
+        color: @font-2;
+        font-size: 18px;
+      }
+    }
+  }
+}

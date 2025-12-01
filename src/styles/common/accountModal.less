@@ -1,0 +1,98 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+.account-modal {
+  .@{app-prefix}-modal-header {
+    .@{app-prefix}-modal-title .@{app-prefix}-col {
+      text-align: left !important;
+    }
+  }
+  .@{app-prefix}-modal-body {
+    padding: 24px;
+  }
+  .account-modal-info-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .account-modal-info-label {
+      line-height: 22px;
+      font-size: 14px;
+      color: @font-5;
+      .font-family-medium();
+    }
+    .account-modal-info-assets {
+      display: flex;
+      align-items: center;
+      line-height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      color: @font-12;
+      min-width: 100px;
+      margin-left: 8px;
+      justify-content: flex-end;
+      .font-family-medium();
+
+      &-arrow {
+        margin-left: 8px;
+        transform: rotateZ(-90deg);
+      }
+    }
+  }
+
+  .account-modal-card {
+    border: 0;
+    border-radius: 2px;
+    .@{app-prefix}-card-body {
+      padding: 0;
+      .account-modal-account {
+        font-size: 14px;
+        .font-family-medium();
+        .anticon {
+          margin-right: 5px;
+        }
+      }
+      .account-modal-copy {
+        color: @font-5;
+        font-size: 14px;
+        height: 18px;
+        line-height: 18px;
+        margin-left: 8px;
+        .anticon {
+          margin-right: 2px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  .account-modal-button {
+    width: 100%;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    .@{app-prefix}-btn-primary {
+      height: 40px;
+      // width: calc(49% - 8px);
+      // margin: 0 4px;
+      flex: 1;
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+
+  .account-modal-card-box {
+    display: flex;
+    &-icon {
+      margin-right: 16px;
+      font-size: 48px;
+    }
+    &-link {
+      line-height: 24px;
+      margin-top: 0;
+      height: 24px;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+@import '/src/assets/theme/color.less';
+
+.result-modal {
+  :global {
+    .@{app-prefix}-modal-body {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+  .result-modal-body {
+    gap: 16px;
+  }
+  .result-description-wrap {
+    gap: 10px;
+    padding: 16px 0;
+  }
+  .result-icon {
+    width: 64px;
+    height: 64px;
+  }
+  .result-description {
+    color: @font-13;
+    text-align: center;
+    line-height: 20px;
+  }
+  .result-button {
+    width: 100%;
+  }
+}

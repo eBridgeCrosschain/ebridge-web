@@ -1,0 +1,84 @@
+@import 'src/assets/theme/constants.less';
+@import 'src/assets/theme/font.less';
+
+.creation-progress-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.creation-progress-title {
+  .font-family-semibold();
+
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.creation-progress-steps {
+  padding-bottom: 16px;
+  :global {
+    .@{app-prefix}-steps-item-title {
+      font-size: 14px !important;
+    }
+  }
+}
+
+.creation-progress-remind {
+  margin-top: 24px;
+}
+
+.creation-progress-button-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+
+  .creation-progress-button {
+    flex: 1;
+    height: 48px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+
+.creation-progress-drawer {
+  :global {
+    .@{app-prefix}-drawer-content-wrapper {
+      max-height: 80%;
+    }
+    .@{app-prefix}-drawer-header {
+      border-bottom: none;
+    }
+    .@{app-prefix}-drawer-body {
+      padding: 16px;
+    }
+  }
+  .creation-progress-title-wrapper {
+    margin-left: 28px;
+  }
+  .creation-progress-title {
+    flex: 1;
+    text-align: center;
+    .font-family-medium();
+
+  }
+}
+
+.creation-progress-modal {
+  :global {
+    .@{app-prefix}-modal-header {
+      height: auto;
+      padding-top: 24px;
+      padding-bottom: 8px;
+    }
+    .@{app-prefix}-modal-title {
+      text-align: left;
+      font-size: 20px;
+      line-height: 28px;
+    }
+    .@{app-prefix}-modal-body {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+}

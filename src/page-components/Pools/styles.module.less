@@ -1,0 +1,72 @@
+@import '/src/assets/theme/color.less';
+@import '/src/assets/theme/font.less';
+@import '/src/assets/theme/constants.less';
+.tooltip-content {
+  .tooltip-title {
+    color: @font-15;
+  }
+  ol {
+    margin-left: 18px;
+    margin-bottom: 0;
+    list-style-type: decimal;
+  }
+}
+
+.pools-page {
+  min-width: 0;
+  width: 100%;
+}
+
+.pool-page-component-wrap {
+  max-width: 893px;
+  width: auto;
+  margin: 0 auto 24px;
+  padding: 32px;
+  background-color: @bg-2;
+  border-radius: 16px;
+  border: 1px solid @border-5;
+}
+
+.page-overview-row {
+  background: transparent;
+  border-width: 0;
+  padding: 0;
+}
+
+.page-overview-card {
+  padding: 24px 24px 24px 32px;
+  background-color: @bg-2;
+  border-radius: 16px;
+  border: 1px solid @border-5;
+  font-size: 14px;
+  .page-overview-data {
+    margin-top: 12px;
+    color: @font-15;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+  }
+  .page-overview-title-row {
+    white-space: nowrap;
+    color: @font-13;
+  }
+}
+.question-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+@media screen and (max-width: @md-width) {
+  .pool-page-component-wrap {
+    margin: 0;
+    padding: 24px 12px;
+  }
+  .page-overview-card {
+    padding: 16px 12px;
+    margin: 0;
+  }
+  .page-overview-row {
+    margin-bottom: 16px;
+  }
+}

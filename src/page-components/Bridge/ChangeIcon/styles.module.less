@@ -1,0 +1,21 @@
+@import '/src/assets/theme/constants.less';
+@import '/src/assets/theme/color.less';
+
+.change-body {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid @border-5;
+}
+
+.change-icon {
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+}
+
+@media screen and (max-width: @md-width) {
+  .change-icon {
+    transform: rotate(0);
+  }
+}

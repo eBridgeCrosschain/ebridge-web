@@ -1,0 +1,217 @@
+{
+  "ELF": {
+    "AELF": { "name": "Native Token", "decimals": 8, "symbol": "ELF", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "Native Token", "decimals": 8, "symbol": "ELF", "address": "", "issueChainId": 9992731 },
+    "1": {
+      "name": "ELF Token",
+      "decimals": 18,
+      "symbol": "ELF",
+      "address": "0xbf2179859fc6D5BEE9Bf9158632Dc51678a4100e"
+    }
+  },
+  "ETH": {
+    "AELF": {
+      "name": "ETH",
+      "decimals": 8,
+      "symbol": "ETH",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "ETH",
+      "decimals": 8,
+      "symbol": "ETH",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "1": {
+      "name": "ETH Token",
+      "decimals": 18,
+      "symbol": "ETH",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "isNativeToken": true
+    },
+    "8453": {
+      "name": "ETH Token",
+      "decimals": 18,
+      "symbol": "ETH",
+      "address": "0x4200000000000000000000000000000000000006",
+      "isNativeToken": true
+    }
+  },
+  "BNB": {
+    "AELF": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 },
+    "56": {
+      "name": "BNB Token",
+      "decimals": 18,
+      "symbol": "BNB",
+      "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      "isNativeToken": true
+    }
+  },
+  "USDC": {
+    "AELF": {
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "1": {
+      "name": "USDC Token",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    "56": {
+      "name": "USDC Token",
+      "decimals": 18,
+      "symbol": "USDC",
+      "address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    },
+    "8453": {
+      "name": "USDC Token",
+      "decimals": 6,
+      "symbol": "USDC",
+      "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+    }
+  },
+  "USDT": {
+    "AELF": {
+      "name": "USDT",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "USDT",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "1": {
+      "name": "USDT Token",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    },
+    "56": {
+      "name": "USDT Token",
+      "decimals": 18,
+      "symbol": "USDT",
+      "address": "0x55d398326f99059ff775485246999027b3197955"
+    },
+    "1100": {
+      "name": "USDT Token",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
+    }
+  },
+  "DAI": {
+    "AELF": {
+      "name": "DAI",
+      "decimals": 8,
+      "symbol": "DAI",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "DAI",
+      "decimals": 8,
+      "symbol": "DAI",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "1": {
+      "name": "DAI Token",
+      "decimals": 18,
+      "symbol": "DAI",
+      "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    },
+    "56": {
+      "name": "DAI Token",
+      "decimals": 18,
+      "symbol": "DAI",
+      "address": "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3"
+    },
+    "8453": {
+      "name": "DAI Token",
+      "decimals": 18,
+      "symbol": "DAI",
+      "address": "0x50c5725949a6f0c72e6c4a641f24049a917db0cb"
+    }
+  },
+  "SGR": {
+    "1": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR",
+      "address": "0x478156DeAbfAc918369044D52A6BdB5Cc5597994"
+    },
+    "tDVV": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR-1",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "Schrodinger",
+      "decimals": 8,
+      "symbol": "SGR-1",
+      "address": "",
+      "issueChainId": 9992731
+    }
+  },
+  "WRITE": {
+    "AELF": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 }
+  },
+  "READ": {
+    "AELF": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 }
+  },
+  "STORAGE": {
+    "AELF": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 }
+  },
+  "TRAFFIC": {
+    "AELF": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 }
+  },
+  "CPU": {
+    "AELF": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 }
+  },
+  "RAM": {
+    "AELF": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 }
+  },
+  "DISK": {
+    "AELF": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 }
+  },
+  "NET": {
+    "AELF": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 }
+  }
+}

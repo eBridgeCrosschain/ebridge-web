@@ -1,0 +1,136 @@
+{
+  "ELF": {
+    "AELF": { "name": "Native Token", "decimals": 8, "symbol": "ELF", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "Native Token", "decimals": 8, "symbol": "ELF", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "Native Token", "decimals": 8, "symbol": "ELF", "address": "", "issueChainId": 9992731 },
+    "97": {
+      "name": "ELF Token",
+      "decimals": 18,
+      "symbol": "ELF",
+      "address": "0xd1CD51a8d28ab58464839ba840E16950A6a635ad"
+    },
+    "11155111": {
+      "name": "ELF Token",
+      "decimals": 18,
+      "symbol": "ELF",
+      "address": "0x8adD57b8aD6C291BC3E3ffF89F767fcA08e0E7Ab"
+    }
+  },
+  "USDT": {
+    "AELF": {
+      "name": "USDT",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "USDT",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "USDT",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "97": {
+      "name": "USDT Token",
+      "decimals": 18,
+      "symbol": "USDT",
+      "address": "0x3F280eE5876CE8B15081947E0f189E336bb740A5"
+    },
+    "11155111": {
+      "name": "USDT Token",
+      "decimals": 6,
+      "symbol": "USDT",
+      "address": "0x60eeCc4d19f65B9EaDe628F2711C543eD1cE6679"
+    }
+  },
+  "ETH": {
+    "AELF": {
+      "name": "ETH",
+      "decimals": 8,
+      "symbol": "ETH",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVV": {
+      "name": "ETH",
+      "decimals": 8,
+      "symbol": "ETH",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "tDVW": {
+      "name": "ETH",
+      "decimals": 8,
+      "symbol": "ETH",
+      "address": "",
+      "issueChainId": 9992731
+    },
+    "11155111": {
+      "name": "ETH Token",
+      "decimals": 18,
+      "symbol": "ETH",
+      "address": "0x035900292c309d8beCBCAFb3227238bec0EBa253",
+      "isNativeToken": true
+    }
+  },
+  "BNB": {
+    "AELF": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 },
+    "97": {
+      "name": "BNB Token",
+      "decimals": 18,
+      "symbol": "BNB",
+      "address": "0x0CBAb7E71f969Bfb3eF5b13542E9087a73244F02",
+      "isNativeToken": true
+    },
+    "tDVW": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "BNB Token", "decimals": 8, "symbol": "BNB", "address": "", "issueChainId": 9992731 }
+  },
+  "WRITE": {
+    "AELF": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "WRITE Token", "decimals": 8, "symbol": "WRITE", "address": "", "issueChainId": 9992731 }
+  },
+  "READ": {
+    "AELF": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "READ Token", "decimals": 8, "symbol": "READ", "address": "", "issueChainId": 9992731 }
+  },
+  "STORAGE": {
+    "AELF": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "STORAGE Token", "decimals": 8, "symbol": "STORAGE", "address": "", "issueChainId": 9992731 }
+  },
+  "TRAFFIC": {
+    "AELF": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "TRAFFIC Token", "decimals": 8, "symbol": "TRAFFIC", "address": "", "issueChainId": 9992731 }
+  },
+  "CPU": {
+    "AELF": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "CPU Token", "decimals": 8, "symbol": "CPU", "address": "", "issueChainId": 9992731 }
+  },
+  "RAM": {
+    "AELF": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "RAM Token", "decimals": 8, "symbol": "RAM", "address": "", "issueChainId": 9992731 }
+  },
+  "DISK": {
+    "AELF": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "DISK Token", "decimals": 8, "symbol": "DISK", "address": "", "issueChainId": 9992731 }
+  },
+  "NET": {
+    "AELF": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 },
+    "tDVV": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 },
+    "tDVW": { "name": "NET Token", "decimals": 8, "symbol": "NET", "address": "", "issueChainId": 9992731 }
+  }
+}
